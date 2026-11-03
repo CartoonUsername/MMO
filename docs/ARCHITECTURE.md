@@ -80,6 +80,10 @@ Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur 
 
 `World` (`mmo_world/world.py`) verdrahtet CEE, Inventar, Register und Dienste. `mmo_world.persistence` speichert Historien (Hash-Ketten) und einen Weltsnapshot (Tag, Inventar, Register, Zähler, Zustands-Hashes) in atomaren Generationen (`Store`); `import_world` prüft beim Laden Format, Regel-Hashes, Ketten, abgeleiteten Zustand und Querbezüge und wirft sonst `PersistenceError`. Format-Migration über `MIGRATIONS`; Regelversionswechsel ist bewusst keine stille Migration (Vorschlag: aufgezeichnetes Migrationsereignis). Bekannte Lücke: Inventar ohne Besitzjournal.
 
+## Markt und Preisbildung (ADR-0015)
+
+`Exchange` (`mmo_world/exchange.py`): Orderbuch je Gut+Güteklasse mit Limit-Orders, Hinterlegung im Treuhandkonto, Preis-Zeit-Priorität (Preis der wartenden Order), Teilausführung, IOC, keine Selbstausführung, Preisband um den CEE-Referenzwert, Gebühr in die Geldsenke, Verfall nach Tagen, Preisindex (letzter Preis, gleitender Durchschnitt, Tagesverlauf). Ausführungen laufen über den `TradeService` (CEE-Berichte unverändert). Regeln: `market_rules_v1.json` (Platzhalter).
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

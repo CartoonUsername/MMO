@@ -17,12 +17,14 @@ from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
 from .discovery import DiscoveryRegistry
+from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
 from .market import TradeService
 from .service import DiscoveryService
 
 CEE_RULES = "rules_v7.json"
 COMPANY_RULES = "company_rules_v1.json"
+MARKET_RULES = "market_rules_v1.json"
 
 
 class World:
@@ -44,8 +46,18 @@ class World:
         self.crafting = CraftingService(self.svc, self.inv, clock, sid)
         self.trading = TradeService(self.svc, self.inv, clock, sid)
         self.company = CompanyService(self.svc, self.inv, self.company_registry, clock, sid)
+        old = getattr(self, "exchange", None)
+        self.exchange = Exchange(self.svc, self.inv, self.trading, load_market_rules(MARKET_RULES), clock, sid)
+        if old is not None:
+            self.exchange._counter, self.exchange.orders, self.exchange.stats = old._counter, old.orders, old.stats
 
     def snapshot(self) -> dict[str, Any]:
+        snap = self._base_snapshot()
+        if self.exchange.active:  # ältere Snapshots/Vektoren ohne Markt bleiben unverändert
+            snap["exchange"] = json.loads(self.exchange.to_json())
+        return snap
+
+    def _base_snapshot(self) -> dict[str, Any]:
         return {"day": self.day[0], "inventory": json.loads(self.inv.to_json()),
                 "discovery": json.loads(self.discovery_registry.to_json()),
                 "companies": json.loads(self.company_registry.to_json()),

@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Gebühren, Fristen, Limits und Preisband sind Vorschläge, KEINE bestätigten Spielinhalte. Ganzzahlen; Divisionen als Floor.",
+  "requires_cee_rules_min": 7,
+  "fee_permille": 20,
+  "band_permille": 250,
+  "order_days": 7,
+  "max_open_orders": 10,
+  "ema_alpha_permille": 200,
+  "history_days": 30
+}

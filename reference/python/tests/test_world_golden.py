@@ -63,6 +63,7 @@ class WorldGoldenTests(unittest.TestCase):
             "final_hash": lambda v: v["scenarios"][0].update(final_world_sha256="f" * 64),
             "cee_rules_hash": lambda v: v.update(cee_rules_sha256="0" * 64),
             "company_rules_hash": lambda v: v.update(company_rules_sha256="0" * 64),
+            "market_rules_hash": lambda v: v.update(market_rules_sha256="0" * 64),
             "format": lambda v: v.update(format=2),
         }
         for name, fn in cases.items():
@@ -74,7 +75,7 @@ class WorldGoldenTests(unittest.TestCase):
         used_err = {s["op"] for s in self.steps if s["expect"] == "error"}
         self.assertEqual(set(OPS) - used_ok, set())
         # Operationen ohne Fehlerfall: reine Hilfsschritte
-        self.assertEqual(set(OPS) - used_err, {"cee_create", "day", "disclosure"})
+        self.assertEqual(set(OPS) - used_err, {"cee_create", "day"})
 
     def test_errors_are_known_classes_and_carry_no_texts(self):
         classes = {s["error"] for s in self.steps if s["expect"] == "error"}
@@ -162,6 +163,22 @@ class WorldGoldenTests(unittest.TestCase):
         close = next(s for s in self.by_name["company_poach_close"]["steps"] if s["op"] == "close" and s["expect"] == "ok")
         self.assertEqual(set(close["result"]), {"boss", "inv"})
         self.assertLess(close["result"]["boss"], close["result"]["inv"])
+
+    def test_market_scenarios_cover_the_exchange(self):
+        steps = self.by_name["market_orderbook"]["steps"]
+        places = [s for s in steps if s["op"] == "market_place" and s["expect"] == "ok"]
+        fills = [f for s in places for f in s["result"]["fills"]]
+        self.assertTrue(any(s["result"]["order_id"] is None and s["result"]["remaining"] > 0 for s in places))  # IOC-Rest
+        self.assertTrue(any(s["result"]["order_id"] and s["result"]["fills"] for s in places))  # Teilausführung mit Rest im Buch
+        self.assertGreaterEqual(len({f["unit_price"] for f in fills}), 4)
+        self.assertTrue(all(f["total"] == f["unit_price"] * f["quantity"] and f["fee"] == f["total"] * 20 // 1000 for f in fills))
+        fin = self.by_name["market_orderbook"]["final"]
+        self.assertEqual(set(fin["exchange"]["stats"]), {"iron_blade@fine", "iron_blade@common"})
+        self.assertEqual(fin["inventory"]["world:sink"][COIN], sum(f["fee"] for f in fills))
+        rnd = self.by_name["random_market_3"]["steps"]
+        self.assertGreaterEqual(sum(1 for s in rnd if s["op"] == "market_place" and s["expect"] == "ok" and s["result"]["fills"]), 15)
+        self.assertTrue(any(s["op"] == "market_cancel" and s["expect"] == "ok" for s in rnd))
+        self.assertTrue(any(s["op"] == "market_expire" and s["result"] for s in rnd if s["expect"] == "ok"))
 
     def test_random_scripts_are_deterministic_state_aware_and_mostly_valid(self):
         a, b = golden.random_script(4, 260), golden.random_script(4, 260)

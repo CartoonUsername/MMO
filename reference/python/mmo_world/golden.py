@@ -12,6 +12,7 @@ Format und Prüfverfahren für Ports: reference/golden/README.md (Abschnitt Welt
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import sys
@@ -24,7 +25,7 @@ from mmo_cee.history import _canonical as canonical_bytes
 
 from .company import goal_of, load_company_rules
 from .errors import WorldError
-from .world import CEE_RULES, COMPANY_RULES, World
+from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, World
 
 FORMAT_VERSION = 1
 Op = dict[str, Any]
@@ -83,6 +84,11 @@ def _set_day(env: Env, a: Op) -> None:
     env.day[0] = a["value"]
 
 
+def _place(env: Env, a: Op) -> Any:
+    r = env.exchange.place(a["char"], a["side"], a["item_key"], a["qty"], a["price"], a.get("ioc", False))
+    return {"order_id": r.order_id, "remaining": r.remaining, "fills": [dataclasses.asdict(f) for f in r.fills]}
+
+
 def _complete(env: Env, a: Op) -> Any:
     ev = env.discovery.complete(a["char"], a["discovery"])
     return {"credit": ev.payload["credit"], "event_hash": ev.hash}
@@ -118,6 +124,9 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "vote": lambda e, a: e.company.vote(a["char"], a["company"], a["proposal"], a["yes"]),
     "close": lambda e, a: e.company.close_company(a["actor"], a["company"]),
     "disclosure": _disclosure,
+    "market_place": _place,
+    "market_cancel": lambda e, a: e.exchange.cancel(a["char"], a["order"]),
+    "market_expire": lambda e, a: e.exchange.expire(a["value"]),
 }
 
 
@@ -431,6 +440,48 @@ def scenario_company_poach_close() -> list[Op]:
     ]
 
 
+def MP(char: str, side: str, qty: int, price: int, key: str = "iron_blade@fine", **kw: Any) -> Op:
+    return S("market_place", char=char, side=side, item_key=key, qty=qty, price=price, **kw)
+
+
+def scenario_market() -> list[Op]:
+    fine = "iron_blade@fine"  # Referenz 180 je Stück, Band 135..225
+    return [
+        *[op for c in "abcd" for op in (*person(c), D(c, COIN, 5000), D(c, fine, 30), D(c, "iron_blade@common", 10))],
+        MP("a", "sell", 5, 190),                                    # ord 1 wartet (Ware hinterlegt)
+        MP("b", "buy", 3, 170),                                     # ord 2 wartet (Münzen hinterlegt)
+        MP("c", "buy", 5, 200),                                     # zahlt den Preis der wartenden Order (190)
+        MP("a", "sell", 4, 200),                                    # ord: trifft nichts (Gebot 170 zu niedrig)
+        MP("d", "sell", 2, 170),                                    # trifft Gebot 170 von b (Teilausführung)
+        MP("d", "sell", 3, 170),                                    # 1 Stück ausgeführt, 2 warten im Buch
+        MP("a", "buy", 1, 150),                                     # eigene Verkaufsorder (200) wird nicht gegen sich selbst ausgeführt
+        MP("b", "sell", 6, 135, ioc=True),                          # IOC am Rand des Bandes, Rest verfällt
+        MP("b", "buy", 1, 226),                                     # über dem Band
+        MP("b", "buy", 1, 134),                                     # unter dem Band
+        MP("b", "buy", 1, 180, key="iron_blade"),                   # Schlüssel ohne Güteklasse
+        MP("b", "hold", 1, 180),                                    # ungültige Seite
+        MP("ghost", "buy", 1, 180),
+        MP("b", "buy", 2000, 180),                                  # Menge über dem Limit
+        MP("b", "buy", 1000, 180),                                  # nicht genug Münzen
+        S("market_cancel", char="b", order="srv1-ord-00000004"),    # fremde Order
+        S("market_cancel", char="a", order="srv1-ord-00000004"),    # eigene Verkaufsorder zurücknehmen
+        S("market_cancel", char="a", order="srv1-ord-00000004"),    # schon weg
+        *[MP("d", "sell", 1, 220 + i % 3) for i in range(9)],       # Order-Limit je Figur: 10 (eine wartet schon)
+        MP("d", "sell", 1, 221),
+        DAY(5),
+        MP("c", "buy", 10, 225),                                    # fegt das Buch leer (mehrere Preise, Preis-Zeit-Priorität)
+        DAY(9),
+        MP("a", "sell", 2, 200),
+        S("market_expire", value=15),                               # a's Order (Tag 9 + 7 = 16) bleibt, alte verfallen
+        S("market_expire", value=-1),
+        S("market_expire", value=16),
+        DAY(20),
+        MP("b", "sell", 3, 150, key="iron_blade@common"),
+        MP("c", "buy", 3, 150, key="iron_blade@common"),
+        S("disclosure", company="srv1-co-00000001"),
+    ]
+
+
 # ---------------------------------------------------------------- Zufallsskripte ---------
 class Rng:
     """Kleiner, in jeder Sprache nachbaubarer Zufall (xorshift32). Er dient nur zum ERZEUGEN der Skripte; die fertigen
@@ -556,6 +607,37 @@ def random_script(seed: int, steps: int) -> list[Op]:
     return script
 
 
+def random_market_script(seed: int, steps: int) -> list[Op]:
+    """Zustandsbewusstes Zufallsskript nur für den Markt (zwei Güter, fünf Figuren, wechselnde Tage)."""
+    rng, env = Rng(seed), Env()
+    script: list[Op] = []
+
+    def emit(op: Op) -> None:
+        script.append(op)
+        execute(env, op)
+
+    keys = ["iron_blade@fine", "iron_blade@common"]
+    for c in "abcde":
+        for op in (*person(c), D(c, COIN, 6000), D(c, keys[0], 40), D(c, keys[1], 40)):
+            emit(op)
+    ref = {keys[0]: 180, keys[1]: 120}
+    for _ in range(steps):
+        kind = rng.below(12)
+        if kind < 8:
+            k = rng.pick(keys)
+            emit(MP(rng.pick(list("abcde")), "buy" if rng.below(2) else "sell", 1 + rng.below(5), ref[k] * (70 + rng.below(60)) // 100, key=k,
+                    ioc=rng.below(5) == 0))
+        elif kind < 10 and env.exchange.orders:
+            oid = rng.pick(sorted(env.exchange.orders))
+            who = env.exchange.orders[oid]["char"] if rng.below(8) else "a"
+            emit(S("market_cancel", char=who, order=oid))
+        else:
+            n = env.day[0] + 1 + rng.below(4)
+            emit(DAY(n))
+            emit(S("market_expire", value=n))
+    return script
+
+
 # ---------------------------------------------------------------- Vektor ------------------
 NAME = "world_scenarios"
 RESULT_KEYS = ("expect", "result", "error", "world_sha256")
@@ -573,6 +655,10 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      "Veto, Ausführungsfehler, Geschäftsführer", scenario_company_governance),
     ("company_poach_close", "Firma: Abwerben (Annahme, schlechtere Angebote), Anteilsverkauf, Liquidation mit Rundungsrest",
      scenario_company_poach_close),
+    ("market_orderbook", "Markt: Orderbuch, Preis-Zeit-Priorität, Teilausführung, IOC, Preisband, Limits, Verfall, Preisindex",
+     scenario_market),
+    ("random_market_3", "Zustandsbewusstes Zufallsskript nur für den Markt (Seed 3, 220 Aktionen), ausgeschrieben",
+     lambda: random_market_script(3, 220)),
     ("random_world_4", "Zustandsbewusst erzeugtes Zufallsskript (Seed 4, 260 Schritte), ausgeschrieben",
      lambda: random_script(4, 260)),
     ("random_world_9", "Zustandsbewusst erzeugtes Zufallsskript (Seed 9, 260 Schritte), ausgeschrieben",
@@ -589,6 +675,7 @@ def run_scenario(name: str, description: str, script: list[Op]) -> dict[str, Any
 def build_vector() -> dict[str, Any]:
     return {"format": FORMAT_VERSION, "name": NAME, "cee_rules_file": CEE_RULES, "cee_rules_sha256": _sha("mmo_cee", CEE_RULES),
             "company_rules_file": COMPANY_RULES, "company_rules_sha256": _sha("mmo_world", COMPANY_RULES),
+            "market_rules_file": MARKET_RULES, "market_rules_sha256": _sha("mmo_world", MARKET_RULES),
             "scenarios": [run_scenario(n, d, f()) for n, d, f in SCENARIOS]}
 
 
@@ -605,6 +692,8 @@ def verify_vector(vec: dict[str, Any]) -> list[str]:
         errs.append("CEE-Regeldatei hat sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["company_rules_file"]) != vec["company_rules_sha256"]:
         errs.append("Firmenregeln haben sich geändert (SHA-256 weicht ab)")
+    if _sha("mmo_world", vec["market_rules_file"]) != vec["market_rules_sha256"]:
+        errs.append("Marktregeln haben sich geändert (SHA-256 weicht ab)")
     for sc in vec["scenarios"]:
         steps, final = run_script([strip_result(s) for s in sc["steps"]])
         for i, (got, want) in enumerate(zip(steps, sc["steps"])):
@@ -657,3 +746,4 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
+
