@@ -73,6 +73,7 @@ class ProductionService:
         validate_production_rules(rules, service.rules, companies.cr)
         self.day, self.server_id, self.coin = day_provider, server_id, companies.coin
         self.crafting = service.rules["crafting"]
+        self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None  # Postausgang (Weltverdrahtung)
         self.jobs: dict[str, dict[str, Any]] = {}
         self.npc_sold: dict[str, dict[str, int]] = {}
         self._counter = 0
@@ -263,6 +264,8 @@ class ProductionService:
                 del self.jobs[jid]
                 self.reg.log(c, d, "production_done", job=jid, recipe=j["recipe"], batches=j["batches"])
                 out.append({"day": d, "company": c["id"], "kind": "production_done", "job": jid})
+                for who in sorted({x for x in (c["founder"], c["ceo"]) if x is not None}):
+                    self.notify(who, "production.job_done", {"company": c["id"], "job": jid, "recipe": j["recipe"]})
         return out
 
     def _on_close(self, c: dict[str, Any]) -> None:

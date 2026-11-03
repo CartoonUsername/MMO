@@ -96,6 +96,10 @@ Ab `rules_v8.json` meldet der Server den Referenzwert jedes Handels (`payload.re
 
 `DirectTrade` (`mmo_world/direct_trade.py`): unveränderliche Angebote an genau eine Figur (verkaufen oder kaufen), Hinterlegung der Leistung im Treuhandkonto, Annahme/Ablehnung nur durch die Adressatin, Zurücknehmen durch den Anbieter, Frist, Limits, Gebühr. Die Annahme läuft durch den `TradeService` (CEE-Berichte); scheitert sie, bleibt das Angebot bestehen. Protokollbefehle `trade.*`, Abfrage `query.offers`.
 
+## Benachrichtigungen (ADR-0024)
+
+`Outbox` (`mmo_world/notifications.py`): Postfach je Figur mit Folgenummer, begrenzt, Abruf (`fetch`), Quittung (`ack`), Stummschaltung; die Weltdienste legen Nachrichten für Betroffene ab (Orderausführung/-verfall, Angebote, Firmen- und Produktionsereignisse, Wissen). Live-Push je Sitzung über `Gateway.on_push`, Zuverlässigkeit durch Abruf. Nicht Teil des Weltzustands, aber mit der Welt gesichert.
+
 ## Regelversions-Migration (ADR-0018)
 
 Eine Figur wechselt die Regelversion durch ein aufgezeichnetes Ereignis `identity.rules_migrated` (neue Version, Hash des Zustands davor, Fingerabdrücke beider Regeln). `RulesChain` (`mmo_cee/migration.py`) spielt Historien mit mehreren Regelversionen ab; `CharacterService.migrate()` hebt eine Figur um eine Stufe an. Nicht migrierte Figuren sind lesbar, aber für alle Aktionen gesperrt. `persistence.upgrade_world` hebt eine ganze Welt (oder eine Teilmenge der Figuren) auf eine höhere CEE-Regeldatei.

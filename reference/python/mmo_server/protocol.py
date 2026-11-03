@@ -63,6 +63,10 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("trade.accept", "char:s offer:s", "char", lambda w, a: _settle(w.offers.accept(a["char"], a["offer"]))),
     _c("trade.decline", "char:s offer:s", "char", lambda w, a: w.offers.decline(a["char"], a["offer"])),
     _c("trade.cancel", "char:s offer:s", "char", lambda w, a: w.offers.cancel(a["char"], a["offer"])),
+    # Benachrichtigungen: Postfach abrufen, quittieren, Arten stummschalten (Push läuft über den Transport; Abruf holt Verpasstes)
+    _c("notify.ack", "char:s upto:i", "char", lambda w, a: w.outbox.ack(a["char"], a["upto"])),
+    _c("notify.mute", "char:s kinds:l", "char", lambda w, a: w.outbox.mute(a["char"], a["kinds"])),
+    _c("notify.unmute", "char:s kinds:l", "char", lambda w, a: w.outbox.unmute(a["char"], a["kinds"])),
     # Kampfentwicklung: Fähigkeiten ausrüsten (Tag setzt der Server)
     _c("combat.set_loadout", "char:s abilities:l", "char",
        lambda w, a: w.svc.record(a["char"], "combat.loadout_set", {"abilities": a["abilities"], "day": w.day[0]}).hash),
@@ -101,6 +105,8 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.economic_profile", "char:s", "char", lambda w, a: w.svc.economic_profile(a["char"]), mutating=False),
     _c("query.offers", "char:s", "char", lambda w, a: {"outgoing": [w.offers.offers[k] for k in w.offers.open_offers(a["char"])["outgoing"]],
                                                        "incoming": [w.offers.offers[k] for k in w.offers.open_offers(a["char"])["incoming"]]},
+       mutating=False),
+    _c("notify.fetch", "char:s after:i? limit:i?", "char", lambda w, a: w.outbox.fetch(a["char"], a.get("after", 0), a.get("limit", 50)),
        mutating=False),
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),

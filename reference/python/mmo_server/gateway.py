@@ -69,6 +69,8 @@ class Gateway:
         self.rules = rules or load_protocol_rules()
         self._seen: dict[str, OrderedDict[str, tuple[str, dict[str, Any]]]] = {}  # Konto -> Anfrage-ID -> (Fingerabdruck, Antwort)
         self._buckets: dict[tuple[str, str], list[int]] = {}  # (Figur, Gruppe) -> [Marken, letzter Tick]
+        self._push: dict[str, list[Callable[[str, dict[str, Any]], None]]] = {}  # Sitzung -> Rückrufe
+        world.outbox.listeners.append(self._dispatch_push)
         self.audit: list[dict[str, Any]] = []
         self._audit_head = "0" * 64
 
@@ -115,6 +117,22 @@ class Gateway:
         self.audit.append(entry)
         if len(self.audit) > self.rules["audit_limit"]:
             del self.audit[0]
+
+    # -- Live-Push (die Transportschicht liefert den Rückruf; Verpasstes holt `notify.fetch`) ------------
+    def on_push(self, session_id: str, callback: Callable[[str, dict[str, Any]], None]) -> None:
+        """Meldet einen Rückruf (Figur, Benachrichtigung) für die Figuren dieser Sitzung an."""
+        if self.sessions.get(session_id) is None:
+            raise ValueError("Unbekannte Sitzung")
+        self._push.setdefault(session_id, []).append(callback)
+
+    def _dispatch_push(self, recipient: str, item: dict[str, Any]) -> None:
+        for sid, callbacks in list(self._push.items()):
+            sess = self.sessions.get(sid)
+            if sess is None:
+                del self._push[sid]  # Sitzung beendet
+            elif recipient in sess["characters"]:
+                for cb in callbacks:
+                    cb(recipient, item)
 
     # -- Eingang -------------------------------------------------------------------------------------
     def handle(self, session_id: str, raw: str | bytes | dict[str, Any]) -> dict[str, Any]:

@@ -75,6 +75,7 @@ class Exchange:
         validate_market_rules(rules, service.rules)
         self.cee, self.inv, self.trading, self.mr, self.day, self.server_id = service, inventory, trading, rules, day_provider, server_id
         self.coin = trading.coin
+        self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None  # Weltdienst setzt den Postausgang
         self.orders: dict[str, dict[str, Any]] = {}
         self.stats: dict[str, dict[str, Any]] = {}
         self._counter = 0
@@ -175,7 +176,9 @@ class Exchange:
             raise WorldError("day ungültig")
         gone = sorted(k for k, o in self.orders.items() if o["expires"] <= day)
         for k in gone:
+            owner = self.orders[k]["char"]
             self._remove(self.orders[k], refund=True)
+            self.notify(owner, "market.expired", {"order": k})
         return gone
 
     # -- Ausführung ---------------------------------------------------------------------
@@ -191,7 +194,11 @@ class Exchange:
                 continue  # keine Selbstausführung
             buy, sell = (inc, rest) if inc["side"] == "buy" else (rest, inc)
             q = min(inc["remaining"], rest["remaining"])
-            fills.append(self._execute(buy, sell, q, rest["price"]))
+            fill = self._execute(buy, sell, q, rest["price"])
+            fills.append(fill)
+            self.notify(rest["char"], "market.fill", {"order": rest["id"], "item_key": fill.item_key, "qty": fill.quantity,
+                                                       "unit_price": fill.unit_price, "trade_id": fill.trade_id,
+                                                       "role": "buyer" if rest is buy else "seller"})
 
     def _execute(self, buy: dict[str, Any], sell: dict[str, Any], q: int, unit: int) -> Fill:
         total = q * unit

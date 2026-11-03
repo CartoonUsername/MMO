@@ -70,6 +70,9 @@ def export_world(world: World) -> tuple[Envelope, Logs]:
                   "pricing_sha256": _file_sha("mmo_world", PRICING_RULES) if world.pricing is not None else None},
         "world": snap, "world_sha256": _sha(snap), "log_heads": heads,
     }
+    if world.outbox.active:  # Postfächer sind abgeleitet und nicht Teil des Weltzustands, werden aber mit gesichert
+        boxes = json.loads(world.outbox.to_json())
+        env["outbox"], env["outbox_sha256"] = boxes, _sha(boxes)
     return env, logs
 
 
@@ -181,6 +184,10 @@ def _import(envelope: Envelope, logs: Logs) -> World:
     if (world.pricing is not None) != (rules["pricing_file"] is not None):
         raise PersistenceError("Preisregeln passen nicht zu den CEE-Regeln")
     world.day[0] = env["saved_day"]
+    if "outbox" in env:
+        if _sha(env["outbox"]) != env.get("outbox_sha256"):
+            raise PersistenceError("Postfächer passen nicht zu ihrem Hash")
+        world.outbox.load(json.dumps(env["outbox"]))
     snap = env["world"]
     world.inv = Inventory.from_json(json.dumps(snap["inventory"]))
     world.discovery_registry = DiscoveryRegistry.from_json(world.svc.rules, json.dumps(snap["discovery"]))

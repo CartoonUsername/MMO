@@ -56,6 +56,7 @@ class DirectTrade:
         validate_trade_rules(rules, service.rules)
         self.cee, self.inv, self.trading, self.tr, self.day, self.server_id = service, inventory, trading, rules, day_provider, server_id
         self.coin = trading.coin
+        self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None
         self.offers: dict[str, dict[str, Any]] = {}
         self._counter = 0
 
@@ -109,6 +110,8 @@ class DirectTrade:
             self._counter -= 1
             raise
         self.offers[oid] = o
+        self.notify(counterparty, "trade.offer_received", {"offer": oid, "from": proposer, "side": side, "item_key": item_key,
+                                                           "qty": qty, "price": price, "expires": o["expires"]})
         return oid
 
     def _refund(self, o: dict[str, Any]) -> None:
@@ -137,6 +140,7 @@ class DirectTrade:
             self.inv.apply(seller, {self.coin: fee}, {})
             self.inv.deposit(SINK, self.coin, fee)
         del self.offers[offer_id]
+        self.notify(o["from"], "trade.offer_accepted", {"offer": offer_id, "by": character_id, "trade_id": res.trade_id})
         return Settlement(res, fee)
 
     def decline(self, character_id: str, offer_id: str) -> None:
@@ -145,6 +149,7 @@ class DirectTrade:
         if o["to"] != character_id:
             raise WorldError("Nur die angesprochene Figur kann ablehnen")
         self._refund(o)
+        self.notify(o["from"], "trade.offer_declined", {"offer": offer_id, "by": character_id})
 
     def cancel(self, character_id: str, offer_id: str) -> None:
         self.day()
@@ -152,6 +157,7 @@ class DirectTrade:
         if o["from"] != character_id:
             raise WorldError("Nur der Anbieter kann das Angebot zurücknehmen")
         self._refund(o)
+        self.notify(o["to"], "trade.offer_cancelled", {"offer": offer_id, "by": character_id})
 
     def expire(self, day: int) -> list[str]:
         """Serverinterner Tagesschritt: räumt verfallene Angebote ab (Rückgabe der Hinterlegung)."""
@@ -159,7 +165,10 @@ class DirectTrade:
             raise WorldError("day ungültig")
         gone = sorted(k for k, o in self.offers.items() if o["expires"] <= day)
         for k in gone:
-            self._refund(self.offers[k])
+            o = self.offers[k]
+            self._refund(o)
+            for who in (o["from"], o["to"]):
+                self.notify(who, "trade.offer_expired", {"offer": k})
         return gone
 
     # -- Invarianten und Persistenz -------------------------------------------------------------

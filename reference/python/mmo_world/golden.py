@@ -165,6 +165,10 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "prod_start": lambda e, a: e.production.start(a["actor"], a["company"], a["worker"], a["recipe"], a["batches"], a["grade"]),
     "prod_cancel": lambda e, a: e.production.cancel(a["actor"], a["company"], a["job"]),
     "prod_sell": lambda e, a: e.production.sell_to_npc(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "notify_fetch": lambda e, a: e.outbox.fetch(a["char"], a.get("after", 0), a.get("limit", 50)),
+    "notify_ack": lambda e, a: e.outbox.ack(a["char"], a["upto"]),
+    "notify_mute": lambda e, a: e.outbox.mute(a["char"], a["kinds"]),
+    "notify_unmute": lambda e, a: e.outbox.unmute(a["char"], a["kinds"]),
     "offer_make": lambda e, a: e.offers.make(a["char"], a["to"], a["side"], a["item_key"], a["qty"], a["price"]),
     "offer_accept": lambda e, a: _accept(e, a),
     "offer_decline": lambda e, a: e.offers.decline(a["char"], a["offer"]),
@@ -595,6 +599,47 @@ def scenario_direct_trade() -> list[Op]:
     ]
 
 
+def scenario_notifications() -> list[Op]:
+    fine = "iron_blade@fine"
+    NF = lambda c, after=0, limit=50: S("notify_fetch", char=c, after=after, limit=limit)  # noqa: E731
+    c1 = co(1)
+    return [
+        *[op for c in ("boss", "emp", "inv", "t", "u") for op in (*person(c, trade=700), D(c, COIN, 20000), D(c, fine, 30), D(c, "iron_ore@standard", 60))],
+        S("notify_mute", char="u", kinds=["market.fill"]),
+        S("notify_mute", char="u", kinds=["no.such.kind"]), S("notify_mute", char="u", kinds=[]),
+        # Orderbuch: wartende Order wird ausgeführt, andere verfällt
+        MP("t", "sell", 2, 190), MP("u", "buy", 2, 190), MP("u", "sell", 1, 200), MP("t", "buy", 1, 200),   # u ist stumm für Ausführungen
+        MP("inv", "buy", 1, 150), DAY(9), S("market_expire", value=9),
+        # Direkter Handel
+        S("offer_make", char="t", to="u", side="sell", item_key=fine, qty=1, price=180),
+        S("offer_make", char="u", to="t", side="buy", item_key=fine, qty=1, price=170),
+        S("offer_accept", char="u", offer="srv1-off-00000001"), S("offer_decline", char="t", offer="srv1-off-00000002"),
+        S("offer_make", char="t", to="u", side="sell", item_key=fine, qty=1, price=180), S("offer_cancel", char="t", offer="srv1-off-00000003"),
+        S("offer_make", char="t", to="u", side="sell", item_key=fine, qty=1, price=180), DAY(15), S("offer_expire", value=15),
+        # Firma
+        S("found", char="boss", capital=5000),
+        S("hire", actor="boss", company=c1, char="emp", wage=40), S("hire", actor="boss", company=c1, char="inv", wage=40),
+        S("offer_shares", char="boss", company=c1, qty=300, price=5),         # noch kein anderer Gesellschafter: niemand wird benachrichtigt
+        DAY(23), S("purchase", char="inv", company=c1, offer=f"{c1}-offer-1", qty=300, ack="$disclosure"),
+        S("offer_shares", char="boss", company=c1, qty=100, price=6),         # inv ist jetzt Gesellschafter und erfährt vom Angebot
+        S("propose", char="boss", company=c1, kind="appoint_ceo", candidate="emp"),    # Kandidat nicht Manager: abgelehnt, keine Nachricht
+        S("advance_day", value=23),
+        S("demote", actor="boss", company=c1, char="emp"),
+        S("close", actor="boss", company=c1),
+        # Wissen
+        *[op for c in ("m1", "m2") for op in person(c, smithing=700)],
+        G("m1", "iron_folding", "ore_sample_a"), G("m1", "iron_folding", "ore_sample_b"), G("m1", "iron_folding", "forge_trial"),
+        S("disc_complete", char="m1", discovery="iron_folding"), DAY(40), S("disc_teach", teacher="m1", learner="m2", discovery="iron_folding"),
+        # Abruf, Quittung, Stummschalten
+        NF("t"), NF("u"), NF("boss"), NF("emp"), NF("inv"), NF("m2"),
+        NF("t", 1, 2), S("notify_fetch", char="t", after=-1), S("notify_fetch", char="t", limit=0), S("notify_fetch", char="t", limit=101),
+        S("notify_ack", char="t", upto=2), NF("t"), S("notify_ack", char="t", upto=99), S("notify_ack", char="t", upto=-1),
+        S("notify_unmute", char="u", kinds=["market.fill"]), S("notify_unmute", char="u", kinds=["market.fill"]),
+        S("notify_unmute", char="u", kinds=["no.such.kind"]),
+        NF("nobody"),
+    ]
+
+
 def scenario_market() -> list[Op]:
     fine = "iron_blade@fine"  # Referenz 180 je Stück, Band 135..225
     return [
@@ -913,6 +958,8 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      scenario_production),
     ("direct_trade", "Direkter Handel: Angebot/Annahme, Hinterlegung, Ablehnen/Zurücknehmen, Fristen, Limits, Gebühr",
      scenario_direct_trade),
+    ("notifications", "Benachrichtigungen: Arten und Empfänger aus Markt, Angeboten, Firma, Produktion, Wissen; Abruf, Quittung, Stummschaltung",
+     scenario_notifications),
     ("market_orderbook", "Markt: Orderbuch, Preis-Zeit-Priorität, Teilausführung, IOC, Preisband, Limits, Verfall, Preisindex",
      scenario_market),
     ("random_market_3", "Zustandsbewusstes Zufallsskript nur für den Markt (Seed 3, 220 Aktionen), ausgeschrieben",

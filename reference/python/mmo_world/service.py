@@ -14,6 +14,7 @@ from .errors import WorldError
 class DiscoveryService:
     def __init__(self, service: CharacterService, registry: DiscoveryRegistry, day_provider: Callable[[], int]) -> None:
         self.cee, self.registry, self.day = service, registry, day_provider
+        self.notify: Callable[[str, str, dict], None] = lambda recipient, kind, data: None  # Postausgang (Weltverdrahtung)
 
     def gather(self, character_id: str, discovery_id: str, evidence_id: str) -> Event:
         """Beweis sammeln (vom Server ausgelöst, jede Beweis-ID je Figur nur einmal)."""
@@ -54,4 +55,5 @@ class DiscoveryService:
         except RuleViolation as e:
             raise WorldError(f"Schüler erfüllt die Voraussetzungen nicht: {e}") from e
         self.registry.note_learned(learner_id, discovery_id, teacher_id, day)
+        self.notify(learner_id, "discovery.taught", {"discovery": discovery_id, "teacher": teacher_id})
         return event

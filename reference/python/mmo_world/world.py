@@ -18,6 +18,7 @@ from .company_service import CompanyService
 from .crafting import CraftingService
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
+from .notifications import Outbox
 from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
 from .market import TradeService
@@ -41,6 +42,7 @@ class World:
         self.inv = Inventory()
         self.day = [1]
         clock = lambda: self.day[0]  # noqa: E731
+        self.outbox = Outbox(clock)
         self.discovery_registry = DiscoveryRegistry(self.svc.rules)
         self.company_rules = load_company_rules(company_rules)
         self.company_registry = CompanyRegistry(self.company_rules)
@@ -72,6 +74,8 @@ class World:
             if oldq is not None:
                 self.pricing.factors, self.pricing.shocks = oldq.factors, oldq.shocks
                 self.pricing.maker_used, self.pricing.last_day = oldq.maker_used, oldq.last_day
+        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production):
+            svc.notify = self.outbox.emit  # Benachrichtigungen (abgeleitet, nicht Teil des Weltzustands/der Vektor-Hashes)
 
     def snapshot(self) -> dict[str, Any]:
         snap = self._base_snapshot()

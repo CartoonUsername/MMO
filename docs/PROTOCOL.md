@@ -78,6 +78,9 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `trade.accept` | char:s, offer:s | char | schreibend | default |
 | `trade.decline` | char:s, offer:s | char | schreibend | default |
 | `trade.cancel` | char:s, offer:s | char | schreibend | default |
+| `notify.ack` | char:s, upto:i | char | schreibend | default |
+| `notify.mute` | char:s, kinds:l | char | schreibend | default |
+| `notify.unmute` | char:s, kinds:l | char | schreibend | default |
 | `combat.set_loadout` | char:s, abilities:l | char | schreibend | default |
 | `company.found` | char:s, capital:i | char | schreibend | default |
 | `company.close` | actor:s, company:s | actor | schreibend | default |
@@ -106,6 +109,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.inventory` | char:s | char | lesend | query |
 | `query.economic_profile` | char:s | char | lesend | query |
 | `query.offers` | char:s | char | lesend | query |
+| `notify.fetch` | char:s, after?:i, limit?:i | char | lesend | query |
 | `query.abilities` | char:s | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 
@@ -121,6 +125,12 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 - **price_shock/rules_upgrade/rules_migrate** – Weltereignisse und Betriebsaktionen
 - **persistence (export/import/commit)** – Betrieb
 <!-- KATALOG:END -->
+
+### Benachrichtigungen (Push, ADR-0024)
+
+Der Server legt für betroffene Figuren Benachrichtigungen in ein **Postfach** (Folgenummer `seq` je Figur) und kann sie live über den Transport schieben (`Gateway.on_push`); **zuverlässig wird es durch Abruf**: `notify.fetch(char, after, limit)` liefert alles nach `after` samt `latest` und `gap` (Lücke, falls das begrenzte Postfach Einträge verdrängt hat), `notify.ack(char, upto)` räumt auf, `notify.mute/unmute` schaltet Arten stumm. Zustellung mindestens einmal, der Client entdoppelt über `seq`. Benachrichtigungen tragen nur Kennungen und Konditionen (kein Inventar/Salden) und sind nicht maßgeblich: die Wahrheit liegt im Weltzustand.
+
+Arten: `market.fill`, `market.expired`, `trade.offer_received/accepted/declined/cancelled/expired`, `company.hired/left/employee_left/promoted/demoted/warning/closed/shares_offered/proposal_opened/proposal_resolved`, `production.job_done`, `discovery.taught`.
 
 ## 6. Echtzeit-Kampf (Planung)
 
@@ -157,7 +167,7 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 
 1. Transport und Format im Detail (WebSocket+JSON für Befehle ist die Referenz; Binärformat und QUIC für den Kampf?).
 2. Direkter Zwei-Parteien-Handel: Angebot/Annahme umgesetzt (ADR-0023); offen sind Gegenangebote und Tausch mehrerer Gegenstände.
-3. Push-Nachrichten an Clients (Ereignisse wie „Order ausgeführt“, „Kündigung“, Beschlüsse): Abonnement- und Zustellmodell, Offline-Postfach.
+3. Push-Nachrichten: Postfach mit Abruf/Quittung/Stummschaltung umgesetzt (ADR-0024); offen sind der Transport des Live-Push (Verbindung, Wiederaufbau), Benachrichtigung außerhalb des Spiels (Mobilgerät/E-Mail) und weitere Ereignisarten (Kampf, Gruppeneinladungen).
 4. Konten, Anmeldung, Token-Lebensdauer, Sperren, Jugendschutz/Rechtliches (nicht Teil der Referenz).
 5. Reihenfolge und Fairness bei gleichzeitigen Befehlen vieler Spieler (Tick-Batching oder strikte Ankunftsreihenfolge).
 6. Rückgängigmachen/Entschädigung bei Serverfehlern, Behandlung von `server_error` mit teilweise geänderter Welt.

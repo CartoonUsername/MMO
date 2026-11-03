@@ -31,6 +31,7 @@ class CompanyService:
         cur = service.rules["economy"]["currency"]
         self.coin = key(cur["item"], cur["grade"])
         self.roles = service.rules["economy"]["career"]["roles"]
+        self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None  # Postausgang (Weltverdrahtung)
         self.day_hooks: list[Callable[..., Any]] = []  # (Firma, Tag, bezahlt-Karte) -> Ereignisse; z. B. Produktion
         self.close_hooks: list[Callable[[dict[str, Any]], None]] = []  # (Firma) vor der Auszahlung
 
@@ -158,6 +159,9 @@ class CompanyService:
         c["open"] = False
         c["ceo"] = None
         self.reg.log(c, day, "closed", payout=dict(sorted(payout.items())))
+        for who in sorted(set(c["shares"]) | {e for e, _ in leaves}):
+            if who != actor:
+                self.notify(who, "company.closed", {"company": company_id})
         return payout
 
     # ------------------------------------------------------------------ Mitarbeiter ---------
@@ -174,6 +178,10 @@ class CompanyService:
         self.cee.record(character_id, CAREER, pl)
         self.reg.add_employee(c, character_id, self._new_employee(character_id, wage, profit_share, day))
         self.reg.log(c, day, "hired", character=character_id, wage=wage)
+        self.notify(character_id, "company.hired", {"company": company_id, "wage": wage})
+
+    def _owners(self, c: dict[str, Any]) -> list[str]:
+        return sorted({x for x in (c["founder"], c["ceo"]) if x is not None})
 
     def _leave(self, c: dict[str, Any], character_id: str, day: int, kind: str) -> None:
         pl = {"company_id": None, "role": None, "day": day}
@@ -181,6 +189,10 @@ class CompanyService:
         self.cee.record(character_id, CAREER, pl)
         self.reg.remove_employee(c, character_id)
         self.reg.log(c, day, kind, character=character_id)
+        self.notify(character_id, "company.left", {"company": c["id"], "reason": kind})
+        if kind != "fired":
+            for o in self._owners(c):
+                self.notify(o, "company.employee_left", {"company": c["id"], "character": character_id, "reason": kind})
 
     def fire(self, actor: str, company_id: str, character_id: str) -> None:
         day = self._today()
@@ -222,6 +234,7 @@ class CompanyService:
         self._change_role(c, character_id, self.roles[idx + 1], day)
         e["promoted_day"] = day
         self.reg.log(c, day, "promoted", character=character_id, role=self.roles[idx + 1])
+        self.notify(character_id, "company.promoted", {"company": company_id, "role": self.roles[idx + 1]})
         return self.roles[idx + 1]
 
     def demote(self, actor: str, company_id: str, character_id: str) -> str:
@@ -235,6 +248,7 @@ class CompanyService:
             raise WorldError("Bereits auf der untersten Stufe")
         self._change_role(c, character_id, self.roles[idx - 1], day)
         self.reg.log(c, day, "demoted", character=character_id, role=self.roles[idx - 1])
+        self.notify(character_id, "company.demoted", {"company": company_id, "role": self.roles[idx - 1]})
         return self.roles[idx - 1]
 
     # ------------------------------------------------------------------ Gebäude & Einnahmen --
@@ -319,6 +333,7 @@ class CompanyService:
             status = employee_status(cr, emp["warning_days"])
             if status != emp["status"]:
                 out.append({"day": d, "company": c["id"], "kind": status, "character": e})
+                self.notify(e, "company.warning", {"company": c["id"], "status": status})
                 self.reg.log(c, d, status, character=e)
             emp["status"] = status
             sats.append(emp["satisfaction"])
@@ -365,6 +380,7 @@ class CompanyService:
         self.cee.record(character_id, CAREER, pl)
         self.reg.add_employee(new, character_id, self._new_employee(character_id, offer_wage, 0, day))
         self.reg.log(new, day, "poached", character=character_id, wage=offer_wage)
+        self.notify(character_id, "company.hired", {"company": new["id"], "wage": offer_wage})
         return res
 
     # ------------------------------------------------------------------ Anteile -------------
@@ -385,6 +401,10 @@ class CompanyService:
         c["offers"][oid] = {"seller": seller, "qty": qty, "remaining": qty, "price": price_per_share, "day": day,
                             "deadline": day + c["constitution"]["preemption_days"]}
         self.reg.log(c, day, "shares_offered", seller=seller, qty=qty, price=price_per_share)
+        for holder in sorted(c["shares"]):
+            if holder != seller:
+                self.notify(holder, "company.shares_offered", {"company": company_id, "offer": oid, "seller": seller, "qty": qty,
+                                                              "price": price_per_share, "deadline": c["offers"][oid]["deadline"]})
         return oid
 
     def _offer(self, c: dict[str, Any], offer_id: str) -> dict[str, Any]:
@@ -481,6 +501,10 @@ class CompanyService:
         c["proposals"][pid] = {"kind": kind, "candidate": candidate, "proposer": proposer, "day": day,
                                "deadline": day + con["vote_days"], "weights": dict(sorted(c["shares"].items())),
                                "votes": {}, "veto_holder": veto, "status": "pending", "result": None}
+        for holder in sorted(c["shares"]):
+            if holder != proposer:
+                self.notify(holder, "company.proposal_opened", {"company": company_id, "proposal": pid, "kind": kind,
+                                                               "candidate": candidate, "deadline": day + con["vote_days"]})
         return pid
 
     def vote(self, voter: str, company_id: str, proposal_id: str, yes: bool) -> str:
@@ -502,6 +526,9 @@ class CompanyService:
             p["status"] = "rejected"
         elif state == "passed":
             self._execute(c, p, day)
+        if p["status"] != "pending":
+            for holder in sorted(p["weights"]):
+                self.notify(holder, "company.proposal_resolved", {"company": company_id, "proposal": proposal_id, "status": p["status"]})
         return p["status"]
 
     def _execute(self, c: dict[str, Any], p: dict[str, Any], day: int) -> None:

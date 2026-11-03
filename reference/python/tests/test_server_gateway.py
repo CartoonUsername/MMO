@@ -50,7 +50,9 @@ class CatalogTests(unittest.TestCase):
                     self.assertEqual(c.args.get(c.actor), "s")
                 self.assertIn(c.rate_group, load_protocol_rules()["rate"] | {"query": 0})
         self.assertTrue(all(not c.mutating for n, c in COMMANDS.items() if n.startswith("query.")))
-        self.assertTrue(all(c.mutating for n, c in COMMANDS.items() if not n.startswith("query.")))
+        readonly = {n for n in COMMANDS if n.startswith("query.")} | {"notify.fetch"}
+        self.assertTrue(all(c.mutating for n, c in COMMANDS.items() if n not in readonly))
+        self.assertTrue(all(not COMMANDS[n].mutating for n in readonly))
 
     def test_clients_cannot_reach_server_internal_operations(self):
         forbidden = ("gather", "advance_day", "deposit", "revenue", "shock", "expire", "upgrade_rules", "migrate", "record", "trade",
