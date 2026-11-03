@@ -14,12 +14,19 @@ from mmo_cee.service import CharacterService
 
 from .errors import SimError
 from .fight import EncounterResult, simulate
+from .group import GroupResult, simulate_group
 
 
 @dataclass(frozen=True)
 class FinishResult:
     result: EncounterResult
     event: Event | None  # None, wenn die Begegnung keine bewertbaren Aktionen enthielt
+
+
+@dataclass(frozen=True)
+class GroupFinish:
+    result: GroupResult
+    events: dict[str, Event | None]  # je Teilnehmer; None, wenn er keine bewertbare Aktion hatte
 
 
 def build_report(cfg: dict[str, Any], encounter_id: str, opponent_type: str, day: int,
@@ -43,6 +50,7 @@ class EncounterServer:
         self.cfg, self.service, self.day_provider, self.server_id = cfg, service, day_provider, server_id
         self._counter = 0
         self._pending: dict[str, tuple[str, str, int]] = {}  # id -> (Charakter, Gegner, Tag)
+        self._groups: dict[str, tuple[tuple[str, ...], str, int]] = {}  # id -> (Teilnehmer, Gegner, Tag)
         self._finished: set[str] = set()
 
     def start(self, character_id: str, opponent_type: str) -> str:
@@ -73,3 +81,57 @@ class EncounterServer:
         report = build_report(self.cfg, encounter_id, opponent_type, day, result)
         event = self.service.record(character_id, "combat.encounter_resolved", report)
         return FinishResult(result, event)
+
+    # -- Gruppenkampf (ADR-0022) -----------------------------------------------------------
+    def _group_command_map(self, equipped: list[str] | None) -> set[str]:
+        mapping = self.cfg.get("group", {}).get("ability_commands", {})
+        return {mapping[a] for a in (equipped or []) if a in mapping}
+
+    def start_group(self, character_ids: Any, opponent_type: str) -> str:
+        g = self.cfg.get("group")
+        if g is None:
+            raise SimError("Diese Regeln kennen keinen Gruppenkampf")
+        if opponent_type not in self.cfg["opponents"]:
+            raise SimError(f"unbekannter Gegner: {opponent_type}")
+        if (not isinstance(character_ids, (list, tuple)) or not 1 <= len(character_ids) <= g["max_party"]
+                or len(set(character_ids)) != len(character_ids) or any(not isinstance(c, str) for c in character_ids)):
+            raise SimError(f"Die Gruppe muss aus 1..{g['max_party']} verschiedenen Figuren bestehen")
+        for c in character_ids:
+            if not self.service.log.has(c):
+                raise SimError("Charakter existiert nicht")
+        self._counter += 1
+        eid = f"{self.server_id}-enc-{self._counter:08d}"
+        self._groups[eid] = (tuple(character_ids), opponent_type, self.day_provider())
+        return eid
+
+    def finish_group(self, encounter_id: str, inputs_by_character: Any) -> GroupFinish:
+        """Schließt einen Gruppenkampf ab: jeder Teilnehmer liefert nur seine Eingaben; jeder erhält seinen eigenen Bericht
+        (nur eigene Aktionszähler). Alle Berichte werden vorab validiert, damit nicht nur ein Teil aufgezeichnet wird."""
+        if encounter_id in self._finished:
+            raise SimError("Begegnung bereits abgeschlossen")
+        entry = self._groups.get(encounter_id)
+        if entry is None:
+            raise SimError("Gruppenbegegnung unbekannt")
+        party, opponent_type, day = entry
+        if not isinstance(inputs_by_character, dict) or set(inputs_by_character) - set(party):
+            raise SimError("Eingaben nur von Teilnehmern der Gruppe")
+        specs = []
+        for c in party:
+            equipped = self.service.equipped_abilities(c)
+            allowed = self.service.allowed_commands(c)
+            if allowed is not None:
+                allowed = sorted(set(allowed) | self._group_command_map(equipped))
+            spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
+            if allowed is not None:
+                spec["allowed"] = allowed
+            if equipped is not None:
+                spec["equipped"] = equipped
+            specs.append(spec)
+        result = simulate_group(self.cfg, opponent_type, specs)  # bei ungültigen Eingaben bleibt die Begegnung offen
+        reports = {c: build_report(self.cfg, encounter_id, opponent_type, day, r) for c, r in zip(party, result.players) if r.actions}
+        for c, rep in reports.items():
+            self.service.projector.validate(self.service.state(c), "combat.encounter_resolved", rep)
+        del self._groups[encounter_id]
+        self._finished.add(encounter_id)
+        events = {c: (self.service.record(c, "combat.encounter_resolved", reports[c]) if c in reports else None) for c in party}
+        return GroupFinish(result, events)

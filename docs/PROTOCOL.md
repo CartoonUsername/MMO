@@ -122,6 +122,7 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 - Welche Befehle ein Spieler im Kampf nutzen darf, folgt aus seiner **Kampfausrüstung** (`combat.set_loadout`, ADR-0020): Grundbefehle plus die der ausgerüsteten Fähigkeiten; der Server ignoriert andere Eingaben.
 - Eigener Kanal, 10 Server-Ticks/s (`mmo_sim`). Client sendet **Eingaben** mit Sequenznummer (`light heavy dodge block stun slow flee`),
   der Server entscheidet Treffer, Ausweichen, Block usw. und sendet Zustandsupdates (Schnappschüsse mit Delta).
+- Gruppenkämpfe (ADR-0022): Der Server nennt die Teilnehmer, jeder sendet nur seine Eingaben; zusätzliche Befehle `heal`/`shield` (nur mit den Fähigkeiten `ally_mend`/`ally_ward`); jeder Teilnehmer erhält seinen eigenen Bericht.
 - Am Ende erzeugt der Server den Begegnungsbericht für `combat.encounter_resolved`; die Begegnungs-ID vergibt der Server (Archivierung
   gewerteter IDs ist offen, siehe ADR-0014).
 - Offene Fragen: Latenzausgleich (Rückspulen vs. Vorhersage am Client), Interessenverwaltung für Gruppen/Weltbosse, Raumgeometrie und

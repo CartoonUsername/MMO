@@ -9,6 +9,7 @@ from typing import Any
 from .errors import SimError
 
 COMMANDS = ("light", "heavy", "dodge", "block", "stun", "slow", "flee")
+GROUP_COMMANDS = ("heal", "shield")  # nur im Gruppenkampf (ADR-0022)
 
 
 def load_sim_rules(name: str = "sim_rules_v1.json") -> dict[str, Any]:
@@ -53,6 +54,28 @@ def combine_effects(cfg: dict[str, Any], equipped: Any) -> dict[str, int]:
     return out
 
 
+def validate_group_rules(cfg: dict[str, Any]) -> None:
+    g = cfg["group"]
+
+    def ok(v: Any, lo: int = 1) -> bool:
+        return isinstance(v, int) and not isinstance(v, bool) and v >= lo
+
+    if not ok(g["max_party"]) or g["max_party"] > 8:
+        raise SimError("group.max_party muss 1..8 sein")
+    if not ok(g["opponent_hp_per_extra_member_permille"], 0):
+        raise SimError("group.opponent_hp_per_extra_member_permille muss >= 0 sein")
+    h, s = g["heal"], g["shield"]
+    if not (ok(h["amount"]) and ok(h["cost"], 0) and ok(h["busy"]) and ok(h["cooldown"], 0)):
+        raise SimError("group.heal ungültig")
+    if not (ok(s["absorb"]) and ok(s["ticks"]) and ok(s["cost"], 0) and ok(s["busy"]) and ok(s["cooldown"], 0)):
+        raise SimError("group.shield ungültig")
+    if not ok(g["threat"]["heal_permille"], 0):
+        raise SimError("group.threat.heal_permille ungültig")
+    cmds = g["ability_commands"]
+    if any(c not in GROUP_COMMANDS for c in cmds.values()) or len(set(cmds.values())) != len(cmds):
+        raise SimError("group.ability_commands: nur heal/shield, je Befehl höchstens eine Fähigkeit")
+
+
 def validate_sim_rules(cfg: dict[str, Any]) -> None:
     def positive(v: Any) -> bool:
         return isinstance(v, int) and not isinstance(v, bool) and v > 0
@@ -66,6 +89,8 @@ def validate_sim_rules(cfg: dict[str, Any]) -> None:
             raise SimError(f"Aktion {name} fehlt oder ist ungültig")
     if cfg["actions"]["precise"]["busy"] < cfg["actions"]["light"]["busy"]:
         raise SimError("precise.busy darf nicht kürzer sein als light.busy")
+    if "group" in cfg:
+        validate_group_rules(cfg)
     for name, eff in ability_effects(cfg).items():
         if not isinstance(eff, dict) or not eff or set(eff) - set(EFFECT_KEYS):
             raise SimError(f"ability_effects.{name}: unbekannte oder fehlende Wirkung")
@@ -104,7 +129,13 @@ def max_actions_per_minute(cfg: dict[str, Any]) -> dict[str, int]:
     def defensive(name: str) -> int:
         return min(_per_minute(cfg, period(name)), attack_bound)
 
+    group = {}
+    if "group" in cfg:  # Unterstützung im Gruppenkampf: begrenzt durch Busy/Abklingzeit
+        g = cfg["group"]
+        group = {"ally_heal": _per_minute(cfg, max(g["heal"]["busy"], g["heal"]["cooldown"], 1)),
+                 "ally_shield": _per_minute(cfg, max(g["shield"]["busy"], g["shield"]["cooldown"], 1))}
     return {
+        **group,
         "light_hit": _per_minute(cfg, period("light")),
         "precise_hit": _per_minute(cfg, period("precise")),
         "heavy_hit": _per_minute(cfg, period("heavy")),
@@ -126,6 +157,8 @@ def check_compatibility(cfg: dict[str, Any], cee_rules: Any) -> list[str]:
         if rate > limit:
             problems.append(f"{action}: Simulation erlaubt bis {rate}/min, CEE-Limit {limit}/min")
     effects = ability_effects(cfg)
+    for name in sorted(set(cfg.get("group", {}).get("ability_commands", {})) - {k for k in cee_rules["combat"].get("abilities", {}) if not k.startswith("_")}):
+        problems.append(f"group.ability_commands.{name}: Fähigkeit existiert in den CEE-Regeln nicht")
     catalog = {k for k in cee_rules["combat"].get("abilities", {}) if not k.startswith("_")}
     for name in sorted(set(effects) - catalog):
         problems.append(f"ability_effects.{name}: Fähigkeit existiert in den CEE-Regeln nicht")

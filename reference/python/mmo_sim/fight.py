@@ -28,7 +28,7 @@ class EncounterResult:
     damage_ticks: tuple[int, ...] = field(default_factory=tuple)
 
 
-def validate_inputs(cfg: dict[str, Any], inputs: Any) -> list[tuple[int, str]]:
+def validate_inputs(cfg: dict[str, Any], inputs: Any, commands: tuple[str, ...] = COMMANDS) -> list[tuple[int, str]]:
     if not isinstance(inputs, (list, tuple)):
         raise SimError("inputs muss eine Liste sein")
     if len(inputs) > cfg["max_inputs"]:
@@ -43,7 +43,7 @@ def validate_inputs(cfg: dict[str, Any], inputs: Any) -> list[tuple[int, str]]:
             raise SimError("tick außerhalb des gültigen Bereichs")
         if tick < last:
             raise SimError("Eingaben müssen nach Tick sortiert sein")
-        if cmd not in COMMANDS:
+        if cmd not in commands:
             raise SimError(f"unbekannter Befehl: {cmd!r}")
         last = tick
         out.append((tick, cmd))
