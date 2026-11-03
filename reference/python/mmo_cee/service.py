@@ -10,10 +10,12 @@ from .economy import EconomyEngine, economic_directions, economic_profile
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
 from .essence import EssenceEngine, eligible_forms, essence_profile, form_scores
+from .errors import RuleViolation
 from .history import Event, EventLog
 from .identity import IdentityEngine
+from .migration import MIGRATION_TYPE, RulesChain, check_migration, migrate_parts, migration_payload, next_version
 from .professions import ProfessionEngine
-from .rules import Rules, load_rules
+from .rules import Rules, load_rules, older_rules
 from .visual import VisualEvolution
 
 
@@ -31,11 +33,18 @@ def default_projector(rules: Rules) -> Projector:
 
 
 class CharacterService:
-    def __init__(self, rules: Rules | None = None, log: EventLog | None = None) -> None:
+    def __init__(self, rules: Rules | None = None, log: EventLog | None = None,
+                 history_rules: dict[str, Rules] | None = None) -> None:
+        """`rules` gelten für neue Ereignisse; `history_rules` (Version -> Regeln) erlauben das Abspielen älterer
+        Historien samt aufgezeichneter Migration (ADR-0018). Ohne sie verweigert das Abspielen fremde Regelversionen."""
         self.rules = rules or load_rules()
         self.log = log or EventLog()
         self.projector = default_projector(self.rules)
+        self.rules_by_version: dict[str, Rules] = {**(history_rules or {}), self.rules.version: self.rules}
+        self.chain = RulesChain({v: (self.projector if v == self.rules.version else default_projector(r))
+                                 for v, r in self.rules_by_version.items()}, self.rules.version)
         self._states: dict[str, CharacterState] = {}
+        self._visual_by_version: dict[str, VisualEvolution] = {}
 
     def create(self, character_id: str, kind: str) -> CharacterState:
         return self._record(character_id, "identity.created", {"kind": kind})[1]
@@ -44,6 +53,8 @@ class CharacterService:
         return self._record(character_id, type, payload)[0]
 
     def _record(self, character_id: str, type: str, payload: dict[str, Any]) -> tuple[Event, CharacterState]:
+        if type == MIGRATION_TYPE:
+            raise RuleViolation("Regelversionswechsel nur über migrate()")
         state = self.state(character_id)
         self.projector.validate(state, type, payload)
         event = self.log.append(character_id, type, payload, self.rules.version)
@@ -53,8 +64,35 @@ class CharacterService:
     def state(self, character_id: str) -> CharacterState:
         if character_id not in self._states:
             self.log.verify(character_id)
-            self._states[character_id] = self.projector.replay(character_id, self.log.events(character_id))
+            self._states[character_id] = self.chain.replay(character_id, self.log.events(character_id))
         return self._states[character_id]
+
+    # -- Regelversionswechsel (ADR-0018) -------------------------------------------------------
+    def rules_of(self, character_id: str) -> Rules:
+        """Regeln, unter denen der Zustand der Figur gerade abgeleitet ist (bei nicht migrierten Figuren die ältere Version)."""
+        return self.rules_by_version[self.state(character_id).rules_version]
+
+    def needs_migration(self, character_id: str) -> bool:
+        return self.log.has(character_id) and self.state(character_id).rules_version != self.rules.version
+
+    def migrate(self, character_id: str) -> Event:
+        """Hebt eine Figur um genau eine Regelversion an (aufgezeichnetes Ereignis). Mehrfach aufrufen, bis `needs_migration`
+        falsch ist. Bestehender Fortschritt bleibt vollständig erhalten."""
+        if not self.log.has(character_id):
+            raise RuleViolation("Charakter wurde noch nicht erstellt")
+        state = self.state(character_id)
+        old = self.rules_by_version[state.rules_version]
+        target = next_version(list(self.rules_by_version), state.rules_version)
+        if target is None:
+            raise RuleViolation("Figur läuft bereits unter der neuesten bekannten Regelversion")
+        new = self.rules_by_version[target]
+        payload = migration_payload(state, old, new)
+        check_migration(state, payload, old, new, list(self.rules_by_version))
+        old_proj, new_proj = self.chain.projectors[old.version], self.chain.projectors[new.version]
+        parts = migrate_parts(old_proj, new_proj, state.parts, old.version, new.version)  # kann ablehnen, vor dem Schreiben
+        event = self.log.append(character_id, MIGRATION_TYPE, payload, new.version)
+        self._states[character_id] = CharacterState(character_id, new.version, parts)
+        return event
 
     def rebuild(self, character_id: str) -> CharacterState:
         """Verifiziert die Kette und leitet den Zustand frisch aus der Historie ab."""
@@ -62,50 +100,51 @@ class CharacterService:
         return self.state(character_id)
 
     def eligible_essences(self, character_id: str) -> list[str]:
-        return eligible_forms(self.state(character_id), self.rules)
+        return eligible_forms(self.state(character_id), self.rules_of(character_id))
 
     def combat_directions(self, character_id: str) -> dict[str, int]:
         """Erreichte Entwicklungsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
-        return reached_directions(self.state(character_id), self.rules)
+        return reached_directions(self.state(character_id), self.rules_of(character_id))
 
     def essence_scores(self, character_id: str) -> dict[str, dict]:
         """Punktzahl/Beiträge/Prüfbarkeit der Bewertungsformen (leer bei Regeln ohne Bewertungsformen)."""
-        return form_scores(self.state(character_id), self.rules)
+        return form_scores(self.state(character_id), self.rules_of(character_id))
 
     def essence_profile(self, character_id: str) -> dict:
         """Vor-/Nachteile der angenommenen Wesensform."""
-        return essence_profile(self.state(character_id), self.rules)
+        return essence_profile(self.state(character_id), self.rules_of(character_id))
 
     def appearance(self, character_id: str) -> dict:
         """Erscheinungsparameter (Visual Evolution): reine, serverseitige Ableitung aus dem Zustand."""
-        if not hasattr(self, "_visual"):
-            self._visual = VisualEvolution(self.rules)
-        return self._visual.appearance(self.state(character_id))
+        rules = self.rules_of(character_id)
+        if rules.version not in self._visual_by_version:
+            self._visual_by_version[rules.version] = VisualEvolution(rules)
+        return self._visual_by_version[rules.version].appearance(self.state(character_id))
 
     def known_discoveries(self, character_id: str) -> list[str]:
         return known_discoveries(self.state(character_id))
 
     def discovery_progress(self, character_id: str, discovery_id: str) -> dict:
         """Beweise, fehlende Voraussetzungen und Abschlussbereitschaft einer Entdeckung."""
-        return discovery_progress(self.state(character_id), self.rules, discovery_id)
+        return discovery_progress(self.state(character_id), self.rules_of(character_id), discovery_id)
 
     def known_recipes(self, character_id: str) -> list[str]:
-        return known_recipes(self.state(character_id), self.rules)
+        return known_recipes(self.state(character_id), self.rules_of(character_id))
 
     def known_techniques(self, character_id: str) -> list[str]:
-        return known_techniques(self.state(character_id), self.rules)
+        return known_techniques(self.state(character_id), self.rules_of(character_id))
 
     def craft_directions(self, character_id: str) -> dict[str, int]:
         """Handwerks-Spezialisierungen -> Stufe (mehrere gleichzeitig möglich)."""
-        return craft_directions(self.state(character_id), self.rules)
+        return craft_directions(self.state(character_id), self.rules_of(character_id))
 
     def craft_profile(self, character_id: str) -> dict[str, int]:
-        return craft_profile(self.state(character_id), self.rules)
+        return craft_profile(self.state(character_id), self.rules_of(character_id))
 
     def economic_directions(self, character_id: str) -> dict[str, int]:
         """Handelsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
-        return economic_directions(self.state(character_id), self.rules)
+        return economic_directions(self.state(character_id), self.rules_of(character_id))
 
     def economic_profile(self, character_id: str) -> dict:
         """Laufbahn, Unternehmen, Netzwerkgröße, Anzahl Handel."""
-        return economic_profile(self.state(character_id), self.rules)
+        return economic_profile(self.state(character_id), self.rules_of(character_id))

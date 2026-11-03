@@ -80,7 +80,7 @@ class WorldGoldenTests(unittest.TestCase):
 
     def test_errors_are_known_classes_and_carry_no_texts(self):
         classes = {s["error"] for s in self.steps if s["expect"] == "error"}
-        self.assertEqual(classes, {"WorldError", "RuleViolation"})
+        self.assertEqual(classes, {"WorldError", "RuleViolation", "PersistenceError"})
         for s in self.steps:
             self.assertEqual(("result" in s), s["expect"] == "ok")
             self.assertEqual(("error" in s), s["expect"] == "error")
@@ -103,7 +103,7 @@ class WorldGoldenTests(unittest.TestCase):
 
     def test_failed_steps_leave_world_unchanged_except_documented_cases(self):
         """Abgelehnte Schritte ändern die Welt nicht - Ausnahmen (bewusst, im Vektor festgehalten):
-        a) eine bereits vergebene Herstellungs-ID wird nicht wiederverwendet (nur der Zähler steigt),
+        a) eine bereits vergebene ID (Herstellung, Handel, Order) wird nicht wiederverwendet (nur der Zähler steigt),
         b) eine Abstimmung nach Fristende setzt den Antrag auf 'expired'."""
         for sc in self.vec["scenarios"]:
             env = golden.Env(sc.get("cee_rules_file", self.vec["cee_rules_file"]))
@@ -119,9 +119,13 @@ class WorldGoldenTests(unittest.TestCase):
                         snap["companies"]["companies"].get(s["company"], {}).pop("proposals", None)
                     self.assertEqual(a2, b2, (sc["name"], i))
                     continue
-                if s["op"] == "craft":
-                    self.assertGreaterEqual(after["counters"]["craft"], before["counters"]["craft"])
-                    before["counters"]["craft"] = after["counters"]["craft"] = 0
+                for key in ("trade", "craft"):  # vergebene IDs werden nie wiederverwendet: Zähler steigen, sinken nie
+                    self.assertGreaterEqual(after["counters"][key], before["counters"][key])
+                    before["counters"][key] = after["counters"][key] = 0
+                if "exchange" in before or "exchange" in after:
+                    self.assertGreaterEqual(after["exchange"]["counter"], before["exchange"]["counter"])
+                    for snap in (before, after):
+                        snap["exchange"] = {**snap["exchange"], "counter": 0}
                 self.assertEqual(after, before, (sc["name"], i, s["op"]))
         expired = [s for sc in self.vec["scenarios"] for s in sc["steps"] if s["op"] == "vote" and s["expect"] == "error"]
         self.assertTrue(expired)

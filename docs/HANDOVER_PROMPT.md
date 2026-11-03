@@ -4,7 +4,7 @@ Du übernimmst die technische Entwicklung eines langfristig geplanten Free-to-Pl
 
 ## 1. Repository und Zustand (verifiziert)
 - Repo `CartoonUsername/MMO`, Arbeitsbranch `claude/awesome-dirac-9k6p3n` (aktueller Stand: `git log -1`). Niemals direkt auf `main` arbeiten, kein Force-Push, keine Merges/PRs ohne Auftrag, kleine nachvollziehbare Commits (Co-Author-Zeilen laut Systemvorgabe).
-- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **619 Tests, alle grün.** Golden Vectors: `reference/golden` (23 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle), `reference/golden_world` (13 Weltseiten-Szenarien inkl. Markt, Firmenproduktion und Preisdynamik, Welt-Hash je Schritt).
+- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **643 Tests, alle grün.** Golden Vectors: `reference/golden` (23 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle), `reference/golden_world` (14 Weltseiten-Szenarien inkl. Markt, Firmenproduktion, Preisdynamik und Regelversions-Migration, Welt-Hash je Schritt).
 - Prüfen vor jeder Arbeit: `git status`, dann `cd reference/python && python -m unittest discover -s . -t . -v`, `python -m mmo_cee.golden check ../golden`, `python -m mmo_sim.golden check ../golden_sim`, `python -m mmo_cee.golden_visual check ../golden_visual`, `python -m mmo_world.golden check ../golden_world`.
 - Dokumentation: `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/STATUS_REPORT.md`, `docs/decisions/ADR-0001…0012`, `reference/golden/README.md` (Format und Prüfverfahren für Portierungen), `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md`, `Game/ENGINE_COMPARISON_PROTOCOL.md`.
 - Wichtige Commits: `ba3d1b0` Kern + Identity/Element/Profession/Essence · `062b52c` Combat Development · `c6c5069` Golden Vectors · `aed6ca6` Kampfsimulation `mmo_sim` · `4a2a156` Wesensbewertung · `2efc9c3` Visual Evolution · `ee32e2c` Discovery · `ad54492` Crafting · danach Economic Profile (siehe `git log`).
@@ -63,7 +63,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Kampf: nur 1:1, kein Raum/Winkel, keine Unterstützungsaktionen/Gruppen in der Simulation (die CEE kennt `ally_heal`/`ally_shield`), keine konkreten Fähigkeiten.
 - Handwerk: Werkzeuge/Werkstätten, Herstellungsdauer, Materialgewinnung, Experimentieren, Rezepte als Gegenstand fehlen.
 - Wesen/Visual: Wirkung der Modifikatoren auf Kampf/Bewegung; echte Optik/Assets; Ausrüstung/Kosmetik; Übergangsanimationen; Handwerksrichtungen noch nicht an Wesen/Visual angebunden.
-- Produktive Datenbank, Archivierung gewerteter Begegnungs-IDs, Migration zwischen Regelversionen (nur Vorschlag in ADR-0014; Snapshot-Referenz vorhanden), Besitzjournal für das Inventar, Server-Protokoll, Mehrfachaccounts/Boosting.
+- Produktive Datenbank, Archivierung gewerteter Begegnungs-IDs, Betrieb der Regelversions-Migration (Mechanismus in ADR-0018; Snapshot-Referenz vorhanden), Besitzjournal für das Inventar, Server-Protokoll, Mehrfachaccounts/Boosting.
 - Balancing-Hinweise: Wiederholungsabnahme dominiert Tageslimits; Ausdauer begrenzt in der Kampfsimulation kaum.
 
 ## 8. Engine- und Infrastrukturstand
@@ -72,7 +72,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Diese Sandbox ist eine Cloud-Linux-Umgebung ohne GPU und ohne Zugang zu RunPod/SSH; niemals private Schlüssel, Passwörter oder Tokens anfordern oder im Repo/Chat speichern.
 
 ## 9. Vorgeschlagene nächste Schritte (Vorschläge, nicht beschlossen)
-1. **Entscheidung zur Regelversions-Migration** (Vorschlag in ADR-0014: Migrationsereignis + Mehrversions-Projector) und Besitzjournal für das Inventar; Persistenz-Referenz (Snapshots, Generationen, Ladeprüfung) und Golden Vectors der Weltseite sind erledigt (ADR-0013/0014).
+1. **Betriebsentscheidungen zur Migration** (wann/für wen: Wartung, Login, Schonfrist; Standard-Regeln auf v8?) und Besitzjournal für das Inventar; der Mechanismus (Migrationsereignis, Mehrversions-Replay, Welt-Upgrade) ist umgesetzt (ADR-0018); Persistenz-Referenz (Snapshots, Generationen, Ladeprüfung) und Golden Vectors der Weltseite sind erledigt (ADR-0013/0014).
 2. Aufträge/Kunden und Lieferketten für Firmen; Orderbuch (ADR-0015), Firmenproduktion (ADR-0016) und Preisdynamik mit CEE-Regeln v8 und NPC-Händler (ADR-0017) sind erledigt. Weiter: regionale Preise, Weltereignisse als Schock-Auslöser, Logistik.
 3. Snapshots/Archivierung und Regel-Migration.
 4. Server-/Protokoll-Schnittstelle planen (PostgreSQL/Redis, Regionen/Instanzen noch offen) und Übergang zur Engine-Phase; Engine-Vergleich nur mit klarem Budget.

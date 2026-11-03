@@ -23,6 +23,7 @@ from urllib.parse import quote, unquote
 
 from mmo_cee.errors import CEEError
 from mmo_cee.history import Event, _canonical as canonical_bytes
+from mmo_cee.rules import load_rules
 
 from .company import CompanyRegistry
 from .discovery import DiscoveryRegistry
@@ -196,6 +197,39 @@ def _import(envelope: Envelope, logs: Logs) -> World:
     if problems:
         raise PersistenceError("Inkonsistenter Weltzustand: " + "; ".join(problems))
     return world
+
+
+# ---------------------------------------------------------------- Regelversion ---------
+def upgrade_world(world: World, target_cee_file: str, characters: list[str] | None = None) -> World:
+    """Hebt die Welt auf eine höhere CEE-Regelversion (ADR-0018): lädt dieselben Historien unter den neuen Regeln
+    (alte Ereignisse werden mit den alten Regeln abgeleitet) und zeichnet für die genannten Figuren (Standard: alle) die
+    Migrationsereignisse auf. Nicht migrierte Figuren bleiben spielbar zurück, dürfen aber an keiner Weltaktion teilnehmen,
+    bis auch sie migriert sind. Die übergebene Welt bleibt unverändert; bei jedem Fehler entsteht keine neue Welt."""
+    if not isinstance(target_cee_file, str) or not re.fullmatch(r"[A-Za-z0-9_]+\.json", target_cee_file):
+        raise PersistenceError("Ungültiger Regeldateiname")
+    try:
+        target = load_rules(target_cee_file)
+    except (OSError, ValueError, KeyError) as e:
+        raise PersistenceError(f"Regeldatei {target_cee_file!r} nicht ladbar") from e
+    if int(target.version) <= int(world.svc.rules.version):
+        raise PersistenceError("Die Zielversion muss höher sein als die aktuelle Regelversion")
+    env, logs = export_world(world)
+    env = json.loads(json.dumps(env))
+    env["rules"]["cee_file"], env["rules"]["cee_sha256"] = target_cee_file, _file_sha("mmo_cee", target_cee_file)
+    has_pricing = "dynamic_reference" in target["economy"]
+    env["rules"]["pricing_file"] = PRICING_RULES if has_pricing else None
+    env["rules"]["pricing_sha256"] = _file_sha("mmo_world", PRICING_RULES) if has_pricing else None
+    new = import_world(env, json.loads(json.dumps(logs)))
+    try:
+        for cid in sorted(new.svc.log.character_ids()) if characters is None else characters:
+            while new.svc.needs_migration(cid):
+                new.svc.migrate(cid)
+    except (CEEError, WorldError, KeyError) as e:
+        raise PersistenceError(f"Migration fehlgeschlagen: {type(e).__name__}: {e}") from e
+    problems = check_consistency(new)
+    if problems:
+        raise PersistenceError("Inkonsistenter Weltzustand nach der Migration: " + "; ".join(problems))
+    return new
 
 
 # ---------------------------------------------------------------- Speicher ----------------

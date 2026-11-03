@@ -23,8 +23,10 @@ from typing import Any, Callable
 from mmo_cee.errors import RuleViolation
 from mmo_cee.history import _canonical as canonical_bytes
 
+from . import persistence
 from .company import goal_of, load_company_rules
 from .errors import WorldError
+from .persistence import PersistenceError
 from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, World
 
 CEE_RULES_V8 = "rules_v8.json"
@@ -86,6 +88,20 @@ def _set_day(env: Env, a: Op) -> None:
     env.day[0] = a["value"]
 
 
+def _upgrade(env: Env, a: Op) -> Any:
+    """Hebt die ganze Welt auf eine höhere Regelversion (Figuren aus `chars`, sonst alle, werden migriert)."""
+    new = persistence.upgrade_world(env, a["to"], a.get("chars"))
+    saved = env.saved
+    env.__dict__.update(new.__dict__)
+    env.saved = saved
+    return {"rules": new.svc.rules.version, "lagging": [c for c in new.svc.log.character_ids() if new.svc.needs_migration(c)]}
+
+
+def _migrate(env: Env, a: Op) -> Any:
+    ev = env.svc.migrate(a["char"])
+    return {"from": ev.payload["from"], "to": ev.payload["to"], "event_hash": ev.hash}
+
+
 def _pricing(env: Env) -> Any:
     if env.pricing is None:
         raise WorldError("Preisdynamik ist mit diesen CEE-Regeln nicht aktiv")
@@ -143,6 +159,8 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "prod_start": lambda e, a: e.production.start(a["actor"], a["company"], a["worker"], a["recipe"], a["batches"], a["grade"]),
     "prod_cancel": lambda e, a: e.production.cancel(a["actor"], a["company"], a["job"]),
     "prod_sell": lambda e, a: e.production.sell_to_npc(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "rules_upgrade": lambda e, a: _upgrade(e, a),
+    "rules_migrate": lambda e, a: _migrate(e, a),
     "price_advance": lambda e, a: _pricing(e).advance(a["value"]),
     "price_shock": lambda e, a: _pricing(e).set_shock(a["item_key"], a["permille"], a["days"]),
     "maker_sell": lambda e, a: _maker(e, "sell", a),
@@ -157,7 +175,7 @@ def execute(env: Env, op: Op) -> dict[str, Any]:
     """Führt einen Schritt aus; Rückgabe: {expect: ok|error, result|error: Klasse}."""
     try:
         res = OPS[op["op"]](env, op)
-    except (WorldError, RuleViolation) as e:
+    except (WorldError, RuleViolation, PersistenceError) as e:
         return {"expect": "error", "error": type(e).__name__}
     return {"expect": "ok", "result": _jsonable(res)}
 
@@ -722,6 +740,39 @@ def random_market_script(seed: int, steps: int) -> list[Op]:
     return script
 
 
+def scenario_rules_migration() -> list[Op]:
+    """Startet unter CEE-Regeln v7 und hebt die Welt mitten im Ablauf auf v8 (Migrationsereignisse in den Historien)."""
+    fine, ore = "iron_blade@fine", "iron_ore@standard"
+    return [
+        *[op for c in "abc" for op in (*person(c, smithing=700, trade=700), D(c, COIN, 20000), D(c, fine, 30), D(c, ore, 60))],
+        S("price_advance", value=1),                                              # v7: keine Preisdynamik
+        S("trade", seller="a", buyer="b", item_key=fine, qty=2, price=360),       # v7-Bericht ohne Referenzfeld
+        S("craft", char="a", recipe="iron_ingot", qty=5, grade="standard"),
+        S("found", char="a", capital=3000), S("hire", actor="a", company=co(1), char="b", wage=40),
+        MP("c", "sell", 3, 190), MP("b", "buy", 2, 170),
+        S("rules_upgrade", to="rules_v7.json"),                                   # nicht höher
+        S("rules_upgrade", to="rules_v99.json"),
+        S("rules_upgrade", to="../data/rules_v8.json"),
+        S("cee_record", char="a", type="identity.rules_migrated", payload={"from": "7", "to": "8"}),  # nur über die Migration
+        S("rules_migrate", char="a"),                                             # Version 8 gibt es im v7-Dienst nicht
+        S("rules_upgrade", to="rules_v8.json", chars=["a", "b"]),                 # c bleibt zurück
+        S("rules_migrate", char="a"),                                             # a ist schon migriert
+        S("trade", seller="a", buyer="b", item_key=fine, qty=2, price=360),       # jetzt mit gemeldetem Referenzwert
+        S("trade", seller="a", buyer="c", item_key=fine, qty=1, price=180),       # c ist nicht migriert
+        S("hire", actor="a", company=co(1), char="c", wage=40),
+        S("craft", char="c", recipe="iron_ingot", qty=1, grade="standard"),
+        MP("c", "sell", 1, 190), MP("a", "buy", 1, 190),                           # Orderbuch: c darf nicht teilnehmen
+        S("price_advance", value=2),
+        S("maker_sell", char="a", item_key=ore, qty=5), S("maker_sell", char="c", item_key=ore, qty=5),
+        S("rules_migrate", char="c"),
+        S("rules_migrate", char="c"),                                             # keine weitere Version
+        S("trade", seller="c", buyer="b", item_key=fine, qty=1, price=180),
+        S("hire", actor="a", company=co(1), char="c", wage=40),
+        DAY(5), S("advance_day", value=5),
+        S("maker_buy", char="c", item_key=ore, qty=5),
+    ]
+
+
 def scenario_price_dynamics() -> list[Op]:
     fine, ore = "iron_blade@fine", "iron_ore@standard"
     MS = lambda c, k, q: S("maker_sell", char=c, item_key=k, qty=q)  # noqa: E731
@@ -823,6 +874,8 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      scenario_price_dynamics),
     ("random_price_5", "Zustandsbewusstes Zufallsskript Markt + Preisdynamik + Händler (Seed 5, 260 Aktionen, Regeln v8), ausgeschrieben",
      lambda: random_price_script(5, 260)),
+    ("rules_migration", "Regelversions-Migration: Welt von v7 auf v8 mitten im Ablauf, Migrationsereignisse, zurückgebliebene Figur",
+     scenario_rules_migration),
 ]
 
 

@@ -92,6 +92,10 @@ Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur 
 
 Ab `rules_v8.json` meldet der Server den Referenzwert jedes Handels (`payload.reference`); die CEE prüft nur eine feste Spanne um den Tabellenwert, der Replay bleibt deterministisch. `PricingService` (`mmo_world/pricing.py`): Preisfaktoren je Gut+Güte, die sich täglich dem Marktsignal (Orderbuch-Durchschnitt) und Schocks nähern (begrenzte Schritte und Spanne), und ein NPC-Händler mit Tagesmengen, der Extrempreise begrenzt. Orderbuch-Band und NPC-Abnehmer der Firmen nutzen denselben Referenzwert. Regeln: `pricing_rules_v1.json` (Platzhalter).
 
+## Regelversions-Migration (ADR-0018)
+
+Eine Figur wechselt die Regelversion durch ein aufgezeichnetes Ereignis `identity.rules_migrated` (neue Version, Hash des Zustands davor, Fingerabdrücke beider Regeln). `RulesChain` (`mmo_cee/migration.py`) spielt Historien mit mehreren Regelversionen ab; `CharacterService.migrate()` hebt eine Figur um eine Stufe an. Nicht migrierte Figuren sind lesbar, aber für alle Aktionen gesperrt. `persistence.upgrade_world` hebt eine ganze Welt (oder eine Teilmenge der Figuren) auf eine höhere CEE-Regeldatei.
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

@@ -54,6 +54,9 @@ class Projector:
         return self.engines[prefix]
 
     def validate(self, state: CharacterState, type: str, payload: dict[str, Any]) -> None:
+        if state.rules_version != self.rules.version:
+            raise RuleViolation(f"Figur läuft unter Regelversion {state.rules_version}, geladen ist {self.rules.version}: "
+                                f"erst migrieren (ADR-0018)")
         engine = self._engine_for(type)
         created = state.parts["identity"]["kind"] is not None
         if type == "identity.created" and created:

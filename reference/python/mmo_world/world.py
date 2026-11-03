@@ -10,7 +10,7 @@ from typing import Any
 
 from mmo_cee.golden import state_hash
 from mmo_cee.history import _canonical as canonical_bytes
-from mmo_cee.rules import load_rules
+from mmo_cee.rules import load_rules, older_rules
 from mmo_cee.service import CharacterService
 
 from .company import CompanyRegistry, load_company_rules
@@ -34,7 +34,8 @@ PRICING_RULES = "pricing_rules_v1.json"
 class World:
     def __init__(self, cee_rules: str = CEE_RULES, company_rules: str = COMPANY_RULES, server_id: str = "srv1") -> None:
         self.cee_rules_file, self.company_rules_file, self.server_id = cee_rules, company_rules, server_id
-        self.svc = CharacterService(rules=load_rules(cee_rules))
+        rules = load_rules(cee_rules)
+        self.svc = CharacterService(rules=rules, history_rules=older_rules(rules))
         self.inv = Inventory()
         self.day = [1]
         clock = lambda: self.day[0]  # noqa: E731
