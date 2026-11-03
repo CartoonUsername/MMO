@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Fristen, Limits und Gebühr sind Vorschläge, KEINE bestätigten Spielinhalte. Ganzzahlen; Divisionen als Floor.",
+  "requires_cee_rules_min": 7,
+  "offer_days": 3,
+  "max_open_offers": 5,
+  "max_incoming_offers": 10,
+  "fee_permille": 20
+}

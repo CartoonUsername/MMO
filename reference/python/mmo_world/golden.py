@@ -27,7 +27,7 @@ from . import persistence
 from .company import goal_of, load_company_rules
 from .errors import WorldError
 from .persistence import PersistenceError
-from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, World
+from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, TRADE_RULES, World
 
 CEE_RULES_V8 = "rules_v8.json"
 
@@ -86,6 +86,12 @@ def _disclosure(env: Env, a: Op) -> Any:
 
 def _set_day(env: Env, a: Op) -> None:
     env.day[0] = a["value"]
+
+
+def _accept(env: Env, a: Op) -> Any:
+    s = env.offers.accept(a["char"], a["offer"])
+    t = s.trade
+    return {"trade_id": t.trade_id, "price": t.price, "quantity": t.quantity, "reference": t.reference, "fee": s.fee}
 
 
 def _upgrade(env: Env, a: Op) -> Any:
@@ -159,6 +165,11 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "prod_start": lambda e, a: e.production.start(a["actor"], a["company"], a["worker"], a["recipe"], a["batches"], a["grade"]),
     "prod_cancel": lambda e, a: e.production.cancel(a["actor"], a["company"], a["job"]),
     "prod_sell": lambda e, a: e.production.sell_to_npc(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "offer_make": lambda e, a: e.offers.make(a["char"], a["to"], a["side"], a["item_key"], a["qty"], a["price"]),
+    "offer_accept": lambda e, a: _accept(e, a),
+    "offer_decline": lambda e, a: e.offers.decline(a["char"], a["offer"]),
+    "offer_cancel": lambda e, a: e.offers.cancel(a["char"], a["offer"]),
+    "offer_expire": lambda e, a: e.offers.expire(a["value"]),
     "rules_upgrade": lambda e, a: _upgrade(e, a),
     "rules_migrate": lambda e, a: _migrate(e, a),
     "price_advance": lambda e, a: _pricing(e).advance(a["value"]),
@@ -546,6 +557,44 @@ def MP(char: str, side: str, qty: int, price: int, key: str = "iron_blade@fine",
     return S("market_place", char=char, side=side, item_key=key, qty=qty, price=price, **kw)
 
 
+def scenario_direct_trade() -> list[Op]:
+    fine = "iron_blade@fine"  # Referenz 180 je Stück
+    OM = lambda c, to, side, q, p, key=fine: S("offer_make", char=c, to=to, side=side, item_key=key, qty=q, price=p)  # noqa: E731
+    OA = lambda c, o: S("offer_accept", char=c, offer=o)  # noqa: E731
+    off = lambda n: f"srv1-off-{n:08d}"  # noqa: E731
+    return [
+        *[op for c in "abcd" for op in (*person(c, trade=700), D(c, COIN, 3000), D(c, fine, 20))],
+        *person("poor"), D("poor", COIN, 50),
+        OM("a", "b", "sell", 2, 360),                                  # 1: a verkauft b 2 Schwerter (Ware hinterlegt)
+        OM("a", "a", "sell", 1, 100), OM("a", "ghost", "sell", 1, 100), OM("ghost", "a", "sell", 1, 100),
+        OM("a", "b", "swap", 1, 100), OM("a", "b", "sell", 0, 100), OM("a", "b", "sell", 1, 0), OM("a", "b", "sell", 1, 100, "iron_blade"),
+        OM("a", "b", "sell", 99, 100),                                 # mehr Ware, als a hat
+        OM("a", "b", "buy", 1, 5000),                                  # mehr Münzen, als a hat
+        OA("c", off(1)),                                               # nicht die angesprochene Figur
+        S("offer_decline", char="c", offer=off(1)), S("offer_cancel", char="b", offer=off(1)),
+        OA("b", off(1)),                                               # b nimmt an: Handel, Gebühr 2 % an die Senke
+        OA("b", off(1)),                                               # erledigt
+        OM("b", "a", "buy", 3, 500),                                   # 2: b will 3 Schwerter für 500 (Münzen hinterlegt)
+        OA("a", off(2)),
+        OM("a", "poor", "sell", 3, 600),                               # 3: poor kann nicht zahlen
+        OA("poor", off(3)),                                            # scheitert, Angebot bleibt
+        D("poor", COIN, 600), OA("poor", off(3)),                      # jetzt klappt es
+        OM("a", "c", "sell", 1, 5),                                    # 4: Scheinpreis weit unter dem Referenzwert: erlaubt, aber ohne Punkte
+        OA("c", off(4)),
+        OM("a", "b", "sell", 2, 360), S("offer_decline", char="b", offer=off(5)),   # 5: abgelehnt, Ware zurück
+        OM("a", "b", "sell", 2, 360), S("offer_cancel", char="a", offer=off(6)),    # 6: zurückgenommen
+        S("offer_cancel", char="a", offer=off(6)),
+        *[OM("a", "b", "sell", 1, 180) for _ in range(6)],             # 7..11: fünf offene Angebote je Anbieter, das sechste scheitert
+        *[OM("c", "b", "sell", 1, 180) for _ in range(6)],             # 12..16: fünf von c an b (eingehend bei b: 10), das sechste scheitert
+        OM("d", "b", "sell", 1, 180),                                  # b hat schon 10 eingehende Angebote: Grenze
+        DAY(3), S("offer_expire", value=3),                            # noch nicht (Frist: Tag 1 + 3 = 4)
+        OA("b", off(8)),                                               # Tag 3 < 4: möglich
+        DAY(4), OA("b", off(9)),                                       # Tag 4: abgelaufen
+        S("offer_expire", value=-1), S("offer_expire", value=4),       # räumt alle verbliebenen ab
+        OM("b", "a", "buy", 1, 180), OA("a", off(99)),                 # unbekanntes Angebot
+    ]
+
+
 def scenario_market() -> list[Op]:
     fine = "iron_blade@fine"  # Referenz 180 je Stück, Band 135..225
     return [
@@ -862,6 +911,8 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      scenario_company_poach_close),
     ("company_production", "Firmenproduktion: Lager, Linien, Chargen, Qualitätsdeckel, Abnehmer mit Tageslimit, Abbruch, Stillstand, Schließung",
      scenario_production),
+    ("direct_trade", "Direkter Handel: Angebot/Annahme, Hinterlegung, Ablehnen/Zurücknehmen, Fristen, Limits, Gebühr",
+     scenario_direct_trade),
     ("market_orderbook", "Markt: Orderbuch, Preis-Zeit-Priorität, Teilausführung, IOC, Preisband, Limits, Verfall, Preisindex",
      scenario_market),
     ("random_market_3", "Zustandsbewusstes Zufallsskript nur für den Markt (Seed 3, 220 Aktionen), ausgeschrieben",
@@ -897,6 +948,7 @@ def build_vector() -> dict[str, Any]:
             "company_rules_file": COMPANY_RULES, "company_rules_sha256": _sha("mmo_world", COMPANY_RULES),
             "market_rules_file": MARKET_RULES, "market_rules_sha256": _sha("mmo_world", MARKET_RULES),
             "production_rules_file": PRODUCTION_RULES, "production_rules_sha256": _sha("mmo_world", PRODUCTION_RULES),
+            "trade_rules_file": TRADE_RULES, "trade_rules_sha256": _sha("mmo_world", TRADE_RULES),
             "pricing_rules_file": PRICING_RULES, "pricing_rules_sha256": _sha("mmo_world", PRICING_RULES),
             "extra_cee_rules": {f: _sha("mmo_cee", f) for f in sorted(set(SCENARIO_RULES.values()))},
             "scenarios": [run_scenario(n, d, f()) for n, d, f in SCENARIOS]}
@@ -919,6 +971,8 @@ def verify_vector(vec: dict[str, Any]) -> list[str]:
         errs.append("Marktregeln haben sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["production_rules_file"]) != vec["production_rules_sha256"]:
         errs.append("Produktionsregeln haben sich geändert (SHA-256 weicht ab)")
+    if _sha("mmo_world", vec["trade_rules_file"]) != vec["trade_rules_sha256"]:
+        errs.append("Handelsregeln haben sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["pricing_rules_file"]) != vec["pricing_rules_sha256"]:
         errs.append("Preisregeln haben sich geändert (SHA-256 weicht ab)")
     for f, h in vec["extra_cee_rules"].items():

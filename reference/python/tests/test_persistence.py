@@ -58,7 +58,7 @@ class RoundtripTests(unittest.TestCase):
     def test_resume_at_many_cut_points_reproduces_the_golden_steps(self):
         """Speichern + Laden mitten im Ablauf ändert nichts: jeder weitere Schritt liefert Ergebnis und Welt-Hash des Vektors."""
         for name in ("world_crafting", "world_discovery", "company_lifecycle", "company_governance", "company_poach_close",
-                     "company_production", "market_orderbook", "price_dynamics"):
+                     "company_production", "market_orderbook", "price_dynamics", "direct_trade"):
             steps = SCEN[name]["steps"]
             for cut in range(1, len(steps), 9):
                 with self.subTest(name=name, cut=cut):
@@ -149,7 +149,7 @@ class TamperTests(unittest.TestCase):
         self.fails(e)
 
     def test_rules_hashes(self):
-        for key in ("cee_sha256", "company_sha256", "market_sha256", "production_sha256"):
+        for key in ("cee_sha256", "company_sha256", "market_sha256", "production_sha256", "trade_sha256"):
             with self.subTest(key):
                 e = copy.deepcopy(self.e)
                 e["rules"][key] = "0" * 64

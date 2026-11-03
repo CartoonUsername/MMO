@@ -74,6 +74,10 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `market.cancel` | char:s, order:s | char | schreibend | default |
 | `maker.sell` | char:s, item_key:s, qty:i | char | schreibend | default |
 | `maker.buy` | char:s, item_key:s, qty:i | char | schreibend | default |
+| `trade.offer` | char:s, to:s, side:s, item_key:s, qty:i, price:i | char | schreibend | default |
+| `trade.accept` | char:s, offer:s | char | schreibend | default |
+| `trade.decline` | char:s, offer:s | char | schreibend | default |
+| `trade.cancel` | char:s, offer:s | char | schreibend | default |
 | `combat.set_loadout` | char:s, abilities:l | char | schreibend | default |
 | `company.found` | char:s, capital:i | char | schreibend | default |
 | `company.close` | actor:s, company:s | actor | schreibend | default |
@@ -101,6 +105,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.disclosure` | company:s | – | lesend | query |
 | `query.inventory` | char:s | char | lesend | query |
 | `query.economic_profile` | char:s | char | lesend | query |
+| `query.offers` | char:s | char | lesend | query |
 | `query.abilities` | char:s | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 
@@ -110,7 +115,7 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 
 - **cee_create/cee_record** – Charaktererstellung und Ereignisse kommen vom Server (Berichte, Kampf, Herstellung)
 - **discovery.gather** – Beweise vergibt der Server aus Spielereignissen
-- **trade (direkt)** – Zwei-Parteien-Handel braucht Zustimmung beider Seiten (Angebot/Annahme); bis dahin nur über das Orderbuch
+- **trade (direkt, ohne Zustimmung)** – Der Handelsdienst selbst ist intern; Clients handeln nur über Orderbuch oder Angebot/Annahme (`trade.*`)
 - **deposit/revenue** – Münzquellen sind serverintern
 - **advance_day/price_advance/market_expire** – Tagesschritte macht der Server nach seiner Uhr
 - **price_shock/rules_upgrade/rules_migrate** – Weltereignisse und Betriebsaktionen
@@ -151,7 +156,7 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 ## 9. Offene Entscheidungen
 
 1. Transport und Format im Detail (WebSocket+JSON für Befehle ist die Referenz; Binärformat und QUIC für den Kampf?).
-2. Direkter Zwei-Parteien-Handel (Angebot/Annahme mit Zustimmung beider) – bisher nur Orderbuch.
+2. Direkter Zwei-Parteien-Handel: Angebot/Annahme umgesetzt (ADR-0023); offen sind Gegenangebote und Tausch mehrerer Gegenstände.
 3. Push-Nachrichten an Clients (Ereignisse wie „Order ausgeführt“, „Kündigung“, Beschlüsse): Abonnement- und Zustellmodell, Offline-Postfach.
 4. Konten, Anmeldung, Token-Lebensdauer, Sperren, Jugendschutz/Rechtliches (nicht Teil der Referenz).
 5. Reihenfolge und Fairness bei gleichzeitigen Befehlen vieler Spieler (Tick-Batching oder strikte Ankunftsreihenfolge).

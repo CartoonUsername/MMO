@@ -57,6 +57,12 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("market.cancel", "char:s order:s", "char", lambda w, a: _res(w.exchange.cancel(a["char"], a["order"]))),
     _c("maker.sell", "char:s item_key:s qty:i", "char", lambda w, a: _res(_pricing(w).sell_to_maker(a["char"], a["item_key"], a["qty"]))),
     _c("maker.buy", "char:s item_key:s qty:i", "char", lambda w, a: _res(_pricing(w).buy_from_maker(a["char"], a["item_key"], a["qty"]))),
+    # Direkter Handel mit Zustimmung beider Seiten (Angebot -> Annahme)
+    _c("trade.offer", "char:s to:s side:s item_key:s qty:i price:i", "char",
+       lambda w, a: w.offers.make(a["char"], a["to"], a["side"], a["item_key"], a["qty"], a["price"])),
+    _c("trade.accept", "char:s offer:s", "char", lambda w, a: _settle(w.offers.accept(a["char"], a["offer"]))),
+    _c("trade.decline", "char:s offer:s", "char", lambda w, a: w.offers.decline(a["char"], a["offer"])),
+    _c("trade.cancel", "char:s offer:s", "char", lambda w, a: w.offers.cancel(a["char"], a["offer"])),
     # Kampfentwicklung: Fähigkeiten ausrüsten (Tag setzt der Server)
     _c("combat.set_loadout", "char:s abilities:l", "char",
        lambda w, a: w.svc.record(a["char"], "combat.loadout_set", {"abilities": a["abilities"], "day": w.day[0]}).hash),
@@ -93,6 +99,9 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.disclosure", "company:s", None, lambda w, a: _res(w.company.disclosure(a["company"])), mutating=False),
     _c("query.inventory", "char:s", "char", lambda w, a: w.inv.holdings(a["char"]), mutating=False),
     _c("query.economic_profile", "char:s", "char", lambda w, a: w.svc.economic_profile(a["char"]), mutating=False),
+    _c("query.offers", "char:s", "char", lambda w, a: {"outgoing": [w.offers.offers[k] for k in w.offers.open_offers(a["char"])["outgoing"]],
+                                                       "incoming": [w.offers.offers[k] for k in w.offers.open_offers(a["char"])["incoming"]]},
+       mutating=False),
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}
@@ -101,12 +110,17 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
 INTERNAL_ONLY: dict[str, str] = {
     "cee_create/cee_record": "Charaktererstellung und Ereignisse kommen vom Server (Berichte, Kampf, Herstellung)",
     "discovery.gather": "Beweise vergibt der Server aus Spielereignissen",
-    "trade (direkt)": "Zwei-Parteien-Handel braucht Zustimmung beider Seiten (Angebot/Annahme); bis dahin nur über das Orderbuch",
+    "trade (direkt, ohne Zustimmung)": "Der Handelsdienst selbst ist intern; Clients handeln nur über Orderbuch oder Angebot/Annahme (`trade.*`)",
     "deposit/revenue": "Münzquellen sind serverintern",
     "advance_day/price_advance/market_expire": "Tagesschritte macht der Server nach seiner Uhr",
     "price_shock/rules_upgrade/rules_migrate": "Weltereignisse und Betriebsaktionen",
     "persistence (export/import/commit)": "Betrieb",
 }
+
+
+def _settle(s: Any) -> dict[str, Any]:
+    t = s.trade
+    return {"trade_id": t.trade_id, "price": t.price, "quantity": t.quantity, "item_key": t.item_key, "fee": s.fee}
 
 
 def _pricing(w: World) -> Any:

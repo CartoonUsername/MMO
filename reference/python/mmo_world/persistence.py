@@ -29,7 +29,7 @@ from .company import CompanyRegistry
 from .discovery import DiscoveryRegistry
 from .errors import WorldError
 from .inventory import Inventory
-from .world import MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, World
+from .world import MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, TRADE_RULES, World
 
 SNAPSHOT_FORMAT = 1
 KIND = "mmo_world_snapshot"
@@ -65,6 +65,7 @@ def export_world(world: World) -> tuple[Envelope, Logs]:
                   "company_file": world.company_rules_file, "company_sha256": _file_sha("mmo_world", world.company_rules_file),
                   "market_file": MARKET_RULES, "market_sha256": _file_sha("mmo_world", MARKET_RULES),
                   "production_file": PRODUCTION_RULES, "production_sha256": _file_sha("mmo_world", PRODUCTION_RULES),
+                  "trade_file": TRADE_RULES, "trade_sha256": _file_sha("mmo_world", TRADE_RULES),
                   "pricing_file": PRICING_RULES if world.pricing is not None else None,
                   "pricing_sha256": _file_sha("mmo_world", PRICING_RULES) if world.pricing is not None else None},
         "world": snap, "world_sha256": _sha(snap), "log_heads": heads,
@@ -118,6 +119,7 @@ def check_consistency(world: World) -> list[str]:
         if founded is None or founded["open"] != c["open"]:
             errs.append(f"{comp_id}: Gründungsstatus weicht von der CEE des Gründers ab")
     errs += [f"Markt: {m}" for m in world.exchange.check()]
+    errs += [f"Angebote: {m}" for m in world.offers.check()]
     errs += [f"Produktion: {m}" for m in world.production.check()]
     if world.pricing is not None:
         errs += [f"Preise: {m}" for m in world.pricing.check()]
@@ -143,7 +145,7 @@ def import_world(envelope: Envelope, logs: Logs) -> World:
 def _import(envelope: Envelope, logs: Logs) -> World:
     env = migrate_envelope(envelope)
     rules = env["rules"]
-    names = [rules["cee_file"], rules["company_file"], rules["market_file"], rules["production_file"]]
+    names = [rules["cee_file"], rules["company_file"], rules["market_file"], rules["production_file"], rules["trade_file"]]
     if rules["pricing_file"] is not None:
         names.append(rules["pricing_file"])
     for name in names:  # nur schlichte Dateinamen aus dem Paket, nie Pfade
@@ -158,6 +160,8 @@ def _import(envelope: Envelope, logs: Logs) -> World:
     if (rules["pricing_file"], rules["pricing_sha256"]) != (None, None) and (
             rules["pricing_file"] != PRICING_RULES or _file_sha("mmo_world", rules["pricing_file"]) != rules["pricing_sha256"]):
         raise PersistenceError("Preisregeln haben sich seit dem Speichern geändert")
+    if rules["trade_file"] != TRADE_RULES or _file_sha("mmo_world", rules["trade_file"]) != rules["trade_sha256"]:
+        raise PersistenceError("Handelsregeln haben sich seit dem Speichern geändert")
     if rules["production_file"] != PRODUCTION_RULES or _file_sha("mmo_world", rules["production_file"]) != rules["production_sha256"]:
         raise PersistenceError("Produktionsregeln haben sich seit dem Speichern geändert")
     if _sha(env["world"]) != env["world_sha256"]:
@@ -185,6 +189,8 @@ def _import(envelope: Envelope, logs: Logs) -> World:
     world.trading._counter, world.crafting._counter = snap["counters"]["trade"], snap["counters"]["craft"]
     if "exchange" in snap:
         world.exchange.load(json.dumps(snap["exchange"]))
+    if "trade_offers" in snap:
+        world.offers.load(json.dumps(snap["trade_offers"]))
     if "production" in snap:
         world.production.load(json.dumps(snap["production"]))
     if "pricing" in snap:

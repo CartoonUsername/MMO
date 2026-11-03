@@ -16,6 +16,7 @@ from mmo_cee.service import CharacterService
 from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
+from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
 from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
@@ -29,6 +30,7 @@ COMPANY_RULES = "company_rules_v1.json"
 MARKET_RULES = "market_rules_v1.json"
 PRODUCTION_RULES = "production_rules_v1.json"
 PRICING_RULES = "pricing_rules_v1.json"
+TRADE_RULES = "trade_rules_v1.json"
 
 
 class World:
@@ -55,6 +57,10 @@ class World:
         self.exchange = Exchange(self.svc, self.inv, self.trading, load_market_rules(MARKET_RULES), clock, sid)
         if old is not None:
             self.exchange._counter, self.exchange.orders, self.exchange.stats = old._counter, old.orders, old.stats
+        oldt = getattr(self, "offers", None)
+        self.offers = DirectTrade(self.svc, self.inv, self.trading, load_trade_rules(TRADE_RULES), clock, sid)
+        if oldt is not None:
+            self.offers._counter, self.offers.offers = oldt._counter, oldt.offers
         oldp = getattr(self, "production", None)
         self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
         if oldp is not None:
@@ -71,6 +77,8 @@ class World:
         snap = self._base_snapshot()
         if self.exchange.active:  # ältere Snapshots/Vektoren ohne Markt bleiben unverändert
             snap["exchange"] = json.loads(self.exchange.to_json())
+        if self.offers.active:
+            snap["trade_offers"] = json.loads(self.offers.to_json())
         if self.production.active:
             snap["production"] = json.loads(self.production.to_json())
         if self.pricing is not None and self.pricing.active:
