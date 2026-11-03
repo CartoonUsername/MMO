@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .combat import reached_directions
 from .engine import CharacterState, Engine
 from .errors import RuleViolation
 from .history import Event
@@ -23,6 +24,11 @@ def eligible_forms(state: CharacterState, rules: Rules) -> list[str]:
             continue
         if not set(req.get("attuned_all", [])) <= attuned:
             continue
+        need = req.get("combat_directions", {})
+        if need:
+            reached = reached_directions(state, rules) if "combat" in state.parts else {}
+            if any(reached.get(d, 0) < t for d, t in need.items()):
+                continue
         mastery = {p: prof.mastery_level(x) for p, x in state.parts["profession"]["xp"].items()}
         if any(mastery.get(p, 0) < m for p, m in req.get("professions", {}).items()):
             continue

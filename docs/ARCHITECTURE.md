@@ -42,6 +42,8 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Ganzzahl-Arithmetik (Promille) für Bit-Identität bei der späteren C++-Portierung (ADR-0004).
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
+Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.
