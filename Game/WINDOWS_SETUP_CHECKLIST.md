@@ -47,7 +47,7 @@ git --version; git lfs version; python --version
 cd D:\dev\MMO\reference\python
 python -m unittest discover -s . -t . -v
 ```
-Erwartet: 36 Tests, `OK`.
+Erwartet: alle Tests (aktuell 76), `OK`.
 
 ## Block 2 – Visual Studio
 

@@ -16,7 +16,7 @@ class HistoryTests(unittest.TestCase):
         evs = self.svc.log.events("c1")
         self.assertEqual([e.seq for e in evs], [0, 1])
         self.assertEqual(evs[1].prev_hash, evs[0].hash)
-        self.assertEqual(evs[0].rules_version, "1")
+        self.assertEqual(evs[0].rules_version, self.svc.rules.version)
 
     def test_tamper_detected(self):
         evs = self.svc.log._events["c1"]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .combat import CombatEngine, reached_directions
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
 from .essence import EssenceEngine, eligible_forms
@@ -13,9 +14,10 @@ from .rules import Rules, load_rules
 
 
 def default_projector(rules: Rules) -> Projector:
-    return Projector(
-        [IdentityEngine(rules), ElementEngine(rules), ProfessionEngine(rules), EssenceEngine(rules)], rules
-    )
+    engines = [IdentityEngine(rules), ElementEngine(rules), ProfessionEngine(rules), EssenceEngine(rules)]
+    if "combat" in rules:  # rules_v1 kennt keine Kampfentwicklung
+        engines.append(CombatEngine(rules))
+    return Projector(engines, rules)
 
 
 class CharacterService:
@@ -51,3 +53,7 @@ class CharacterService:
 
     def eligible_essences(self, character_id: str) -> list[str]:
         return eligible_forms(self.state(character_id), self.rules)
+
+    def combat_directions(self, character_id: str) -> dict[str, int]:
+        """Erreichte Entwicklungsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
+        return reached_directions(self.state(character_id), self.rules)

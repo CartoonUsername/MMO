@@ -11,7 +11,10 @@ from .engine import CharacterState
 
 
 class CombatDevelopment(Protocol):
-    """Prefix 'combat.': Kampfstil-Metriken -> Fähigkeiten-Freischaltung."""
+    """Prefix 'combat.': Teilweise umgesetzt in combat.py (Metriken, Entwicklungsrichtungen).
+
+    Offen bleibt nur diese Schnittstelle: konkrete Fähigkeiten sind noch nicht beschlossen.
+    """
 
     def unlocked_abilities(self, state: CharacterState) -> list[str]: ...
 

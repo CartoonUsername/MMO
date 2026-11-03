@@ -1,36 +1,40 @@
 # Technischer Zustandsbericht
 
-Stand: 2026-11-03 · Basis: Commit `d64029e` (Initial commit)
+Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unverändert (nur `README.md` mit `# MMO`)
 
-## Befund (verifiziert)
+> Korrektur: Frühere Fassungen dieses Berichts beschrieben zuerst den Ausgangszustand („kein Code“) und hängten den Stand nach der Implementierung an. Dieser Bericht beschreibt ausschließlich den **aktuellen** Zustand des Arbeitsbranches. Der Ausgangszustand steht nur noch im Abschnitt „Historie“.
+
+## Aktueller Zustand (verifiziert durch Testlauf)
 
 | Bereich | Stand |
 |---|---|
-| Git | 1 Commit auf `main`; Branch `docs/game-master-blueprint` zeigt auf denselben Commit (kein zusätzlicher Inhalt) |
-| Dateien | nur `README.md` (eine Zeile: `# MMO`) |
-| Code | keiner |
-| Python-Referenzprototyp | **nicht vorhanden** |
-| Datenmodelle, Wesensmatrix, Historie, Berufe, Elemente, Fähigkeiten, NPC-Entwicklung | **nicht vorhanden** |
-| Tests / Abhängigkeiten | keine |
-| Dokumentation | keine |
+| Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
+| Implementierte Engines | Identity, Element, Profession, Essence, **Combat Development** + Character History (Event-Log, Hash-Kette, Replay) |
+| Regeln | `rules_v1.json` (unverändert, ohne Kampf), `rules_v2.json` (v1 + `combat`); Standard ist v2 |
+| Tests | **76** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0004, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
+| Unreal-Projekt | nicht vorhanden (bewusst; erst nach Windows-Checkliste und Freigabe) |
 
-Konsequenz: Es gibt nichts weiterzuentwickeln und nichts, was überschrieben werden könnte. Die Character Evolution Engine (CEE) wird neu begonnen. Wenn ein Prototyp außerhalb dieses Repos existiert (lokal, anderes Repo), bitte bereitstellen, damit er integriert statt dupliziert wird.
+## Noch nicht implementiert
+
+Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Discovery, Crafting, Economic Profile, Visual Evolution (nur Schnittstellen in `interfaces.py`), Persistenz/Snapshots, Server-Protokoll.
+
+## Nicht bestätigte Inhalte (Vorschläge)
+
+- Wesensformen in `rules_v1.json`/`rules_v2.json` (`ember_kin`, …) sind Platzhalter zur Mechanikprüfung.
+- Kampfdimensionen (Kraft, Präzision, Mobilität, Kontrolle, Verteidigung, Unterstützung), Aktionstypen, Entwicklungsrichtungen (`vanguard`, `duelist`, …), alle Gewichte, Schwellen, Tageslimits und Raten in `rules_v2.json` sind **vorläufige technische Vorschläge**, kein beschlossenes Balancing.
+- Bestätigte Spielentscheidungen aus dem Briefing (9 Elemente, max. 2 + 1 Endgame-Element, dauerhafte Wesensform, Start als Mensch, serverseitige Entwicklung, Spieler und NPCs gleiche Pipeline) sind unverändert umgesetzt.
 
 ## Umgebung
 
-Python 3.13, kein pytest installiert. Der Referenzprototyp nutzt deshalb nur die Standardbibliothek und `unittest`.
+Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 
-## Entscheidungen dieses Schritts
+## Historie
 
-Siehe `docs/ARCHITECTURE.md` und `docs/decisions/`. Die Spielentscheidungen aus dem Briefing (9 Elemente, max. 2 reguläre + 1 Endgame-Element, permanente Wesenform, Start als Mensch, serverseitig) sind unverändert übernommen.
+1. `d64029e` Ausgangszustand: nur `README.md`, kein Code, kein Prototyp.
+2. `1b07107` Zustandsbericht, Architektur, Roadmap.
+3. `ba3d1b0` Event-Log, Identity/Element/Profession/Essence, 36 Tests.
+4. `961f534` Production-Readiness-Doku, Windows-Checkliste, LFS-/Unreal-Ignore-Regeln.
+5. (dieser Stand) Combat Development Engine, Regeln v2, 76 Tests.
 
-## Priorisierter Entwicklungsplan
-
-Siehe `docs/ROADMAP.md`.
-
-## Stand nach erster Implementierung (Folgecommit)
-
-- `reference/python/mmo_cee/`: Event-Log mit Hash-Kette, Projector (Replay), Identity-, Element-, Profession- und Essence-Engine, versionierte Regeln (`rules_v1.json`).
-- 36 Tests (`unittest`), alle grün.
-- Die vier Wesensformen in `rules_v1.json` sind **Platzhalter-Vorschläge** zur Verifikation der Mechanik, keine bestätigten Spielinhalte.
-- Nicht implementiert: Combat Development, Discovery, Crafting, Economic Profile, Visual Evolution (nur Schnittstellen in `interfaces.py`).
+Plan: `docs/ROADMAP.md`.

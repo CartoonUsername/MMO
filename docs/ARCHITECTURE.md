@@ -24,7 +24,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 |---|---|---|---|
 | 1 | Identity | `identity.` | **implementiert** (Typ Spieler/NPC, Klasse, XP/Level) |
 | 2 | Essence (Wesen) | `essence.` | **implementiert** (Eignung, Prüfung, dauerhafte Annahme) |
-| 3 | Combat Development | `combat.` | Schnittstelle (`interfaces.py`), nicht implementiert |
+| 3 | Combat Development | `combat.` | **implementiert** (Metriken, Entwicklungsrichtungen, Anti-Farming; konkrete Fähigkeiten offen) |
 | 4 | Element | `element.` | **implementiert** (9 Elemente, Prägung, 2 + 1 Limit) |
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
 | 6 | Discovery | `discovery.` | Schnittstelle, nicht implementiert |
@@ -32,6 +32,15 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | 8 | Economic Profile | `economy.` | Schnittstelle, nicht implementiert |
 | 9 | Character History | (Querschnitt) | **implementiert** (`history.py`: Log, Hash-Kette, Verifikation) |
 | 10 | Visual Evolution | `visual.` | Schnittstelle, nicht implementiert (reine Ableitung aus State) |
+
+## Combat Development Engine (Details, siehe ADR-0003)
+
+- Einziges Ereignis: `combat.encounter_resolved` – ein **serverseitig bestätigter Begegnungsbericht** mit beobachteten Aktionszählern (`actions: {Aktion: Anzahl}`), Gegnertyp/-stufe, Ergebnis, Dauer und Spieltag. Das Payload-Schema ist strikt: jedes unbekannte Feld (z. B. `points`, `strength`) wird abgelehnt.
+- Punkte entstehen nur in der Engine: Aktionen → Dimensionen (Gewichte aus Regeln) × Ergebnis × Relevanz × Wiederholungsabnahme, danach Tageslimit je Dimension (voller Satz bis `full_cap`, reduziert bis `hard_cap`, dann 0).
+- Exploit-Schutz: eindeutige `encounter_id` je Charakter, Plausibilität der Aktionsraten (`max_per_minute`, Dauer, Burst), Tag darf nicht zurückspringen, Wiederholungsabnahme je Gegnertyp und Tag, Abwertung trivialer Gegner.
+- Entwicklungsrichtungen sind eine **abgeleitete Sicht** (`reached_directions`): gewichtete Summen der Dimensionspunkte gegen Stufenschwellen. Nicht exklusiv, Punkte sinken nie, jede Dimension bleibt unabhängig von der Grundklasse trainierbar.
+- Ganzzahl-Arithmetik (Promille) für Bit-Identität bei der späteren C++-Portierung (ADR-0004).
+- Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 

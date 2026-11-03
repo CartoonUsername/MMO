@@ -18,7 +18,10 @@ class Rules:
     def __getitem__(self, key: str) -> Any:
         return self.data[key]
 
+    def __contains__(self, key: str) -> bool:
+        return key in self.data
 
-def load_rules(name: str = "rules_v1.json") -> Rules:
+
+def load_rules(name: str = "rules_v2.json") -> Rules:
     text = resources.files("mmo_cee").joinpath("data", name).read_text(encoding="utf-8")
     return Rules(json.loads(text))
