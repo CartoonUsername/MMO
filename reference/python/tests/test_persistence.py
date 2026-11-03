@@ -16,8 +16,12 @@ VEC = json.loads((Path(__file__).resolve().parents[2] / "golden_world" / "world_
 SCEN = {s["name"]: s for s in VEC["scenarios"]}
 
 
-def play(script, upto=None):
-    env = golden.Env()
+def rules_of(sc):
+    return sc.get("cee_rules_file", VEC["cee_rules_file"])
+
+
+def play(script, upto=None, rules=None):
+    env = golden.Env(rules or VEC["cee_rules_file"])
     for op in script[:upto]:
         golden.execute(env, golden.strip_result(op))
     return env
@@ -29,9 +33,9 @@ def over_json(env):
     return json.loads(json.dumps(e)), json.loads(json.dumps(logs))
 
 
-def resume(world, saved):
+def resume(world, saved, rules=None):
     """Setzt die Skriptausführung auf einer geladenen Welt fort (Platzhalter bleiben erhalten)."""
-    env = golden.Env()
+    env = golden.Env(rules or VEC["cee_rules_file"])
     env.__dict__.update(world.__dict__)
     env.saved = dict(saved)
     return env
@@ -45,7 +49,7 @@ class RoundtripTests(unittest.TestCase):
     def test_every_scenario_roundtrips_exactly(self):
         for name, sc in SCEN.items():
             with self.subTest(name):
-                env = play(sc["steps"])
+                env = play(sc["steps"], rules=rules_of(sc))
                 loaded = import_world(*over_json(env))
                 self.assertEqual(loaded.snapshot(), env.snapshot())
                 self.assertEqual(loaded.snapshot(), sc["final"])
@@ -53,13 +57,14 @@ class RoundtripTests(unittest.TestCase):
 
     def test_resume_at_many_cut_points_reproduces_the_golden_steps(self):
         """Speichern + Laden mitten im Ablauf ändert nichts: jeder weitere Schritt liefert Ergebnis und Welt-Hash des Vektors."""
-        for name in ("world_crafting", "world_discovery", "company_lifecycle", "company_governance", "company_poach_close"):
+        for name in ("world_crafting", "world_discovery", "company_lifecycle", "company_governance", "company_poach_close",
+                     "company_production", "market_orderbook", "price_dynamics"):
             steps = SCEN[name]["steps"]
-            for cut in range(1, len(steps), 7):
+            for cut in range(1, len(steps), 9):
                 with self.subTest(name=name, cut=cut):
-                    env = play(steps, cut)
+                    env = play(steps, cut, rules_of(SCEN[name]))
                     world = import_world(*over_json(env))
-                    cont = resume(world, env.saved)
+                    cont = resume(world, env.saved, rules_of(SCEN[name]))
                     for st in steps[cut:]:
                         out = golden.execute(cont, golden.strip_result(st))
                         snap = cont.snapshot()

@@ -88,6 +88,10 @@ Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur 
 
 `ProductionService` (`mmo_world/production.py`): Firmenlager (Inventarkonto), Produktionslinien nach Gebäudestufe, Aufträge mit Arbeiter und Chargen, Fortschritt nur im Tagesabschluss und nur bei bezahltem, angestelltem Arbeiter, gedeckelte Ausbeute/Qualität, Betriebskosten in die Geldsenke, NPC-Abnehmer mit Tageslimit. Keine CEE-Berichte (kein Berufsfortschritt aus Offline-Produktion). Haken in `CompanyService` (`day_hooks`, `close_hooks`). Regeln: `production_rules_v1.json` (Platzhalter).
 
+## Preisdynamik (ADR-0017, CEE-Regeln v8)
+
+Ab `rules_v8.json` meldet der Server den Referenzwert jedes Handels (`payload.reference`); die CEE prüft nur eine feste Spanne um den Tabellenwert, der Replay bleibt deterministisch. `PricingService` (`mmo_world/pricing.py`): Preisfaktoren je Gut+Güte, die sich täglich dem Marktsignal (Orderbuch-Durchschnitt) und Schocks nähern (begrenzte Schritte und Spanne), und ein NPC-Händler mit Tagesmengen, der Extrempreise begrenzt. Orderbuch-Band und NPC-Abnehmer der Firmen nutzen denselben Referenzwert. Regeln: `pricing_rules_v1.json` (Platzhalter).
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

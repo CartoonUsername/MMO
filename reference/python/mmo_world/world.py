@@ -20,6 +20,7 @@ from .discovery import DiscoveryRegistry
 from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
 from .market import TradeService
+from .pricing import PricingService, load_pricing_rules
 from .production import ProductionService, load_production_rules
 from .service import DiscoveryService
 
@@ -27,6 +28,7 @@ CEE_RULES = "rules_v7.json"
 COMPANY_RULES = "company_rules_v1.json"
 MARKET_RULES = "market_rules_v1.json"
 PRODUCTION_RULES = "production_rules_v1.json"
+PRICING_RULES = "pricing_rules_v1.json"
 
 
 class World:
@@ -53,9 +55,16 @@ class World:
         if old is not None:
             self.exchange._counter, self.exchange.orders, self.exchange.stats = old._counter, old.orders, old.stats
         oldp = getattr(self, "production", None)
-        self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid)
+        self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
         if oldp is not None:
             self.production._counter, self.production.jobs, self.production.npc_sold = oldp._counter, oldp.jobs, oldp.npc_sold
+        oldq = getattr(self, "pricing", None)
+        self.pricing = None
+        if "dynamic_reference" in self.svc.rules["economy"]:  # ab CEE-Regeln v8
+            self.pricing = PricingService(self.svc, self.inv, self.trading, self.exchange, load_pricing_rules(PRICING_RULES), clock)
+            if oldq is not None:
+                self.pricing.factors, self.pricing.shocks = oldq.factors, oldq.shocks
+                self.pricing.maker_used, self.pricing.last_day = oldq.maker_used, oldq.last_day
 
     def snapshot(self) -> dict[str, Any]:
         snap = self._base_snapshot()
@@ -63,6 +72,8 @@ class World:
             snap["exchange"] = json.loads(self.exchange.to_json())
         if self.production.active:
             snap["production"] = json.loads(self.production.to_json())
+        if self.pricing is not None and self.pricing.active:
+            snap["pricing"] = json.loads(self.pricing.to_json())
         return snap
 
     def _base_snapshot(self) -> dict[str, Any]:

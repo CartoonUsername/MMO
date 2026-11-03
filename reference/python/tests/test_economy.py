@@ -34,6 +34,80 @@ def eco(svc, cid="a"):
     return svc.state(cid).parts["economy"]
 
 
+RULES8 = load_rules("rules_v8.json")
+
+
+def tr8(tid="t1", ref=360, **kw):
+    return {**tr(tid, **kw), "reference": ref}
+
+
+class DynamicReferenceTests(unittest.TestCase):
+    """Ab rules_v8 meldet der Server den Referenzwert jedes Handels (Spanne um den Tabellenwert)."""
+
+    def setUp(self):
+        self.svc = CharacterService(rules=RULES8)
+        make(self.svc)
+
+    def test_bounds_are_inclusive_and_exact(self):
+        for i, ref in enumerate((216, 360, 504)):
+            self.svc.record("a", TRADE, tr8(f"ok{i}", ref, cp=f"p{i}"))
+        for i, ref in enumerate((215, 505, 0, -1, 10**9)):
+            with self.subTest(ref=ref):
+                with self.assertRaisesRegex(RuleViolation, "reference"):
+                    self.svc.record("a", TRADE, tr8(f"bad{i}", ref, cp=f"q{i}"))
+
+    def test_reference_must_be_a_plain_integer_and_present(self):
+        for bad in (True, 360.0, "360", None, [360]):
+            with self.subTest(bad=bad):
+                with self.assertRaises(RuleViolation):
+                    self.svc.record("a", TRADE, tr8("x", bad, cp="p"))
+        with self.assertRaisesRegex(RuleViolation, "fehlend"):
+            self.svc.record("a", TRADE, tr("x", cp="p"))
+        old = CharacterService(rules=RULES)
+        make(old)
+        with self.assertRaisesRegex(RuleViolation, "unzulässig"):
+            old.record("a", TRADE, tr8("x", cp="p"))  # unter v7 ist das Feld unbekannt
+
+    def test_bounds_round_outward_for_small_values(self):
+        # Brot (rough), 1 Stück: Tabellenwert 3 -> Spanne 1..5 (3*0,6 abgerundet, 3*1,4 aufgerundet)
+        for i, ref in enumerate((1, 3, 5)):
+            self.svc.record("a", TRADE, tr8(f"s{i}", ref, cp=f"p{i}", item="bread", grade="rough", qty=1, value=3))
+        for i, ref in enumerate((0, 6)):
+            with self.assertRaises(RuleViolation):
+                self.svc.record("a", TRADE, tr8(f"b{i}", ref, cp=f"q{i}", item="bread", grade="rough", qty=1, value=3))
+        with self.assertRaises(RuleViolation):  # True ist in Python 1, aber kein gültiger Referenzwert
+            self.svc.record("a", TRADE, tr8("bool", True, cp="z", item="bread", grade="rough", qty=1, value=3))
+
+    def test_credit_follows_the_reported_reference(self):
+        # Tabellenwert 360: Wert 450 liegt am Rand (+25 %) -> v7 schreibt 360 gut; mit gemeldetem Referenzwert 504 sind es 450
+        a = CharacterService(rules=RULES)
+        make(a)
+        a.record("a", TRADE, tr("t", value=450))
+        self.svc.record("a", TRADE, tr8("t", 504, value=450))
+        self.assertEqual(eco(a)["points"]["volume"], 36)
+        self.assertEqual(eco(self.svc)["points"]["volume"], 45)
+        # Wert weit über dem gemeldeten Wert: gewertet, aber 0 Punkte
+        before = eco(self.svc)["points"]["volume"]
+        self.svc.record("a", TRADE, tr8("u", 360, cp="c", value=600))
+        self.assertEqual(eco(self.svc)["points"]["volume"], before)
+        self.assertIn("u", eco(self.svc)["trades"])
+
+    def test_replay_is_deterministic(self):
+        self.svc.record("a", TRADE, tr8("t1", 504, value=450))
+        self.svc.record("a", TRADE, tr8("t2", 216, cp="c", value=216))
+        again = self.svc.rebuild("a")
+        self.assertEqual(again.parts, CharacterService(rules=RULES8, log=self.svc.log).state("a").parts)
+
+    def test_rules_validation(self):
+        for bad in (-1, 901, True, 1.5, "400"):
+            with self.subTest(bad=bad):
+                data = copy.deepcopy(RULES8.data)
+                data["economy"]["dynamic_reference"]["max_shift_permille"] = bad
+                with self.assertRaises(CEEError):
+                    validate_economy_rules(Rules(data))
+        self.assertNotIn("dynamic_reference", RULES["economy"])  # v7 unverändert
+
+
 class EconomyRulesTests(unittest.TestCase):
     def _bad(self, mutate):
         data = copy.deepcopy(RULES.data)

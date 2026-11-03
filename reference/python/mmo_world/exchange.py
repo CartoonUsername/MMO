@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from importlib import resources
 from typing import Any, Callable
 
-from mmo_cee.economy import reference_value
 from mmo_cee.service import CharacterService
 
 from .errors import WorldError
@@ -90,7 +89,7 @@ class Exchange:
 
     def _band(self, item_key: str, unit_price: int) -> None:
         item, grade = self._check_item(item_key)
-        ref = reference_value(self.cee.rules, item, grade, 1)
+        ref = self.trading.reference(item, grade, 1)
         if abs(unit_price - ref) * 1000 > self.mr["band_permille"] * ref:
             raise WorldError(f"Preis außerhalb des Preisbandes (Referenz {ref}, Band ±{self.mr['band_permille']}‰)")
 

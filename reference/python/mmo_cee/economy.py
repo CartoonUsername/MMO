@@ -24,6 +24,7 @@ from .rules import Rules
 TRADE, CAREER, FOUNDED, CLOSED = ("economy.trade_completed", "economy.career_changed",
                                   "economy.company_founded", "economy.company_closed")
 TRADE_KEYS = frozenset({"trade_id", "role", "counterparty", "item_id", "grade", "quantity", "value", "day"})
+TRADE_KEYS_DYNAMIC = TRADE_KEYS | {"reference"}  # ab rules_v8: serverseitig gemeldeter Referenzwert
 CAREER_KEYS = frozenset({"company_id", "role", "day"})
 COMPANY_KEYS = frozenset({"company_id", "day"})
 ROLES_OF_TRADE = ("buyer", "seller")
@@ -62,6 +63,10 @@ def validate_economy_rules(rules: Rules) -> None:
         for g in [*rules["crafting"]["material_grades"], *rules["crafting"]["tiers"]]:
             if g not in cfg["grade_permille"]:
                 raise CEEError(f"Güte/Qualität {g!r} hat keinen Wertfaktor")
+    if "dynamic_reference" in cfg:
+        ms = cfg["dynamic_reference"]["max_shift_permille"]
+        if not _is_int(ms) or not 0 <= ms <= 900:
+            raise CEEError("dynamic_reference.max_shift_permille muss 0..900 sein")
     t = cfg["trade"]
     for k in ("max_quantity", "max_value", "value_per_point"):
         if not _is_int(t[k]) or t[k] <= 0:
@@ -111,6 +116,19 @@ def reference_value(rules: Rules, item_id: str, grade: str, quantity: int) -> in
     return cfg["items"][item_id]["base_value"] * cfg["grade_permille"][grade] * quantity // 1000
 
 
+def reference_bounds(rules: Rules, table_ref: int) -> tuple[int, int]:
+    """Zulässige Spanne des gemeldeten Referenzwerts um den Tabellenwert (nur mit economy.dynamic_reference)."""
+    shift = rules["economy"]["dynamic_reference"]["max_shift_permille"]
+    return table_ref * (1000 - shift) // 1000, -(-table_ref * (1000 + shift) // 1000)
+
+
+def trade_reference(rules: Rules, payload: dict[str, Any]) -> int:
+    """Referenzwert eines Handels: ab v8 der gemeldete (innerhalb der Spanne geprüfte), sonst der Tabellenwert."""
+    if "dynamic_reference" in rules["economy"]:
+        return payload["reference"]
+    return reference_value(rules, payload["item_id"], payload["grade"], payload["quantity"])
+
+
 def credited_value(rules: Rules, value: int, reference: int) -> int:
     """Gutgeschriebener Wert: 0 bei zu großer Abweichung vom Referenzwert, sonst das Minimum beider."""
     dev = rules["economy"]["trade"]["max_deviation_permille"]
@@ -137,7 +155,7 @@ def trade_gains(state: CharacterState, rules: Rules, payload: dict[str, Any]) ->
     cfg, part = rules["economy"], state.parts["economy"]
     t = cfg["trade"]
     today, repeats = _today(part, payload["day"], cfg["dimensions"])
-    ref = reference_value(rules, payload["item_id"], payload["grade"], payload["quantity"])
+    ref = trade_reference(rules, payload)
     credited = credited_value(rules, payload["value"], ref)
     rep = t["counterparty_repeat_permille"]
     decay = rep[min(repeats.get(payload["counterparty"], 0), len(rep) - 1)]
@@ -192,6 +210,7 @@ class EconomyEngine(Engine):
         super().__init__(rules)
         validate_economy_rules(rules)
         self.cfg = rules["economy"]
+        self.dynamic = "dynamic_reference" in self.cfg
 
     def initial(self) -> dict[str, Any]:
         c = self.cfg
@@ -216,7 +235,7 @@ class EconomyEngine(Engine):
 
     def _validate_trade(self, state: CharacterState, p: dict[str, Any]) -> None:
         part, cfg = state.parts["economy"], self.cfg
-        self._keys(p, TRADE_KEYS)
+        self._keys(p, TRADE_KEYS_DYNAMIC if self.dynamic else TRADE_KEYS)
         if not _short_str(p["trade_id"]):
             raise RuleViolation("trade_id muss ein String mit 1-64 Zeichen sein")
         if p["trade_id"] in part["trades"]:
@@ -236,6 +255,10 @@ class EconomyEngine(Engine):
             raise RuleViolation("quantity außerhalb des gültigen Bereichs")
         if not _is_int(p["value"]) or not 1 <= p["value"] <= t["max_value"]:
             raise RuleViolation("value außerhalb des gültigen Bereichs")
+        if self.dynamic:
+            lo, hi = reference_bounds(self.rules, reference_value(self.rules, p["item_id"], p["grade"], p["quantity"]))
+            if not _is_int(p["reference"]) or not lo <= p["reference"] <= hi:
+                raise RuleViolation(f"reference außerhalb der zulässigen Spanne ({lo}..{hi})")
         self._day(state, p)
 
     def _validate_career(self, state: CharacterState, p: dict[str, Any]) -> None:
@@ -325,7 +348,7 @@ class EconomyEngine(Engine):
             part["classes"][cls] += gains["volume"]
             repeats[p["counterparty"]] = repeats.get(p["counterparty"], 0) + 1
             part["daily"] = {"day": p["day"], "points": today, "counterparties": repeats}
-            ref = reference_value(self.rules, p["item_id"], p["grade"], p["quantity"])
+            ref = trade_reference(self.rules, p)
             if credited_value(self.rules, p["value"], ref) >= self.cfg["trade"]["network_min_credited_value"]:
                 # Netzwerk = Partner mit mindestens einem qualifizierten (echten) Handel
                 part["counterparties"][p["counterparty"]] = part["counterparties"].get(p["counterparty"], 0) + 1

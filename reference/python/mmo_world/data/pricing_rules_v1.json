@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Glättung, Schrittweite, Spanne, Schocks und NPC-Händler sind Vorschläge, KEINE bestätigten Spielinhalte. Ganzzahlen (Promille); Divisionen als Floor. Benötigt CEE-Regeln mit economy.dynamic_reference (ab v8).",
+  "requires_cee_rules_min": 8,
+  "alpha_permille": 100,
+  "max_step_permille": 50,
+  "max_shift_permille": 300,
+  "stale_days": 7,
+  "max_catch_up_days": 30,
+  "shock": {"max_permille": 300, "max_days": 30},
+  "maker": {
+    "character_id": "npc:maker",
+    "items": ["iron_ore", "charcoal", "healing_herb", "clean_water", "timber", "flour", "glass_sand"],
+    "spread_permille": 150,
+    "daily_qty_per_side": 40
+  }
+}

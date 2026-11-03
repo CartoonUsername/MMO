@@ -583,6 +583,31 @@ def scenario_economy_career_founding() -> dict[str, Any]:
     }
 
 
+def _rx(tid: str, ref: Any, **kw: Any) -> Step:
+    t, pl = _tx(tid, **kw)
+    return (t, {**pl, "reference": ref})
+
+
+def scenario_economy_dynamic_reference() -> dict[str, Any]:
+    return {
+        "description": "Dynamischer Referenzwert (rules v8): der Server meldet payload.reference; erlaubt ist nur die Spanne 216..504 um den Tabellenwert 360. Preisband und Gutschrift richten sich nach dem gemeldeten Wert.",
+        "rules_file": "rules_v8.json",
+        "steps": [
+            _created(),
+            _rx("r1", 360, cp="q1"),
+            _rx("r2", 504, cp="q2", value=450),  # obere Spanne; Wert 450 liegt im Band des gemeldeten Werts: 450 gutgeschrieben
+            _rx("r3", 216, cp="q3", value=270),  # untere Spanne; gutgeschrieben nur 216
+            _rx("r4", 505, cp="q4"), _rx("r5", 215, cp="q5"),  # außerhalb der Spanne
+            _tx("r6", cp="q6"),  # Feld reference fehlt
+            _rx("r7", True, cp="q7"), _rx("r8", 360.5, cp="q8"), _rx("r9", "360", cp="q9"), _rx("r10", None, cp="q10"),
+            ("economy.trade_completed", {**_rx("r11", 360, cp="q11")[1], "points": 99}),  # unbekanntes Feld
+            _rx("r12", 360, cp="q12", value=600),  # weit über dem gemeldeten Wert: gewertet, aber 0 Punkte
+            _rx("r13", 504, cp="q13", value=630),  # genau am Rand des Bandes (+25 %): gutgeschrieben die Referenz 504
+            _rx("r14", 216, cp="q14", value=270, qty=2),  # Wiederholung des Falls r3 mit anderer ID und Partner
+        ],
+    }
+
+
 def scenario_economy_directions() -> dict[str, Any]:
     steps: list[Step] = [_created()]
     for day in range(1, 5):
@@ -619,6 +644,7 @@ SCENARIOS = {
     "economy_wash_trading": scenario_economy_wash_trading,
     "economy_career_founding": scenario_economy_career_founding,
     "economy_directions": scenario_economy_directions,
+    "economy_dynamic_reference": scenario_economy_dynamic_reference,
 }
 
 

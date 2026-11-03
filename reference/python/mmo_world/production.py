@@ -67,8 +67,9 @@ def job_owner(job_id: str) -> str:
 
 class ProductionService:
     def __init__(self, service: CharacterService, inventory: Inventory, companies: CompanyService, rules: dict[str, Any],
-                 day_provider: Callable[[], int], server_id: str = "srv1") -> None:
+                 day_provider: Callable[[], int], server_id: str = "srv1", trading: Any = None) -> None:
         self.cee, self.inv, self.cs, self.reg, self.pr = service, inventory, companies, companies.reg, rules
+        self.trading = trading  # liefert den aktuellen Referenzwert (Preisdynamik); ohne: Regeltabelle
         validate_production_rules(rules, service.rules, companies.cr)
         self.day, self.server_id, self.coin = day_provider, server_id, companies.coin
         self.crafting = service.rules["crafting"]
@@ -212,7 +213,8 @@ class ProductionService:
     # -- Verkauf ----------------------------------------------------------------------------
     def npc_price(self, item_key: str, qty: int) -> int:
         name, grade = self._item(item_key)
-        return reference_value(self.cee.rules, name, grade, qty) * self.pr["npc_buyer"]["permille"] // 1000
+        ref = self.trading.reference(name, grade, qty) if self.trading is not None else reference_value(self.cee.rules, name, grade, qty)
+        return ref * self.pr["npc_buyer"]["permille"] // 1000
 
     def sell_to_npc(self, actor: str, company_id: str, item_key: str, qty: int) -> int:
         today = self.day()

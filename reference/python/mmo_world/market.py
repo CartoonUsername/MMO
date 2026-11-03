@@ -38,6 +38,14 @@ class TradeService:
         cur = self.rules["economy"]["currency"]
         self.coin = key(cur["item"], cur["grade"])
         self._counter = 0
+        self.dynamic = "dynamic_reference" in self.rules["economy"]
+        self.reference_provider: Callable[[str, str, int], int] | None = None  # (Gegenstand, Güte, Menge) -> Referenzwert
+
+    def reference(self, item: str, grade: str, quantity: int) -> int:
+        """Aktueller Referenzwert: ab Regeln v8 vom Preisdienst, sonst die Regeltabelle."""
+        if self.dynamic and self.reference_provider is not None:
+            return self.reference_provider(item, grade, quantity)
+        return reference_value(self.rules, item, grade, quantity)
 
     def parse(self, item_key: str) -> tuple[str, str]:
         cfg = self.rules["economy"]
@@ -66,6 +74,9 @@ class TradeService:
         trade_id = f"{self.server_id}-trade-{self._counter:08d}"
         day = self.day()
         base = {"trade_id": trade_id, "item_id": item, "grade": grade, "quantity": quantity, "value": price, "day": day}
+        ref = self.reference(item, grade, quantity)
+        if self.dynamic:
+            base["reference"] = ref
         seller_pl = {**base, "role": "seller", "counterparty": buyer_id}
         buyer_pl = {**base, "role": "buyer", "counterparty": seller_id}
         for cid, pl in ((seller_id, seller_pl), (buyer_id, buyer_pl)):  # vor jeder Bestandsänderung
@@ -80,5 +91,4 @@ class TradeService:
             self.inv.apply_many([(seller_id, {self.coin: price}, {item_key: quantity}),
                                  (buyer_id, {item_key: quantity}, {self.coin: price})])
             raise
-        return TradeResult(trade_id, seller_ev, buyer_ev, item_key, quantity, price,
-                           reference_value(self.rules, item, grade, quantity))
+        return TradeResult(trade_id, seller_ev, buyer_ev, item_key, quantity, price, ref)

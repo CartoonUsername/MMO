@@ -25,7 +25,9 @@ from mmo_cee.history import _canonical as canonical_bytes
 
 from .company import goal_of, load_company_rules
 from .errors import WorldError
-from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRODUCTION_RULES, World
+from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, World
+
+CEE_RULES_V8 = "rules_v8.json"
 
 FORMAT_VERSION = 1
 Op = dict[str, Any]
@@ -43,8 +45,8 @@ def _jsonable(x: Any) -> Any:
 class Env(World):
     """Ausführungsumgebung der Skripte: eine Welt plus gemerkte Werte (Platzhalter)."""
 
-    def __init__(self) -> None:
-        super().__init__(CEE_RULES, COMPANY_RULES)
+    def __init__(self, cee_rules: str = CEE_RULES) -> None:
+        super().__init__(cee_rules, COMPANY_RULES)
         self.saved: dict[str, Any] = {}
 
     def resolve(self, value: Any, op: Op) -> Any:
@@ -82,6 +84,18 @@ def _disclosure(env: Env, a: Op) -> Any:
 
 def _set_day(env: Env, a: Op) -> None:
     env.day[0] = a["value"]
+
+
+def _pricing(env: Env) -> Any:
+    if env.pricing is None:
+        raise WorldError("Preisdynamik ist mit diesen CEE-Regeln nicht aktiv")
+    return env.pricing
+
+
+def _maker(env: Env, side: str, a: Op) -> Any:
+    p = _pricing(env)
+    r = (p.sell_to_maker if side == "sell" else p.buy_from_maker)(a["char"], a["item_key"], a["qty"])
+    return {"trade_id": r.trade_id, "price": r.price, "reference": r.reference, "quantity": r.quantity}
 
 
 def _place(env: Env, a: Op) -> Any:
@@ -129,6 +143,10 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "prod_start": lambda e, a: e.production.start(a["actor"], a["company"], a["worker"], a["recipe"], a["batches"], a["grade"]),
     "prod_cancel": lambda e, a: e.production.cancel(a["actor"], a["company"], a["job"]),
     "prod_sell": lambda e, a: e.production.sell_to_npc(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "price_advance": lambda e, a: _pricing(e).advance(a["value"]),
+    "price_shock": lambda e, a: _pricing(e).set_shock(a["item_key"], a["permille"], a["days"]),
+    "maker_sell": lambda e, a: _maker(e, "sell", a),
+    "maker_buy": lambda e, a: _maker(e, "buy", a),
     "market_place": _place,
     "market_cancel": lambda e, a: e.exchange.cancel(a["char"], a["order"]),
     "market_expire": lambda e, a: e.exchange.expire(a["value"]),
@@ -144,8 +162,8 @@ def execute(env: Env, op: Op) -> dict[str, Any]:
     return {"expect": "ok", "result": _jsonable(res)}
 
 
-def run_script(script: list[Op]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    env = Env()
+def run_script(script: list[Op], cee_rules: str = CEE_RULES) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    env = Env(cee_rules)
     steps = []
     for op in script:
         out = execute(env, op)
@@ -704,6 +722,76 @@ def random_market_script(seed: int, steps: int) -> list[Op]:
     return script
 
 
+def scenario_price_dynamics() -> list[Op]:
+    fine, ore = "iron_blade@fine", "iron_ore@standard"
+    MS = lambda c, k, q: S("maker_sell", char=c, item_key=k, qty=q)  # noqa: E731
+    MB = lambda c, k, q: S("maker_buy", char=c, item_key=k, qty=q)  # noqa: E731
+    wash = [op for d in range(2, 12) for op in (DAY(d), MP("a", "sell", 5, 216), MP("b", "buy", 5, 216), S("price_advance", value=d))]
+    return [
+        *[op for c in "abc" for op in (*person(c), D(c, COIN, 20000), D(c, fine, 60), D(c, ore, 100))],
+        S("trade", seller="a", buyer="b", item_key=fine, qty=2, price=360),        # Referenz = Tabellenwert (Faktor 1000)
+        S("price_advance", value=1),
+        S("price_advance", value=1),                                                # nicht rückwärts / nicht doppelt
+        S("price_advance", value=40),                                               # zu viele Tage auf einmal
+        MP("a", "sell", 1, 226), MP("a", "sell", 1, 225),                           # Band ±25 % um den Referenzwert
+        *wash,                                                                      # Scheinhandel treibt den Faktor nur langsam und begrenzt
+        S("trade", seller="a", buyer="b", item_key=fine, qty=1, price=216),         # CEE-Bericht trägt den aktuellen Referenzwert
+        MP("a", "sell", 1, 250),                                                    # Band wandert mit dem Referenzwert (alt: max. 225)
+        MP("a", "sell", 1, 256),
+        S("price_shock", item_key=ore, permille=1300, days=5),
+        S("price_shock", item_key=ore, permille=1000, days=5),                      # kein Schock
+        S("price_shock", item_key=ore, permille=1301, days=5),
+        S("price_shock", item_key=ore, permille=699, days=5),
+        S("price_shock", item_key=ore, permille=1100, days=0),
+        S("price_shock", item_key=ore, permille=1100, days=31),
+        S("price_shock", item_key="ghost@fine", permille=1100, days=3),
+        MS("a", ore, 10), MB("b", ore, 10),                                         # Händler: Spanne um den Referenzwert
+        DAY(12), S("price_advance", value=12), DAY(13), S("price_advance", value=13),
+        MB("b", ore, 40), MB("b", ore, 1),                                          # Tagesmenge des Händlers erschöpft
+        MS("a", fine, 1),                                                           # Händler handelt nicht damit
+        MS("a", ore, 0), MS("ghost", ore, 1), MS("npc:maker", ore, 1),
+        MS("c", ore, 1000), MB("c", ore, 1),
+        D("c", "iron_ore@rough", 1), MS("c", "iron_ore@rough", 1),                  # Preis wäre 0
+        DAY(14), MB("b", ore, 40),                                                  # neuer Tag
+        *[op for d in range(15, 30) for op in (DAY(d), S("price_advance", value=d))],   # Schock endet, Rückkehr zum Marktpreis
+        MS("a", ore, 5),
+    ]
+
+
+def random_price_script(seed: int, steps: int) -> list[Op]:
+    """Zustandsbewusstes Zufallsskript für Markt + Preisdynamik + Händler (CEE-Regeln v8)."""
+    rng, env = Rng(seed), Env(CEE_RULES_V8)
+    script: list[Op] = []
+
+    def emit(op: Op) -> None:
+        script.append(op)
+        execute(env, op)
+
+    keys = ["iron_blade@fine", "iron_ore@standard", "bread@common"]
+    ref = {keys[0]: 180, keys[1]: 1, keys[2]: 3}
+    for c in "abcd":
+        for op in (*person(c), D(c, COIN, 30000), *[D(c, k, 80) for k in keys]):
+            emit(op)
+    for _ in range(steps):
+        kind, who, k = rng.below(14), rng.pick(list("abcd")), rng.pick(keys)
+        if kind < 5:
+            r = ref[k] * (60 + rng.below(100)) // 100
+            emit(MP(who, "buy" if rng.below(2) else "sell", 1 + rng.below(6), max(1, r), key=k, ioc=rng.below(6) == 0))
+        elif kind < 8:
+            emit(S("maker_sell" if rng.below(2) else "maker_buy", char=who, item_key=k, qty=1 + rng.below(12)))
+        elif kind == 8:
+            emit(S("price_shock", item_key=k, permille=1000 + rng.below(700) - 350, days=1 + rng.below(12)))
+        elif kind == 9 and env.exchange.orders:
+            oid = rng.pick(sorted(env.exchange.orders))
+            emit(S("market_cancel", char=env.exchange.orders[oid]["char"], order=oid))
+        else:
+            n = env.day[0] + 1 + rng.below(3)
+            emit(DAY(n))
+            emit(S("price_advance", value=n))
+            emit(S("market_expire", value=n))
+    return script
+
+
 # ---------------------------------------------------------------- Vektor ------------------
 NAME = "world_scenarios"
 RESULT_KEYS = ("expect", "result", "error", "world_sha256")
@@ -731,13 +819,24 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      lambda: random_script(4, 260)),
     ("random_world_9", "Zustandsbewusst erzeugtes Zufallsskript (Seed 9, 260 Schritte), ausgeschrieben",
      lambda: random_script(9, 260)),
+    ("price_dynamics", "Preisdynamik (CEE-Regeln v8): Referenzwert folgt dem Markt, Band wandert, Schocks, NPC-Händler mit Tagesmengen",
+     scenario_price_dynamics),
+    ("random_price_5", "Zustandsbewusstes Zufallsskript Markt + Preisdynamik + Händler (Seed 5, 260 Aktionen, Regeln v8), ausgeschrieben",
+     lambda: random_price_script(5, 260)),
 ]
 
 
+SCENARIO_RULES: dict[str, str] = {"price_dynamics": CEE_RULES_V8, "random_price_5": CEE_RULES_V8}  # Szenarien, die nicht unter CEE_RULES laufen (z. B. Preisdynamik ab Regeln v8)
+
+
 def run_scenario(name: str, description: str, script: list[Op]) -> dict[str, Any]:
-    steps, final = run_script(script)
-    return {"name": name, "description": description, "steps": steps, "final": final,
-            "final_world_sha256": hashlib.sha256(canonical_bytes(final)).hexdigest()}
+    rules = SCENARIO_RULES.get(name, CEE_RULES)
+    steps, final = run_script(script, rules)
+    sc = {"name": name, "description": description, "steps": steps, "final": final,
+          "final_world_sha256": hashlib.sha256(canonical_bytes(final)).hexdigest()}
+    if rules != CEE_RULES:
+        sc["cee_rules_file"] = rules
+    return sc
 
 
 def build_vector() -> dict[str, Any]:
@@ -745,6 +844,8 @@ def build_vector() -> dict[str, Any]:
             "company_rules_file": COMPANY_RULES, "company_rules_sha256": _sha("mmo_world", COMPANY_RULES),
             "market_rules_file": MARKET_RULES, "market_rules_sha256": _sha("mmo_world", MARKET_RULES),
             "production_rules_file": PRODUCTION_RULES, "production_rules_sha256": _sha("mmo_world", PRODUCTION_RULES),
+            "pricing_rules_file": PRICING_RULES, "pricing_rules_sha256": _sha("mmo_world", PRICING_RULES),
+            "extra_cee_rules": {f: _sha("mmo_cee", f) for f in sorted(set(SCENARIO_RULES.values()))},
             "scenarios": [run_scenario(n, d, f()) for n, d, f in SCENARIOS]}
 
 
@@ -765,8 +866,13 @@ def verify_vector(vec: dict[str, Any]) -> list[str]:
         errs.append("Marktregeln haben sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["production_rules_file"]) != vec["production_rules_sha256"]:
         errs.append("Produktionsregeln haben sich geändert (SHA-256 weicht ab)")
+    if _sha("mmo_world", vec["pricing_rules_file"]) != vec["pricing_rules_sha256"]:
+        errs.append("Preisregeln haben sich geändert (SHA-256 weicht ab)")
+    for f, h in vec["extra_cee_rules"].items():
+        if _sha("mmo_cee", f) != h:
+            errs.append(f"CEE-Regeldatei {f} hat sich geändert (SHA-256 weicht ab)")
     for sc in vec["scenarios"]:
-        steps, final = run_script([strip_result(s) for s in sc["steps"]])
+        steps, final = run_script([strip_result(s) for s in sc["steps"]], sc.get("cee_rules_file", vec["cee_rules_file"]))
         for i, (got, want) in enumerate(zip(steps, sc["steps"])):
             if got != want:
                 errs.append(f"{sc['name']}: Schritt {i} ({want['op']}) weicht ab")
@@ -785,7 +891,8 @@ def render(vec: dict[str, Any]) -> str:
     head = {k: v for k, v in vec.items() if k != "scenarios"}
     lines = [_compact(head)[:-1] + ',"scenarios":[']
     for si, sc in enumerate(vec["scenarios"]):
-        lines.append('{"description":' + _compact(sc["description"]) + ',"final":' + _compact(sc["final"])
+        lines.append("{" + ('"cee_rules_file":' + _compact(sc["cee_rules_file"]) + "," if "cee_rules_file" in sc else "")
+                     + '"description":' + _compact(sc["description"]) + ',"final":' + _compact(sc["final"])
                      + ',"final_world_sha256":' + _compact(sc["final_world_sha256"]) + ',"name":' + _compact(sc["name"])
                      + ',"steps":[')
         lines += [_compact(st) + ("," if i < len(sc["steps"]) - 1 else "") for i, st in enumerate(sc["steps"])]

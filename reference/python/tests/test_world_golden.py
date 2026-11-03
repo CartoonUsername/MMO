@@ -106,7 +106,7 @@ class WorldGoldenTests(unittest.TestCase):
         a) eine bereits vergebene Herstellungs-ID wird nicht wiederverwendet (nur der Zähler steigt),
         b) eine Abstimmung nach Fristende setzt den Antrag auf 'expired'."""
         for sc in self.vec["scenarios"]:
-            env = golden.Env()
+            env = golden.Env(sc.get("cee_rules_file", self.vec["cee_rules_file"]))
             for i, s in enumerate(sc["steps"]):
                 before = env.snapshot()
                 out = golden.execute(env, strip_result(s))
@@ -131,6 +131,7 @@ class WorldGoldenTests(unittest.TestCase):
             minted = sum(s["qty"] for s in sc["steps"] if s["op"] == "deposit" and s["key"] == COIN and s["expect"] == "ok")
             minted += sum(s["amount"] for s in sc["steps"] if s["op"] == "revenue" and s["expect"] == "ok")  # Münzquelle: Umsatz
             minted += sum(s["result"] for s in sc["steps"] if s["op"] == "prod_sell" and s["expect"] == "ok")  # Münzquelle 3: NPC-Abnehmer
+            minted += sum(s["result"]["price"] for s in sc["steps"] if s["op"] == "maker_sell" and s["expect"] == "ok")  # Münzquelle 4: NPC-Händler
             held = sum(h.get(COIN, 0) for h in sc["final"]["inventory"].values())
             self.assertEqual(held, minted, sc["name"])
 
