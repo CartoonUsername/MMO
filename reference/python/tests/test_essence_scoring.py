@@ -10,7 +10,7 @@ from mmo_cee.rules import Rules, load_rules
 from .helpers import attune
 from .test_combat import EV, train
 
-RULES = load_rules()  # v4
+RULES = load_rules("rules_v4.json")  # Tests sind auf Regeln v4 festgelegt (neuere Versionen: eigene Tests)  # v4
 VOW = "essence.decision_made"
 
 
@@ -88,13 +88,13 @@ class EssenceRulesTests(unittest.TestCase):
         with self.assertRaises(RuleViolation):
             v3.record("p", VOW, {"decision_id": "ember_vow", "choice": "accept"})
         self.assertEqual(v3.essence_scores("p"), {})
-        v4 = CharacterService()
+        v4 = CharacterService(rules=RULES)
         self.assertEqual(v4.create("p", "player").parts["essence"]["decisions"], {})
 
 
 class DecisionTests(unittest.TestCase):
     def setUp(self):
-        self.svc = CharacterService()
+        self.svc = CharacterService(rules=RULES)
         prepared(self.svc)
 
     def reject(self, payload):
@@ -143,7 +143,7 @@ class DecisionTests(unittest.TestCase):
 
 class ScoringTests(unittest.TestCase):
     def setUp(self):
-        self.svc = CharacterService()
+        self.svc = CharacterService(rules=RULES)
 
     def test_exact_contributions(self):
         ember_ready(self.svc, smithing=700)
@@ -285,7 +285,7 @@ class ScoringTests(unittest.TestCase):
         self.svc.record("p", "essence.trial_passed", {"form": "ember_kin"})
         live = copy.deepcopy(self.svc.state("p").parts)
         self.assertEqual(self.svc.rebuild("p").parts, live)
-        svc2 = CharacterService(log=EventLog.from_json("p", self.svc.log.to_json("p")))
+        svc2 = CharacterService(rules=RULES, log=EventLog.from_json("p", self.svc.log.to_json("p")))
         self.assertEqual(svc2.state("p").parts, live)
         self.assertEqual(svc2.essence_scores("p"), self.svc.essence_scores("p"))
 

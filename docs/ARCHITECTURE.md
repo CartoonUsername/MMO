@@ -27,7 +27,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | 3 | Combat Development | `combat.` | **implementiert** (Metriken, Entwicklungsrichtungen, Anti-Farming; konkrete Fähigkeiten offen) |
 | 4 | Element | `element.` | **implementiert** (9 Elemente, Prägung, 2 + 1 Limit) |
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
-| 6 | Discovery | `discovery.` | Schnittstelle, nicht implementiert |
+| 6 | Discovery | `discovery.` | **implementiert** (Charakterseite in der CEE + Weltseite `mmo_world`, ADR-0009; Inhalte sind Platzhalter) |
 | 7 | Crafting | `crafting.` | Schnittstelle, nicht implementiert |
 | 8 | Economic Profile | `economy.` | Schnittstelle, nicht implementiert |
 | 9 | Character History | (Querschnitt) | **implementiert** (`history.py`: Log, Hash-Kette, Verifikation) |
@@ -43,6 +43,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
+## Discovery Engine (ADR-0009)
+
+*Charakterseite* (`mmo_cee.discovery`): Ereignisse `discovery.evidence_gathered` (eindeutige Beweise), `discovery.made` (Abschluss mit Anerkennung), `discovery.learned` (nur teilbare Entdeckungen). *Weltseite* (`mmo_world`): `DiscoveryRegistry` (Pionier, Halter, endliches Lehrfenster) und `DiscoveryService` (transaktionale Verbindung beider Ebenen, Rollback bei Ablehnung). Unabhängige Forschung ist nie blockiert; nur das Lehren ist im Fenster dem Pionier vorbehalten. Entdeckungen speisen das Wesenssystem (Signal `discovery:<id>`, Gate `requires_discoveries` für geheime Formen). `RulesVersionMismatch` verhindert stilles Replay unter anderen Regeln.
 
 ## Visual Evolution (ADR-0008)
 

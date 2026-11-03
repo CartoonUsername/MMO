@@ -12,6 +12,7 @@ ENGINE_EVENT_TYPES = [
     "element.exposure", "element.attuned",
     "profession.work",
     "essence.trial_passed", "essence.adopted", "essence.decision_made",
+    "discovery.evidence_gathered", "discovery.made", "discovery.learned",
     "combat.encounter_resolved",
 ]
 
@@ -141,6 +142,18 @@ class GoldenVectorTests(unittest.TestCase):
         self.assertEqual(npc["final_state"]["identity"]["kind"], "npc")
         self.assertEqual(npc["final_state"]["essence"]["form"], "stone_born")  # zweite Form wird abgelehnt
         self.assertGreaterEqual(npc["derived"]["essence_scores"]["ember_kin"]["score"], 600)
+        research = self.vectors["discovery_research"]
+        self.assertEqual(research["derived"]["known_discoveries"], ["frostglass_recipe", "iron_folding", "old_shrine_map"])
+        known = research["final_state"]["discovery"]["known"]
+        self.assertEqual((known["iron_folding"]["credit"], known["old_shrine_map"]["credit"], known["frostglass_recipe"]["credit"]),
+                         ("pioneer", "discoverer", "learner"))
+        self.assertEqual(known["frostglass_recipe"]["from"], "teacher-1")
+        self.assertEqual(research["final_state"]["discovery"]["evidence"]["iron_folding"], ["ore_sample_a", "ore_sample_b", "forge_trial"])
+        secret = self.vectors["discovery_secret_form"]
+        self.assertEqual(secret["final_state"]["essence"]["form"], "twilight_kin")
+        self.assertEqual(secret["derived"]["known_discoveries"], ["old_shrine_map", "twilight_rite"])
+        self.assertNotIn("discovery", self.vectors["essence_scoring_ember"]["final_state"])  # v4-Vektoren ohne Entdeckungsteil
+        self.assertNotIn("known_discoveries", self.vectors["essence_scoring_ember"]["derived"])
         self.assertNotIn("decisions", self.vectors["essence_path"]["final_state"]["essence"])  # Legacy-Schema unverändert
         self.assertNotIn("essence_scores", self.vectors["essence_path"]["derived"])
         self.assertEqual(self.vectors["rules_v1_without_combat"]["rules_file"], "rules_v1.json")

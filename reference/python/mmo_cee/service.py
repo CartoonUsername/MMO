@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from .combat import CombatEngine, reached_directions
+from .discovery import DiscoveryEngine, discovery_progress, known_discoveries
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
 from .essence import EssenceEngine, eligible_forms, essence_profile, form_scores
@@ -18,6 +19,8 @@ def default_projector(rules: Rules) -> Projector:
     engines = [IdentityEngine(rules), ElementEngine(rules), ProfessionEngine(rules), EssenceEngine(rules)]
     if "combat" in rules:  # rules_v1 kennt keine Kampfentwicklung
         engines.append(CombatEngine(rules))
+    if "discovery" in rules:  # ab rules_v5
+        engines.append(DiscoveryEngine(rules))
     return Projector(engines, rules)
 
 
@@ -72,3 +75,10 @@ class CharacterService:
         if not hasattr(self, "_visual"):
             self._visual = VisualEvolution(self.rules)
         return self._visual.appearance(self.state(character_id))
+
+    def known_discoveries(self, character_id: str) -> list[str]:
+        return known_discoveries(self.state(character_id))
+
+    def discovery_progress(self, character_id: str, discovery_id: str) -> dict:
+        """Beweise, fehlende Voraussetzungen und Abschlussbereitschaft einer Entdeckung."""
+        return discovery_progress(self.state(character_id), self.rules, discovery_id)

@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
 
-from .errors import RuleViolation
+from .errors import RuleViolation, RulesVersionMismatch
 from .history import Event
 from .rules import Rules
 
@@ -68,5 +68,9 @@ class Projector:
     def replay(self, character_id: str, events: list[Event]) -> CharacterState:
         state = self.new_state(character_id)
         for e in events:
+            if e.rules_version != self.rules.version:
+                raise RulesVersionMismatch(
+                    f"Ereignis seq={e.seq} von {character_id} wurde unter Regelversion {e.rules_version} aufgezeichnet, "
+                    f"geladen ist {self.rules.version}")
             self.apply(state, e)
         return state

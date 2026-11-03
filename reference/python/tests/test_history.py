@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 
-from mmo_cee import CharacterService, IntegrityError
+from mmo_cee import CharacterService, IntegrityError, RulesVersionMismatch
 from mmo_cee.history import EventLog
 
 
@@ -50,6 +50,34 @@ class HistoryTests(unittest.TestCase):
         payload["amount"] = 10**9
         self.assertEqual(ev.payload["amount"], 10)
         self.svc.log.verify("c1")
+
+
+class RulesVersionGuardTests(unittest.TestCase):
+    def test_replay_under_other_rules_version_is_refused(self):
+        from mmo_cee.rules import load_rules
+
+        svc = CharacterService(rules=load_rules("rules_v3.json"))
+        svc.create("p", "player")
+        svc.record("p", "identity.xp_gained", {"amount": 50})
+        log = EventLog.from_json("p", svc.log.to_json("p"))
+        with self.assertRaises(RulesVersionMismatch):
+            CharacterService(rules=load_rules("rules_v4.json"), log=log).state("p")  # v3-Log unter v4
+        again = CharacterService(rules=load_rules("rules_v3.json"), log=log)  # passende Regeln: ok
+        self.assertEqual(again.state("p").parts["identity"]["xp"], 50)
+
+    def test_mixed_versions_in_one_log_are_refused(self):
+        from mmo_cee.rules import load_rules
+
+        old = CharacterService(rules=load_rules("rules_v3.json"))
+        old.create("p", "player")
+        new = CharacterService(rules=load_rules("rules_v4.json"), log=old.log)
+        with self.assertRaises(RulesVersionMismatch):
+            new.record("p", "identity.xp_gained", {"amount": 10})  # Fortsetzen unter anderer Version nicht still möglich
+
+    def test_error_is_a_cee_error(self):
+        from mmo_cee import CEEError
+
+        self.assertTrue(issubclass(RulesVersionMismatch, CEEError))
 
 
 if __name__ == "__main__":

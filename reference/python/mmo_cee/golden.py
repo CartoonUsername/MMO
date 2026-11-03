@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .combat import reached_directions, style_profile
+from .discovery import discovery_progress, known_discoveries
 from .essence import essence_profile, form_scores
 from .errors import RuleViolation
 from .history import _canonical as canonical_bytes
@@ -326,6 +327,82 @@ def scenario_essence_npc_two_candidates() -> dict[str, Any]:
     }
 
 
+def _attune(element: str, amount: int = 100) -> list[Step]:
+    return [("element.exposure", {"element": element, "amount": amount}), ("element.attuned", {"element": element})]
+
+
+DEV, DMADE, DLEARNED = "discovery.evidence_gathered", "discovery.made", "discovery.learned"
+
+
+def _gather(did: str, evidence: list[str]) -> list[Step]:
+    return [(DEV, {"discovery_id": did, "evidence_id": e}) for e in evidence]
+
+
+def _train_level(day: int, actions: dict[str, int], level: int, n: int = 6) -> list[Step]:
+    return [(EV, enc(f"L{level}d{day}-{i}", opponent_type=f"mob{i}", opponent_level=level, day=day, actions=actions)) for i in range(n)]
+
+
+def scenario_discovery_research() -> dict[str, Any]:
+    iron = ["ore_sample_a", "ore_sample_b", "forge_trial"]
+    return {
+        "description": "Entdeckung (rules v5): eindeutige Beweise, Abschluss nur mit allen Beweisen und Voraussetzungen, Anerkennung, Lernen nur bei teilbaren Entdeckungen.",
+        "rules_file": "rules_v5.json",
+        "steps": [
+            _created(), ("identity.xp_gained", {"amount": 10000}),
+            (DEV, {"discovery_id": "ghost", "evidence_id": "x"}),
+            (DEV, {"discovery_id": "iron_folding", "evidence_id": "frost_lily"}),
+            (DEV, {"discovery_id": "twilight_rite", "evidence_id": "dusk_altar"}),  # Vorwissen fehlt
+            (DEV, {"discovery_id": "iron_folding", "evidence_id": "ore_sample_a", "points": 5}),
+            (DEV, {"discovery_id": "iron_folding", "evidence_id": "ore_sample_a"}),
+            (DEV, {"discovery_id": "iron_folding", "evidence_id": "ore_sample_a"}),  # doppelt
+            (DMADE, {"discovery_id": "iron_folding", "day": 1, "credit": "pioneer"}),  # unvollständig
+            *_gather("iron_folding", iron[1:]),
+            (DMADE, {"discovery_id": "iron_folding", "day": 1, "credit": "pioneer"}),  # Beruf fehlt
+            ("profession.work", {"profession": "smithing", "xp": 700}),
+            (DMADE, {"discovery_id": "iron_folding", "day": 1, "credit": "king"}),
+            (DMADE, {"discovery_id": "iron_folding", "day": 1}),
+            (DMADE, {"discovery_id": "iron_folding", "day": 3, "credit": "pioneer"}),
+            (DMADE, {"discovery_id": "iron_folding", "day": 3, "credit": "pioneer"}),  # bekannt
+            (DEV, {"discovery_id": "iron_folding", "evidence_id": "forge_trial"}),  # bekannt
+            *_gather("old_shrine_map", ["shrine_mural", "hermit_story"]),
+            (DMADE, {"discovery_id": "old_shrine_map", "day": 2, "credit": "discoverer"}),  # Tag zurück
+            (DMADE, {"discovery_id": "old_shrine_map", "day": 3, "credit": "discoverer"}),
+            (DLEARNED, {"discovery_id": "frostglass_recipe", "day": 4, "from_character": "teacher-1"}),  # Voraussetzungen fehlen
+            ("profession.work", {"profession": "alchemy", "xp": 300}),
+            *_attune("ice"),
+            (DLEARNED, {"discovery_id": "frostglass_recipe", "day": 4, "from_character": "c1"}),  # sich selbst
+            (DLEARNED, {"discovery_id": "frostglass_recipe", "day": 4, "from_character": ""}),
+            (DLEARNED, {"discovery_id": "frostglass_recipe", "day": 4, "from_character": "teacher-1"}),
+            (DLEARNED, {"discovery_id": "frostglass_recipe", "day": 5, "from_character": "teacher-2"}),  # bekannt
+            (DLEARNED, {"discovery_id": "twilight_rite", "day": 5, "from_character": "teacher-1"}),  # nicht teilbar
+            ("discovery.grant_all", {}),
+        ],
+    }
+
+
+def scenario_discovery_secret_form() -> dict[str, Any]:
+    steps: list[Step] = [_created(), ("identity.xp_gained", {"amount": 36100}), *_attune("light"), *_attune("shadow")]
+    for day in range(1, 7):
+        steps += _train_level(day, {"dodge": 33, "perfect_dodge": 18, "light_hit": 120}, 20)
+    steps += [
+        ("essence.trial_passed", {"form": "twilight_kin"}),  # genug Punkte, aber geheime Form ohne Entdeckung
+        (DEV, {"discovery_id": "twilight_rite", "evidence_id": "dusk_altar"}),  # Vorwissen fehlt
+        *_gather("old_shrine_map", ["shrine_mural", "hermit_story"]),
+        (DMADE, {"discovery_id": "old_shrine_map", "day": 10, "credit": "pioneer"}),
+        *_gather("twilight_rite", ["dusk_altar", "dawn_altar"]),
+        (DMADE, {"discovery_id": "twilight_rite", "day": 11, "credit": "pioneer"}),  # Beweis fehlt
+        (DEV, {"discovery_id": "twilight_rite", "evidence_id": "blended_light"}),
+        (DMADE, {"discovery_id": "twilight_rite", "day": 11, "credit": "pioneer"}),
+        ("essence.trial_passed", {"form": "twilight_kin"}),
+        ("essence.adopted", {"form": "twilight_kin"}),
+    ]
+    return {
+        "description": "Geheime Wesensform (Platzhalter twilight_kin): Punkte allein genügen nicht, die Entdeckung (mit Vorwissen-Kette) schaltet den Weg frei.",
+        "rules_file": "rules_v5.json",
+        "steps": steps,
+    }
+
+
 SCENARIOS = {
     "identity_basic": scenario_identity_basic,
     "element_limits": scenario_element_limits,
@@ -339,6 +416,8 @@ SCENARIOS = {
     "essence_scoring_ember": scenario_essence_scoring_ember,
     "essence_decision_path": scenario_essence_decision_path,
     "essence_npc_two_candidates": scenario_essence_npc_two_candidates,
+    "discovery_research": scenario_discovery_research,
+    "discovery_secret_form": scenario_discovery_secret_form,
 }
 
 
@@ -349,6 +428,9 @@ def _derived(svc: CharacterService) -> dict[str, Any]:
     if "combat" in svc.rules:
         out["combat_directions"] = reached_directions(state, svc.rules)
         out["style_profile"] = style_profile(state, svc.rules)
+    if "discovery" in svc.rules:  # ab rules v5
+        out["known_discoveries"] = known_discoveries(state)
+        out["discovery_progress"] = {d: discovery_progress(state, svc.rules, d) for d in svc.rules["discovery"]["discoveries"]}
     if "decisions" in svc.rules["essence"]:  # Bewertungsschema (rules v4+)
         out["essence_scores"] = form_scores(state, svc.rules)
         out["essence_profile"] = essence_profile(state, svc.rules)

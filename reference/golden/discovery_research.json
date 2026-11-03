@@ -1,0 +1,602 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": true,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_missing": [],
+        "evidence_needed": 3,
+        "known": true,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_missing": [],
+        "evidence_needed": 2,
+        "known": true,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 100,
+          "element_affinity:fire": 0,
+          "element_attuned:fire": 0,
+          "profession:smithing": 75
+        },
+        "eligible": false,
+        "score": 175,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 30,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 30,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [
+      "frostglass_recipe",
+      "iron_folding",
+      "old_shrine_map"
+    ],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Entdeckung (rules v5): eindeutige Beweise, Abschluss nur mit allen Beweisen und Voraussetzungen, Anerkennung, Lernen nur bei teilbaren Entdeckungen.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "discovery": {
+      "evidence": {
+        "iron_folding": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "old_shrine_map": [
+          "shrine_mural",
+          "hermit_story"
+        ]
+      },
+      "known": {
+        "frostglass_recipe": {
+          "credit": "learner",
+          "day": 4,
+          "from": "teacher-1",
+          "how": "learned",
+          "seq": 13
+        },
+        "iron_folding": {
+          "credit": "pioneer",
+          "day": 3,
+          "how": "researched",
+          "seq": 6
+        },
+        "old_shrine_map": {
+          "credit": "discoverer",
+          "day": 3,
+          "how": "researched",
+          "seq": 9
+        }
+      },
+      "last_day": 4
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 100,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "ice"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "alchemy": 300,
+        "smithing": 700
+      }
+    }
+  },
+  "final_state_sha256": "b41782c301c71c3cf70d3d50ef7720375cab36e30e49c98013c85531eb8dd9b8",
+  "format": 1,
+  "name": "discovery_research",
+  "rules_file": "rules_v5.json",
+  "rules_sha256": "83332f0e0e6080c9c7194a17a576886f6ac8ce84f24dc94e7aa987b5c19b95ae",
+  "steps": [
+    {
+      "event_hash": "395f51e52b8acb04f9d4d73db3d5fda5414d0490a110b2bbc31f1d6711e3290b",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "549990c8a542ead335e95d544685c3a4f5d16ce3e3b01d40ff699332aeeac751",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "af9b77dc4ff24120fbe1f3537bbb0965b4bcf35225a9271c5d720b4a8a01fef7",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "5e740ad2b6583f3f1d10deee7f5ba5f18de8c5d1ca1e90dc4c674b4bf70d58d2",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "ghost",
+        "evidence_id": "x"
+      },
+      "state_sha256": "5e740ad2b6583f3f1d10deee7f5ba5f18de8c5d1ca1e90dc4c674b4bf70d58d2",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "frost_lily"
+      },
+      "state_sha256": "5e740ad2b6583f3f1d10deee7f5ba5f18de8c5d1ca1e90dc4c674b4bf70d58d2",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "twilight_rite",
+        "evidence_id": "dusk_altar"
+      },
+      "state_sha256": "5e740ad2b6583f3f1d10deee7f5ba5f18de8c5d1ca1e90dc4c674b4bf70d58d2",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_a",
+        "points": 5
+      },
+      "state_sha256": "5e740ad2b6583f3f1d10deee7f5ba5f18de8c5d1ca1e90dc4c674b4bf70d58d2",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "857001b0a7a9233528b7b963532031b2128e94a804bac6dd717e3e723e7a942f",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_a"
+      },
+      "seq": 2,
+      "state_sha256": "cdede756cfe7244de8f3a06d9f0f927a0a02b25c0b465c67a6f610b97ea409bc",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_a"
+      },
+      "state_sha256": "cdede756cfe7244de8f3a06d9f0f927a0a02b25c0b465c67a6f610b97ea409bc",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "credit": "pioneer",
+        "day": 1,
+        "discovery_id": "iron_folding"
+      },
+      "state_sha256": "cdede756cfe7244de8f3a06d9f0f927a0a02b25c0b465c67a6f610b97ea409bc",
+      "type": "discovery.made"
+    },
+    {
+      "event_hash": "795a81a74e27cb4c735651dcb614a9e4a6f9a9efd59f2eb0f5b5d6835e00e2fc",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_b"
+      },
+      "seq": 3,
+      "state_sha256": "751b9cc3ca22b24d8879d90600d95ffbd099864a8a993405c3c5dd67780ad34a",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "e133ecad8cd92e4500d408d9513c3c7cde480dc358ede47b8303ac58917768e6",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "forge_trial"
+      },
+      "seq": 4,
+      "state_sha256": "2d459dfb609f1486e42750398f9a5a1bce574fa8f4cf5b955a946c61ae8dc4fa",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "credit": "pioneer",
+        "day": 1,
+        "discovery_id": "iron_folding"
+      },
+      "state_sha256": "2d459dfb609f1486e42750398f9a5a1bce574fa8f4cf5b955a946c61ae8dc4fa",
+      "type": "discovery.made"
+    },
+    {
+      "event_hash": "95d36aac7ca10bbffb1956653d456e8ab78f392d13f2f973791b843c752a40b3",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 700
+      },
+      "seq": 5,
+      "state_sha256": "e92d0ad728e26a39e491cb099b884080348eeb05073bd96847f5deb668454078",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "credit": "king",
+        "day": 1,
+        "discovery_id": "iron_folding"
+      },
+      "state_sha256": "e92d0ad728e26a39e491cb099b884080348eeb05073bd96847f5deb668454078",
+      "type": "discovery.made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 1,
+        "discovery_id": "iron_folding"
+      },
+      "state_sha256": "e92d0ad728e26a39e491cb099b884080348eeb05073bd96847f5deb668454078",
+      "type": "discovery.made"
+    },
+    {
+      "event_hash": "25bea154c33231e6e438ba0fc584f6e8d296b6b3e5d2930d1fe79e04f31340d6",
+      "expect": "accepted",
+      "payload": {
+        "credit": "pioneer",
+        "day": 3,
+        "discovery_id": "iron_folding"
+      },
+      "seq": 6,
+      "state_sha256": "7d703f54c40b1d79fef684b0eef450620e375f2d2a2738d5c71c23b5f5290b9c",
+      "type": "discovery.made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "credit": "pioneer",
+        "day": 3,
+        "discovery_id": "iron_folding"
+      },
+      "state_sha256": "7d703f54c40b1d79fef684b0eef450620e375f2d2a2738d5c71c23b5f5290b9c",
+      "type": "discovery.made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "forge_trial"
+      },
+      "state_sha256": "7d703f54c40b1d79fef684b0eef450620e375f2d2a2738d5c71c23b5f5290b9c",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "12f25abbb0dedc4ff487a77ead0018347bb7ace90372f95a7364381b08a88835",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "old_shrine_map",
+        "evidence_id": "shrine_mural"
+      },
+      "seq": 7,
+      "state_sha256": "a4bc158a585291667042d07fec9c819d13780522f0b0f95283cca737c7116579",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "66091596b76b64465b8c75a0a483bd7379d5e8d348d3f8d84b5984801268badb",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "old_shrine_map",
+        "evidence_id": "hermit_story"
+      },
+      "seq": 8,
+      "state_sha256": "b42811027e4488999594b210e2c6faaf43507f0bbcb5988b17eb0e8b69c1bdff",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "credit": "discoverer",
+        "day": 2,
+        "discovery_id": "old_shrine_map"
+      },
+      "state_sha256": "b42811027e4488999594b210e2c6faaf43507f0bbcb5988b17eb0e8b69c1bdff",
+      "type": "discovery.made"
+    },
+    {
+      "event_hash": "26d01142885a5d21bf22b261275d4d65d4708e5dbda4c0c752e6ca50a706e185",
+      "expect": "accepted",
+      "payload": {
+        "credit": "discoverer",
+        "day": 3,
+        "discovery_id": "old_shrine_map"
+      },
+      "seq": 9,
+      "state_sha256": "4b57dc04cf036579fccc7c4a83c202babc157f6e5b04b89c12646b1af2caa27c",
+      "type": "discovery.made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 4,
+        "discovery_id": "frostglass_recipe",
+        "from_character": "teacher-1"
+      },
+      "state_sha256": "4b57dc04cf036579fccc7c4a83c202babc157f6e5b04b89c12646b1af2caa27c",
+      "type": "discovery.learned"
+    },
+    {
+      "event_hash": "6c6a53c672ef34d2d923436ce8f0cafd3bd90a87bb42002878f89fd62c6b7725",
+      "expect": "accepted",
+      "payload": {
+        "profession": "alchemy",
+        "xp": 300
+      },
+      "seq": 10,
+      "state_sha256": "ddc6f62251e8b068b05276206a66685611750c3a597bfb235dbb39d5be8d2853",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "255ce623a478f762a8b3c4537d41ddc0ed57d687cf818d7d272e3f3ef3580379",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "ice"
+      },
+      "seq": 11,
+      "state_sha256": "8e18861fa1f4522fbd0d9fafe9801a2954044dca914170d42bbddd6ae8e47240",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "b00f1ad06146b69de02bb5061e7ab6106692f01a84d73cf7c980bf5bbe84aef5",
+      "expect": "accepted",
+      "payload": {
+        "element": "ice"
+      },
+      "seq": 12,
+      "state_sha256": "c2d39f187e890a58690c1bce956462afbcfa342445a302bc790499ff2626701a",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 4,
+        "discovery_id": "frostglass_recipe",
+        "from_character": "c1"
+      },
+      "state_sha256": "c2d39f187e890a58690c1bce956462afbcfa342445a302bc790499ff2626701a",
+      "type": "discovery.learned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 4,
+        "discovery_id": "frostglass_recipe",
+        "from_character": ""
+      },
+      "state_sha256": "c2d39f187e890a58690c1bce956462afbcfa342445a302bc790499ff2626701a",
+      "type": "discovery.learned"
+    },
+    {
+      "event_hash": "da69d51f41b7e7f27fca8b8ebdf861f85d2fb65e082bad8671eb0ad484c6391d",
+      "expect": "accepted",
+      "payload": {
+        "day": 4,
+        "discovery_id": "frostglass_recipe",
+        "from_character": "teacher-1"
+      },
+      "seq": 13,
+      "state_sha256": "b41782c301c71c3cf70d3d50ef7720375cab36e30e49c98013c85531eb8dd9b8",
+      "type": "discovery.learned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 5,
+        "discovery_id": "frostglass_recipe",
+        "from_character": "teacher-2"
+      },
+      "state_sha256": "b41782c301c71c3cf70d3d50ef7720375cab36e30e49c98013c85531eb8dd9b8",
+      "type": "discovery.learned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "day": 5,
+        "discovery_id": "twilight_rite",
+        "from_character": "teacher-1"
+      },
+      "state_sha256": "b41782c301c71c3cf70d3d50ef7720375cab36e30e49c98013c85531eb8dd9b8",
+      "type": "discovery.learned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {},
+      "state_sha256": "b41782c301c71c3cf70d3d50ef7720375cab36e30e49c98013c85531eb8dd9b8",
+      "type": "discovery.grant_all"
+    }
+  ]
+}

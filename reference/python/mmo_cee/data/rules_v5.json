@@ -1,0 +1,528 @@
+{
+  "version": "5",
+  "identity": {
+    "classes": [
+      "warrior",
+      "shaman_alchemist",
+      "archer"
+    ],
+    "level_xp_unit": 100,
+    "max_level": 50
+  },
+  "elements": {
+    "all": [
+      "fire",
+      "water",
+      "shadow",
+      "light",
+      "wind",
+      "earth",
+      "electric",
+      "ice",
+      "nature"
+    ],
+    "attunement_threshold": 100,
+    "max_regular": 2,
+    "max_total": 3,
+    "third_element_min_level": 40
+  },
+  "professions": {
+    "all": [
+      "smithing",
+      "alchemy",
+      "farming",
+      "mining",
+      "construction",
+      "woodworking",
+      "trade",
+      "logistics",
+      "research",
+      "architecture",
+      "engineering"
+    ],
+    "mastery_thresholds": [
+      100,
+      300,
+      700,
+      1500,
+      3000,
+      6000,
+      12000,
+      24000,
+      48000,
+      96000
+    ]
+  },
+  "essence": {
+    "_comment": "PLATZHALTER zur Verifikation der Mechanik: Formen, Namen, Gewichte, Schwellen, Vor-/Nachteile und Entscheidungen sind Vorschläge, KEINE bestätigten Spielinhalte. Signale: element_attuned:<e>, element_affinity:<e>, combat_direction:<d>, profession:<p>, decision:<id>:<choice>. Gewicht = Beitrag in Punkten bei Signalwert 1000 (Promille). Eine Form wird prüfbar, wenn Stufe und Punktzahl >= threshold erreicht sind; kein einzelnes Signal darf allein genügen.",
+    "signal_caps": {
+      "element_affinity": 300,
+      "direction_score": 300000,
+      "profession_mastery": 10
+    },
+    "balance": {
+      "max_net_imbalance": 50
+    },
+    "decisions": {
+      "ember_vow": {
+        "options": [
+          "accept",
+          "refuse"
+        ],
+        "min_level": 5
+      },
+      "shadow_pact": {
+        "options": [
+          "accept",
+          "refuse"
+        ],
+        "min_level": 5
+      },
+      "mountain_oath": {
+        "options": [
+          "accept",
+          "refuse"
+        ],
+        "min_level": 5
+      },
+      "grove_rite": {
+        "options": [
+          "accept",
+          "refuse"
+        ],
+        "min_level": 5
+      }
+    },
+    "forms": {
+      "ember_kin": {
+        "min_level": 10,
+        "threshold": 600,
+        "signals": {
+          "element_attuned:fire": 250,
+          "element_affinity:fire": 100,
+          "profession:smithing": 250,
+          "combat_direction:vanguard": 200,
+          "decision:ember_vow:accept": 200,
+          "discovery:iron_folding": 100
+        },
+        "modifiers": {
+          "advantages": {
+            "fire_damage_permille": 150,
+            "cold_resist_permille": 100
+          },
+          "disadvantages": {
+            "water_resist_permille": 150,
+            "stealth_permille": 100
+          }
+        }
+      },
+      "umbral_kin": {
+        "min_level": 10,
+        "threshold": 600,
+        "signals": {
+          "element_attuned:shadow": 300,
+          "element_affinity:shadow": 100,
+          "combat_direction:skirmisher": 300,
+          "combat_direction:duelist": 100,
+          "decision:shadow_pact:accept": 200
+        },
+        "modifiers": {
+          "advantages": {
+            "stealth_permille": 200,
+            "move_speed_permille": 100
+          },
+          "disadvantages": {
+            "light_resist_permille": 200,
+            "healing_received_permille": 100
+          }
+        }
+      },
+      "stone_born": {
+        "min_level": 10,
+        "threshold": 600,
+        "signals": {
+          "element_attuned:earth": 250,
+          "profession:mining": 300,
+          "profession:construction": 150,
+          "combat_direction:guardian": 150,
+          "decision:mountain_oath:accept": 150
+        },
+        "modifiers": {
+          "advantages": {
+            "physical_resist_permille": 200,
+            "carry_capacity_permille": 100
+          },
+          "disadvantages": {
+            "move_speed_permille": 150,
+            "dodge_window_permille": 150
+          }
+        }
+      },
+      "tide_walker": {
+        "min_level": 10,
+        "threshold": 600,
+        "signals": {
+          "element_attuned:water": 250,
+          "profession:logistics": 200,
+          "profession:trade": 150,
+          "combat_direction:supporter": 200,
+          "decision:ember_vow:refuse": 100
+        },
+        "modifiers": {
+          "advantages": {
+            "swim_speed_permille": 250,
+            "healing_done_permille": 100
+          },
+          "disadvantages": {
+            "fire_resist_permille": 200,
+            "armor_permille": 150
+          }
+        }
+      },
+      "grove_warden": {
+        "min_level": 10,
+        "threshold": 600,
+        "signals": {
+          "element_attuned:nature": 250,
+          "profession:farming": 250,
+          "profession:alchemy": 150,
+          "combat_direction:supporter": 150,
+          "decision:grove_rite:accept": 200
+        },
+        "modifiers": {
+          "advantages": {
+            "regeneration_permille": 200,
+            "herb_yield_permille": 150
+          },
+          "disadvantages": {
+            "fire_resist_permille": 200,
+            "metal_armor_permille": 150
+          }
+        }
+      },
+      "twilight_kin": {
+        "min_level": 20,
+        "threshold": 600,
+        "requires_discoveries": [
+          "twilight_rite"
+        ],
+        "signals": {
+          "element_attuned:light": 250,
+          "element_attuned:shadow": 250,
+          "discovery:twilight_rite": 200,
+          "combat_direction:duelist": 150
+        },
+        "modifiers": {
+          "advantages": {
+            "light_damage_permille": 150,
+            "shadow_damage_permille": 150
+          },
+          "disadvantages": {
+            "physical_resist_permille": 200,
+            "healing_received_permille": 100
+          }
+        }
+      }
+    }
+  },
+  "combat": {
+    "_comment": "VORLÄUFIGE technische Vorschläge: Dimensionen, Aktionen, Richtungen, Gewichte und Schwellen sind NICHT als Spielinhalt beschlossen. Alle Anteile in Promille (1000 = 100 %), alles Ganzzahlen.",
+    "dimensions": [
+      "strength",
+      "precision",
+      "mobility",
+      "control",
+      "defense",
+      "support"
+    ],
+    "point_scale": 100,
+    "actions": {
+      "light_hit": {
+        "weights": {
+          "precision": 1,
+          "mobility": 1
+        },
+        "max_per_minute": 120
+      },
+      "heavy_hit": {
+        "weights": {
+          "strength": 3
+        },
+        "max_per_minute": 40
+      },
+      "precise_hit": {
+        "weights": {
+          "precision": 3
+        },
+        "max_per_minute": 40
+      },
+      "dodge": {
+        "weights": {
+          "mobility": 2
+        },
+        "max_per_minute": 30
+      },
+      "perfect_dodge": {
+        "weights": {
+          "mobility": 3,
+          "precision": 1
+        },
+        "max_per_minute": 15
+      },
+      "block": {
+        "weights": {
+          "defense": 2
+        },
+        "max_per_minute": 30
+      },
+      "parry": {
+        "weights": {
+          "defense": 3,
+          "precision": 1
+        },
+        "max_per_minute": 15
+      },
+      "stun_applied": {
+        "weights": {
+          "control": 3
+        },
+        "max_per_minute": 10
+      },
+      "slow_applied": {
+        "weights": {
+          "control": 2
+        },
+        "max_per_minute": 20
+      },
+      "ally_heal": {
+        "weights": {
+          "support": 3
+        },
+        "max_per_minute": 20
+      },
+      "ally_shield": {
+        "weights": {
+          "support": 2,
+          "defense": 1
+        },
+        "max_per_minute": 15
+      }
+    },
+    "encounter": {
+      "min_duration_s": 5,
+      "max_duration_s": 3600,
+      "burst_allowance": 3,
+      "max_opponent_level": 100
+    },
+    "outcome_permille": {
+      "victory": 1000,
+      "defeat": 500,
+      "fled": 250
+    },
+    "relevance": {
+      "trivial_level_gap": 10,
+      "trivial_permille": 100
+    },
+    "repeat_opponent_permille": [
+      1000,
+      1000,
+      750,
+      500,
+      250,
+      100
+    ],
+    "daily": {
+      "full_cap": 30000,
+      "reduced_permille": 250,
+      "hard_cap": 50000
+    },
+    "directions": {
+      "vanguard": {
+        "weights": {
+          "strength": 600,
+          "defense": 400
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      },
+      "duelist": {
+        "weights": {
+          "precision": 500,
+          "mobility": 500
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      },
+      "controller": {
+        "weights": {
+          "control": 800,
+          "precision": 200
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      },
+      "guardian": {
+        "weights": {
+          "defense": 700,
+          "support": 300
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      },
+      "supporter": {
+        "weights": {
+          "support": 800,
+          "control": 200
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      },
+      "skirmisher": {
+        "weights": {
+          "mobility": 600,
+          "strength": 200,
+          "precision": 200
+        },
+        "tier_thresholds": [
+          50000,
+          300000,
+          1500000
+        ]
+      }
+    }
+  },
+  "discovery": {
+    "_comment": "PLATZHALTER zur Verifikation der Mechanik: Entdeckungen, Namen, Beweise (evidence), Voraussetzungen, Fenster und Wirkungen sind Vorschläge, KEINE bestätigten Spielinhalte. Beweise sind eindeutige, vom Server vergebene IDs (jede nur einmal je Figur) - Wiederholen derselben Handlung bringt nichts. Pioniervorsprung: nur der erste Entdecker darf innerhalb des Fensters lehren; unabhängige Forschung bleibt immer möglich und das Fenster ist endlich (max_window_days), so dass nichts dauerhaft blockiert wird.",
+    "kinds": [
+      "recipe",
+      "technique",
+      "region",
+      "lore",
+      "technology"
+    ],
+    "max_window_days": 30,
+    "default_pioneer_window_days": 7,
+    "discoveries": {
+      "old_shrine_map": {
+        "kind": "region",
+        "evidence": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "shareable": true,
+        "requires": {},
+        "grants": {
+          "regions": [
+            "old_shrine"
+          ]
+        }
+      },
+      "iron_folding": {
+        "kind": "technique",
+        "evidence": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "shareable": true,
+        "pioneer_window_days": 10,
+        "requires": {
+          "professions": {
+            "smithing": 3
+          }
+        },
+        "grants": {
+          "techniques": [
+            "folded_iron"
+          ]
+        }
+      },
+      "frostglass_recipe": {
+        "kind": "recipe",
+        "evidence": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "shareable": true,
+        "requires": {
+          "professions": {
+            "alchemy": 2
+          },
+          "elements_attuned": [
+            "ice"
+          ]
+        },
+        "grants": {
+          "recipes": [
+            "frostglass"
+          ]
+        }
+      },
+      "windrider_glider": {
+        "kind": "technology",
+        "evidence": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "shareable": true,
+        "pioneer_window_days": 14,
+        "requires": {
+          "professions": {
+            "engineering": 2,
+            "research": 3
+          },
+          "min_level": 15
+        },
+        "grants": {
+          "technologies": [
+            "glider"
+          ]
+        }
+      },
+      "twilight_rite": {
+        "kind": "lore",
+        "evidence": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "shareable": false,
+        "requires": {
+          "min_level": 20,
+          "elements_attuned": [
+            "light",
+            "shadow"
+          ],
+          "discoveries": [
+            "old_shrine_map"
+          ]
+        },
+        "grants": {
+          "techniques": [
+            "twilight_binding"
+          ]
+        }
+      }
+    }
+  }
+}

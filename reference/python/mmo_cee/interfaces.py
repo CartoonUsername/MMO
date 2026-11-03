@@ -20,7 +20,11 @@ class CombatDevelopment(Protocol):
 
 
 class Discovery(Protocol):
-    """Prefix 'discovery.': Entdeckungen (Wissen, Orte, Verfahren)."""
+    """Prefix 'discovery.': Entdeckungen (Wissen, Orte, Verfahren).
+
+    Umgesetzt in mmo_cee/discovery.py (Charakterseite) und mmo_world (Weltseite), ADR-0009;
+    diese Schnittstelle bleibt als Vertrag bestehen.
+    """
 
     def discovered(self, state: CharacterState) -> list[str]: ...
 

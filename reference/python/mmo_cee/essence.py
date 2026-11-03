@@ -18,7 +18,7 @@ from .history import Event
 from .professions import ProfessionEngine
 from .rules import Rules
 
-SIGNAL_KINDS = ("element_attuned", "element_affinity", "combat_direction", "profession", "decision")
+SIGNAL_KINDS = ("element_attuned", "element_affinity", "combat_direction", "profession", "decision", "discovery")
 DECISION_KEYS = frozenset({"decision_id", "choice"})
 
 
@@ -67,11 +67,15 @@ def validate_essence_rules(rules: Rules) -> None:
             known = {
                 "element_attuned": rules["elements"]["all"], "element_affinity": rules["elements"]["all"],
                 "combat_direction": directions, "profession": rules["professions"]["all"], "decision": decisions,
+                "discovery": rules["discovery"]["discoveries"] if "discovery" in rules else {},
             }[kind]
             if name not in known:
                 raise CEEError(f"Form {form}: unbekanntes Signalziel {key!r}")
             if kind == "decision" and choice not in decisions[name]["options"]:
                 raise CEEError(f"Form {form}: unbekannte Option in {key!r}")
+        for need in f.get("requires_discoveries", []):
+            if "discovery" not in rules or need not in rules["discovery"]["discoveries"]:
+                raise CEEError(f"Form {form}: unbekannte Entdeckung {need!r} in requires_discoveries")
         adv, dis = f["modifiers"]["advantages"], f["modifiers"]["disadvantages"]
         if not adv or not dis:
             raise CEEError(f"Form {form}: Vor- UND Nachteile erforderlich")
@@ -97,6 +101,8 @@ def signal_value(state: CharacterState, rules: Rules, key: str) -> int:
     if kind == "profession":
         xp = state.parts["profession"]["xp"].get(name, 0)
         return min(1000, ProfessionEngine(rules).mastery_level(xp) * 1000 // caps["profession_mastery"])
+    if kind == "discovery":
+        return 1000 if name in state.parts.get("discovery", {}).get("known", {}) else 0
     return 1000 if state.parts["essence"].get("decisions", {}).get(name) == choice else 0
 
 
@@ -110,8 +116,10 @@ def form_scores(state: CharacterState, rules: Rules) -> dict[str, dict[str, Any]
             continue
         contrib = {k: w * signal_value(state, rules, k) // 1000 for k, w in f["signals"].items()}
         score = sum(contrib.values())
+        known = state.parts.get("discovery", {}).get("known", {})
+        gated = all(d in known for d in f.get("requires_discoveries", []))  # geheime Formen: nur durch Entdeckungen
         out[form] = {"score": score, "threshold": f["threshold"], "contributions": contrib,
-                     "eligible": human and level >= f.get("min_level", 1) and score >= f["threshold"]}
+                     "eligible": human and gated and level >= f.get("min_level", 1) and score >= f["threshold"]}
     return out
 
 

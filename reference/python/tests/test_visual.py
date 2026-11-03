@@ -13,7 +13,7 @@ from .helpers import attune
 from .test_combat import EV, enc, train
 from .test_essence_scoring import ember_ready, prepared
 
-RULES = load_rules()
+RULES = load_rules("rules_v4.json")  # Tests sind auf Regeln v4 festgelegt (neuere Versionen: eigene Tests)
 VR = load_visual_rules()
 ELEMENTS = RULES["elements"]["all"]
 
@@ -92,7 +92,7 @@ class VisualRulesTests(unittest.TestCase):
 
 class AppearanceTests(unittest.TestCase):
     def setUp(self):
-        self.svc = CharacterService()
+        self.svc = CharacterService(rules=RULES)
 
     def test_fresh_character_is_a_neutral_human(self):
         self.svc.create("p", "player")
@@ -112,7 +112,7 @@ class AppearanceTests(unittest.TestCase):
         self.assertEqual(self.svc.appearance("p")["appearance_sha256"], live["appearance_sha256"])
         self.svc.rebuild("p")
         self.assertEqual(self.svc.appearance("p"), live)
-        svc2 = CharacterService(log=EventLog.from_json("p", self.svc.log.to_json("p")))
+        svc2 = CharacterService(rules=RULES, log=EventLog.from_json("p", self.svc.log.to_json("p")))
         self.assertEqual(svc2.appearance("p"), live)
 
     def test_individual_variation_is_stable_per_character(self):
