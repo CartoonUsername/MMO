@@ -16,6 +16,6 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | **erledigt** (Mechanik, ADR-0008, Golden Vectors); offen: echte Optik/Assets, Ausrüstung/Kosmetik, Übergänge |
 | 9 | Snapshots, Regel-Migration/Rebuild, Anti-Cheat-Plausibilitätsregeln | offen |
 | 9b | Golden Test Vectors (Referenz ↔ Portierung) | **erledigt** (`reference/golden/`, ADR-0005) |
-| 10 | Server-Schnittstelle (Protokoll) + Portierung/Anbindung Unreal | offen |
+| 10 | Server-Schnittstelle (Protokoll) + Portierung/Anbindung Unreal | Befehlsschicht als Referenz erledigt (`mmo_server`, ADR-0019, `docs/PROTOCOL.md`); offen: Transport, Anmeldung, Push, Echtzeit-Kampfkanal, Mehrserver-Betrieb, Engine-Anbindung |
 
 Nicht in dieser Phase: Kampfechos, Städte, Wirtschaftssimulation (eigene Module, greifen später über Ereignisse auf die CEE zu).

@@ -96,6 +96,10 @@ Ab `rules_v8.json` meldet der Server den Referenzwert jedes Handels (`payload.re
 
 Eine Figur wechselt die Regelversion durch ein aufgezeichnetes Ereignis `identity.rules_migrated` (neue Version, Hash des Zustands davor, Fingerabdrücke beider Regeln). `RulesChain` (`mmo_cee/migration.py`) spielt Historien mit mehreren Regelversionen ab; `CharacterService.migrate()` hebt eine Figur um eine Stufe an. Nicht migrierte Figuren sind lesbar, aber für alle Aktionen gesperrt. `persistence.upgrade_world` hebt eine ganze Welt (oder eine Teilmenge der Figuren) auf eine höhere CEE-Regeldatei.
 
+## Server-Protokoll (ADR-0019, `docs/PROTOCOL.md`)
+
+`mmo_server.Gateway` ist die Befehlsschicht zwischen Clients und Weltdiensten: JSON-Hülle `{v, id, cmd, args}`, exakter Befehlskatalog (nur Absichten, nie Zeit/Fortschritt/Ergebnisse), Berechtigung (handelnde Figur gehört zur Sitzung), Idempotenz je Konto, Ratenbegrenzung je Figur und Gruppe nach Serveruhr, hash-verkettetes Audit ohne Inhalte. Alles, was Fortschritt, Zeit, Geld oder Weltzustand setzt, ist serverintern. Transport, Anmeldung, Push, Echtzeit-Kampfkanal und Mehrserver-Betrieb sind in `docs/PROTOCOL.md` geplant.
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

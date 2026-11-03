@@ -11,7 +11,7 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 | Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
 | Implementierte Engines | Identity, Element, Profession, Essence, Combat Development, Visual Evolution, Discovery, Crafting, **Economic Profile** + Character History (Event-Log, Hash-Kette, Replay) |
 | Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung), `rules_v4.json` (v3 + Wesensbewertung mit Entscheidungen, ADR-0007), `rules_v5.json` (v4 + Entdeckungen, geheime Wesensform, ADR-0009), `rules_v6.json` (v5 + Handwerk: Rezepte, Techniken, ADR-0010), `rules_v7.json` (v6 + Wirtschaft: Handel, Laufbahn, Gründung, ADR-0011); v1–v6 unverändert, Standard ist v7 |
-| Tests | **643** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Tests | **676** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
 | Weltzustand | `reference/python/mmo_world/` – `DiscoveryRegistry` (Pionier, Lehrfenster), `DiscoveryService` (transaktional mit der CEE), `Inventory` (atomar), `CraftingService` (Herstellung, ADR-0010) `TradeService` (Handel, ADR-0011) sowie `CompanyRegistry`/`CompanyService` (Firmensimulation, ADR-0012; Regeln `company_rules_v1.json`) |
 | Kampfsimulation | `reference/python/mmo_sim/` – deterministischer 1:1-Kampfkern, `EncounterServer` (ADR-0006), `sim_rules_v1.json` (vorläufige Werte) |
 | Golden Test Vectors | `reference/golden/` (CEE, 23 Szenarien, `mmo_cee.golden`) `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`) `reference/golden_visual/` (Visual Evolution, 21 Fälle, `mmo_cee.golden_visual`) und `reference/golden_world/` (Weltseite, 14 Szenarien mit Welt-Hash je Schritt, `mmo_world.golden`, ADR-0013); Format: `reference/golden/README.md` |
@@ -55,6 +55,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 18. `f97447d` Markt und Preisbildung (ADR-0015, `mmo_world.exchange`), 555 Tests.
 19. `3be3865`/`1541175` Firmenproduktion (ADR-0016, `mmo_world.production`), 585 Tests.
 20. `5c805da` Preisdynamik mit CEE-Regeln v8 (ADR-0017, `mmo_world.pricing`), 619 Tests.
-21. (dieser Stand) Regelversions-Migration (ADR-0018, `mmo_cee.migration`, `persistence.upgrade_world`), 643 Tests.
+21. `1ed1699` Regelversions-Migration (ADR-0018, `mmo_cee.migration`, `persistence.upgrade_world`), 643 Tests.
+22. (dieser Stand) Server-Protokoll: Planung (`docs/PROTOCOL.md`) und Referenz der Befehlsschicht (ADR-0019, `mmo_server`), 676 Tests.
 
 Plan: `docs/ROADMAP.md`.

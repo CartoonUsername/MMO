@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Größen, Fenster und Ratenlimits sind Vorschläge, KEINE bestätigten Werte. Ganzzahlen. Zeit in Server-Ticks (Vorschlag: 10 Ticks je Sekunde).",
+  "protocol_version": 1,
+  "max_message_bytes": 4096,
+  "max_string_length": 64,
+  "idempotency_window": 256,
+  "audit_limit": 1000,
+  "rate": {
+    "default": {"capacity": 20, "refill_per_tick": 1},
+    "market.place": {"capacity": 10, "refill_per_tick": 1},
+    "craft": {"capacity": 5, "refill_per_tick": 1},
+    "query": {"capacity": 40, "refill_per_tick": 2}
+  }
+}

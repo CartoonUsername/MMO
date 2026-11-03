@@ -8,3 +8,4 @@ requires-python = ">=3.11"
 mmo_cee = ["data/*.json"]
 mmo_sim = ["data/*.json"]
 mmo_world = ["data/*.json"]
+mmo_server = ["data/*.json"]
