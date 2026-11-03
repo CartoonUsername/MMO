@@ -144,7 +144,7 @@ class TamperTests(unittest.TestCase):
         self.fails(e)
 
     def test_rules_hashes(self):
-        for key in ("cee_sha256", "company_sha256", "market_sha256"):
+        for key in ("cee_sha256", "company_sha256", "market_sha256", "production_sha256"):
             with self.subTest(key):
                 e = copy.deepcopy(self.e)
                 e["rules"][key] = "0" * 64

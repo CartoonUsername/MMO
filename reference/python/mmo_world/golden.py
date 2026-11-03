@@ -25,7 +25,7 @@ from mmo_cee.history import _canonical as canonical_bytes
 
 from .company import goal_of, load_company_rules
 from .errors import WorldError
-from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, World
+from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRODUCTION_RULES, World
 
 FORMAT_VERSION = 1
 Op = dict[str, Any]
@@ -124,6 +124,11 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "vote": lambda e, a: e.company.vote(a["char"], a["company"], a["proposal"], a["yes"]),
     "close": lambda e, a: e.company.close_company(a["actor"], a["company"]),
     "disclosure": _disclosure,
+    "prod_stock_in": lambda e, a: e.production.stock_in(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "prod_stock_out": lambda e, a: e.production.stock_out(a["actor"], a["company"], a["item_key"], a["qty"]),
+    "prod_start": lambda e, a: e.production.start(a["actor"], a["company"], a["worker"], a["recipe"], a["batches"], a["grade"]),
+    "prod_cancel": lambda e, a: e.production.cancel(a["actor"], a["company"], a["job"]),
+    "prod_sell": lambda e, a: e.production.sell_to_npc(a["actor"], a["company"], a["item_key"], a["qty"]),
     "market_place": _place,
     "market_cancel": lambda e, a: e.exchange.cancel(a["char"], a["order"]),
     "market_expire": lambda e, a: e.exchange.expire(a["value"]),
@@ -440,6 +445,67 @@ def scenario_company_poach_close() -> list[Op]:
     ]
 
 
+def scenario_production() -> list[Op]:
+    c1, c2 = co(1), co(2)
+    ore, ing = "iron_ore@standard", "iron_ingot@standard"
+    PS = lambda actor, company, key, qty: S("prod_stock_in", actor=actor, company=company, item_key=key, qty=qty)  # noqa: E731
+    START = lambda actor, company, worker, recipe, batches, grade: S("prod_start", actor=actor, company=company,  # noqa: E731
+                                                                  worker=worker, recipe=recipe, batches=batches, grade=grade)
+    return [
+        *person("boss", trade=700), D("boss", COIN, 30000), *person("smith", smithing=700), *person("novice"),
+        *person("alch", alchemy=700), *person("rival", trade=700), D("rival", COIN, 5000), *person("w1", smithing=700),
+        *person("w2", smithing=100),
+        D("boss", ore, 600), D("boss", ing, 60), D("boss", "charcoal@standard", 40), D("boss", "iron_blade@fine", 60),
+        S("found", char="boss", capital=5000), S("found", char="rival", capital=1000),
+        S("hire", actor="boss", company=c1, char="smith", wage=50), S("hire", actor="boss", company=c1, char="novice", wage=40),
+        S("hire", actor="boss", company=c1, char="alch", wage=60),
+        PS("boss", c1, ore, 100), PS("smith", c1, ore, 1),                  # Berechtigung fehlt
+        PS("boss", c1, COIN, 1), PS("boss", c1, ore, 101),                  # Münzen sind keine Ware / Lager (200) voll
+        PS("boss", c1, ing, 20), PS("boss", c1, "charcoal@standard", 20),
+        S("prod_stock_out", actor="boss", company=c1, item_key=ore, qty=10), S("prod_stock_out", actor="boss", company=c1, item_key=ore, qty=500),
+        START("boss", c1, "smith", "iron_ingot", 3, "standard"),            # Auftrag 1: 3 Chargen, 1 Tag je Charge
+        START("boss", c1, "smith", "iron_ingot", 1, "standard"),            # Arbeiter belegt
+        START("boss", c1, "novice", "iron_ingot", 1, "standard"),           # keine freie Linie (Stufe 1)
+        START("smith", c1, "novice", "iron_ingot", 1, "standard"),          # keine Berechtigung
+        START("boss", c1, "boss", "iron_ingot", 1, "standard"),             # kein Mitarbeiter
+        START("boss", c1, "novice", "ghost", 1, "standard"),
+        START("boss", c1, "novice", "iron_ingot", 11, "standard"),
+        START("boss", c1, "novice", "iron_ingot", 1, "legendary"),
+        S("revenue", company=c1, amount=6000), S("upgrade", actor="boss", company=c1),   # Stufe 2: zwei Linien, Lager 600
+        START("boss", c1, "novice", "iron_blade", 1, "standard"),           # Meisterschaft fehlt (Material vorhanden)
+        START("boss", c1, "alch", "frostglass", 1, "standard"),             # Entdeckung fehlt
+        START("boss", c1, "novice", "iron_ingot", 20, "standard"),          # Material reicht nicht
+        DAY(2), S("advance_day", value=2),                                  # Tag 1+2: zwei Chargen fertig
+        PS("boss", c1, ing, 20),
+        START("boss", c1, "novice", "iron_ingot", 1, "standard"),           # Auftrag 2
+        START("boss", c1, "alch", "iron_ingot", 1, "standard"),             # beide Linien belegt
+        DAY(4), S("advance_day", value=4),
+        S("prod_sell", actor="boss", company=c1, item_key="iron_ingot@common", qty=20),   # NPC kauft zu 60 % des Referenzwerts
+        S("prod_sell", actor="boss", company=c1, item_key="iron_blade@fine", qty=20),     # nicht im Lager
+        S("prod_sell", actor="smith", company=c1, item_key="iron_ingot@common", qty=1),
+        PS("boss", c1, "iron_blade@fine", 60),
+        S("prod_sell", actor="boss", company=c1, item_key="iron_blade@fine", qty=40),     # Tageslimit des Abnehmers
+        S("prod_sell", actor="boss", company=c1, item_key="iron_blade@fine", qty=16),   # 240 + 1728 = 1968: unter dem Limit
+        DAY(5),
+        S("prod_sell", actor="boss", company=c1, item_key="iron_blade@fine", qty=2),      # neuer Tag
+        START("boss", c1, "smith", "iron_blade", 2, "standard"),            # Stufe 2: 2 Tage je Charge
+        S("prod_cancel", actor="smith", company=c1, job=f"srv1-job-{3:08d}"),
+        DAY(6), S("advance_day", value=6),
+        S("prod_cancel", actor="boss", company=c1, job=f"srv1-job-{3:08d}"),  # angefangene Charge verloren, Rest zurück
+        S("prod_cancel", actor="boss", company=c1, job=f"srv1-job-{3:08d}"),
+        # Firma 2: kleine Kasse, Lohn bleibt aus -> Linie steht
+        S("hire", actor="rival", company=c2, char="w1", wage=400), S("hire", actor="rival", company=c2, char="w2", wage=400),
+        D("rival", ore, 60), PS("rival", c2, ore, 60),
+        START("rival", c2, "w1", "iron_ingot", 3, "standard"),
+        DAY(7), S("advance_day", value=7),
+        DAY(12), S("advance_day", value=12),
+        PS("boss", c1, ore, 60), START("boss", c1, "alch", "iron_ingot", 2, "standard"),   # Auftrag läuft beim Schließen weiter
+        S("close", actor="boss", company=c1),                               # Ware und Auftragskonten gehen an den Gründer
+        START("boss", c1, "smith", "iron_ingot", 1, "standard"),            # Firma geschlossen
+        S("close", actor="rival", company=c2),
+    ]
+
+
 def MP(char: str, side: str, qty: int, price: int, key: str = "iron_blade@fine", **kw: Any) -> Op:
     return S("market_place", char=char, side=side, item_key=key, qty=qty, price=price, **kw)
 
@@ -655,6 +721,8 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      "Veto, Ausführungsfehler, Geschäftsführer", scenario_company_governance),
     ("company_poach_close", "Firma: Abwerben (Annahme, schlechtere Angebote), Anteilsverkauf, Liquidation mit Rundungsrest",
      scenario_company_poach_close),
+    ("company_production", "Firmenproduktion: Lager, Linien, Chargen, Qualitätsdeckel, Abnehmer mit Tageslimit, Abbruch, Stillstand, Schließung",
+     scenario_production),
     ("market_orderbook", "Markt: Orderbuch, Preis-Zeit-Priorität, Teilausführung, IOC, Preisband, Limits, Verfall, Preisindex",
      scenario_market),
     ("random_market_3", "Zustandsbewusstes Zufallsskript nur für den Markt (Seed 3, 220 Aktionen), ausgeschrieben",
@@ -676,6 +744,7 @@ def build_vector() -> dict[str, Any]:
     return {"format": FORMAT_VERSION, "name": NAME, "cee_rules_file": CEE_RULES, "cee_rules_sha256": _sha("mmo_cee", CEE_RULES),
             "company_rules_file": COMPANY_RULES, "company_rules_sha256": _sha("mmo_world", COMPANY_RULES),
             "market_rules_file": MARKET_RULES, "market_rules_sha256": _sha("mmo_world", MARKET_RULES),
+            "production_rules_file": PRODUCTION_RULES, "production_rules_sha256": _sha("mmo_world", PRODUCTION_RULES),
             "scenarios": [run_scenario(n, d, f()) for n, d, f in SCENARIOS]}
 
 
@@ -694,6 +763,8 @@ def verify_vector(vec: dict[str, Any]) -> list[str]:
         errs.append("Firmenregeln haben sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["market_rules_file"]) != vec["market_rules_sha256"]:
         errs.append("Marktregeln haben sich geändert (SHA-256 weicht ab)")
+    if _sha("mmo_world", vec["production_rules_file"]) != vec["production_rules_sha256"]:
+        errs.append("Produktionsregeln haben sich geändert (SHA-256 weicht ab)")
     for sc in vec["scenarios"]:
         steps, final = run_script([strip_result(s) for s in sc["steps"]])
         for i, (got, want) in enumerate(zip(steps, sc["steps"])):

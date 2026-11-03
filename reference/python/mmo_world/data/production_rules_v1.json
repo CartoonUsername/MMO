@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Linien, Dauer, Ausbeute, Qualitätsgrenze, Betriebskosten und NPC-Abnehmer sind Vorschläge, KEINE bestätigten Spielinhalte. Ganzzahlen; Divisionen als Floor. Firmenproduktion erzeugt bewusst keine CEE-Herstellungsberichte (kein Berufsfortschritt aus Offline-Produktion).",
+  "requires_cee_rules_min": 7,
+  "lines_by_building_level": [1, 2, 4],
+  "batch_size": 10,
+  "max_batches_per_job": 10,
+  "days_per_batch_by_tier": {"1": 1, "2": 2, "3": 3, "4": 4},
+  "output_permille": 800,
+  "max_quality": "fine",
+  "upkeep_per_batch_by_tier": {"1": 2, "2": 5, "3": 12, "4": 30},
+  "npc_buyer": {"permille": 600, "daily_cap": 2000}
+}

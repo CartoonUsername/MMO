@@ -20,11 +20,13 @@ from .discovery import DiscoveryRegistry
 from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
 from .market import TradeService
+from .production import ProductionService, load_production_rules
 from .service import DiscoveryService
 
 CEE_RULES = "rules_v7.json"
 COMPANY_RULES = "company_rules_v1.json"
 MARKET_RULES = "market_rules_v1.json"
+PRODUCTION_RULES = "production_rules_v1.json"
 
 
 class World:
@@ -50,11 +52,17 @@ class World:
         self.exchange = Exchange(self.svc, self.inv, self.trading, load_market_rules(MARKET_RULES), clock, sid)
         if old is not None:
             self.exchange._counter, self.exchange.orders, self.exchange.stats = old._counter, old.orders, old.stats
+        oldp = getattr(self, "production", None)
+        self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid)
+        if oldp is not None:
+            self.production._counter, self.production.jobs, self.production.npc_sold = oldp._counter, oldp.jobs, oldp.npc_sold
 
     def snapshot(self) -> dict[str, Any]:
         snap = self._base_snapshot()
         if self.exchange.active:  # ältere Snapshots/Vektoren ohne Markt bleiben unverändert
             snap["exchange"] = json.loads(self.exchange.to_json())
+        if self.production.active:
+            snap["production"] = json.loads(self.production.to_json())
         return snap
 
     def _base_snapshot(self) -> dict[str, Any]:

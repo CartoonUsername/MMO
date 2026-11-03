@@ -31,6 +31,8 @@ class CompanyService:
         cur = service.rules["economy"]["currency"]
         self.coin = key(cur["item"], cur["grade"])
         self.roles = service.rules["economy"]["career"]["roles"]
+        self.day_hooks: list[Callable[..., Any]] = []  # (Firma, Tag, bezahlt-Karte) -> Ereignisse; z. B. Produktion
+        self.close_hooks: list[Callable[[dict[str, Any]], None]] = []  # (Firma) vor der Auszahlung
 
     # ------------------------------------------------------------------ Hilfen -----------
     def _today(self) -> int:
@@ -137,6 +139,8 @@ class CompanyService:
             self.cee.record(cid, CAREER, pl)
             self.reg.remove_employee(c, cid)
         self.cee.record(c["founder"], CLOSED, closed)
+        for hook in self.close_hooks:
+            hook(c)
         payout: dict[str, int] = {}
         treasury = self._treasury(c)
         bal = self.inv.balance(treasury, self.coin)
@@ -295,6 +299,8 @@ class CompanyService:
                 if share > 0 and paid[e]:
                     self._pay(treasury, e, share)
                     profit_paid[e] = True
+        for hook in self.day_hooks:
+            out += hook(c, d, paid)
         headcount = len(emps) * 1000 // building(cr, c["building_level"])["max_employees"]
         sats = []
         for e in emps:

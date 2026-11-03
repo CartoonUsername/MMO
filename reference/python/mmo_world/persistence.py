@@ -28,7 +28,7 @@ from .company import CompanyRegistry
 from .discovery import DiscoveryRegistry
 from .errors import WorldError
 from .inventory import Inventory
-from .world import MARKET_RULES, World
+from .world import MARKET_RULES, PRODUCTION_RULES, World
 
 SNAPSHOT_FORMAT = 1
 KIND = "mmo_world_snapshot"
@@ -62,7 +62,8 @@ def export_world(world: World) -> tuple[Envelope, Logs]:
         "format": SNAPSHOT_FORMAT, "kind": KIND, "server_id": world.server_id, "saved_day": world.day[0],
         "rules": {"cee_file": world.cee_rules_file, "cee_sha256": _file_sha("mmo_cee", world.cee_rules_file),
                   "company_file": world.company_rules_file, "company_sha256": _file_sha("mmo_world", world.company_rules_file),
-                  "market_file": MARKET_RULES, "market_sha256": _file_sha("mmo_world", MARKET_RULES)},
+                  "market_file": MARKET_RULES, "market_sha256": _file_sha("mmo_world", MARKET_RULES),
+                  "production_file": PRODUCTION_RULES, "production_sha256": _file_sha("mmo_world", PRODUCTION_RULES)},
         "world": snap, "world_sha256": _sha(snap), "log_heads": heads,
     }
     return env, logs
@@ -114,6 +115,7 @@ def check_consistency(world: World) -> list[str]:
         if founded is None or founded["open"] != c["open"]:
             errs.append(f"{comp_id}: Gründungsstatus weicht von der CEE des Gründers ab")
     errs += [f"Markt: {m}" for m in world.exchange.check()]
+    errs += [f"Produktion: {m}" for m in world.production.check()]
     dreg = world.discovery_registry
     for did, rec in sorted(dreg.records.items()):
         for cid in sorted(rec["holders"]):
@@ -136,7 +138,7 @@ def import_world(envelope: Envelope, logs: Logs) -> World:
 def _import(envelope: Envelope, logs: Logs) -> World:
     env = migrate_envelope(envelope)
     rules = env["rules"]
-    for name in (rules["cee_file"], rules["company_file"], rules["market_file"]):  # nur schlichte Dateinamen aus dem Paket, nie Pfade
+    for name in (rules["cee_file"], rules["company_file"], rules["market_file"], rules["production_file"]):  # nur schlichte Dateinamen aus dem Paket, nie Pfade
         if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_]+\.json", name):
             raise PersistenceError("Ungültiger Regeldateiname")
     if _file_sha("mmo_cee", rules["cee_file"]) != rules["cee_sha256"]:
@@ -145,6 +147,8 @@ def _import(envelope: Envelope, logs: Logs) -> World:
         raise PersistenceError("Firmenregeln haben sich seit dem Speichern geändert")
     if rules["market_file"] != MARKET_RULES or _file_sha("mmo_world", rules["market_file"]) != rules["market_sha256"]:
         raise PersistenceError("Marktregeln haben sich seit dem Speichern geändert")
+    if rules["production_file"] != PRODUCTION_RULES or _file_sha("mmo_world", rules["production_file"]) != rules["production_sha256"]:
+        raise PersistenceError("Produktionsregeln haben sich seit dem Speichern geändert")
     if _sha(env["world"]) != env["world_sha256"]:
         raise PersistenceError("Weltzustand passt nicht zu seinem Hash")
     heads = env["log_heads"]
@@ -168,6 +172,8 @@ def _import(envelope: Envelope, logs: Logs) -> World:
     world.trading._counter, world.crafting._counter = snap["counters"]["trade"], snap["counters"]["craft"]
     if "exchange" in snap:
         world.exchange.load(json.dumps(snap["exchange"]))
+    if "production" in snap:
+        world.production.load(json.dumps(snap["production"]))
     if world.snapshot() != snap:  # Zustands-Hashes der Figuren aus den Historien + alle Register gegen den Snapshot
         raise PersistenceError("Aus den Historien abgeleiteter Zustand weicht vom Snapshot ab")
     problems = check_consistency(world)

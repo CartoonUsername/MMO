@@ -64,6 +64,7 @@ class WorldGoldenTests(unittest.TestCase):
             "cee_rules_hash": lambda v: v.update(cee_rules_sha256="0" * 64),
             "company_rules_hash": lambda v: v.update(company_rules_sha256="0" * 64),
             "market_rules_hash": lambda v: v.update(market_rules_sha256="0" * 64),
+            "production_rules_hash": lambda v: v.update(production_rules_sha256="0" * 64),
             "format": lambda v: v.update(format=2),
         }
         for name, fn in cases.items():
@@ -128,7 +129,8 @@ class WorldGoldenTests(unittest.TestCase):
     def test_coin_conservation_in_every_scenario(self):
         for sc in self.vec["scenarios"]:
             minted = sum(s["qty"] for s in sc["steps"] if s["op"] == "deposit" and s["key"] == COIN and s["expect"] == "ok")
-            minted += sum(s["amount"] for s in sc["steps"] if s["op"] == "revenue" and s["expect"] == "ok")  # einzige Münzquelle
+            minted += sum(s["amount"] for s in sc["steps"] if s["op"] == "revenue" and s["expect"] == "ok")  # Münzquelle: Umsatz
+            minted += sum(s["result"] for s in sc["steps"] if s["op"] == "prod_sell" and s["expect"] == "ok")  # Münzquelle 3: NPC-Abnehmer
             held = sum(h.get(COIN, 0) for h in sc["final"]["inventory"].values())
             self.assertEqual(held, minted, sc["name"])
 
@@ -179,6 +181,24 @@ class WorldGoldenTests(unittest.TestCase):
         self.assertGreaterEqual(sum(1 for s in rnd if s["op"] == "market_place" and s["expect"] == "ok" and s["result"]["fills"]), 15)
         self.assertTrue(any(s["op"] == "market_cancel" and s["expect"] == "ok" for s in rnd))
         self.assertTrue(any(s["op"] == "market_expire" and s["result"] for s in rnd if s["expect"] == "ok"))
+
+    def test_production_scenario_covers_lines_stalls_sales_and_closing(self):
+        sc = self.by_name["company_production"]
+        steps = sc["steps"]
+        started = [s for s in steps if s["op"] == "prod_start" and s["expect"] == "ok"]
+        self.assertEqual([s["result"] for s in started], [f"srv1-job-{i:08d}" for i in range(1, 6)])
+        done = [e for s in steps if s["op"] == "advance_day" and s["expect"] == "ok" for e in s["result"] if e["kind"] == "production_done"]
+        self.assertGreaterEqual(len(done), 2)
+        sales = [s["result"] for s in steps if s["op"] == "prod_sell" and s["expect"] == "ok"]
+        self.assertEqual(sales, [240, 1728, 216])
+        cancel = next(s for s in steps if s["op"] == "prod_cancel" and s["expect"] == "ok")
+        self.assertEqual(cancel["result"], {"charcoal@standard": 10, "iron_ingot@standard": 20})
+        fin = sc["final"]
+        self.assertEqual(fin["production"]["jobs"], {})  # Schließung beendet alle Aufträge
+        self.assertEqual([k for k in fin["inventory"] if k.startswith("production:")], [])
+        self.assertTrue(fin["inventory"]["boss"]["iron_ore@standard"] > 0)  # Ware zurück an den Gründer
+        log = [l["kind"] for l in fin["companies"]["companies"][golden.co(2)]["log"]]
+        self.assertIn("production_started", log)
 
     def test_random_scripts_are_deterministic_state_aware_and_mostly_valid(self):
         a, b = golden.random_script(4, 260), golden.random_script(4, 260)
