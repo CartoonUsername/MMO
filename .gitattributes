@@ -1,0 +1,32 @@
+# Git LFS für Unreal-Binärassets. Vor dem ersten Asset-Commit: `git lfs install`.
+# "lockable" = Datei-Locks (`git lfs lock`), da .uasset/.umap nicht mergebar sind.
+*.uasset filter=lfs diff=lfs merge=lfs -text lockable
+*.umap   filter=lfs diff=lfs merge=lfs -text lockable
+*.upk    filter=lfs diff=lfs merge=lfs -text
+*.udk    filter=lfs diff=lfs merge=lfs -text
+*.ubulk  filter=lfs diff=lfs merge=lfs -text
+*.uexp   filter=lfs diff=lfs merge=lfs -text
+# Quell-Assets
+*.fbx    filter=lfs diff=lfs merge=lfs -text
+*.blend  filter=lfs diff=lfs merge=lfs -text
+*.abc    filter=lfs diff=lfs merge=lfs -text
+*.usd    filter=lfs diff=lfs merge=lfs -text
+*.usdc   filter=lfs diff=lfs merge=lfs -text
+*.psd    filter=lfs diff=lfs merge=lfs -text
+*.tga    filter=lfs diff=lfs merge=lfs -text
+*.exr    filter=lfs diff=lfs merge=lfs -text
+*.png    filter=lfs diff=lfs merge=lfs -text
+*.jpg    filter=lfs diff=lfs merge=lfs -text
+*.wav    filter=lfs diff=lfs merge=lfs -text
+*.mp4    filter=lfs diff=lfs merge=lfs -text
+# Text bleibt Text (Zeilenenden stabil)
+*.cpp text eol=lf
+*.h   text eol=lf
+*.cs  text eol=lf
+*.py  text eol=lf
+*.json text eol=lf
+*.md  text eol=lf
+*.ini text eol=lf
+*.uproject text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf

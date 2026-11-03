@@ -1,0 +1,20 @@
+# Unreal Engine – generierte/lokale Dateien
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+Build/
+.vs/
+.idea/
+*.sln
+*.slnx
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+# Plugin-Binärordner
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+# Lokale MCP-Konfiguration (enthält lokalen Port)
+.mcp.json
