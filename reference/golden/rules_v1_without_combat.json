@@ -1,0 +1,93 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "eligible_essences": []
+  },
+  "description": "Regelversion 1 kennt keine Kampfentwicklung: combat.* wird abgelehnt, übrige Engines unverändert.",
+  "final_state": {
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "3b4e6e24b60242700edceeb5a3416e16c744aa15eafee2c34eadcc31787643ea",
+  "format": 1,
+  "name": "rules_v1_without_combat",
+  "rules_file": "rules_v1.json",
+  "rules_sha256": "34407fc2651c924d65ee0c26b299436d98305da157219553235aa85fb6a6ef64",
+  "steps": [
+    {
+      "event_hash": "12fadff727a54444ea0cdba03aa3fcdbd963e0cea7d83772d3d5a8a5292c56bf",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "1690cad89cfc9da9e178c90438c43adc4b4899098844f1f407e358e55e8acd57",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e1",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "1690cad89cfc9da9e178c90438c43adc4b4899098844f1f407e358e55e8acd57",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "367552d77b0f93f7e361f9b7644214d91257c79960f7db57d2ff84f2855c2b8c",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 1,
+      "state_sha256": "9ba4228dcc0ce03dcecd5882c326c428ee55259a5d6efe1e45732ca25461a30b",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "ea7eede3251178878e4c10a96315c0966f965982f08374ffaf6cc7c9c982be34",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 2,
+      "state_sha256": "3b4e6e24b60242700edceeb5a3416e16c744aa15eafee2c34eadcc31787643ea",
+      "type": "element.attuned"
+    }
+  ]
+}

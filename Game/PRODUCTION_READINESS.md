@@ -17,7 +17,7 @@ Installationsschritte: `Game/WINDOWS_SETUP_CHECKLIST.md`.
 | Punkt | Befund |
 |---|---|
 | Inhalt | `docs/` (Zustandsbericht, Architektur, Roadmap, 2 ADRs), `reference/python/mmo_cee/` (Event-Log, Identity/Element/Profession/Essence-Engine), `README.md` |
-| Tests | 83 `unittest`-Tests (Stand Combat Engine), alle grün |
+| Tests | 96 `unittest`-Tests (Stand Combat Engine), alle grün |
 | Unreal-Projekt | **nicht vorhanden** (`.uproject`, C++-Module, Content fehlen) |
 | Neu in diesem Schritt | `Game/` (diese Doku + Checkliste, `Game/.gitignore`) und `.gitattributes` (Git-LFS-Regeln). Kein bestehender Code geändert. |
 | Branches | `main` unverändert; Arbeit nur auf `claude/awesome-dirac-9k6p3n`; kein Merge |
@@ -94,7 +94,7 @@ Regeln:
 ### Integration der Python-Referenz-CEE – Optionen
 | Option | Beschreibung | Bewertung |
 |---|---|---|
-| **A (💡 Empfehlung)** | **C++-Portierung** des Kerns als Runtime; Python bleibt **Referenz und Test-Orakel**. Gemeinsame **Golden Vectors** (JSON: Rules + Event-Log + erwarteter State + erwartete Hashes). Python exportiert, C++-Automation-Test spielt nach und vergleicht. | Im Spiel-Build gibt es keine Python-Abhängigkeit; Hot-Path performant; Regel-Drift wird von Tests erkannt. |
+| **A (💡 Empfehlung)** | **C++-Portierung** des Kerns als Runtime; Python bleibt **Referenz und Test-Orakel**. Gemeinsame **Golden Vectors** (JSON: Rules + Event-Log + erwarteter State + erwartete Hashes; **vorhanden** in `reference/golden/`). Python exportiert, C++-Automation-Test spielt nach und vergleicht. | Im Spiel-Build gibt es keine Python-Abhängigkeit; Hot-Path performant; Regel-Drift wird von Tests erkannt. |
 | B | Python-Sidecar-Dienst (gRPC/HTTP) | Gut für spätere Backend-Dienste (Persistenz/Analytik), nicht im Spielthread; zusätzlicher Betriebsaufwand. |
 | C | Editor-Python (Unreal-Python) für Tools: Regel-Validierung, Golden-Vector-Export, Datenimport | 🟡 Editor-only: Unreal-Python ist ein Editor-Plugin und wird nicht ins Spiel-Build geliefert (Allgemeinwissen, in M0 bestätigen). Nur für Tooling. |
 

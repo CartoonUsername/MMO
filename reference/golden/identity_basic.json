@@ -1,0 +1,217 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Erstellung, Klassenwahl (einmalig), XP/Level-Kurve und Obergrenze, ungültige Eingaben.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": "warrior",
+      "kind": "player",
+      "level": 50,
+      "xp": 1000000100
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "6fce04a5304e15397708fa5612079452f2bb44646a115c9ddf18319e56e1083b",
+  "format": 1,
+  "name": "identity_basic",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": 5
+      },
+      "state_sha256": null,
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "kind": "player"
+      },
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "kind": "monster"
+      },
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "base_class": "mage"
+      },
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.class_chosen"
+    },
+    {
+      "event_hash": "ce4842ace4ce57c73f3c47af7bfae7ce583e2805cf093c891ca7f55ce3dd2e48",
+      "expect": "accepted",
+      "payload": {
+        "base_class": "warrior"
+      },
+      "seq": 1,
+      "state_sha256": "26eb6984c381b972aed7f6cb9d93a8a9cc81cd7f128410ad520c62fc8936301f",
+      "type": "identity.class_chosen"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "base_class": "archer"
+      },
+      "state_sha256": "26eb6984c381b972aed7f6cb9d93a8a9cc81cd7f128410ad520c62fc8936301f",
+      "type": "identity.class_chosen"
+    },
+    {
+      "event_hash": "f1f52a477309c4ad78b15600c55ac2c8c0f94403aa93cac48d27c040f16db91d",
+      "expect": "accepted",
+      "payload": {
+        "amount": 99
+      },
+      "seq": 2,
+      "state_sha256": "10f7cb4d83d2d997060251c5a5d93bf86067190bb21a49682b7f486bc57c28dc",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "8a8e5338dfc298edf0f088fa91e4024d2d84eebf71c3117bbf2d6f69c3d77f0e",
+      "expect": "accepted",
+      "payload": {
+        "amount": 1
+      },
+      "seq": 3,
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": 0
+      },
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": -5
+      },
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": 1.5
+      },
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": "10"
+      },
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": true
+      },
+      "state_sha256": "1f252ff96b2447dc70f22ab54c8864c07defde3abdd62aef228f27f863fcf332",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "e6305fb84d4a4a5ab6a6690a3d7c08ea629f7d777c2b0d5a577d6f9284f29540",
+      "expect": "accepted",
+      "payload": {
+        "amount": 1000000000
+      },
+      "seq": 4,
+      "state_sha256": "6fce04a5304e15397708fa5612079452f2bb44646a115c9ddf18319e56e1083b",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {},
+      "state_sha256": "6fce04a5304e15397708fa5612079452f2bb44646a115c9ddf18319e56e1083b",
+      "type": "bogus.thing"
+    }
+  ]
+}

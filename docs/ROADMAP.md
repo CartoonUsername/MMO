@@ -13,6 +13,7 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 7 | Economic Profile (Handel, Unternehmen, Karriere) | offen |
 | 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | offen |
 | 9 | Snapshots, Regel-Migration/Rebuild, Anti-Cheat-Plausibilitätsregeln | offen |
+| 9b | Golden Test Vectors (Referenz ↔ Portierung) | **erledigt** (`reference/golden/`, ADR-0005) |
 | 10 | Server-Schnittstelle (Protokoll) + Portierung/Anbindung Unreal | offen |
 
 Nicht in dieser Phase: Kampfechos, Städte, Wirtschaftssimulation (eigene Module, greifen später über Ereignisse auf die CEE zu).

@@ -1,0 +1,215 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Wesensweg Mensch -> ember_kin (Platzhalter): Voraussetzungen, Prüfung, dauerhafte Annahme.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": 6,
+      "form": "ember_kin",
+      "trials_passed": [
+        "ember_kin"
+      ]
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "smithing": 700
+      }
+    }
+  },
+  "final_state_sha256": "afaa1974245249239162fe4fbd0718b0914bf114c5c9607731d5689130531bbe",
+  "format": 1,
+  "name": "essence_path",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "0ab88306f898217bbed094a018776f8c8d36cf7901ffba83bf8ffd3a20d96413",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "95c9a95b1e87397e63179a2a99b9eb4b4c9f10e891219818999d52fe49d65ddd",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "7e30b40701a492d661d4edfcb7d8d3b09c4e9354e07507a663eda7bf762dafd6",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 2,
+      "state_sha256": "4b6ed7b8ffc82982f9b71e20c5ea656dbd359d4a67e8c2c5cbbf680afaf3b724",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "d259c243bc38bb00b020f8055ad40fb5a423b3f926a843fb35ab801e0d950f58",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 3,
+      "state_sha256": "1f34fb9b622adc35c0c58a9cb96435f70d9241bcf25e1399f259b5000d480393",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "1f34fb9b622adc35c0c58a9cb96435f70d9241bcf25e1399f259b5000d480393",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "130a1b1dcf8dccc3c6fd2b91759bbc2ec83779f2b4bb9766df120ae606cf7511",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 700
+      },
+      "seq": 4,
+      "state_sha256": "a2fa2b37258fc5851a48e239f1dbc8a4e670a75e215f8bb2c82887a6345c5174",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "a2fa2b37258fc5851a48e239f1dbc8a4e670a75e215f8bb2c82887a6345c5174",
+      "type": "essence.adopted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "dragon"
+      },
+      "state_sha256": "a2fa2b37258fc5851a48e239f1dbc8a4e670a75e215f8bb2c82887a6345c5174",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "a5f5de5f365d9916db9d55ab211e59a7800e8514887eaa97d3776e23e65aab31",
+      "expect": "accepted",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "seq": 5,
+      "state_sha256": "5a039c5a192ba7e4e203779784788a8a0f50d3491394ebc0fd7fe5c5a5fc3fc3",
+      "type": "essence.trial_passed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "5a039c5a192ba7e4e203779784788a8a0f50d3491394ebc0fd7fe5c5a5fc3fc3",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "8ff55a1316d23aa2ad83224d39e1a29e6105e6caadaa75021fcbbabcacde1856",
+      "expect": "accepted",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "seq": 6,
+      "state_sha256": "afaa1974245249239162fe4fbd0718b0914bf114c5c9607731d5689130531bbe",
+      "type": "essence.adopted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "stone_born"
+      },
+      "state_sha256": "afaa1974245249239162fe4fbd0718b0914bf114c5c9607731d5689130531bbe",
+      "type": "essence.adopted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "stone_born"
+      },
+      "state_sha256": "afaa1974245249239162fe4fbd0718b0914bf114c5c9607731d5689130531bbe",
+      "type": "essence.trial_passed"
+    }
+  ]
+}

@@ -1,0 +1,498 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 53,
+      "mobility": 35,
+      "precision": 26,
+      "strength": 884,
+      "support": 0
+    }
+  },
+  "description": "Kampfbericht: exakte Punkte, Ergebnisfaktoren, Duplikate, Pflichtfelder, Wertebereiche, Aktionsraten-Grenzen.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 1,
+        "opponents": {
+          "a": 1,
+          "b": 1,
+          "c": 1,
+          "d": 1,
+          "e": 1,
+          "wolf": 1,
+          "x": 1
+        },
+        "points": {
+          "control": 0,
+          "defense": 1200,
+          "mobility": 800,
+          "precision": 600,
+          "strength": 19950,
+          "support": 0
+        }
+      },
+      "encounters": {
+        "e1": 1,
+        "e11": 5,
+        "e13": 6,
+        "e19": 7,
+        "e1b": 2,
+        "e2": 3,
+        "e3": 4
+      },
+      "points": {
+        "control": 0,
+        "defense": 1200,
+        "mobility": 800,
+        "precision": 600,
+        "strength": 19950,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 1,
+        "fled": 1,
+        "victory": 5
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "9909c20837a73e45513421ddef9846c14f7546091cfab71c27665f12706c0e25",
+  "format": 1,
+  "name": "combat_validation",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "5fffb622abb94228fdd41321c514a2274ce9a092be266e33304ab55774819a51",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e1",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 1,
+      "state_sha256": "fbd3efc1de49d9c4cc3a22b59f0c3965014b79bce029c7d55783b511d2ded1aa",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e1",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "fbd3efc1de49d9c4cc3a22b59f0c3965014b79bce029c7d55783b511d2ded1aa",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "4f61446d689ecad87590be8b5190ee07c920fd312119f9dde51db4d68f993f29",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 1
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e1b",
+        "opponent_level": 5,
+        "opponent_type": "x",
+        "outcome": "victory"
+      },
+      "seq": 2,
+      "state_sha256": "694092e5992f935cef1fb6a06e9efab8d15032a8dbe30141cf6fdd600af89dac",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "2b314bd62f40f1f5869acc54c174cd1eabf60f03d1dba1e5821ce248f04465dd",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e2",
+        "opponent_level": 5,
+        "opponent_type": "a",
+        "outcome": "defeat"
+      },
+      "seq": 3,
+      "state_sha256": "6500a3d3a5d86cbec2a9175cb725e76415ec64ff7291c42c9c3bd5a3968c19b0",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "71f5315cae726db6cfa82d8a8220674799736e594d85c7b7c121fb6a81594ba2",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e3",
+        "opponent_level": 5,
+        "opponent_type": "b",
+        "outcome": "fled"
+      },
+      "seq": 4,
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e4",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "draw"
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e5",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory",
+        "points": 999999
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e6",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory",
+        "strength": 5
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "fireball": 3
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e7",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {},
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e8",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 0
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e9",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 44
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e10",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "5c46f100f8b089cd84ce727444af0a7ee31dc0190ce3ed15d4af9e19231bd49c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "9d0e68c42ffc37c32ff4c76a81c06b32376ae43a2547d7e8bcd0ab153ab3b943",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e11",
+        "opponent_level": 5,
+        "opponent_type": "c",
+        "outcome": "victory"
+      },
+      "seq": 5,
+      "state_sha256": "f9b0c8134ddd1de2f3144bfd51afacc9a46384163c48016eb04d1ad253ffd1af",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 7
+        },
+        "day": 1,
+        "duration_s": 5,
+        "encounter_id": "e12",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "f9b0c8134ddd1de2f3144bfd51afacc9a46384163c48016eb04d1ad253ffd1af",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "894c71c9e41f47e1b27b2fb6bedd5367bf246b92674d27db43f71f6101c3367d",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 6
+        },
+        "day": 1,
+        "duration_s": 5,
+        "encounter_id": "e13",
+        "opponent_level": 5,
+        "opponent_type": "d",
+        "outcome": "victory"
+      },
+      "seq": 6,
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 4,
+        "encounter_id": "e14",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 3601,
+        "encounter_id": "e15",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e16",
+        "opponent_level": 0,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e17",
+        "opponent_level": 101,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": -1,
+        "duration_s": 60,
+        "encounter_id": "e18",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "",
+        "opponent_level": 5,
+        "opponent_type": "y",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "state_sha256": "bac7f16983f414593cc67d0e2659bac02a10e7148e9d7ed91191a76520d84e10",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f9354b15e5056a6b0501ae768f862d6d13e2a9c2ae7b31c81a9b5b6a81542744",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "parry": 4,
+          "perfect_dodge": 2
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "e19",
+        "opponent_level": 5,
+        "opponent_type": "e",
+        "outcome": "victory"
+      },
+      "seq": 7,
+      "state_sha256": "9909c20837a73e45513421ddef9846c14f7546091cfab71c27665f12706c0e25",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "strength": 100
+      },
+      "state_sha256": "9909c20837a73e45513421ddef9846c14f7546091cfab71c27665f12706c0e25",
+      "type": "combat.grant_points"
+    }
+  ]
+}

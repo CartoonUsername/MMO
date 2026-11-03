@@ -1,0 +1,1498 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {
+      "vanguard": 1
+    },
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 309,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 690,
+      "support": 0
+    }
+  },
+  "description": "Anti-Farming: Wiederholungsabnahme je Gegnertyp, Tageslimit (voll/reduziert/hart), Tagwechsel, Tag nicht rückwärts.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 3,
+        "opponents": {
+          "mob0": 1,
+          "mob1": 1,
+          "mob10": 1,
+          "mob11": 1,
+          "mob12": 1,
+          "mob13": 1,
+          "mob14": 1,
+          "mob15": 1,
+          "mob16": 1,
+          "mob17": 1,
+          "mob18": 1,
+          "mob19": 1,
+          "mob2": 1,
+          "mob20": 1,
+          "mob21": 1,
+          "mob22": 1,
+          "mob23": 1,
+          "mob24": 1,
+          "mob25": 1,
+          "mob26": 1,
+          "mob27": 1,
+          "mob28": 1,
+          "mob29": 1,
+          "mob3": 1,
+          "mob4": 1,
+          "mob5": 1,
+          "mob6": 1,
+          "mob7": 1,
+          "mob8": 1,
+          "mob9": 1
+        },
+        "points": {
+          "control": 0,
+          "defense": 50000,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 50000,
+          "support": 0
+        }
+      },
+      "encounters": {
+        "d2-0": 9,
+        "d2-1": 10,
+        "d2-10": 19,
+        "d2-11": 20,
+        "d2-12": 21,
+        "d2-13": 22,
+        "d2-14": 23,
+        "d2-15": 24,
+        "d2-16": 25,
+        "d2-17": 26,
+        "d2-18": 27,
+        "d2-19": 28,
+        "d2-2": 11,
+        "d2-20": 29,
+        "d2-21": 30,
+        "d2-22": 31,
+        "d2-23": 32,
+        "d2-24": 33,
+        "d2-25": 34,
+        "d2-26": 35,
+        "d2-27": 36,
+        "d2-28": 37,
+        "d2-29": 38,
+        "d2-3": 12,
+        "d2-4": 13,
+        "d2-5": 14,
+        "d2-6": 15,
+        "d2-7": 16,
+        "d2-8": 17,
+        "d2-9": 18,
+        "d3-0": 40,
+        "d3-1": 41,
+        "d3-10": 50,
+        "d3-11": 51,
+        "d3-12": 52,
+        "d3-13": 53,
+        "d3-14": 54,
+        "d3-15": 55,
+        "d3-16": 56,
+        "d3-17": 57,
+        "d3-18": 58,
+        "d3-19": 59,
+        "d3-2": 42,
+        "d3-20": 60,
+        "d3-21": 61,
+        "d3-22": 62,
+        "d3-23": 63,
+        "d3-24": 64,
+        "d3-25": 65,
+        "d3-26": 66,
+        "d3-27": 67,
+        "d3-28": 68,
+        "d3-29": 69,
+        "d3-3": 43,
+        "d3-4": 44,
+        "d3-5": 45,
+        "d3-6": 46,
+        "d3-7": 47,
+        "d3-8": 48,
+        "d3-9": 49,
+        "extra": 39,
+        "w0": 1,
+        "w1": 2,
+        "w2": 3,
+        "w3": 4,
+        "w4": 5,
+        "w5": 6,
+        "w6": 7,
+        "w7": 8
+      },
+      "points": {
+        "control": 0,
+        "defense": 50000,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 111400,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 69
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "3815b2a8693eb9203d2663a71384b85848929bae9bf82d68be8c69afdcd2addd",
+  "format": 1,
+  "name": "combat_antifarm",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "aa23ce4c5c70e67e140a49d10bb99ed4c9f81ec447da1800abec7fa60b0140d1",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w0",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 1,
+      "state_sha256": "9091add68e54696c1c7b55283b9e4455c5819d29e94ad1b83cf7bb9cc600b15d",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "e267155e49b8fa8c2cb8cbe26ca2bb3da7e647dcba2eeff4283852b9e399530a",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w1",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 2,
+      "state_sha256": "c2a1bfddde9d6e7faecfb4674bd2e1049c6ef4d46d0154dad6bf3ebfbb1a6b6a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f4fced2e5954041f35a7c9023df1ebbdbb1f838fc398d9fbf02625b3ccd6aabd",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w2",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 3,
+      "state_sha256": "ac3547f19e6d9d4dd9aee0ad24a640ee90bad0ab2936ce1e77ec92457fe00f79",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "30765d11297dfa932d027b0478ca5d87dc1cf5bba8929c632af6a888854b5ba7",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w3",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 4,
+      "state_sha256": "15619f95e753861a2d00aa9c8ce84efdefc3835b6a3c2a9e8d3fa60fa7df7bb2",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "7048fa219baf5ca3140e5f4eb2ef0f8e663732ab5e1f9f0fcdb8a37be6740324",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w4",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 5,
+      "state_sha256": "97efd7ff7773717fa0ae4bb25a37a5276e0acb2fd188622f9cd59fc87c3ed829",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "1cb5e13cf56c038eca082daab68673c36ca870ac6f9857d81a7a7d9ce47b1b4b",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w5",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 6,
+      "state_sha256": "03cb43c490784b13001d66e9d3ed96ac21c62a2a85c62d128971d56154404fae",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "76395476573fc8ecd5c173c5216433589f685e96d336ecebe64071d2206b813a",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w6",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 7,
+      "state_sha256": "5206233938ac78186d9e062427f7f8fc7f4a2228b8f76291425150ff517d31a1",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "043a0cfe438493b83187e2fc1eff7265a27c4814dcae714d8933982a65ab4fb0",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "w7",
+        "opponent_level": 5,
+        "opponent_type": "wolf",
+        "outcome": "victory"
+      },
+      "seq": 8,
+      "state_sha256": "f5a0cfd2b5739d92b4012e728806e76892328a60df35bea9e4ba8896c230bafb",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 0,
+        "duration_s": 60,
+        "encounter_id": "late",
+        "opponent_level": 5,
+        "opponent_type": "z",
+        "outcome": "victory"
+      },
+      "state_sha256": "f5a0cfd2b5739d92b4012e728806e76892328a60df35bea9e4ba8896c230bafb",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "1eaf6baf0c8b595622bdc2b485afe53be552dfbe1d41194784231715bd1e11ca",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 9,
+      "state_sha256": "9f6e0c7848863072e0b9de9b5e30d783a068f2282bec2f1cfb87b1baa269004b",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "86410ef2233c4a9bb3e1b717dfd283c6fbd48eeb8565049d3041fd54b0abcb17",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 10,
+      "state_sha256": "e77ad8154c158e58c4909ce7322f59a0688b698c557636c70cf722ea33c6dd3a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "9fe08747b9de21ec9a52a4af7e9fc92035e2367c3e92839d3bac08243536965c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 11,
+      "state_sha256": "a6f2b415b45b237dbac1437fd853e32025ec436d156b80469f62a26ec105d433",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "5300edb041eeb50276af3c89be22dd29a0d518757ea23784d866b9b2f121ec04",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 12,
+      "state_sha256": "fc0f671fbf9def842d2e48081dac023a8046fb68650d84068b4ec75c5ec90f66",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c5a1d9653e54e058f059ecaa4a9c863ab64057f78302da4acf95b5097675b55b",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 13,
+      "state_sha256": "3c721cd14d0a2dc9d15e380afa7c97deea77beeee7472cbbe14ddc4d6db8d8f7",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "8860c8e098f8221885d8d81d97d3d6f726346a848cb5f5045169efbef0d61972",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 14,
+      "state_sha256": "356633d7e426946705456452a741c899021781028ad42bbf09de0d29b4de278f",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "adf6cfd5c8832be03843dd417f3508cb3f45ef42ec89c7ba64b57af30062a55f",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-6",
+        "opponent_level": 5,
+        "opponent_type": "mob6",
+        "outcome": "victory"
+      },
+      "seq": 15,
+      "state_sha256": "803d337be71e208c08791e291b046d3edfc810f6b6b9a490f7f033d3bc3f8ae7",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f30b41c2ac579f20751600fcaf30b9c2017f2ce83803af8ec84344a4e39585d5",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-7",
+        "opponent_level": 5,
+        "opponent_type": "mob7",
+        "outcome": "victory"
+      },
+      "seq": 16,
+      "state_sha256": "3b102f536b81ee54745855ab700ad1fe5930c04034672f9a6118f735c52da061",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "2ca0b01ad8a95a95e39a8375f656fde9f943cb765ca862f65a490c66eae92b56",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-8",
+        "opponent_level": 5,
+        "opponent_type": "mob8",
+        "outcome": "victory"
+      },
+      "seq": 17,
+      "state_sha256": "b38c5889b4f7f69a70f50e22cd17755678f439a06cde6b42eb54ad811f2f458b",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "bd9b96a33bcf1f957dd07341a7fb508fe941318f35b81c7d8070d26a1e61f52e",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-9",
+        "opponent_level": 5,
+        "opponent_type": "mob9",
+        "outcome": "victory"
+      },
+      "seq": 18,
+      "state_sha256": "1a5c39db118a3a0e3e5ea782729a73268302395f5d2cf2feba196e2639c2f39a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ec1d508a24cfcc0f50ca5af23386e52afda7b781b9c480dbe815c8d8a3463e18",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-10",
+        "opponent_level": 5,
+        "opponent_type": "mob10",
+        "outcome": "victory"
+      },
+      "seq": 19,
+      "state_sha256": "381093a88963286ad00d55bc6b95e93a234e0792eda22f3bc2f313d4272a7713",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "67d94aae913f15e229de4ba01fbe52db07d7744a733d7479521d37151aa795f9",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-11",
+        "opponent_level": 5,
+        "opponent_type": "mob11",
+        "outcome": "victory"
+      },
+      "seq": 20,
+      "state_sha256": "50ae1aaa8a23c9105c6784aa78e5953d64a5640df1a69cb09a2b20512b350672",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f30ce8707512266e6a92200bd89058f665ff472f7a1e56e761da79e80bbf222b",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-12",
+        "opponent_level": 5,
+        "opponent_type": "mob12",
+        "outcome": "victory"
+      },
+      "seq": 21,
+      "state_sha256": "e43f7aa3f600ebbf5699c5b52b2930c41f04d6b377e4074292ce21010199acbf",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f56c34ba4bddbfe296f4a1d8e27d698a5c78074cf7481323b2aff043c23b4076",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-13",
+        "opponent_level": 5,
+        "opponent_type": "mob13",
+        "outcome": "victory"
+      },
+      "seq": 22,
+      "state_sha256": "e39cf4b2ed45496251a996a45ade6226e4ff48fabf48b8aa71a55a2832d0a767",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "31203ee76b112acb4704a3b0cb82eda9a447e836fa0e26ac0805f709b1aa5a97",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-14",
+        "opponent_level": 5,
+        "opponent_type": "mob14",
+        "outcome": "victory"
+      },
+      "seq": 23,
+      "state_sha256": "cdb7c56b6e2a84ca0947f8f96b8f7ad7b9ba11395f85aa2f2f8edb59f188ad2a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "0f1ad6c810446d8b4baf623fb7a6a7063cc910018df61c267b5ee09236c0732c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-15",
+        "opponent_level": 5,
+        "opponent_type": "mob15",
+        "outcome": "victory"
+      },
+      "seq": 24,
+      "state_sha256": "9d4ea2255dec5470b555dc8dc147e1e6a07a60f6749c251af486b6df6689e405",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "06acc2cd262a600b538ce0b0fdcb9ab09c01d93f267fe67c7db593afa5e3b902",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-16",
+        "opponent_level": 5,
+        "opponent_type": "mob16",
+        "outcome": "victory"
+      },
+      "seq": 25,
+      "state_sha256": "8eae8aa0e367e143b4d33a9c2cadbe5e443e1d95cf5e383943a702a64b22053a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "cb6aa51566edfb3731e6d31d77558890bf6277cb76969bd1f4d06cdd33988b01",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-17",
+        "opponent_level": 5,
+        "opponent_type": "mob17",
+        "outcome": "victory"
+      },
+      "seq": 26,
+      "state_sha256": "4aac9869e98976523ee94445ec63e80c31180c464db6e58f0d9d7f062059d057",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "43dc6d3203e7a5d1477811cf8288feff757cf924eaba8ed9bb4a0e7aee4644e4",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-18",
+        "opponent_level": 5,
+        "opponent_type": "mob18",
+        "outcome": "victory"
+      },
+      "seq": 27,
+      "state_sha256": "388bd79d3f9b5fee0e5412e79c3363f6b1a204f95ecc6cf7219b21166b08ecba",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c8ccedf32d46302bf255f8ca3b0627521eca20ffdd87d67f90b7277519ed85ec",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-19",
+        "opponent_level": 5,
+        "opponent_type": "mob19",
+        "outcome": "victory"
+      },
+      "seq": 28,
+      "state_sha256": "6c7b9e901fe41b551599ab50c1742dafbb657549ad8aabedf4696569322ad727",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c8b103a52e1b6b8cd0cc763ea5493809eedc22b9095dbee73feb1d576bf9d53c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-20",
+        "opponent_level": 5,
+        "opponent_type": "mob20",
+        "outcome": "victory"
+      },
+      "seq": 29,
+      "state_sha256": "63eaada5322f856b590035bc9c4e4c51c2d72185a926c97f507bef658727cf67",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "7d7bef6c81a4cef13f7cf2048633da27422124307bb7cc74c5a8b9ddca8b5606",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-21",
+        "opponent_level": 5,
+        "opponent_type": "mob21",
+        "outcome": "victory"
+      },
+      "seq": 30,
+      "state_sha256": "6ea28515cfa69ea4f52a24d13563c27bb72793fc46c68f5f5ca5fb78373d293e",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "003f7c56b8c6a1c4a7c3fe14017b26656ae43398f9ce17bb6ecc1c4af65a1769",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-22",
+        "opponent_level": 5,
+        "opponent_type": "mob22",
+        "outcome": "victory"
+      },
+      "seq": 31,
+      "state_sha256": "2dfeab7938986b1cb69bb60e76a99491b077fa74be2a587a44c72ceccb9214ae",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "910de7dfbf818f79956d1eae11191fa7a272827fab7bcc13fe156ee8ecf9189c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-23",
+        "opponent_level": 5,
+        "opponent_type": "mob23",
+        "outcome": "victory"
+      },
+      "seq": 32,
+      "state_sha256": "e03503a163f3d8c878fd16da2a54f671074975f705a587bd3ea00b54d5f9e7cf",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "a201a2fa623ac8a9ee65e6f49c1fe3e9c0855c647e01d73fe6eb78725da6ccf0",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-24",
+        "opponent_level": 5,
+        "opponent_type": "mob24",
+        "outcome": "victory"
+      },
+      "seq": 33,
+      "state_sha256": "4d522698db13e9b40180f7b6d40112c8c6424c144115b430dd2d62097c4b877d",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "e67be0002b52386aa497dfc8cd437fda0b072d85598842e5738f02004c1fadec",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-25",
+        "opponent_level": 5,
+        "opponent_type": "mob25",
+        "outcome": "victory"
+      },
+      "seq": 34,
+      "state_sha256": "b4eb9ec8052766089e5ab1b5410feeb65e69ee333c832e07f23f2ac158416c3a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "5004bc019a569e076a7bdab0e4214f405ef70d5810f4618934a013fef42489e5",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-26",
+        "opponent_level": 5,
+        "opponent_type": "mob26",
+        "outcome": "victory"
+      },
+      "seq": 35,
+      "state_sha256": "18c20d9c9e248ae7bf7596b0a5a0a311480bd2827ad883a85d25b2bc892f19bc",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "2ef06c3c7697c1b9038c27f725448ea4c09e7749ae24946c93bc95b4231de046",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-27",
+        "opponent_level": 5,
+        "opponent_type": "mob27",
+        "outcome": "victory"
+      },
+      "seq": 36,
+      "state_sha256": "255d14d260a8d2a0bbbd4d27344416a6544c2e2e3a96fb4fca6196245cbcdaa6",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ca1297709b3fe6f0256ab8bb7e50c7896952e382dcc09ee4f446b5612db9ca3e",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-28",
+        "opponent_level": 5,
+        "opponent_type": "mob28",
+        "outcome": "victory"
+      },
+      "seq": 37,
+      "state_sha256": "059b604fbc6339aad8d2aaa0f40aa4009b3f90721e70d5316625fd1488af4397",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "a8f11867659c0e291f0b548dcab48a84cefa52cf99f8a3f576c496c2aa7bfa8e",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-29",
+        "opponent_level": 5,
+        "opponent_type": "mob29",
+        "outcome": "victory"
+      },
+      "seq": 38,
+      "state_sha256": "2c338572688ba98d3640ecb53cf5fc9cb34a5817af53f4242bafb803d0bc404c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "dbb30e6edf3dcc9152d8a505a5fe3d1fde208ed59c5e0f5176cb0b1dc3a24a38",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "heavy_hit": 43
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "extra",
+        "opponent_level": 5,
+        "opponent_type": "fresh",
+        "outcome": "victory"
+      },
+      "seq": 39,
+      "state_sha256": "47819932a3eb7c16dfb526d25e4426b91b52cc55ca312a246736a1b015fa8c95",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ba5c3e3c23c41355234b624aa1a170a8618bd90fea4e47705056a45d77ff8dc6",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 40,
+      "state_sha256": "fc8743d16cbf4507ad6aca5a54ebb46076be2901dcc1b99ee595762b15aac8e7",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "3f77d372352a4588b3864cb956bc5514793482a469fcaa4192f79ac4839b23e8",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 41,
+      "state_sha256": "17165ce0d37ecce5ef2bf2f223754dac78b35140cf80a7ceb671f766703a06e9",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "dfc1c14fb0fa0dcb3df199c4dba9e9de993bfacb789fad0c04f3a08b638b7cdd",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 42,
+      "state_sha256": "f4749718345ffbcefb6fb02a892671f13325cb7c097310c28f499b4a3bd1c35c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "2e6e194c937b540bb9623aa7a8d183e770d37b79bd8433797875f3034377479e",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 43,
+      "state_sha256": "5c9f5c5adef48ce5211d2417e42ca1ac08b53a805a8996736917c077ee407c7d",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "df6ab86e9651b974a2e367f6e039bbec16a1623b8282e04dee0e2ba7d9dad157",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 44,
+      "state_sha256": "e2bdf10788e95b706a470b53b0f0efa8f4b242eb6f709335e712764fcee05425",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "53acd76f3ce2ecece56fd8b5c5b25cccf188b063b6a34d83f3d307e6f95bef4c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 45,
+      "state_sha256": "87f0e1864739f8cf3d27a9eeb9e581be3d13176a03aa08ac7a749a8dcb1d6e46",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "b70a036b7de66b45f34a5f26cfb25536d7543a87f266741b50dbc8872d03d4a1",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-6",
+        "opponent_level": 5,
+        "opponent_type": "mob6",
+        "outcome": "victory"
+      },
+      "seq": 46,
+      "state_sha256": "a6af445d637f2eaeccd82ac659e9df24335ef1da18989cfa57b163e670d415c8",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "119866ce9fb1d3978dc6534eb2a836003ee02a1edfbc5f16f4bc7e4f8e786b40",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-7",
+        "opponent_level": 5,
+        "opponent_type": "mob7",
+        "outcome": "victory"
+      },
+      "seq": 47,
+      "state_sha256": "6d1921c43d5515bb9b769e0c0a1f5b3b7cf633ab12884f066c47c33bf915f2cd",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ef0f5141dffc3432782348c678be078285981898a41899ead466013b78a8af19",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-8",
+        "opponent_level": 5,
+        "opponent_type": "mob8",
+        "outcome": "victory"
+      },
+      "seq": 48,
+      "state_sha256": "3d3f03ab1d9d88d04e4be8b8c7825ed50365a3addb8041fce42611f8e319aa9e",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "a40367a319034b058d303ad67e14620c3e132b35ccab371c660345cab7393140",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-9",
+        "opponent_level": 5,
+        "opponent_type": "mob9",
+        "outcome": "victory"
+      },
+      "seq": 49,
+      "state_sha256": "457d509dc32846927ff23762137a07fb702391ba8b7b2c3b1310ac2cb306575b",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "7f99b44ed367ec923676253cc03fcd896927e5d37026f58595f8deb3760e5b56",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-10",
+        "opponent_level": 5,
+        "opponent_type": "mob10",
+        "outcome": "victory"
+      },
+      "seq": 50,
+      "state_sha256": "ce789d3ce00c7158902064c96bc4e58c2e48ad6a9d5e858ee22dd32095b2c205",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c6bfb5dac88ede485a366a952a7cc36cfebd4842e03598bf1c09d321ebed8896",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-11",
+        "opponent_level": 5,
+        "opponent_type": "mob11",
+        "outcome": "victory"
+      },
+      "seq": 51,
+      "state_sha256": "a4fafd3b0f8c23165d8b8162028aaffcaf41e66a366a8833620d80cf628d9529",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "1b5b8ec55c65496e897242c447268aa6b01c038ccc3304f70bef6bf06d80ed17",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-12",
+        "opponent_level": 5,
+        "opponent_type": "mob12",
+        "outcome": "victory"
+      },
+      "seq": 52,
+      "state_sha256": "2d4af6088f420a6225ff54426e82ab4c4450f2de105e3cb2e924744f119b78ec",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "4ffeec9b5ac26977479e8a9c618a9e6f4314554ed8b713490e6e8b996a1e17e6",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-13",
+        "opponent_level": 5,
+        "opponent_type": "mob13",
+        "outcome": "victory"
+      },
+      "seq": 53,
+      "state_sha256": "6e56c0e531e152281621b82f4e8e4fac6dc15996d5d38cc824525f6f2ce0b74c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f3a93349c0be1b702ce90aebae765076fe6ae49293a6b72b82019df589226226",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-14",
+        "opponent_level": 5,
+        "opponent_type": "mob14",
+        "outcome": "victory"
+      },
+      "seq": 54,
+      "state_sha256": "eb29fc6956589de5641fe8c6fd7a73fdd97446e0ec27ec66092608c6473bb955",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "8430416de5200549f190256617137da17cdc92471ac929f0dac95ab0a94c5e4b",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-15",
+        "opponent_level": 5,
+        "opponent_type": "mob15",
+        "outcome": "victory"
+      },
+      "seq": 55,
+      "state_sha256": "5cc6f7be50f27880a94147a559003ad309616aa2ac8c4ac35db26f43a087f80a",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "6d042b45d1fe8533f3144177bdbcefc261322dde334b8501aa4f647fab1ee3c2",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-16",
+        "opponent_level": 5,
+        "opponent_type": "mob16",
+        "outcome": "victory"
+      },
+      "seq": 56,
+      "state_sha256": "1e50c7f3efd97520cbd5d6f64e83bbe9ff9c6a33a9771f54cfa44a43fcdeb032",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "1c786756f6264009d9cda40c92f56e79537e91d0c41e982a5160e841cc49d911",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-17",
+        "opponent_level": 5,
+        "opponent_type": "mob17",
+        "outcome": "victory"
+      },
+      "seq": 57,
+      "state_sha256": "482671399da010f420c08faebba4c6b571b9345a2154c2b35eb2143344444519",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "caf088b566935edbceea9b70339f8eb4712e55a39d0a195b13348bdf1afc1448",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-18",
+        "opponent_level": 5,
+        "opponent_type": "mob18",
+        "outcome": "victory"
+      },
+      "seq": 58,
+      "state_sha256": "cecd71715f356a00036c859ecfc82ada921585910ebe3afd652ce54f3489b0f4",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "7461998e1df098d36e1adf446b7cff26221c3a95f6c88192c9e5e88652f4a017",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-19",
+        "opponent_level": 5,
+        "opponent_type": "mob19",
+        "outcome": "victory"
+      },
+      "seq": 59,
+      "state_sha256": "7910dafbac580332953eb3f692d45016a68946259476af2d8773185ea1343be8",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "604507a0e26be79b27357bfe39765afa2c636533e1ba329b146955ce61a630a8",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-20",
+        "opponent_level": 5,
+        "opponent_type": "mob20",
+        "outcome": "victory"
+      },
+      "seq": 60,
+      "state_sha256": "43db37062da094c723f55eea087a2d5447c233a08b817dcf15b4f057b74a25f6",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "fe643116a22086c4e29524a53b9a144e71def242b9676570d147f8a9644f31cc",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-21",
+        "opponent_level": 5,
+        "opponent_type": "mob21",
+        "outcome": "victory"
+      },
+      "seq": 61,
+      "state_sha256": "85965d3a7704351ff3969704f1fb31a11bfc9fdf2b6dcc1ce0355867be3f1fa6",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "afda9e0bab69fd7b4ce884a605f19b9dae599df341dc222ea990dd3380fe0a24",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-22",
+        "opponent_level": 5,
+        "opponent_type": "mob22",
+        "outcome": "victory"
+      },
+      "seq": 62,
+      "state_sha256": "aebaf3b7aa77f687e291eeb177d5469a000fc63874c8c3c7158e7ca0730ee00e",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "193df64a441e24585075b26caa554109b8d1e6f2ff18f1300a1eb2afc925a298",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-23",
+        "opponent_level": 5,
+        "opponent_type": "mob23",
+        "outcome": "victory"
+      },
+      "seq": 63,
+      "state_sha256": "1ed18a14fde90fea5ac3f585e62722493ff292996c440f819a6fee59f4b3d38c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "b47e88c4540fe54872fe4351606fbdd7e31f41270456c5240d1f79b340bb848f",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-24",
+        "opponent_level": 5,
+        "opponent_type": "mob24",
+        "outcome": "victory"
+      },
+      "seq": 64,
+      "state_sha256": "bea7cde886d34ff79e7721b41448aafc09bd6edd32d664eb8fb3b99b65c55cf2",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "263fc5e55de41fc96e2deb91ca40155b9bcc886159f8237661da489ddf2b2280",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-25",
+        "opponent_level": 5,
+        "opponent_type": "mob25",
+        "outcome": "victory"
+      },
+      "seq": 65,
+      "state_sha256": "b6965e2a57be8dac52dc76e5862f43cc943726aa4aec84dd051a2add469480d2",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "83e5fbac81ba8c0a83ed25d67092176c6c96d912442d2d5d98b668cbc1c25eb3",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-26",
+        "opponent_level": 5,
+        "opponent_type": "mob26",
+        "outcome": "victory"
+      },
+      "seq": 66,
+      "state_sha256": "1ea984270f6f9732db4ed5e0e8000ee6827703a45255ad00eee670fa53627243",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "e2f3bcefd8e40addfa8f06f4e448b61663f6910e88b1b8208149dd93d977d9f0",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-27",
+        "opponent_level": 5,
+        "opponent_type": "mob27",
+        "outcome": "victory"
+      },
+      "seq": 67,
+      "state_sha256": "0c569896f7402705c1de07520d65f265b75be168e20c006fa59695b2b8dd08aa",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "b6a3b874772a18f3410b530e5ede24887a70da5f8e10ed9d634fe8a5cd7fa5b7",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-28",
+        "opponent_level": 5,
+        "opponent_type": "mob28",
+        "outcome": "victory"
+      },
+      "seq": 68,
+      "state_sha256": "58699de6369e1503f76c282b7d5551433994b301ff5eea366ef11c3e87f57505",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c234854f85147a1943f07a105f38aa108bc8e2feb5ecdfb15e4e55d61a58724c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "block": 33,
+          "heavy_hit": 43
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-29",
+        "opponent_level": 5,
+        "opponent_type": "mob29",
+        "outcome": "victory"
+      },
+      "seq": 69,
+      "state_sha256": "3815b2a8693eb9203d2663a71384b85848929bae9bf82d68be8c69afdcd2addd",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "actions": {
+          "heavy_hit": 10
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "back",
+        "opponent_level": 5,
+        "opponent_type": "q",
+        "outcome": "victory"
+      },
+      "state_sha256": "3815b2a8693eb9203d2663a71384b85848929bae9bf82d68be8c69afdcd2addd",
+      "type": "combat.encounter_resolved"
+    }
+  ]
+}

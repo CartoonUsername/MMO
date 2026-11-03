@@ -1,0 +1,168 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Berufserfahrung je Beruf, Meisterschaftsgrenzen, ungültige Berufe/Werte.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {
+        "alchemy": 99,
+        "mining": 1000000,
+        "smithing": 300
+      }
+    }
+  },
+  "final_state_sha256": "6966a024d4adcbb74594e7b9333a485634e8c07b10984e691b377f611d09b467",
+  "format": 1,
+  "name": "profession_mastery",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "ba424c46d1a2b9b56e1dc57f098228386cff601b24dbbd1ccd6c48619ab99acd",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 60
+      },
+      "seq": 1,
+      "state_sha256": "cc0305b5e0a57dcc2115c4c5c9aa30666a04827c442b98aadf8a917404054d2d",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "c8a0bc732b76a8b3fe3f5aeda6dd98cc8795dda5caa7f4fd884dc0086ec120e2",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 40
+      },
+      "seq": 2,
+      "state_sha256": "a7c675732bf1262e6e2cf500c298a22bf3463f485eb0bfb27981b203866f2df2",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "dd06ebabcebd7d3934084278c3d65532603587f622a5201b9d54945b06b6b8ed",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 200
+      },
+      "seq": 3,
+      "state_sha256": "2b4381821f77d443c41735b99db6ae3d289f6867650d8844f08f474515f62073",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "0eb94acf25f98dd6b9ae39b0de1e10a66e78a2f8a82db1d4f3ab4b0b022cc692",
+      "expect": "accepted",
+      "payload": {
+        "profession": "alchemy",
+        "xp": 99
+      },
+      "seq": 4,
+      "state_sha256": "b45c77cb960b974645e88b0170136ec8cb04659559038ef19f2d84cc0570f2de",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "profession": "necromancy",
+        "xp": 5
+      },
+      "state_sha256": "b45c77cb960b974645e88b0170136ec8cb04659559038ef19f2d84cc0570f2de",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "profession": "mining",
+        "xp": 0
+      },
+      "state_sha256": "b45c77cb960b974645e88b0170136ec8cb04659559038ef19f2d84cc0570f2de",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "999f99b9a8a0ac5f08f38200cdb0892a6a2718c3aac33da9bddabba77c61033d",
+      "expect": "accepted",
+      "payload": {
+        "profession": "mining",
+        "xp": 1000000
+      },
+      "seq": 5,
+      "state_sha256": "6966a024d4adcbb74594e7b9333a485634e8c07b10984e691b377f611d09b467",
+      "type": "profession.work"
+    }
+  ]
+}

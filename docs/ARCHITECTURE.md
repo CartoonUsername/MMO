@@ -44,6 +44,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
 
+## Golden Test Vectors (ADR-0005)
+
+`reference/golden/*.json` enthalten Szenarien mit erwarteten Ereignis-/Zustands-Hashes, abgelehnten Eingaben und abgeleiteten Sichten. Jede Portierung muss sie bit-identisch bestehen; Python-Tests erzwingen, dass die Vektoren mit der Referenz übereinstimmen. Format und Prüfverfahren: `reference/golden/README.md`.
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

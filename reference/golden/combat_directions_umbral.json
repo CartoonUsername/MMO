@@ -1,0 +1,679 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {
+      "duelist": 1,
+      "skirmisher": 1
+    },
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 536,
+      "precision": 463,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Kampfrichtung skirmisher + Schattenprägung -> Wesensform umbral_kin (Platzhalter); mehrere Systeme zusammen.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 4,
+        "opponents": {
+          "mob0": 1,
+          "mob1": 1,
+          "mob2": 1,
+          "mob3": 1,
+          "mob4": 1,
+          "mob5": 1
+        },
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 50000,
+          "precision": 43200,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {
+        "d1-0": 2,
+        "d1-1": 3,
+        "d1-2": 4,
+        "d1-3": 5,
+        "d1-4": 6,
+        "d1-5": 7,
+        "d2-0": 8,
+        "d2-1": 9,
+        "d2-2": 10,
+        "d2-3": 11,
+        "d2-4": 12,
+        "d2-5": 13,
+        "d3-0": 14,
+        "d3-1": 15,
+        "d3-2": 16,
+        "d3-3": 17,
+        "d3-4": 18,
+        "d3-5": 19,
+        "d4-0": 20,
+        "d4-1": 21,
+        "d4-2": 22,
+        "d4-3": 23,
+        "d4-4": 24,
+        "d4-5": 25
+      },
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 200000,
+        "precision": 172800,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 24
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 100,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "shadow"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": 29,
+      "form": "umbral_kin",
+      "trials_passed": [
+        "umbral_kin"
+      ]
+    },
+    "identity": {
+      "base_class": "warrior",
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "ca9d372eda5efb078adb1bc48b569cee6c5afd0a0347ff4da1c935c6e41f31b3",
+  "format": 1,
+  "name": "combat_directions_umbral",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "0ab88306f898217bbed094a018776f8c8d36cf7901ffba83bf8ffd3a20d96413",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "95c9a95b1e87397e63179a2a99b9eb4b4c9f10e891219818999d52fe49d65ddd",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "7c786a54b858c1da2669f4f63b06145adb4856d1598669f0f2b4c98e562405fd",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 2,
+      "state_sha256": "cc54ffc2b16de70c1eacaff4008da9d0a2f1542440d1d63a6c5ff590cd01a9b4",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "e695148b0c613921724514738a42811fc1ea6fd2bb0136df2cd608796d06ae04",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 3,
+      "state_sha256": "1084226ad98865b724c0c5ed0a46ae2785e78961677bcbb5a8117f4d857f3cb8",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "eaa8005354e8dfe439c27f09a7aecc92be8f5e5a087e616816ccd03b07aa1354",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 4,
+      "state_sha256": "a4aedc37e0a76c540414bf2840bd8ad421cdca69cfb68e082f36305ca7d1cf47",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "69fbced29ac43f769b1b8d12c4a24b4c0767e7ee9db0de92f5b2bcd5ad1e54a4",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 5,
+      "state_sha256": "f950a3c3f74dc61b8e730a5dc0388639e0c871e5269802612aafcb1a939234f5",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "f6ef2e938fdf7de966131fa4351006b89d0780cdf5b038aa173f6cbd85a86de8",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 6,
+      "state_sha256": "749ee02b32392a79a602fda0ab1a5aae70ac7b8bc8cda02f89dd93169e5a6838",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "575188610c5f155146eed6e071ea88b402f58e2271b1b90462e3add9d7d38fa6",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 1,
+        "duration_s": 60,
+        "encounter_id": "d1-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 7,
+      "state_sha256": "0125dcca49f48fb335b3f35a7ad3e372e5e967d9b591671e61d158302f0fd0c4",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ac308399914d1b985cb6785801c988939a5461e85297f614c41cb8a7bc1c6761",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 8,
+      "state_sha256": "4bf8267ffb449887360d2a3968331ff95a403479b806203c72dc098e58c8c412",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "07bd192786157d0775615aaec7020ca839f6739e2607d690b47b301ffe64670c",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 9,
+      "state_sha256": "a1c6bb43fab2858de5bc86c3b4f2b17eb41e2109650fc1519bc6aed304e13627",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "26034248c26443694a8b34639c0b94e93367b3e03b688479336289a5e0e7b18f",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 10,
+      "state_sha256": "137be4e1141e780954b63391fd9302d430998e3d2f836d2e42ea55c42358640c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c9db3bfc9ec1d203b63998d0c4d2797a9bb5c25864ded68b8997545186818c03",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 11,
+      "state_sha256": "6f634bfcc292a22a21ee5e2ed693958485636d0c2a5ba5547a1b266da7abe029",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "eca59763d8c2b7b2659c7c8b491c5fd9ff6fcb616273f32939d0e15159b96902",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 12,
+      "state_sha256": "50d49d10a7e5a9624292224eb84a6018b4bc32255a3a538e3a3b0bc286bd0bf8",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "82ce045c9ef1263ff30a3d5854e5365d77372bf4f2afb61b0e519d8ed5ceb119",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 2,
+        "duration_s": 60,
+        "encounter_id": "d2-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 13,
+      "state_sha256": "e4b3cbeec3332a6b6b001e3d1b605323b2a823b02efc252305897cb0e89eea38",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "8f3dbcef78bb3bed21bc5e492122303786ed30b93ade7700b8f2dfcf811057a6",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 14,
+      "state_sha256": "21807dd17dd41f92dc2dbe9a3a50e90250adaec4fb033fd652d007f08b6da526",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "b8cd1bbfbc1ee32bb255af3d0edfd4e4dcdf1e09d2e96c1ef3618a38c7aafb8f",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 15,
+      "state_sha256": "3b872883a7f90494cf2548cf506acd20e72a350c523eb504515208ee9cb8e3b0",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "da0cc5b4a8fdb195383087aba36477bd0c8dcef4aaa4054b109da0ae5ce1893e",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 16,
+      "state_sha256": "53c3bfb5ae426c50c573eb3184248da4180eb7c9328efa8638ec9f1d0eaf3960",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "0c8e795de664601a115724547c2f2ef0386e91ee576a0d6b93d01783f611e982",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 17,
+      "state_sha256": "176637baf272cd2313a53e3f934c774b81f51a6cbda34fa765a218a74b1464c6",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "23814115c532a44deddedd1f16f64b2d6d98e250de6778aa077019631dab96d6",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 18,
+      "state_sha256": "58d18ea7d884829baed730fa0e603596a857cae02291182e09a74845b73f04b1",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "ddedba57236493243e538102c25776e3fd7681420dfc27ebc8b54b6eb23748e0",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 3,
+        "duration_s": 60,
+        "encounter_id": "d3-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 19,
+      "state_sha256": "ff4a3e718b2f5d26b09312838faa9475de1d354a2bc17a4e5dfe7f309c5d2e15",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "e131fffaaaf60ab1c395ee53860bfa7ba1ee20647b4413c0afb1ca2f89ea43af",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-0",
+        "opponent_level": 5,
+        "opponent_type": "mob0",
+        "outcome": "victory"
+      },
+      "seq": 20,
+      "state_sha256": "0669cb4ee9a84916e9e6ff0d49aab7c3eb08f8eba9cadd474fd8e748a326ba52",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "c4cc660d812201547484c0bb0dba741ef616784a5d006ee91b2d4e23a691c732",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-1",
+        "opponent_level": 5,
+        "opponent_type": "mob1",
+        "outcome": "victory"
+      },
+      "seq": 21,
+      "state_sha256": "38e739d3050402128aa4fed80a52e015731a37277a4d2020c1c0f4a52970d6d7",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "962c96d8fd9c53476392fc3fba6f3fc173018abb8801e7a6fe2baff547245623",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-2",
+        "opponent_level": 5,
+        "opponent_type": "mob2",
+        "outcome": "victory"
+      },
+      "seq": 22,
+      "state_sha256": "79afc85fe8af481b944172b184d9dfc20977435af014fda2a5980d8fb318a2b0",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "b9d5c2161461b2f0e9f1d841b9c2fd2467cec8e730462114c6e2886b6dc16be3",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-3",
+        "opponent_level": 5,
+        "opponent_type": "mob3",
+        "outcome": "victory"
+      },
+      "seq": 23,
+      "state_sha256": "37509ec2a6da92d78fc7198521448f5ce9a7d992bce613db0e7e116e1728251c",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "6bc958a087ac80c94394dd42f57ffdaf0895e66f834bd4801406d99da5e350d5",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-4",
+        "opponent_level": 5,
+        "opponent_type": "mob4",
+        "outcome": "victory"
+      },
+      "seq": 24,
+      "state_sha256": "cdfb89a86138d06a1678e28575b79aaaa9dc12416a1743dafac8cf9876a38401",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "event_hash": "8ae9fbfc20d2040e14b76b37c242f59d33a52e906152f472e647a3a02bef959d",
+      "expect": "accepted",
+      "payload": {
+        "actions": {
+          "dodge": 33,
+          "light_hit": 120,
+          "perfect_dodge": 18
+        },
+        "day": 4,
+        "duration_s": 60,
+        "encounter_id": "d4-5",
+        "opponent_level": 5,
+        "opponent_type": "mob5",
+        "outcome": "victory"
+      },
+      "seq": 25,
+      "state_sha256": "5fd88f8c8db44638f474a1187dd3fd0b6d21394ecfb84a88b0bc5f6720a2e472",
+      "type": "combat.encounter_resolved"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "umbral_kin"
+      },
+      "state_sha256": "5fd88f8c8db44638f474a1187dd3fd0b6d21394ecfb84a88b0bc5f6720a2e472",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "6963256228025493ce97e7eaebff06817e9825da2d933e91724b0b53f1ce1c1b",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "shadow"
+      },
+      "seq": 26,
+      "state_sha256": "dbd6d02598674c7d501ff51040b7f6634e9fe49ba247fa5c99746958b748461c",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "53db507d5cfe4673d0cbea7de4b5a6d70def146eef3275299a923eef9129a686",
+      "expect": "accepted",
+      "payload": {
+        "element": "shadow"
+      },
+      "seq": 27,
+      "state_sha256": "78d8ed1e8b61733841a59251182f0939d94529bdcbee79d481ea3a6d252b35b9",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "2d5b956d30be99bbfa527fa5502d944f685c36643c3ef3df38c5a872d95b58ca",
+      "expect": "accepted",
+      "payload": {
+        "form": "umbral_kin"
+      },
+      "seq": 28,
+      "state_sha256": "74ddf9e3e963c166f7e0fbbc2f0fb81536b36baf939e38c65ca875fe6468de14",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "b4afbf8dfbe023ae6ef299bd0333885044faff290969f3ce2b0acf61047a7e9a",
+      "expect": "accepted",
+      "payload": {
+        "form": "umbral_kin"
+      },
+      "seq": 29,
+      "state_sha256": "ab68c19e57872cd7f2a3bf88d2813c84d817d67a3095f11a71d6cb2d2a814454",
+      "type": "essence.adopted"
+    },
+    {
+      "event_hash": "f182f4f0fbcd2f0dc50695abebaae87ac1c48a66e754e39d3409edb50122067d",
+      "expect": "accepted",
+      "payload": {
+        "base_class": "warrior"
+      },
+      "seq": 30,
+      "state_sha256": "ca9d372eda5efb078adb1bc48b569cee6c5afd0a0347ff4da1c935c6e41f31b3",
+      "type": "identity.class_chosen"
+    }
+  ]
+}

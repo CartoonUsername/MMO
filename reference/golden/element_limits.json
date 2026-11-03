@@ -1,0 +1,250 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Neun Elemente, Prägung ab Schwelle, zwei reguläre + ein Endgame-Element (Mindeststufe), Obergrenze drei.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 500,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 500,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 100
+      },
+      "attuned": [
+        "fire",
+        "wind",
+        "light"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 41,
+      "xp": 161000
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "10dd00c706a81fc85ea1c33978c0e175c43755bf598114b36113575dcceef36b",
+  "format": 1,
+  "name": "element_limits",
+  "rules_file": "rules_v3.json",
+  "rules_sha256": "2a1a62c16a9c1213a964e0e3b2fa31c21afdcbf44b78c63fc64fa1ce16814520",
+  "steps": [
+    {
+      "event_hash": "3eb02ac18157c50c4492e869758ed47d23d194c47be8461845c19aab4e2298ab",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "87245625974a0cd5632b3db1460104b359abf555f1b47f10c1c9a99a108ba5ee",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "43e8ebb3f8e511c7ab87206867d2e4844731110301bb6ffc6a1c251d47318596",
+      "expect": "accepted",
+      "payload": {
+        "amount": 1000
+      },
+      "seq": 1,
+      "state_sha256": "51c831e8c31ba8d66d3df8c2099ab5947015c3a90c9e0e3cd57fbdd155fc43f1",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": 5,
+        "element": "metal"
+      },
+      "state_sha256": "51c831e8c31ba8d66d3df8c2099ab5947015c3a90c9e0e3cd57fbdd155fc43f1",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "6a10094ecc221cefe3d1e5d13d872fedf4d322d5b60e5223c31675b4fa738353",
+      "expect": "accepted",
+      "payload": {
+        "amount": 99,
+        "element": "fire"
+      },
+      "seq": 2,
+      "state_sha256": "6e03c8efde9058d55272e5a7dc1a80db5809f1bf713309b76f28b46f55730976",
+      "type": "element.exposure"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "element": "fire"
+      },
+      "state_sha256": "6e03c8efde9058d55272e5a7dc1a80db5809f1bf713309b76f28b46f55730976",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "ef3992cdd7c117cc0adfbca06270cad48cc8cea9efd004a085b13eab5939b1e9",
+      "expect": "accepted",
+      "payload": {
+        "amount": 1,
+        "element": "fire"
+      },
+      "seq": 3,
+      "state_sha256": "ec780ade45d6ee8400bfb4a7d59bcaf061053044f2b430d86db5bc09a0b839c9",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "cc2782f5531165dbf0388ed160fed1776daa6cd6ea72c406cc286fc7fa7b56e2",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 4,
+      "state_sha256": "e1a8c87bcc8f7dc1977b107f27a6bb1b456f96ed478f958a196bb4716da3eee2",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "element": "fire"
+      },
+      "state_sha256": "e1a8c87bcc8f7dc1977b107f27a6bb1b456f96ed478f958a196bb4716da3eee2",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "535ac1ba9d6edcc3244260ee02c65c918dc909971a8986c66488df8cac6a17c8",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "wind"
+      },
+      "seq": 5,
+      "state_sha256": "0741e9a3676770768ec086d4e3ef83a691283ac123865b6dd31115644c6222af",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "e11288042f1b47ef74d7e1cf05f2b6e48b3f074212a5affe5baa375ba2422ea2",
+      "expect": "accepted",
+      "payload": {
+        "element": "wind"
+      },
+      "seq": 6,
+      "state_sha256": "7bda89644188cdfad9becf38745ea8ef1211519a8a45c16a8043c1333ed39284",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "b4c747f4c7573da650cf0a67cefdc26223b9ec8c864a23d1e5d478251e175768",
+      "expect": "accepted",
+      "payload": {
+        "amount": 500,
+        "element": "light"
+      },
+      "seq": 7,
+      "state_sha256": "b6275f06c6e53175f0e00046fb8053cc2f00e0f112fea9fa3e2aa6c37ea3640c",
+      "type": "element.exposure"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "element": "light"
+      },
+      "state_sha256": "b6275f06c6e53175f0e00046fb8053cc2f00e0f112fea9fa3e2aa6c37ea3640c",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "52d3ec4b081f4ea26fbc870e8fc6ac7892cbb58029b2b84094b1559e69b7308d",
+      "expect": "accepted",
+      "payload": {
+        "amount": 160000
+      },
+      "seq": 8,
+      "state_sha256": "b1cecb2eeff66fa9f6356d06e029933a268314ed9131e53f98971545337d0788",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "771016343365cc04152f2603145fef4ea72c73c2ac30512a98a85fd8f6172e29",
+      "expect": "accepted",
+      "payload": {
+        "element": "light"
+      },
+      "seq": 9,
+      "state_sha256": "867e13eb4d74b227dcea723fb092931a215431f48e90ad89e1241c27f12450c2",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "94b75f95793b16d7df0ade3db9cb7304274eac47aa153389cf0a37ed93126550",
+      "expect": "accepted",
+      "payload": {
+        "amount": 500,
+        "element": "earth"
+      },
+      "seq": 10,
+      "state_sha256": "10dd00c706a81fc85ea1c33978c0e175c43755bf598114b36113575dcceef36b",
+      "type": "element.exposure"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "element": "earth"
+      },
+      "state_sha256": "10dd00c706a81fc85ea1c33978c0e175c43755bf598114b36113575dcceef36b",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "amount": 0,
+        "element": "ice"
+      },
+      "state_sha256": "10dd00c706a81fc85ea1c33978c0e175c43755bf598114b36113575dcceef36b",
+      "type": "element.exposure"
+    }
+  ]
+}
