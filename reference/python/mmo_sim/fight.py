@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .errors import SimError
-from .rules import COMMANDS
+from .rules import COMMANDS, combine_effects
 
 
 @dataclass(frozen=True)
@@ -51,12 +51,13 @@ def validate_inputs(cfg: dict[str, Any], inputs: Any) -> list[tuple[int, str]]:
 
 
 class _Fight:
-    def __init__(self, cfg: dict[str, Any], opponent_type: str, player_level: int, allowed: Any = None) -> None:
+    def __init__(self, cfg: dict[str, Any], opponent_type: str, player_level: int, allowed: Any = None, equipped: Any = None) -> None:
         if opponent_type not in cfg["opponents"]:
             raise SimError(f"unbekannter Gegner: {opponent_type}")
         if not isinstance(player_level, int) or isinstance(player_level, bool) or player_level < 1:
             raise SimError("player_level muss eine positive ganze Zahl sein")
         self.cfg, self.A = cfg, cfg["actions"]
+        self.fx = combine_effects(cfg, equipped)  # Wirkung ausgerüsteter Fähigkeiten (leer = unverändert)
         self.allowed = None if allowed is None else frozenset(allowed)  # None: alle Befehle; sonst nur diese (und immer flee)
         self.opp = cfg["opponents"][opponent_type]
         p = cfg["player"]
@@ -76,6 +77,15 @@ class _Fight:
         self.hit_tick: int | None = None
 
     # -- Hilfen ------------------------------------------------------------------
+    def _fx(self, key: str, default: int = 0) -> int:
+        return self.fx.get(key, default)
+
+    def _scaled(self, base: int, key: str) -> int:
+        return base * self.fx.get(key, 1000) // 1000
+
+    def _taken(self, damage: int) -> int:
+        return self._scaled(damage, "damage_taken_permille")
+
     def _count(self, name: str, n: int = 1) -> None:
         self.counts[name] = self.counts.get(name, 0) + n
 
@@ -90,7 +100,9 @@ class _Fight:
     def command(self, t: int, cmd: str) -> None:
         name = "light" if cmd == "light" else cmd
         a = self.A[name]
-        if t < self.busy_until or self.stam < a["cost"] or (name in self.cd and t < self.cd[name]):
+        cost = max(0, a["cost"] + (self._fx("dodge_cost_delta") if name == "dodge" else 0))
+        cooldown = max(0, a["cooldown"] + (self._fx("dodge_cooldown_delta") if name == "dodge" else 0))
+        if t < self.busy_until or self.stam < cost or (name in self.cd and t < self.cd[name]):
             self.ignored += 1
             return
         if cmd == "light":
@@ -99,26 +111,26 @@ class _Fight:
                 self._count("precise_hit")
             else:
                 self._count("light_hit")
-            self.opp_hp -= a["damage"]
+            self.opp_hp -= self._scaled(a["damage"], "light_damage_permille")
         elif cmd == "heavy":
-            self.heavy_pending = (t + a["windup"], a["damage"])
+            self.heavy_pending = (t + a["windup"], self._scaled(a["damage"], "heavy_damage_permille"))
         elif cmd == "dodge":
             self.dodge_start, self.dodge_until = t, t + a["active"]
         elif cmd == "block":
             self.block_start, self.block_until = t, t + a["active"]
         elif cmd == "stun":
-            self.stun_until = t + a["ticks"]
+            self.stun_until = t + a["ticks"] + self._fx("stun_ticks_bonus")
             self.hit_tick = None
             if self.next_start is not None:
                 self.next_start = self.stun_until + self._interval(t)
             self._count("stun_applied")
         elif cmd == "slow":
-            self.slow_until = t + a["ticks"]
+            self.slow_until = t + a["ticks"] + self._fx("slow_ticks_bonus")
             self._count("slow_applied")
-        self.stam -= a["cost"]
+        self.stam -= cost
         self.busy_until = t + a["busy"]
         if name in self.cd:
-            self.cd[name] = t + a["cooldown"]
+            self.cd[name] = t + cooldown
 
     # -- Gegner -------------------------------------------------------------------
     def opponent(self, t: int) -> None:
@@ -139,14 +151,14 @@ class _Fight:
         elif self.block_start <= t < self.block_until:
             if t - self.block_start < a["block"]["parry_window"]:
                 self._count("parry")
-                self.stagger_until = t + self.opp["stagger"]
-                extra = self.opp["stagger"]
+                extra = self.opp["stagger"] + self._fx("parry_stagger_bonus")
+                self.stagger_until = t + extra
             else:
                 self._count("block")
-                self.hp -= self.opp["damage"] * a["block"]["damage_permille"] // 1000
+                self.hp -= self._taken(self.opp["damage"] * min(a["block"]["damage_permille"], self._fx("block_damage_permille", 1000)) // 1000)
                 self.damage_ticks.append(t)
         else:
-            self.hp -= self.opp["damage"]
+            self.hp -= self._taken(self.opp["damage"])
             self.damage_ticks.append(t)
         self.hit_tick = None
         self.next_start = t + self._interval(t) + extra
@@ -173,7 +185,7 @@ class _Fight:
             self.opponent(t)
             if self.hp <= 0:
                 return self._result("defeat", t + 1)
-            self.stam = min(cfg["player"]["stamina_max"], self.stam + cfg["player"]["stamina_regen_per_tick"])
+            self.stam = min(cfg["player"]["stamina_max"], self.stam + cfg["player"]["stamina_regen_per_tick"] + self._fx("stamina_regen_bonus"))
         return self._result("fled", cfg["max_ticks"])  # Zeitlimit zählt als Rückzug (Vorschlag)
 
     def _result(self, outcome: str, ticks: int) -> EncounterResult:
@@ -181,8 +193,10 @@ class _Fight:
                                self.opp_hp, self.ignored, tuple(self.damage_ticks))
 
 
-def simulate(cfg: dict[str, Any], opponent_type: str, player_level: int, inputs: Any, allowed: Any = None) -> EncounterResult:
-    """`allowed`: erlaubte Befehle (aus der Kampfausrüstung der Figur) oder None für alle."""
+def simulate(cfg: dict[str, Any], opponent_type: str, player_level: int, inputs: Any, allowed: Any = None,
+             equipped: Any = None) -> EncounterResult:
+    """`allowed`: erlaubte Befehle (aus der Kampfausrüstung der Figur) oder None für alle; `equipped`: ausgerüstete
+    Fähigkeiten, deren Wirkung die Regeln (`ability_effects`) festlegen, oder None."""
     if allowed is not None and (not isinstance(allowed, (list, tuple, set, frozenset)) or any(c not in COMMANDS for c in allowed)):
         raise SimError("allowed muss eine Liste bekannter Befehle sein")
-    return _Fight(cfg, opponent_type, player_level, allowed).run(validate_inputs(cfg, inputs))
+    return _Fight(cfg, opponent_type, player_level, allowed, equipped).run(validate_inputs(cfg, inputs))

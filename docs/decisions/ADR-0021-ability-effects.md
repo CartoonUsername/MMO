@@ -1,0 +1,20 @@
+# ADR-0021: Wirkung der Kampffähigkeiten in der Simulation
+
+**Status:** akzeptiert als technische Grundlage. **Alle Wirkungen und Zahlen in `sim_rules_v2.json` sind Platzhalter** (kein Balancing, keine bestätigten Spielinhalte).
+
+**Kontext:** ADR-0020 machte Fähigkeiten freischalt- und ausrüstbar, gab aber nur Simulationsbefehle frei. Eine Fähigkeit soll sich im Kampf bemerkbar machen, ohne dass der Client etwas behaupten kann und ohne die Plausibilitätsgrenzen der CEE zu verletzen.
+
+**Entscheidungen**
+1. **Wirkung gehört in die Simulationsregeln, nicht in die CEE-Regeln.** `sim_rules_v2.json` = v1 + `ability_effects` (Schlüssel = Fähigkeitsnamen der CEE-Regeln v9). Damit bleiben die CEE-Regeln v9 unverändert (keine neue Regelversion, keine Migration); die Wirkung ändert nur, *wie* die Simulation Berichte erzeugt. `check_compatibility` meldet Fähigkeiten, die es in den CEE-Regeln nicht gibt. `sim_rules_v1.json` bleibt unverändert (Wirkungstabelle fehlt = keine Wirkung).
+2. **Fester Wirkungswortschatz** (`EFFECT_KEYS`, ganzzahlig, mit Wertegrenzen, beim Laden validiert): `heavy_damage_permille`, `light_damage_permille` (gilt auch für präzise Treffer), `damage_taken_permille`, `block_damage_permille` (Minimum, verbessert nur), `stun_ticks_bonus`, `slow_ticks_bonus`, `parry_stagger_bonus`, `dodge_cost_delta`, `dodge_cooldown_delta`, `stamina_regen_bonus`. Platzhalter-Belegung: power_strike (schwer ×1,25), disrupting_blow (+5 Ticks Betäubung), hindering_mark (+10 Ticks Verlangsamung), shield_wall (Block lässt 15 % statt 25 % durch), riposte (+6 Ticks Parade-Schwäche), flowing_step (Ausweichen −8 Ausdauer/−8 Abklingzeit), ember_strike (Leicht/Präzise ×1,4), veteran_focus (+1 Ausdauer je Tick), twilight_veil (−10 % erlittener Schaden); Gruppenfähigkeiten (ally_mend/ally_ward) haben noch keine Wirkung.
+3. **Zusammensetzung:** Promille-Faktoren multiplizieren (Fähigkeiten in alphabetischer Reihenfolge, je Schritt abgerundet), `block_damage_permille` nimmt das Minimum, Boni/Deltas addieren sich. Die Reihenfolge der Eingabe spielt keine Rolle; Dopplungen und Nicht-Strings sind Fehler.
+4. **Anwendung:** `simulate(cfg, gegner, stufe, eingaben, allowed, equipped)`; ohne `equipped` oder ohne Eintrag ist das Ergebnis bit-identisch zu vorher (Test und Vektoren). `EncounterServer` übergibt die Ausrüstung der Figur (`equipped_abilities`, nur wenn ihre Regeln Fähigkeiten kennen).
+5. **Berichte bleiben plausibel:** Die Aktionszähler entstehen weiter nur aus der Simulation. `max_actions_per_minute` rechnet im Bestfall mit allen schneller machenden Fähigkeiten gleichzeitig (Ausweichen-Abklingzeit); ein Test lässt zufällige Kämpfe mit verschiedenen Ausrüstungen laufen, deren Berichte die CEE akzeptieren muss.
+6. **Golden Vectors:** Simulationsfälle haben optional `equipped` und `rules_file` (Standard: Kopf-Datei); neue Fälle unter `sim_rules_v2.json` stellen je Wirkung ein Paar „ohne/mit Fähigkeit“ gegenüber, dazu Stapelung, Fähigkeiten ohne Eintrag, v1-Regeln mit Ausrüstung (keine Wirkung) und Fehlerfälle. Der Kopf führt `extra_rules` (Datei -> SHA-256).
+
+**Absicherung:** `tests/test_ability_effects.py` (25 Tests: Regelprüfung, Zusammensetzung, jede Wirkung quantitativ, Grenzen wie „Block wird nie schlechter“, Wirkungen wirken nur auf ihre Aktion, Raten-Bestfall, Berichts-Plausibilität bei zufälligen Kämpfen, Begegnungsserver) plus Golden Vectors; Mutationstests (alle erkannt, vier Lücken wurden mit zusätzlichen Fällen geschlossen).
+
+**Offen / Grenzen**
+- Wirkungen sind rein passive Modifikatoren; eigene Fähigkeitsbefehle mit Kosten/Abklingzeit/Schaden (Element-, Gruppen-, Zustandsfähigkeiten), Wirkung über Zeit, Fähigkeitsstufen/Verbesserung durch Nutzung, Gruppen- und Unterstützungskampf (`ally_mend`, `ally_ward`), Raum/Winkel und Kampfechos fehlen.
+- Der Wortschatz ist bewusst klein; neue Wirkungsarten erfordern Code in der Simulation und neue Vektoren.
+- Balancing steht aus (Stapelung aller Fähigkeiten ist technisch möglich, aber durch Platzzahl 2–4 begrenzt).

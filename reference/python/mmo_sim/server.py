@@ -64,7 +64,8 @@ class EncounterServer:
         _, opponent_type, day = entry
         level = self.service.state(character_id).parts["identity"]["level"]
         allowed = self.service.allowed_commands(character_id)  # Fähigkeiten der Figur (ab Regeln v9), sonst alle Befehle
-        result = simulate(self.cfg, opponent_type, level, inputs, allowed)  # bei ungültigen Eingaben bleibt die Begegnung offen
+        equipped = self.service.equipped_abilities(character_id)  # ihre Wirkung legen die Simulationsregeln fest
+        result = simulate(self.cfg, opponent_type, level, inputs, allowed, equipped)  # bei ungültigen Eingaben bleibt die Begegnung offen
         del self._pending[encounter_id]
         self._finished.add(encounter_id)
         if not result.actions:

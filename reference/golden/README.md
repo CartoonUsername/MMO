@@ -52,13 +52,14 @@ Schritt: `{type, payload, expect, [seq, event_hash], state_sha256}`
 
 ## Simulation (`reference/golden_sim/sim_fights.json`)
 
-Erzeugt/geprüft mit `python -m mmo_sim.golden write|check ../golden_sim` (Regeln: `mmo_sim/data/sim_rules_v1.json`, per SHA-256 gebunden).
+Erzeugt/geprüft mit `python -m mmo_sim.golden write|check ../golden_sim` (Regeln: `mmo_sim/data/sim_rules_v1.json` als Standard und `sim_rules_v2.json` für Fälle mit Fähigkeitswirkung, beide per SHA-256 gebunden).
 
-Datei: Kopfzeile mit `format`, `name`, `rules_file`, `rules_sha256`, dann `cases` (ein Fall pro Zeile). Fall: `{name, opponent_type, player_level, inputs, expect, [result, report]}`.
+Datei: Kopfzeile mit `format`, `name`, `rules_file`, `rules_sha256`, `extra_rules` (weitere Regeldateien -> SHA-256), dann `cases` (ein Fall pro Zeile). Fall: `{name, opponent_type, player_level, inputs, expect, [result, report]}`.
 
 - `inputs`: Liste `[tick, befehl]`, Befehle `light heavy dodge block stun slow flee`.
 - `expect: "ok"`: `result = {outcome, ticks, actions, player_hp, opponent_hp, ignored_inputs, damage_ticks}`; `report` = erwarteter CEE-Bericht (Begegnungs-ID `golden-<name>`, Tag 1) oder `null`, wenn keine Aktion stattfand.
 - Optional `allowed` (Liste von Befehlen): Kampfausrüstung der Figur (CEE-Regeln v9). Befehle außerhalb der Liste zählen als `ignored_inputs` und werden nicht ausgeführt; `flee` geht immer; ohne das Feld sind alle Befehle erlaubt. Ungültiges `allowed` (unbekannter Befehl, keine Liste) = Fehler.
+- Optional `equipped` (Liste eindeutiger Fähigkeitsnamen) und `rules_file` (Standard: Kopf-Datei): Die Wirkung ausgerüsteter Fähigkeiten steht in `ability_effects` der Regeldatei (ADR-0021). Zusammensetzung: `*_permille` multiplizieren (Fähigkeiten alphabetisch, je Schritt abgerundet), `block_damage_permille` = Minimum, `*_bonus`/`*_delta` addieren. Anwendung: leicht/präzise Schaden, schwerer Schaden, Betäubungs-/Verlangsamungsdauer, Parade-Schwäche des Gegners, Ausweichen-Kosten/-Abklingzeit (nur Ausweichen), Ausdauerregeneration je Tick, erlittener Schaden (auch bei Block), Block-Durchlass. Fähigkeiten ohne Eintrag und Regeln ohne Tabelle: keine Wirkung. Ungültiges `equipped` = Fehler.
 - `expect: "error"`: ungültige Eingabe (Typ, Bereich, Reihenfolge, Menge, unbekannter Gegner/Stufe); es wird nichts simuliert.
 - Die Simulation ist rein ganzzahlig (Tick = 100 ms). Ereignisreihenfolge je Tick: Spielerbefehle, schwerer Treffer, Sieg-Prüfung, Gegner, Niederlage-Prüfung, Ausdauer-Regeneration (siehe `mmo_sim/fight.py`).
 - Pseudozufällige Eingabemuster nutzen einen festen LCG (`x' = (1103515245·x + 12345) mod 2^31`); die Eingaben stehen aber ausgeschrieben in der Datei.

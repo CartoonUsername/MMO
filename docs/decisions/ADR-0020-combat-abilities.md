@@ -16,6 +16,6 @@
 **Absicherung:** `tests/test_abilities.py` (21 Tests: Regelprüfung, jede Voraussetzungsart inkl. Grenzen, Ereignis-Ablehnungen, Plätze nach Stufe, Replay, ältere Regeln unberührt, Simulationsfreigabe inkl. Begegnungsserver, Migration, Welt-Upgrade, Gateway) plus Golden Vectors; Mutationstests (zwei Überlebende sind gleichwertig bzw. wurden mit Tests geschlossen).
 
 **Offen / Grenzen**
-- Wirkung der Fähigkeiten über Befehlsfreigabe hinaus (Schaden, Zustände, Abklingzeit, Kosten je Fähigkeit), Gruppen-/Unterstützungskampf, Raum/Winkel, Kampfechos, Elementfähigkeiten in der Simulation, Fähigkeitsstufen/Verbesserung durch Nutzung.
+- Wirkung der Fähigkeiten: passive Modifikatoren seit ADR-0021; offen sind eigene Fähigkeitsbefehle (Kosten, Abklingzeit, Zustände), Gruppen-/Unterstützungskampf, Raum/Winkel, Kampfechos, Elementfähigkeiten in der Simulation, Fähigkeitsstufen/Verbesserung durch Nutzung.
 - Der Spieler wählt aus freigeschalteten Fähigkeiten; ob Fähigkeiten zusätzlich gelernt/entdeckt werden (Verbindung zum Entdeckungssystem) ist offen.
 - Zahlen, Namen und Zuordnung zu Befehlen sind Vorschläge; ein Balancing steht aus.

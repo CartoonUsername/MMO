@@ -119,6 +119,11 @@ class CharacterService:
         rules = self.rules_of(character_id)
         return loadout_slots(self.state(character_id), rules) if "abilities" in rules["combat"] else 0
 
+    def equipped_abilities(self, character_id: str) -> list[str] | None:
+        """Ausgerüstete Fähigkeiten; None, wenn die Regeln der Figur keine Fähigkeiten kennen."""
+        rules = self.rules_of(character_id)
+        return list(self.state(character_id).parts["combat"]["loadout"]) if "abilities" in rules["combat"] else None
+
     def allowed_commands(self, character_id: str) -> list[str] | None:
         """Simulationsbefehle der Figur; None, wenn ihre Regeln keine Fähigkeiten kennen (dann gilt jeder Befehl)."""
         rules = self.rules_of(character_id)
