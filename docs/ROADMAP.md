@@ -12,7 +12,7 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 5 | Wesensmatrix erweitern: gewichtete Bewertung, Entscheidungsereignisse, Vor-/Nachteile (rules_v4, ADR-0007) | **erledigt** (Mechanik); offen: echte Formen/Inhalte, Wirkung der Modifikatoren, geheime Formen über Discovery |
 | 6 | Discovery + Crafting (Rezept-/Verfahrensentdeckung, Seltenheit) | offen |
 | 7 | Economic Profile (Handel, Unternehmen, Karriere) | offen |
-| 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | offen |
+| 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | **erledigt** (Mechanik, ADR-0008, Golden Vectors); offen: echte Optik/Assets, Ausrüstung/Kosmetik, Übergänge |
 | 9 | Snapshots, Regel-Migration/Rebuild, Anti-Cheat-Plausibilitätsregeln | offen |
 | 9b | Golden Test Vectors (Referenz ↔ Portierung) | **erledigt** (`reference/golden/`, ADR-0005) |
 | 10 | Server-Schnittstelle (Protokoll) + Portierung/Anbindung Unreal | offen |

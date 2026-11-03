@@ -38,6 +38,9 @@ class EconomicProfile(Protocol):
 
 
 class VisualEvolution(Protocol):
-    """Reine Ableitung State -> Erscheinungsparameter (deterministisch, kein eigener Zustand)."""
+    """Reine Ableitung State -> Erscheinungsparameter (deterministisch, kein eigener Zustand).
+
+    Umgesetzt in mmo_cee/visual.py (ADR-0008); diese Schnittstelle bleibt als Vertrag bestehen.
+    """
 
     def appearance(self, state: CharacterState) -> dict[str, Any]: ...

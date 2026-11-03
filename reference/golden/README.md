@@ -62,4 +62,12 @@ Datei: Kopfzeile mit `format`, `name`, `rules_file`, `rules_sha256`, dann `cases
 - Die Simulation ist rein ganzzahlig (Tick = 100 ms). Ereignisreihenfolge je Tick: Spielerbefehle, schwerer Treffer, Sieg-Prüfung, Gegner, Niederlage-Prüfung, Ausdauer-Regeneration (siehe `mmo_sim/fight.py`).
 - Pseudozufällige Eingabemuster nutzen einen festen LCG (`x' = (1103515245·x + 12345) mod 2^31`); die Eingaben stehen aber ausgeschrieben in der Datei.
 
+## Visual Evolution (`reference/golden_visual/appearance.json`)
+
+Erzeugt/geprüft mit `python -m mmo_cee.golden_visual write|check ../golden_visual`. Kopfzeile: `format`, `cee_rules_file`/`cee_rules_sha256` (Regeln v4), `visual_rules_file`/`visual_rules_sha256`; danach `cases` (ein Fall pro Zeile): `{name, character_id, state, appearance}`.
+
+- `state` sind die Teilzustände aller Engines (wie `final_state` der CEE-Vektoren); ein Port baut daraus `{character_id, parts: state}` und muss exakt `appearance` liefern, **inklusive** `appearance_sha256` (SHA-256 der kanonischen JSON-Darstellung aller übrigen Felder).
+- Ableitung (siehe `mmo_cee/visual.py`): Quellen in Promille; `value = base + Σ gewicht × quelle // 1000` (Floor), Jitter `sha256("<character_id>|<parameter>")[0:4]` (big-endian) `mod (2j+1) − j`, danach Wesens-Delta, Klemmen auf `min/max` (Standard 0..1000), Quantisierung `(v + q//2) // q * q` und erneute Klemmung. Aura: `Σ palette[e] × w[e] // Σ w[e]` mit `w = 500 + affinitaet // 2`, Elemente alphabetisch sortiert. Alle Zahlen Ganzzahlen.
+- Die Fälle decken Grundklassen, Elementpaare und Dreierkombination, Kampfstile, Berufe, Entscheidungen, drei Wesensformen und einen NPC ab; `fresh_human` und `fresh_human_other_id` zeigen: gleicher Zustand, andere Figur-ID → andere individuelle Variation.
+
 Inhalte wie Wesensformen, Kampfrichtungen und Zahlen sind vorläufige Vorschläge; die Vektoren sichern nur, dass Implementierungen sie gleich behandeln.

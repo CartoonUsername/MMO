@@ -1,0 +1,440 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER: Parameternamen, Quellen, Gewichte, Paletten, Teile und Essence-Schichten sind technische Vorschläge zur Verifikation der Ableitung, KEINE beschlossene Optik oder Spielinhalte. Alle Werte Ganzzahlen; Promille 0..1000 sofern nicht anders angegeben. Quellen: style:<dim> (Anteil am Kampfstil x Zuversicht), element_attuned:<e>, element_affinity:<e>, profession:<p>, combat_direction:<d>, essence:<form>, decision:<id>:<choice>. Gewichte >= 0 (Division nur als Ganzzahl-Floor); negative Anpassungen nur als Delta in essence_layers.",
+  "requires_cee_rules_min": 4,
+  "skeleton": "humanoid_v1",
+  "quantize_permille": 10,
+  "caps": {
+    "element_affinity": 300,
+    "profession_mastery": 10,
+    "direction_score": 300000,
+    "style_total": 100000
+  },
+  "classes": {
+    "warrior": {
+      "body_set": "warrior_base"
+    },
+    "shaman_alchemist": {
+      "body_set": "shaman_alchemist_base"
+    },
+    "archer": {
+      "body_set": "archer_base"
+    }
+  },
+  "default_body_set": "unassigned_base",
+  "palette": {
+    "fire": [
+      255,
+      96,
+      32
+    ],
+    "water": [
+      40,
+      120,
+      255
+    ],
+    "shadow": [
+      96,
+      40,
+      140
+    ],
+    "light": [
+      255,
+      240,
+      170
+    ],
+    "wind": [
+      170,
+      235,
+      220
+    ],
+    "earth": [
+      150,
+      110,
+      60
+    ],
+    "electric": [
+      255,
+      230,
+      60
+    ],
+    "ice": [
+      170,
+      225,
+      255
+    ],
+    "nature": [
+      70,
+      190,
+      80
+    ]
+  },
+  "skin_tint_base": [
+    200,
+    160,
+    130
+  ],
+  "morphs": {
+    "muscle_mass": {
+      "base": 250,
+      "from": {
+        "style:strength": 500,
+        "style:defense": 300
+      }
+    },
+    "leanness": {
+      "base": 300,
+      "from": {
+        "style:mobility": 500,
+        "style:precision": 200
+      }
+    },
+    "shoulder_width": {
+      "base": 500,
+      "from": {
+        "style:strength": 250,
+        "style:defense": 150
+      }
+    },
+    "posture_forward": {
+      "base": 300,
+      "from": {
+        "style:strength": 100,
+        "style:control": 100
+      }
+    },
+    "face_width": {
+      "base": 500,
+      "from": {},
+      "jitter": 120
+    },
+    "nose_bridge": {
+      "base": 500,
+      "from": {},
+      "jitter": 120
+    },
+    "jaw_depth": {
+      "base": 500,
+      "from": {
+        "style:strength": 80
+      },
+      "jitter": 100
+    }
+  },
+  "materials": {
+    "skin_roughness": {
+      "base": 300,
+      "from": {
+        "profession:mining": 300,
+        "profession:smithing": 200,
+        "profession:farming": 150
+      }
+    },
+    "soot_amount": {
+      "base": 0,
+      "from": {
+        "profession:smithing": 800
+      }
+    },
+    "dirt_amount": {
+      "base": 0,
+      "from": {
+        "profession:mining": 600,
+        "profession:farming": 400
+      }
+    },
+    "eye_glow": {
+      "base": 0,
+      "from": {
+        "element_attuned:light": 300,
+        "element_attuned:electric": 300,
+        "element_attuned:fire": 200,
+        "element_attuned:shadow": 100
+      }
+    },
+    "skin_frost": {
+      "base": 0,
+      "from": {
+        "element_affinity:ice": 500,
+        "element_attuned:ice": 300
+      }
+    },
+    "skin_ember_cracks": {
+      "base": 0,
+      "from": {
+        "element_affinity:fire": 400,
+        "essence:ember_kin": 600
+      }
+    },
+    "shadow_dissolve": {
+      "base": 0,
+      "from": {
+        "element_attuned:shadow": 300,
+        "essence:umbral_kin": 500
+      }
+    },
+    "leaf_growth": {
+      "base": 0,
+      "from": {
+        "element_attuned:nature": 300,
+        "profession:farming": 150,
+        "essence:grove_warden": 400
+      }
+    },
+    "stone_skin": {
+      "base": 0,
+      "from": {
+        "element_attuned:earth": 250,
+        "profession:mining": 150,
+        "essence:stone_born": 500
+      }
+    },
+    "water_sheen": {
+      "base": 0,
+      "from": {
+        "element_attuned:water": 300,
+        "essence:tide_walker": 500
+      }
+    }
+  },
+  "vfx": {
+    "aura_fire": {
+      "base": 0,
+      "from": {
+        "element_attuned:fire": 600,
+        "element_affinity:fire": 400
+      }
+    },
+    "aura_water": {
+      "base": 0,
+      "from": {
+        "element_attuned:water": 600,
+        "element_affinity:water": 400
+      }
+    },
+    "aura_shadow": {
+      "base": 0,
+      "from": {
+        "element_attuned:shadow": 600,
+        "element_affinity:shadow": 400
+      }
+    },
+    "aura_light": {
+      "base": 0,
+      "from": {
+        "element_attuned:light": 600,
+        "element_affinity:light": 400
+      }
+    },
+    "aura_wind": {
+      "base": 0,
+      "from": {
+        "element_attuned:wind": 600,
+        "element_affinity:wind": 400
+      }
+    },
+    "aura_earth": {
+      "base": 0,
+      "from": {
+        "element_attuned:earth": 600,
+        "element_affinity:earth": 400
+      }
+    },
+    "aura_electric": {
+      "base": 0,
+      "from": {
+        "element_attuned:electric": 600,
+        "element_affinity:electric": 400
+      }
+    },
+    "aura_ice": {
+      "base": 0,
+      "from": {
+        "element_attuned:ice": 600,
+        "element_affinity:ice": 400
+      }
+    },
+    "aura_nature": {
+      "base": 0,
+      "from": {
+        "element_attuned:nature": 600,
+        "element_affinity:nature": 400
+      }
+    },
+    "essence_presence": {
+      "base": 0,
+      "from": {
+        "essence:ember_kin": 1000,
+        "essence:umbral_kin": 1000,
+        "essence:stone_born": 1000,
+        "essence:tide_walker": 1000,
+        "essence:grove_warden": 1000
+      }
+    }
+  },
+  "parts": {
+    "hands": {
+      "source": "profession:smithing",
+      "variants": [
+        {
+          "min": 0,
+          "id": "hands_plain"
+        },
+        {
+          "min": 300,
+          "id": "hands_calloused"
+        },
+        {
+          "min": 700,
+          "id": "hands_forge_scarred"
+        }
+      ]
+    },
+    "shoulders": {
+      "source": "style:defense",
+      "variants": [
+        {
+          "min": 0,
+          "id": "shoulders_plain"
+        },
+        {
+          "min": 250,
+          "id": "shoulders_guarded"
+        },
+        {
+          "min": 500,
+          "id": "shoulders_bulwark"
+        }
+      ]
+    }
+  },
+  "animation_tags": [
+    {
+      "tag": "heavy_stance",
+      "source": "style:strength",
+      "min": 300
+    },
+    {
+      "tag": "agile_stance",
+      "source": "style:mobility",
+      "min": 300
+    },
+    {
+      "tag": "guarded_stance",
+      "source": "style:defense",
+      "min": 300
+    },
+    {
+      "tag": "precise_stance",
+      "source": "style:precision",
+      "min": 300
+    },
+    {
+      "tag": "channeling_pose",
+      "source": "style:support",
+      "min": 250
+    },
+    {
+      "tag": "controlling_gestures",
+      "source": "style:control",
+      "min": 250
+    }
+  ],
+  "essence_layers": {
+    "ember_kin": {
+      "morphs": {
+        "muscle_mass": 80
+      },
+      "materials": {
+        "skin_roughness": 100
+      },
+      "vfx": {},
+      "parts": {
+        "head_ornament": "horns_ember"
+      },
+      "tags": [
+        "ember_gait"
+      ],
+      "skin_tint_delta": [
+        30,
+        -10,
+        -20
+      ]
+    },
+    "umbral_kin": {
+      "morphs": {
+        "leanness": 100
+      },
+      "materials": {
+        "skin_roughness": -100
+      },
+      "vfx": {},
+      "parts": {
+        "head_ornament": "hood_umbral"
+      },
+      "tags": [
+        "shadow_step"
+      ],
+      "skin_tint_delta": [
+        -40,
+        -30,
+        -10
+      ]
+    },
+    "stone_born": {
+      "morphs": {
+        "muscle_mass": 150,
+        "leanness": -100
+      },
+      "materials": {},
+      "vfx": {},
+      "parts": {
+        "head_ornament": "crest_stone"
+      },
+      "tags": [
+        "grounded_gait"
+      ],
+      "skin_tint_delta": [
+        -20,
+        -10,
+        -10
+      ]
+    },
+    "tide_walker": {
+      "morphs": {
+        "leanness": 80
+      },
+      "materials": {},
+      "vfx": {},
+      "parts": {
+        "head_ornament": "fins_tide"
+      },
+      "tags": [
+        "wave_gait"
+      ],
+      "skin_tint_delta": [
+        -30,
+        0,
+        30
+      ]
+    },
+    "grove_warden": {
+      "morphs": {
+        "posture_forward": -100
+      },
+      "materials": {},
+      "vfx": {},
+      "parts": {
+        "head_ornament": "antlers_grove"
+      },
+      "tags": [
+        "rooted_gait"
+      ],
+      "skin_tint_delta": [
+        -20,
+        20,
+        -20
+      ]
+    }
+  }
+}

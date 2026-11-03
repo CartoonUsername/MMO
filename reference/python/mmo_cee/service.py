@@ -11,6 +11,7 @@ from .history import Event, EventLog
 from .identity import IdentityEngine
 from .professions import ProfessionEngine
 from .rules import Rules, load_rules
+from .visual import VisualEvolution
 
 
 def default_projector(rules: Rules) -> Projector:
@@ -65,3 +66,9 @@ class CharacterService:
     def essence_profile(self, character_id: str) -> dict:
         """Vor-/Nachteile der angenommenen Wesensform."""
         return essence_profile(self.state(character_id), self.rules)
+
+    def appearance(self, character_id: str) -> dict:
+        """Erscheinungsparameter (Visual Evolution): reine, serverseitige Ableitung aus dem Zustand."""
+        if not hasattr(self, "_visual"):
+            self._visual = VisualEvolution(self.rules)
+        return self._visual.appearance(self.state(character_id))

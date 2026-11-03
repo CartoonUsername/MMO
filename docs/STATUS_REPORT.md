@@ -9,17 +9,17 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 | Bereich | Stand |
 |---|---|
 | Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
-| Implementierte Engines | Identity, Element, Profession, Essence, **Combat Development** + Character History (Event-Log, Hash-Kette, Replay) |
+| Implementierte Engines | Identity, Element, Profession, Essence, Combat Development, **Visual Evolution** + Character History (Event-Log, Hash-Kette, Replay) |
 | Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung), `rules_v4.json` (v3 + Wesensbewertung mit Entscheidungen, ADR-0007); v1–v3 unverändert, Standard ist v4 |
-| Tests | **166** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Tests | **199** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
 | Kampfsimulation | `reference/python/mmo_sim/` – deterministischer 1:1-Kampfkern, `EncounterServer` (ADR-0006), `sim_rules_v1.json` (vorläufige Werte) |
-| Golden Test Vectors | `reference/golden/` (CEE, 12 Szenarien, `mmo_cee.golden`) und `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`); Format: `reference/golden/README.md` |
-| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0007, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
+| Golden Test Vectors | `reference/golden/` (CEE, 12 Szenarien, `mmo_cee.golden`) `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`) und `reference/golden_visual/` (Visual Evolution, 21 Fälle, `mmo_cee.golden_visual`); Format: `reference/golden/README.md` |
+| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0008, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
 | Unreal-Projekt | nicht vorhanden (bewusst; erst nach Windows-Checkliste und Freigabe) |
 
 ## Noch nicht implementiert
 
-Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Gruppen-/Raumkampf und Unterstützungsaktionen in der Simulation, Discovery, Crafting, Economic Profile, Visual Evolution (nur Schnittstellen in `interfaces.py`), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
+Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Gruppen-/Raumkampf und Unterstützungsaktionen in der Simulation, Discovery, Crafting, Economic Profile (nur Schnittstellen in `interfaces.py`), echte Optik/Assets zur Visual Evolution (nur Parametermechanik), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
 
 ## Nicht bestätigte Inhalte (Vorschläge)
 
@@ -43,7 +43,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 7. `c6c5069` Golden Test Vectors, 96 Tests.
 8. `aed6ca6` Serverseitiger Kampfkern `mmo_sim`, 128 Tests.
 9. `428e9ba` Golden Vectors der Simulation, 140 Tests.
-10. `4a2a156` Wesensbewertung (rules v4), 166 Tests.
-11. (dieser Stand) Dokumentation zur Wesensbewertung nachgezogen.
+10. `4a2a156`/`d3b2ae6` Wesensbewertung (rules v4), 166 Tests.
+11. (dieser Stand) Visual Evolution Engine, 199 Tests.
 
 Plan: `docs/ROADMAP.md`.

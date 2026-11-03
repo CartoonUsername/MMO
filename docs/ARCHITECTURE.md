@@ -31,7 +31,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | 7 | Crafting | `crafting.` | Schnittstelle, nicht implementiert |
 | 8 | Economic Profile | `economy.` | Schnittstelle, nicht implementiert |
 | 9 | Character History | (Querschnitt) | **implementiert** (`history.py`: Log, Hash-Kette, Verifikation) |
-| 10 | Visual Evolution | `visual.` | Schnittstelle, nicht implementiert (reine Ableitung aus State) |
+| 10 | Visual Evolution | (keine Ereignisse) | **implementiert** (reine Ableitung Zustand → Erscheinungsparameter, ADR-0008; Optik ist Platzhalter) |
 
 ## Combat Development Engine (Details, siehe ADR-0003)
 
@@ -43,6 +43,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
+## Visual Evolution (ADR-0008)
+
+`VisualEvolution.appearance(state)` leitet aus dem Charakterzustand engine-neutrale Parameter ab: `body_set` (Grundklasse), Morphs, Materialien, Effektstärken, Aura-/Hautfarbe (freie Elementmischung), Teile-IDs, Animations-Tags, Signatur und Hash. Kein eigener Zustand, keine Ereignisse; nur der Server berechnet, Clients lesen. Regeln: `visual_rules_v1.json` (Platzhalter, validiert). Golden Vectors: `reference/golden_visual/`.
 
 ## Wesensbewertung (ADR-0007)
 
