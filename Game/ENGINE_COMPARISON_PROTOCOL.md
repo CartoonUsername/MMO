@@ -9,14 +9,16 @@ Status: **Entwurf, Vorschlag.** Die Engine-Entscheidung ist offen (Handover Teil
 - Kosten: 1,21 USD/h (5090). Gesamtbudget für den Vergleich: **max. 5 GPU-Stunden** (≈ 6 USD), harte Grenze; danach Pod stoppen.
 - Unity-Konto vorhanden, Sitz „Unity Personal“ **noch nicht aktiviert**.
 
-## Offene Voraussetzungen (vor GPU-Start klären, kosten sonst Wartezeit)
+## Voraussetzungen – Stand der Recherche (2026-11-03)
 
-| # | Frage | Wie klären | Status |
+Quellen sind Suchauszüge; Epic-Seiten waren in der Sandbox nicht direkt lesbar. Vor dem Start gegen die Doku der exakten Version prüfen.
+
+| # | Frage | Ergebnis | Status |
 |---|---|---|---|
-| V1 | Läuft Unity-6-Editor auf Ubuntu 20.04? | Systemanforderungen der gewählten Unity-6-Version prüfen; sonst neuen Pod mit 22.04/24.04 | offen |
-| V2 | Lizenzaktivierung headless möglich? | Unity-Doku „manual activation“ prüfen | offen |
-| V3 | Unreal-Linux-Build erhältlich + Plattenbedarf (120 GB) ausreichend? | Epic-Doku/Download prüfen | offen |
-| V4 | Wie kommen Ergebnisse vom Pod zu uns? | Screenshots/CSV in Git (kleine Dateien), Push nur mit Login auf dem Pod | offen |
+| V1 | Unity-6-Editor auf Ubuntu 20.04? | **Nein.** Unity 6 unterstützt auf Linux nur Ubuntu 22.04 und 24.04 (Unity-Doku „System requirements“). Der aktuelle Pod (20.04) ist ungeeignet. Neuer Pod mit Ubuntu 22.04 nötig, z. B. RunPod-PyTorch-Template mit CUDA 12.8 (laut RunPod-Doku-Beispiel `…cuda12.8.1-…-ubuntu22.04`; Template-Name in der Konsole bestätigen). Die RTX 5090 braucht ein Template mit passender CUDA-Version. | geklärt |
+| V2 | Lizenzaktivierung ohne Fenster? | **Ungeklärt, größtes Risiko.** Möglich laut Suchauszügen: manuelle Aktivierung (`-createManualActivationFile` → .alf → .ulf → `-manualLicenseFile`) unter `xvfb-run`; Aktivierung per Benutzername/Passwort im Batchmodus scheitert häufig ohne Display; in Containern gab es Probleme mit der Machine-ID. Ob das für **Personal** geht, ist nicht belegt. Vermutung (nicht belegt): Eine Lizenz hängt an der Maschine, jeder neue Pod müsste neu aktiviert werden. | offen |
+| V3 | Unreal 5.8 auf dem Pod? | **Nicht empfohlen für den ersten Test.** Epic empfiehlt für Linux Ubuntu 22.04; Foren melden Vulkan-Abstürze (`VK_ERROR_DEVICE_LOST`) mit 5.8 unter Linux (Einzelberichte, teils Preview). Download-/Plattenbedarf nicht belegt. | geklärt (Risiko hoch) |
+| V4 | Ergebnisse vom Pod holen? | Container-Disk wird beim Stoppen geleert; `/workspace` bleibt, kostet aber weiter (RunPod-Doku). SCP/SFTP geht über `ssh.runpod.io` nicht. Einfachste Variante ohne Zugangsdaten: Messwerte als Text und Screenshots direkt in den Chat. Alternative: Push mit einem auf dieses Repo und einen Tag begrenzten GitHub-Token, nur auf dem Pod eingegeben (deine Entscheidung). | geklärt |
 
 ## Testszene (identisch in beiden Engines)
 
