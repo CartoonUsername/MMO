@@ -81,6 +81,8 @@ class Gateway:
             return isinstance(value, int) and not isinstance(value, bool) and abs(value) <= 10**12
         if kind == "b":
             return isinstance(value, bool)
+        if kind == "l":
+            return isinstance(value, list) and len(value) <= 16 and all(self._check_type(v, "s") for v in value)
         return False
 
     def _validate_args(self, cmd: Command, args: Any) -> str | None:

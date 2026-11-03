@@ -4,7 +4,7 @@ Du übernimmst die technische Entwicklung eines langfristig geplanten Free-to-Pl
 
 ## 1. Repository und Zustand (verifiziert)
 - Repo `CartoonUsername/MMO`, Arbeitsbranch `claude/awesome-dirac-9k6p3n` (aktueller Stand: `git log -1`). Niemals direkt auf `main` arbeiten, kein Force-Push, keine Merges/PRs ohne Auftrag, kleine nachvollziehbare Commits (Co-Author-Zeilen laut Systemvorgabe).
-- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **676 Tests, alle grün.** Befehlsschicht des Server-Protokolls: `reference/python/mmo_server/`, Planung `docs/PROTOCOL.md`. Golden Vectors: `reference/golden` (23 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle), `reference/golden_world` (14 Weltseiten-Szenarien inkl. Markt, Firmenproduktion, Preisdynamik und Regelversions-Migration, Welt-Hash je Schritt).
+- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **698 Tests, alle grün.** Befehlsschicht des Server-Protokolls: `reference/python/mmo_server/`, Planung `docs/PROTOCOL.md`. Golden Vectors: `reference/golden` (24 CEE-Szenarien), `reference/golden_sim` (72 Fälle), `reference/golden_visual` (21 Fälle), `reference/golden_world` (14 Weltseiten-Szenarien inkl. Markt, Firmenproduktion, Preisdynamik und Regelversions-Migration, Welt-Hash je Schritt).
 - Prüfen vor jeder Arbeit: `git status`, dann `cd reference/python && python -m unittest discover -s . -t . -v`, `python -m mmo_cee.golden check ../golden`, `python -m mmo_sim.golden check ../golden_sim`, `python -m mmo_cee.golden_visual check ../golden_visual`, `python -m mmo_world.golden check ../golden_world`.
 - Dokumentation: `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/STATUS_REPORT.md`, `docs/decisions/ADR-0001…0012`, `reference/golden/README.md` (Format und Prüfverfahren für Portierungen), `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md`, `Game/ENGINE_COMPARISON_PROTOCOL.md`.
 - Wichtige Commits: `ba3d1b0` Kern + Identity/Element/Profession/Essence · `062b52c` Combat Development · `c6c5069` Golden Vectors · `aed6ca6` Kampfsimulation `mmo_sim` · `4a2a156` Wesensbewertung · `2efc9c3` Visual Evolution · `ee32e2c` Discovery · `ad54492` Crafting · danach Economic Profile (siehe `git log`).
@@ -60,7 +60,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 
 ## 7. Bekannte offene Punkte
 - Aufträge/Kunden und Lieferketten der Firmen, Filialen/Töchter, Dividenden, regionale Märkte/Logistik/Weltereignisse als Preisauslöser, Spielerstädte, Technologie-Etablierung je Region, Kampfechos – nicht begonnen. Der Unternehmenslevel hat noch keine Wirkung; Golden Vectors der Weltseite sind vorhanden (ADR-0013).
-- Kampf: nur 1:1, kein Raum/Winkel, keine Unterstützungsaktionen/Gruppen in der Simulation (die CEE kennt `ally_heal`/`ally_shield`), keine konkreten Fähigkeiten.
+- Kampf: nur 1:1, kein Raum/Winkel, keine Unterstützungsaktionen/Gruppen in der Simulation (die CEE kennt `ally_heal`/`ally_shield`). Fähigkeiten (Regeln v9, ADR-0020) sind freischalt- und ausrüstbar und geben Simulationsbefehle frei (`heavy`, `stun`, `slow`); ihre übrige Wirkung (Schaden, Zustände, Kosten, Schild/Konter/Unterstützung/Element) fehlt noch.
 - Handwerk: Werkzeuge/Werkstätten, Herstellungsdauer, Materialgewinnung, Experimentieren, Rezepte als Gegenstand fehlen.
 - Wesen/Visual: Wirkung der Modifikatoren auf Kampf/Bewegung; echte Optik/Assets; Ausrüstung/Kosmetik; Übergangsanimationen; Handwerksrichtungen noch nicht an Wesen/Visual angebunden.
 - Produktive Datenbank, Archivierung gewerteter Begegnungs-IDs, Betrieb der Regelversions-Migration (Mechanismus in ADR-0018; Snapshot-Referenz vorhanden), Besitzjournal für das Inventar, Server-Protokoll (Transport, Anmeldung, Push, Echtzeit-Kampfkanal; Befehlsschicht steht), Mehrfachaccounts/Boosting.
@@ -76,7 +76,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 2. Aufträge/Kunden und Lieferketten für Firmen; Orderbuch (ADR-0015), Firmenproduktion (ADR-0016) und Preisdynamik mit CEE-Regeln v8 und NPC-Händler (ADR-0017) sind erledigt. Weiter: regionale Preise, Weltereignisse als Schock-Auslöser, Logistik.
 3. Snapshots/Archivierung und Regel-Migration.
 4. Server-/Protokoll: Befehlsschicht ist umgesetzt (ADR-0019); offen sind Transport (WebSocket/TLS?), Anmeldung, Push-Ereignisse, direkter Zwei-Parteien-Handel, Echtzeit-Kampfkanal, Datenbank/Regionen und der Übergang zur Engine-Phase; Engine-Vergleich nur mit klarem Budget.
-5. Kampf erweitern (Gruppen, Unterstützung, Raum), Kampfechos als eigenes System konzipieren.
+5. Kampf erweitern: Wirkung der Fähigkeiten, Gruppen, Unterstützung, Raum; Kampfechos als eigenes System konzipieren. (Fähigkeiten/Ausrüstung: ADR-0020 erledigt.)
 
 ## 10. Arbeitsregeln
 Keine unnötigen Rückfragen bei rein technischen Entscheidungen; Spielentscheidungen nicht eigenmächtig verändern; Vorschläge und Platzhalter deutlich markieren; nichts als fertig deklarieren, was nur Schnittstelle ist; ehrlich über Testergebnisse, Fehlschläge und Grenzen berichten; bestehende Module nicht überschreiben, sondern abwärtskompatibel erweitern.

@@ -20,7 +20,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
-from .combat import reached_directions, style_profile
+from .combat import ability_progress, allowed_commands, loadout_slots, reached_directions, style_profile, unlocked_abilities
 from .crafting import craft_direction_scores, craft_directions, craft_profile, known_recipes, known_techniques
 from .discovery import discovery_progress, known_discoveries
 from .economy import economic_direction_scores, economic_directions, economic_profile
@@ -223,6 +223,43 @@ def scenario_combat_directions_umbral() -> dict[str, Any]:
     return {
         "description": "Kampfrichtung skirmisher + Schattenprägung -> Wesensform umbral_kin (Platzhalter); mehrere Systeme zusammen.",
         "rules_file": "rules_v3.json",
+        "steps": steps,
+    }
+
+
+LOADOUT_EV = "combat.loadout_set"
+
+
+def scenario_combat_abilities_loadout() -> dict[str, Any]:
+    mix = {"heavy_hit": 35, "block": 28, "stun_applied": 9, "slow_applied": 18}
+    lo = lambda abilities, day=8: (LOADOUT_EV, {"abilities": abilities, "day": day})  # noqa: E731
+    steps: list[Step] = [lo([], 1), _created(), ("identity.xp_gained", {"amount": 10000}),
+                         lo(["power_strike"], 1)]  # noch nichts freigeschaltet
+    for day in range(1, 9):
+        steps += _train(day, mix, n=6)
+    steps += [
+        lo(["power_strike", "disrupting_blow"]),
+        lo(["power_strike", "disrupting_blow"], 9),  # erneut setzen ist zulässig
+        lo(["hindering_mark", "power_strike", "shield_wall"], 9),  # 3 Plätze bei Stufe 11
+        lo(["hindering_mark", "power_strike", "shield_wall", "disrupting_blow"], 9),  # zu viele
+        lo(["power_strike", "power_strike"], 9), lo(["fireball"], 9), lo(["_comment"], 9),
+        lo(["riposte"], 9), lo(["ember_strike"], 9), lo(["veteran_focus"], 9), lo(["twilight_veil"], 9),  # nicht freigeschaltet
+        lo(["power_strike"], 8),  # Tag springt zurück
+        lo("power_strike", 9), lo(["power_strike", 5], 9), lo(["power_strike"], -1), lo(["power_strike"], True),
+        (LOADOUT_EV, {"abilities": ["power_strike"]}), (LOADOUT_EV, {"day": 9}),
+        (LOADOUT_EV, {"abilities": ["power_strike"], "day": 9, "slot": 1}),
+        lo([], 10),
+        ("identity.xp_gained", {"amount": 30000}),  # Stufe 15+
+        lo(["veteran_focus", "flowing_step", "ally_mend", "shield_wall"], 11),  # vier Plätze erst ab Stufe 25
+        lo(["veteran_focus", "flowing_step", "ally_mend"], 11),
+        ("element.exposure", {"element": "fire", "amount": 100}), ("element.attuned", {"element": "fire"}),
+    ]
+    for day in range(12, 22):
+        steps += _train(day, {"heavy_hit": 40, "block": 30}, n=6, tag="v")
+    steps += [lo(["ember_strike", "power_strike", "veteran_focus"], 22), lo(["ember_strike"], 22)]
+    return {
+        "description": "Fähigkeiten (rules v9): Freischaltung aus Richtungsstufen/Element/Stufe, Ausrüstung per Ereignis mit Platzgrenze nach Stufe, abgeleitete erlaubte Simulationsbefehle.",
+        "rules_file": "rules_v9.json",
         "steps": steps,
     }
 
@@ -645,6 +682,7 @@ SCENARIOS = {
     "economy_career_founding": scenario_economy_career_founding,
     "economy_directions": scenario_economy_directions,
     "economy_dynamic_reference": scenario_economy_dynamic_reference,
+    "combat_abilities_loadout": scenario_combat_abilities_loadout,
 }
 
 
@@ -655,6 +693,11 @@ def _derived(svc: CharacterService) -> dict[str, Any]:
     if "combat" in svc.rules:
         out["combat_directions"] = reached_directions(state, svc.rules)
         out["style_profile"] = style_profile(state, svc.rules)
+        if "abilities" in svc.rules["combat"]:  # ab rules v9
+            out["unlocked_abilities"] = unlocked_abilities(state, svc.rules)
+            out["ability_progress"] = ability_progress(state, svc.rules)
+            out["loadout_slots"] = loadout_slots(state, svc.rules)
+            out["allowed_commands"] = allowed_commands(state, svc.rules)
     if "economy" in svc.rules:  # ab rules v7
         out["economic_profile"] = economic_profile(state, svc.rules)
         out["economic_direction_scores"] = economic_direction_scores(state, svc.rules)

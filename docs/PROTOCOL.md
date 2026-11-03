@@ -62,8 +62,9 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 - **Reihenfolge:** Die Welt hat einen Schreiber; Befehle werden nacheinander ausgeführt (Reihenfolge = Ankunft, bei Gleichzeitigkeit nach
   Serverregel). Zeit ist die Serveruhr.
 
-## 5. Befehlskatalog (aus `mmo_server/protocol.py` erzeugt)
+## 5. Befehlskatalog (aus `mmo_server/protocol.py` erzeugt: `python -m mmo_server.docgen`)
 
+<!-- KATALOG:BEGIN -->
 | Befehl | Argumente | handelnde Figur | Art | Ratengruppe |
 |---|---|---|---|---|
 | `craft` | char:s, recipe:s, qty:i, grade:s, technique?:s, element?:s | char | schreibend | craft |
@@ -73,6 +74,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `market.cancel` | char:s, order:s | char | schreibend | default |
 | `maker.sell` | char:s, item_key:s, qty:i | char | schreibend | default |
 | `maker.buy` | char:s, item_key:s, qty:i | char | schreibend | default |
+| `combat.set_loadout` | char:s, abilities:l | char | schreibend | default |
 | `company.found` | char:s, capital:i | char | schreibend | default |
 | `company.close` | actor:s, company:s | actor | schreibend | default |
 | `company.hire` | actor:s, company:s, char:s, wage:i, share?:i | actor | schreibend | default |
@@ -99,9 +101,10 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.disclosure` | company:s | – | lesend | query |
 | `query.inventory` | char:s | char | lesend | query |
 | `query.economic_profile` | char:s | char | lesend | query |
+| `query.abilities` | char:s | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 
-Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `?` optional.
+Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste von Zeichenketten (höchstens 16), `?` optional.
 
 ### Bewusst nur serverintern (nicht erreichbar)
 
@@ -112,9 +115,11 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `?` optional
 - **advance_day/price_advance/market_expire** – Tagesschritte macht der Server nach seiner Uhr
 - **price_shock/rules_upgrade/rules_migrate** – Weltereignisse und Betriebsaktionen
 - **persistence (export/import/commit)** – Betrieb
+<!-- KATALOG:END -->
 
 ## 6. Echtzeit-Kampf (Planung)
 
+- Welche Befehle ein Spieler im Kampf nutzen darf, folgt aus seiner **Kampfausrüstung** (`combat.set_loadout`, ADR-0020): Grundbefehle plus die der ausgerüsteten Fähigkeiten; der Server ignoriert andere Eingaben.
 - Eigener Kanal, 10 Server-Ticks/s (`mmo_sim`). Client sendet **Eingaben** mit Sequenznummer (`light heavy dodge block stun slow flee`),
   der Server entscheidet Treffer, Ausweichen, Block usw. und sendet Zustandsupdates (Schnappschüsse mit Delta).
 - Am Ende erzeugt der Server den Begegnungsbericht für `combat.encounter_resolved`; die Begegnungs-ID vergibt der Server (Archivierung

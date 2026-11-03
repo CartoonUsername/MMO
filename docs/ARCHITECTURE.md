@@ -24,7 +24,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 |---|---|---|---|
 | 1 | Identity | `identity.` | **implementiert** (Typ Spieler/NPC, Klasse, XP/Level) |
 | 2 | Essence (Wesen) | `essence.` | **implementiert** (gewichtete Bewertung aus der Historie, Entscheidungen, Prüfung, dauerhafte Annahme, Vor-/Nachteile; Legacy-Schema weiter gültig) |
-| 3 | Combat Development | `combat.` | **implementiert** (Metriken, Entwicklungsrichtungen, Anti-Farming; konkrete Fähigkeiten offen) |
+| 3 | Combat Development | `combat.` | **implementiert** (Metriken, Entwicklungsrichtungen, Anti-Farming; ab Regeln v9 Fähigkeiten mit Ausrüstung und Befehlsfreigabe für die Simulation, ADR-0020; Wirkung/Gruppen/Raum offen) |
 | 4 | Element | `element.` | **implementiert** (9 Elemente, Prägung, 2 + 1 Limit) |
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
 | 6 | Discovery | `discovery.` | **implementiert** (Charakterseite in der CEE + Weltseite `mmo_world`, ADR-0009; Inhalte sind Platzhalter) |

@@ -49,8 +49,11 @@ def cases() -> list[dict[str, Any]]:
     mt = cfg["max_ticks"]
     c: list[dict[str, Any]] = []
 
-    def add(name: str, opp: str, level: int, inputs: Any) -> None:
-        c.append({"name": name, "opponent_type": opp, "player_level": level, "inputs": inputs})
+    def add(name: str, opp: str, level: int, inputs: Any, allowed: Any = None) -> None:
+        case = {"name": name, "opponent_type": opp, "player_level": level, "inputs": inputs}
+        if allowed is not None:  # Kampfausrüstung der Figur (ab CEE-Regeln v9); ohne: alle Befehle erlaubt
+            case["allowed"] = allowed
+        c.append(case)
 
     for opp in cfg["opponents"]:
         add(f"idle_{opp}", opp, 1, [])
@@ -100,13 +103,26 @@ def cases() -> list[dict[str, Any]]:
     }
     for name, (opp, lvl, inputs) in bad.items():
         add(name, opp, lvl, inputs)
+    # Befehlsfreigabe durch ausgerüstete Fähigkeiten: nicht erlaubte Befehle zählen als ignoriert (flee geht immer)
+    base = ["light", "dodge", "block", "flee"]
+    mixed = [[0, "heavy"], [20, "heavy"], [40, "stun"], [50, "slow"], [60, "light"], [70, "dodge"], [90, "block"], [200, "flee"]]
+    add("allowed_base_only_wolf", "wolf", 1, mixed, base)
+    add("allowed_all_wolf", "wolf", 1, mixed, list(COMMANDS))
+    add("allowed_heavy_only_dummy", "training_dummy", 1, [[0, "heavy"], [20, "heavy"], [40, "stun"], [60, "heavy"]], base + ["heavy"])
+    add("allowed_stun_cancels_attack", "wolf", 1, [[38, "stun"], [46, "light"], [200, "flee"]], base + ["stun"])
+    add("allowed_without_stun_attack_lands", "wolf", 1, [[38, "stun"], [46, "light"], [200, "flee"]], base)
+    add("allowed_empty_means_nothing_but_flee", "wolf", 1, [[0, "light"], [10, "flee"]], [])
+    add("allowed_flee_cannot_be_withheld", "bear", 1, [[0, "flee"]], ["light"])
+    add("allowed_spam_golem", "stone_golem", 20, [[t, cmd] for t in range(0, 60) for cmd in COMMANDS if cmd != "flee"], base + ["slow"])
+    add("invalid_allowed_unknown_command", "wolf", 1, [[0, "light"]], ["fireball"])
+    add("invalid_allowed_not_a_list", "wolf", 1, [[0, "light"]], "light")
     return c
 
 
 def run_case(cfg: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
-    out = {k: case[k] for k in ("name", "opponent_type", "player_level", "inputs")}
+    out = {k: case[k] for k in ("name", "opponent_type", "player_level", "inputs", "allowed") if k in case}
     try:
-        r = simulate(cfg, case["opponent_type"], case["player_level"], case["inputs"])
+        r = simulate(cfg, case["opponent_type"], case["player_level"], case["inputs"], case.get("allowed"))
     except SimError:
         out["expect"] = "error"
         return out

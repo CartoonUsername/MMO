@@ -51,12 +51,13 @@ def validate_inputs(cfg: dict[str, Any], inputs: Any) -> list[tuple[int, str]]:
 
 
 class _Fight:
-    def __init__(self, cfg: dict[str, Any], opponent_type: str, player_level: int) -> None:
+    def __init__(self, cfg: dict[str, Any], opponent_type: str, player_level: int, allowed: Any = None) -> None:
         if opponent_type not in cfg["opponents"]:
             raise SimError(f"unbekannter Gegner: {opponent_type}")
         if not isinstance(player_level, int) or isinstance(player_level, bool) or player_level < 1:
             raise SimError("player_level muss eine positive ganze Zahl sein")
         self.cfg, self.A = cfg, cfg["actions"]
+        self.allowed = None if allowed is None else frozenset(allowed)  # None: alle Befehle; sonst nur diese (und immer flee)
         self.opp = cfg["opponents"][opponent_type]
         p = cfg["player"]
         self.hp = p["base_hp"] + p["hp_per_level"] * player_level
@@ -159,6 +160,9 @@ class _Fight:
                 i += 1
                 if cmd == "flee":
                     return self._result("fled", t)
+                if self.allowed is not None and cmd not in self.allowed:  # Fähigkeit nicht ausgerüstet: Befehl wird ignoriert
+                    self.ignored += 1
+                    continue
                 self.command(t, cmd)
             if self.heavy_pending and self.heavy_pending[0] == t:
                 self.opp_hp -= self.heavy_pending[1]
@@ -177,5 +181,8 @@ class _Fight:
                                self.opp_hp, self.ignored, tuple(self.damage_ticks))
 
 
-def simulate(cfg: dict[str, Any], opponent_type: str, player_level: int, inputs: Any) -> EncounterResult:
-    return _Fight(cfg, opponent_type, player_level).run(validate_inputs(cfg, inputs))
+def simulate(cfg: dict[str, Any], opponent_type: str, player_level: int, inputs: Any, allowed: Any = None) -> EncounterResult:
+    """`allowed`: erlaubte Befehle (aus der Kampfausrüstung der Figur) oder None für alle."""
+    if allowed is not None and (not isinstance(allowed, (list, tuple, set, frozenset)) or any(c not in COMMANDS for c in allowed)):
+        raise SimError("allowed muss eine Liste bekannter Befehle sein")
+    return _Fight(cfg, opponent_type, player_level, allowed).run(validate_inputs(cfg, inputs))

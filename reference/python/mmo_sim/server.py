@@ -63,7 +63,8 @@ class EncounterServer:
             raise SimError("Begegnung unbekannt oder gehört einem anderen Charakter")
         _, opponent_type, day = entry
         level = self.service.state(character_id).parts["identity"]["level"]
-        result = simulate(self.cfg, opponent_type, level, inputs)  # bei ungültigen Eingaben bleibt die Begegnung offen
+        allowed = self.service.allowed_commands(character_id)  # Fähigkeiten der Figur (ab Regeln v9), sonst alle Befehle
+        result = simulate(self.cfg, opponent_type, level, inputs, allowed)  # bei ungültigen Eingaben bleibt die Begegnung offen
         del self._pending[encounter_id]
         self._finished.add(encounter_id)
         if not result.actions:

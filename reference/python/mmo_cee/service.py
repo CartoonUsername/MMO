@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .combat import CombatEngine, reached_directions
+from .combat import CombatEngine, ability_progress, allowed_commands, loadout_slots, reached_directions, unlocked_abilities
 from .discovery import DiscoveryEngine, discovery_progress, known_discoveries
 from .crafting import CraftingEngine, craft_directions, craft_profile, known_recipes, known_techniques
 from .economy import EconomyEngine, economic_directions, economic_profile
@@ -105,6 +105,24 @@ class CharacterService:
     def combat_directions(self, character_id: str) -> dict[str, int]:
         """Erreichte Entwicklungsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
         return reached_directions(self.state(character_id), self.rules_of(character_id))
+
+    def abilities(self, character_id: str) -> dict:
+        """Fähigkeiten mit Stand: fehlende Voraussetzungen, Befehl, ausgerüstet (nur ab Regeln v9, sonst leer)."""
+        rules = self.rules_of(character_id)
+        return ability_progress(self.state(character_id), rules) if "abilities" in rules["combat"] else {}
+
+    def unlocked_abilities(self, character_id: str) -> list[str]:
+        rules = self.rules_of(character_id)
+        return unlocked_abilities(self.state(character_id), rules) if "abilities" in rules["combat"] else []
+
+    def loadout_slots(self, character_id: str) -> int:
+        rules = self.rules_of(character_id)
+        return loadout_slots(self.state(character_id), rules) if "abilities" in rules["combat"] else 0
+
+    def allowed_commands(self, character_id: str) -> list[str] | None:
+        """Simulationsbefehle der Figur; None, wenn ihre Regeln keine Fähigkeiten kennen (dann gilt jeder Befehl)."""
+        rules = self.rules_of(character_id)
+        return allowed_commands(self.state(character_id), rules) if "abilities" in rules["combat"] else None
 
     def essence_scores(self, character_id: str) -> dict[str, dict]:
         """Punktzahl/Beiträge/Prüfbarkeit der Bewertungsformen (leer bei Regeln ohne Bewertungsformen)."""

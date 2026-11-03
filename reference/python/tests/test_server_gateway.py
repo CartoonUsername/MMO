@@ -37,7 +37,7 @@ class Env:
 
 
 def dummy(cmd):
-    return {k: {"s": "x", "i": 1, "b": True}[t.rstrip("?")] for k, t in cmd.args.items() if not t.endswith("?")}
+    return {k: {"s": "x", "i": 1, "b": True, "l": ["x"]}[t.rstrip("?")] for k, t in cmd.args.items() if not t.endswith("?")}
 
 
 class CatalogTests(unittest.TestCase):
@@ -45,7 +45,7 @@ class CatalogTests(unittest.TestCase):
         for name, c in COMMANDS.items():
             with self.subTest(name):
                 self.assertEqual(c.name, name)
-                self.assertTrue(all(t.rstrip("?") in ("s", "i", "b") for t in c.args.values()))
+                self.assertTrue(all(t.rstrip("?") in ("s", "i", "b", "l") for t in c.args.values()))
                 if c.actor is not None:
                     self.assertEqual(c.args.get(c.actor), "s")
                 self.assertIn(c.rate_group, load_protocol_rules()["rate"] | {"query": 0})
@@ -63,6 +63,13 @@ class CatalogTests(unittest.TestCase):
         banned = {"day", "tick", "time", "xp", "points", "reference", "quality", "value", "progress", "result", "rules_version"}
         for name, c in COMMANDS.items():
             self.assertFalse(banned & set(c.args), name)
+
+    def test_protocol_document_catalog_is_generated_from_the_code(self):
+        from mmo_server import docgen
+        text = DOC.read_text(encoding="utf-8")
+        self.assertEqual(docgen.apply(text), text)  # sonst: python -m mmo_server.docgen write ../../docs/PROTOCOL.md
+        self.assertEqual(docgen.main(["g", "check", str(DOC)]), 0)
+        self.assertEqual(docgen.main(["g"]), 2)
 
     def test_protocol_document_lists_every_command(self):
         text = DOC.read_text(encoding="utf-8")

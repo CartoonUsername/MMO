@@ -23,6 +23,9 @@ from .history import Event
 from .rules import Rules
 
 ENCOUNTER_EVENT = "combat.encounter_resolved"
+LOADOUT_EVENT = "combat.loadout_set"  # ab rules_v9 (Fähigkeiten, ADR-0020)
+_LOADOUT_KEYS = frozenset({"abilities", "day"})
+_REQUIRE_KEYS = frozenset({"direction", "tier", "elements_attuned", "min_level", "essence_form"})
 _PAYLOAD_KEYS = frozenset(
     {"encounter_id", "opponent_type", "opponent_level", "outcome", "duration_s", "day", "actions"}
 )
@@ -53,6 +56,39 @@ def validate_combat_rules(cfg: dict[str, Any]) -> None:
         raise CEEError("combat.daily inkonsistent")
     if not cfg["repeat_opponent_permille"] or not cfg["outcome_permille"]:
         raise CEEError("combat: repeat_opponent_permille/outcome_permille dürfen nicht leer sein")
+    if "abilities" in cfg:
+        _validate_abilities(cfg)
+
+
+def _validate_abilities(cfg: dict[str, Any]) -> None:
+    ab = {k: v for k, v in cfg["abilities"].items() if not k.startswith("_")}
+    if not ab:
+        raise CEEError("combat.abilities darf nicht leer sein")
+    lo = cfg["loadout"]
+    base = lo["base_commands"]
+    if not base or len(set(base)) != len(base) or "flee" not in base:
+        raise CEEError("loadout.base_commands muss eindeutig sein und flee enthalten")
+    slots = lo["slots_by_level"]
+    if (not slots or slots[0][0] != 1 or any(not _is_int(l) or not _is_int(n) or n < 1 for l, n in slots)
+            or any(b[0] <= a[0] or b[1] < a[1] for a, b in zip(slots, slots[1:]))):
+        raise CEEError("loadout.slots_by_level: bei Stufe 1 beginnen, Stufen aufsteigend, Plätze nicht fallend, mindestens 1")
+    commands: dict[str, str] = {}
+    for name, a in ab.items():
+        req = a["requires"]
+        if not isinstance(name, str) or not name or set(req) - _REQUIRE_KEYS:
+            raise CEEError(f"Fähigkeit {name}: ungültige Voraussetzungen")
+        if "direction" in req:
+            d = cfg["directions"].get(req["direction"])
+            if d is None or not _is_int(req.get("tier")) or not 1 <= req["tier"] <= len(d["tier_thresholds"]):
+                raise CEEError(f"Fähigkeit {name}: Richtung/Stufe ungültig")
+        elif "tier" in req:
+            raise CEEError(f"Fähigkeit {name}: tier braucht direction")
+        if "min_level" in req and (not _is_int(req["min_level"]) or req["min_level"] < 1):
+            raise CEEError(f"Fähigkeit {name}: min_level ungültig")
+        if a["command"] is not None:
+            if a["command"] in base or a["command"] in commands:
+                raise CEEError(f"Fähigkeit {name}: Befehl {a['command']!r} ist Grundbefehl oder schon vergeben")
+            commands[a["command"]] = name
 
 
 class CombatEngine(Engine):
@@ -65,15 +101,20 @@ class CombatEngine(Engine):
 
     def initial(self) -> dict[str, Any]:
         zero = {d: 0 for d in self.cfg["dimensions"]}
-        return {
+        part = {
             "points": dict(zero),
             "encounters": {},  # encounter_id -> seq des bestätigten Ereignisses
             "daily": {"day": 0, "points": dict(zero), "opponents": {}},
             "stats": {o: 0 for o in self.cfg["outcome_permille"]},
         }
+        if "abilities" in self.cfg:  # ab rules_v9
+            part["loadout"], part["loadout_day"] = [], 0
+        return part
 
     # ---- Validierung -------------------------------------------------------
     def validate(self, state: CharacterState, type: str, payload: dict[str, Any]) -> None:
+        if type == LOADOUT_EVENT and "abilities" in self.cfg:
+            return self._validate_loadout(state, payload)
         if type != ENCOUNTER_EVENT:
             raise RuleViolation(f"Unbekannter Ereignistyp: {type}")
         cfg, part = self.cfg, state.parts["combat"]
@@ -118,6 +159,29 @@ class CombatEngine(Engine):
                 raise RuleViolation(f"Unplausible Aktionsrate: {name}={count} > {limit}")
 
     # ---- Berechnung (rein, deterministisch) ----------------------------------
+    def _validate_loadout(self, state: CharacterState, p: dict[str, Any]) -> None:
+        part = state.parts["combat"]
+        if set(p) != _LOADOUT_KEYS:
+            raise RuleViolation(f"Ungültige Felder (unzulässig: {sorted(set(p) - _LOADOUT_KEYS)}, fehlend: {sorted(_LOADOUT_KEYS - set(p))})")
+        day, chosen = p["day"], p["abilities"]
+        if not _is_int(day) or day < 0:
+            raise RuleViolation("day muss eine nichtnegative ganze Zahl sein")
+        if day < part["loadout_day"]:
+            raise RuleViolation("day darf nicht zurückspringen")
+        if not isinstance(chosen, list) or any(not isinstance(a, str) for a in chosen):
+            raise RuleViolation("abilities muss eine Liste von Namen sein")
+        if len(set(chosen)) != len(chosen):
+            raise RuleViolation("Fähigkeit doppelt gewählt")
+        slots = loadout_slots(state, self.rules)
+        if len(chosen) > slots:
+            raise RuleViolation(f"Nur {slots} Plätze verfügbar")
+        for a in chosen:
+            if a not in self.cfg["abilities"] or a.startswith("_"):
+                raise RuleViolation(f"Unbekannte Fähigkeit: {a}")
+            missing = ability_blockers(state, self.rules, a)
+            if missing:
+                raise RuleViolation(f"Fähigkeit {a} nicht freigeschaltet: {missing}")
+
     def _today(self, part: dict[str, Any], day: int) -> tuple[dict[str, int], dict[str, int]]:
         d = part["daily"]
         if day > d["day"]:
@@ -153,6 +217,9 @@ class CombatEngine(Engine):
 
     def apply(self, state: CharacterState, event: Event) -> None:
         part, pl = state.parts["combat"], event.payload
+        if event.type == LOADOUT_EVENT:
+            part["loadout"], part["loadout_day"] = list(pl["abilities"]), pl["day"]
+            return
         gains = self.compute_gains(state, pl)
         today, opponents = self._today(part, pl["day"])
         for dim, g in gains.items():
@@ -189,3 +256,48 @@ def style_profile(state: CharacterState, rules: Rules) -> dict[str, int]:
     points = state.parts["combat"]["points"]
     total = sum(points.values())
     return {d: (p * 1000 // total if total else 0) for d, p in points.items()}
+
+
+# ---- Fähigkeiten (abgeleitet aus der Entwicklung; ab rules_v9) --------------------------
+def ability_catalog(rules: Rules) -> dict[str, dict[str, Any]]:
+    return {k: v for k, v in rules["combat"].get("abilities", {}).items() if not k.startswith("_")}
+
+
+def ability_blockers(state: CharacterState, rules: Rules, ability: str) -> list[str]:
+    """Was einer Fähigkeit zur Freischaltung noch fehlt (leer = freigeschaltet). Nur Wachstumsgrößen -> dauerhaft."""
+    req = ability_catalog(rules)[ability]["requires"]
+    out: list[str] = []
+    if "direction" in req:
+        tier = reached_directions(state, rules).get(req["direction"], 0)
+        if tier < req["tier"]:
+            out.append(f"direction:{req['direction']}>={req['tier']}")
+    attuned = state.parts["element"]["attuned"]
+    out += [f"attuned:{e}" for e in req.get("elements_attuned", []) if e not in attuned]
+    if "min_level" in req and state.parts["identity"]["level"] < req["min_level"]:
+        out.append(f"level>={req['min_level']}")
+    if "essence_form" in req and state.parts["essence"]["form"] != req["essence_form"]:
+        out.append(f"form:{req['essence_form']}")
+    return out
+
+
+def unlocked_abilities(state: CharacterState, rules: Rules) -> list[str]:
+    return sorted(a for a in ability_catalog(rules) if not ability_blockers(state, rules, a))
+
+
+def ability_progress(state: CharacterState, rules: Rules) -> dict[str, dict[str, Any]]:
+    cat = ability_catalog(rules)
+    return {a: {"kind": d["kind"], "command": d["command"], "missing": ability_blockers(state, rules, a),
+                "equipped": a in state.parts["combat"].get("loadout", [])} for a, d in cat.items()}
+
+
+def loadout_slots(state: CharacterState, rules: Rules) -> int:
+    level = state.parts["identity"]["level"]
+    return max((n for lv, n in rules["combat"]["loadout"]["slots_by_level"] if level >= lv), default=0)
+
+
+def allowed_commands(state: CharacterState, rules: Rules) -> list[str]:
+    """Simulationsbefehle, die die Figur nutzen darf: Grundbefehle plus die der ausgerüsteten (freigeschalteten) Fähigkeiten."""
+    cfg = rules["combat"]
+    cat = ability_catalog(rules)
+    extra = {cat[a]["command"] for a in state.parts["combat"]["loadout"] if cat[a]["command"] is not None}
+    return sorted(set(cfg["loadout"]["base_commands"]) | extra)

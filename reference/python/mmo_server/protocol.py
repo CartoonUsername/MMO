@@ -3,7 +3,7 @@
 Ein Befehl ist eine **Absicht** des Spielers; er enthält nie Fortschritt, Ergebnisse, Zeit oder Preisreferenzen. Der Katalog
 legt je Befehl fest: Name, Argumente samt Typ, welches Argument die handelnde Figur ist (muss der Sitzung gehören) und den
 Aufruf in der Welt. Alles, was nicht im Katalog steht, ist für Clients nicht erreichbar (`INTERNAL_ONLY` nennt die bewusst
-nur serverinternen Operationen). Typkürzel: s = String, i = Ganzzahl (kein bool), b = bool, `?` = optional.
+nur serverinternen Operationen). Typkürzel: s = String, i = Ganzzahl (kein bool), b = bool, l = Liste von Strings (höchstens 16), `?` = optional.
 """
 from __future__ import annotations
 
@@ -57,6 +57,9 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("market.cancel", "char:s order:s", "char", lambda w, a: _res(w.exchange.cancel(a["char"], a["order"]))),
     _c("maker.sell", "char:s item_key:s qty:i", "char", lambda w, a: _res(_pricing(w).sell_to_maker(a["char"], a["item_key"], a["qty"]))),
     _c("maker.buy", "char:s item_key:s qty:i", "char", lambda w, a: _res(_pricing(w).buy_from_maker(a["char"], a["item_key"], a["qty"]))),
+    # Kampfentwicklung: Fähigkeiten ausrüsten (Tag setzt der Server)
+    _c("combat.set_loadout", "char:s abilities:l", "char",
+       lambda w, a: w.svc.record(a["char"], "combat.loadout_set", {"abilities": a["abilities"], "day": w.day[0]}).hash),
     # Firmen
     _c("company.found", "char:s capital:i", "char", lambda w, a: w.company.found(a["char"], a["capital"])),
     _c("company.close", "actor:s company:s", "actor", lambda w, a: _res(w.company.close_company(a["actor"], a["company"]))),
@@ -90,6 +93,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.disclosure", "company:s", None, lambda w, a: _res(w.company.disclosure(a["company"])), mutating=False),
     _c("query.inventory", "char:s", "char", lambda w, a: w.inv.holdings(a["char"]), mutating=False),
     _c("query.economic_profile", "char:s", "char", lambda w, a: w.svc.economic_profile(a["char"]), mutating=False),
+    _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}
 

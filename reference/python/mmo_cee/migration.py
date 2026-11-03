@@ -25,8 +25,15 @@ from .rules import Rules
 MIGRATION_TYPE = "identity.rules_migrated"
 MIGRATION_KEYS = frozenset({"from", "to", "state_sha256", "from_rules_sha256", "to_rules_sha256"})
 
+def _v8_to_v9(parts: dict[str, Any]) -> dict[str, Any]:
+    """v9 führt die Kampfausrüstung ein (combat.loadout/loadout_day); bestehender Fortschritt bleibt, die Ausrüstung ist leer."""
+    parts["combat"].setdefault("loadout", [])
+    parts["combat"].setdefault("loadout_day", 0)
+    return parts
+
+
 # (von, nach) -> Funktion Teilzustände -> Teilzustände (nur bei strukturellen Änderungen; v7 -> v8 braucht keine)
-STATE_MIGRATIONS: dict[tuple[str, str], Callable[[dict[str, Any]], dict[str, Any]]] = {}
+STATE_MIGRATIONS: dict[tuple[str, str], Callable[[dict[str, Any]], dict[str, Any]]] = {("8", "9"): _v8_to_v9}
 
 
 def parts_hash(parts: dict[str, Any]) -> str:

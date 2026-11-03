@@ -41,7 +41,7 @@ def rebuild(events, tamper=None):
 
 class RulesCatalogTests(unittest.TestCase):
     def test_available_and_older(self):
-        self.assertEqual(list(available_rules()), [str(i) for i in range(1, 9)])
+        self.assertEqual(list(available_rules()), [str(i) for i in range(1, 10)])
         self.assertEqual(list(older_rules(R["8"])), [str(i) for i in range(1, 8)])
         self.assertEqual(older_rules(R["1"]), {})
 

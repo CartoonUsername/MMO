@@ -19,4 +19,4 @@
 **Bekannte Grenzen / offen**
 - `state.encounters` wächst unbegrenzt; Snapshots/Archivierung folgen mit Persistenz (Roadmap 9). Pruning würde Replay-Schutz schwächen und braucht eigene Entscheidung.
 - Mehrere Accounts/Bots, Boosting zwischen kooperierenden Spielern: nicht durch diese Engine lösbar; Tageslimits dämpfen es nur.
-- Konkrete Fähigkeiten pro Richtung/Stufe sind nicht definiert.
+- Konkrete Fähigkeiten pro Richtung/Stufe: seit ADR-0020 (Regeln v9) als freischaltbare, ausrüstbare Fähigkeiten definiert; ihre Wirkung über die Befehlsfreigabe hinaus ist offen.
