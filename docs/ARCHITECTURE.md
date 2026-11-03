@@ -44,6 +44,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
 
+## Firmensimulation (ADR-0012)
+
+`mmo_world.CompanyRegistry` (Weltzustand: Kasse als Inventarkonto, Gebäudelevel = Kapazität, Unternehmenslevel aus Umsatz, Anteile, Mitarbeiter, Angebote, Anträge) und `CompanyService` (Gründung, Einstellung/Entlassung/Verträge, Beförderung bis Manager, Gebäudeausbau, Tagesabschluss mit Gehalt/Gewinnbeteiligung/Zufriedenheit/Loyalität/Warnung/Kündigung/Reputation, Abwerben, Anteile mit Vorkaufsrecht und Offenlegungsbestätigung, Gesellschafterbeschlüsse mit Gründer-Veto, Schließung mit Liquidation). Mitarbeiter sind Figuren; Laufbahn und Gründung laufen über die CEE-Ereignisse aus ADR-0011. Reine Regelfunktionen in `mmo_world/company.py`; Regeln `mmo_world/data/company_rules_v1.json` (Platzhalter).
+
 ## Economic Profile (ADR-0011)
 
 *Charakterseite* (`mmo_cee.economy`): `economy.trade_completed` (Referenzwert exakt aus Regeltabelle, Preisband, Wiederholungsabnahme je Handelspartner und Tag, Tageslimits, Netzwerkbonus nur für qualifizierte neue Partner), `economy.career_changed` (Karriereleiter mit Meisterschaft, Dienstzeit und Punkten; Beförderung nur eine Stufe; Firmenwechsel nur nach Austritt), `economy.company_founded`/`company_closed` (Gate, Höchstzahl offener Firmen, IDs nie wiederverwendbar). Abgeleitet: nicht-exklusive Handelsrichtungen und `economic_profile`. *Weltseite* (`mmo_world`): `TradeService` (atomare Übertragung von Ware und Münzen, beide Berichte vorab validiert, Rückbuchung bei Ausfall) und `Inventory.apply_many`. Schutz vor Scheinhandel: kein Selbsthandel, absurde Preise und Kleinsthandel bringen weder Volumen noch Netzwerk.

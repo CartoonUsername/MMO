@@ -4,9 +4,9 @@ Du übernimmst die technische Entwicklung eines langfristig geplanten Free-to-Pl
 
 ## 1. Repository und Zustand (verifiziert)
 - Repo `CartoonUsername/MMO`, Arbeitsbranch `claude/awesome-dirac-9k6p3n` (aktueller Stand: `git log -1`). Niemals direkt auf `main` arbeiten, kein Force-Push, keine Merges/PRs ohne Auftrag, kleine nachvollziehbare Commits (Co-Author-Zeilen laut Systemvorgabe).
-- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **379 Tests, alle grün.** Golden Vectors: `reference/golden` (22 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle).
+- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **477 Tests, alle grün.** Golden Vectors: `reference/golden` (22 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle).
 - Prüfen vor jeder Arbeit: `git status`, dann `cd reference/python && python -m unittest discover -s . -t . -v`, `python -m mmo_cee.golden check ../golden`, `python -m mmo_sim.golden check ../golden_sim`, `python -m mmo_cee.golden_visual check ../golden_visual`.
-- Dokumentation: `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/STATUS_REPORT.md`, `docs/decisions/ADR-0001…0011`, `reference/golden/README.md` (Format und Prüfverfahren für Portierungen), `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md`, `Game/ENGINE_COMPARISON_PROTOCOL.md`.
+- Dokumentation: `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/STATUS_REPORT.md`, `docs/decisions/ADR-0001…0012`, `reference/golden/README.md` (Format und Prüfverfahren für Portierungen), `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md`, `Game/ENGINE_COMPARISON_PROTOCOL.md`.
 - Wichtige Commits: `ba3d1b0` Kern + Identity/Element/Profession/Essence · `062b52c` Combat Development · `c6c5069` Golden Vectors · `aed6ca6` Kampfsimulation `mmo_sim` · `4a2a156` Wesensbewertung · `2efc9c3` Visual Evolution · `ee32e2c` Discovery · `ad54492` Crafting · danach Economic Profile (siehe `git log`).
 
 ## 2. Bestätigte Spielentscheidungen (nicht eigenmächtig ändern)
@@ -22,7 +22,7 @@ Du übernimmst die technische Entwicklung eines langfristig geplanten Free-to-Pl
 ## 3. Architektur (Leitprinzipien)
 1. **Event Sourcing mit Hash-Kette je Charakter** (`history.py`): Zustand ist nur Ableitung (Replay) aus append-only Ereignissen (Charakter-ID, seq, Typ, Payload, `rules_version`, `schema_version`, prev_hash, hash). Abgelehnte Ereignisse werden nicht aufgezeichnet und ändern nichts.
 2. **Engines** (`engine.py`): je ein Teilzustand `state.parts[name]`, `validate` (wirft `RuleViolation`) und `apply`. Engines sind nur aktiv, wenn die Regeln den passenden Abschnitt enthalten (ältere Regelversionen bleiben bit-identisch lauffähig).
-3. **Daten statt Code**: Regeln in versionierten JSON-Dateien (`mmo_cee/data/rules_v1…v7.json`, `visual_rules_v1.json`, `mmo_sim/data/sim_rules_v1.json`). Regelversionen sind **unveränderlich**; Erweiterung = neue Datei. Regeln werden beim Start auf Konsistenz geprüft.
+3. **Daten statt Code**: Regeln in versionierten JSON-Dateien (`mmo_cee/data/rules_v1…v7.json`, `visual_rules_v1.json`, `mmo_sim/data/sim_rules_v1.json`, `mmo_world/data/company_rules_v1.json`). Regelversionen sind **unveränderlich**; Erweiterung = neue Datei. Regeln werden beim Start auf Konsistenz geprüft.
 4. **Ganzzahlen** (Promille, Floor-Division) für bit-identische Ergebnisse bei einer späteren Portierung (C++/C#/Rust). Keine Gleitkommazahlen in Regeln/Zuständen.
 5. **Vertrauensgrenze**: Der Client sendet nie Fortschritt. Berichte (Kampf, Herstellung), Entscheidungen, Beweise, Prüfungen und Lehren kommen vom Spielserver; die Engines begrenzen Schaden (Eindeutigkeit, Raten, Limits, Reihenfolge), können Fälschungen mit plausiblem Inhalt aber nicht erkennen.
 6. **Anti-Farming-Muster** (Kampf, Handwerk): serverseitig vergebene eindeutige IDs je Figur, strikte Payload-Felder, Plausibilitätsgrenzen, Wiederholungsabnahme je Gegner/Rezept und Tag, Tageslimits (voll → reduziert → hart). Mit den Standardwerten greift die Wiederholungsabnahme deutlich vor dem Tageslimit (Balancing-Hinweis).
@@ -50,6 +50,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - **`mmo_world.DiscoveryRegistry` + `DiscoveryService`**: Pionier, Halter, **endliches Lehrfenster** (nur der Pionier darf lehren; danach jeder Halter); unabhängige Forschung ist immer möglich; persönliche Entdeckungen nie lehrbar; transaktional mit der CEE (Rollback).
 - **`mmo_world.Inventory` + `CraftingService`**: atomares Inventar (keine negativen Bestände), Herstellung deterministisch: Voraussetzungen → Qualität → Eingaben entnehmen → CEE-Bericht → Ausgaben; vollständiger Rollback; Berufserfahrung nur aus gedeckelten Punkten; ohne Material keine Produktion.
 - **`mmo_world.TradeService`**: Handel zwischen zwei Figuren mit atomarer Übertragung von Ware und Münzen (`Inventory.apply_many`), beide CEE-Berichte vorab validiert, Rückbuchung bei Ausfall; Währung `coin@gold` entsteht nur serverintern; Ware und Münzen werden über viele Handel erhalten (Test).
+- **`mmo_world.CompanyRegistry` + `CompanyService`** (Firmensimulation, ADR-0012): Kasse als Inventarkonto, Gebäudelevel (Kapazität) getrennt vom Unternehmenslevel (aus Umsatz), Mitarbeiter = Figuren (Spieler/NPC gleich) mit Gehalt, Gewinnbeteiligung, Zufriedenheit, Loyalität, persönlichem Ziel, Warnung → Kündigungsabsicht → Kündigung; Tagesabschluss (`advance_day`); **Abwerben** als transparente, zufallsfreie Entscheidung; **Anteile** mit Vorkaufsrecht (nur Gesellschafter in der Frist), Offenlegungsbestätigung vor dem Kauf, Mitarbeiterbeteiligung mit Obergrenze; **Gesellschafterbeschlüsse** (Stimmgewichte als Snapshot, Gründer-Veto, Geschäftsführer bestellen/abberufen → CEE-Beförderung); Eigentümer ≠ Geschäftsführer; Schließung mit anteiliger Liquidation. Laufbahn/Gründung laufen über die CEE-Ereignisse; ein Test prüft für jede Figur Register == CEE.
 
 ## 6. Qualitätsstandard (bitte beibehalten)
 - Jede wichtige Funktion mit `unittest`-Tests (ungültige Eingaben, Duplikate, NPCs, Replay, Determinismus, Rollback), Regeländerungen nur als neue Regelversion, Architekturentscheidungen in ADRs, Doku im selben Commit.
@@ -58,7 +59,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Vor jedem Commit: gesamte Suite + alle Golden-Prüfungen grün; neue Verhaltensänderung = neue Regelversion + Vektoren neu erzeugen; bisherige Vektoren müssen byte-identisch bleiben.
 
 ## 7. Bekannte offene Punkte
-- Firmensimulation (Mitarbeiter, Gehälter, Loyalität, Abwerben, Anteile/Stimmrechte, Gewinnbeteiligung, Filialen), Märkte/Preisbildung/NPC-Wirtschaft/Logistik, Offline-Produktion, Spielerstädte, Technologie-Etablierung je Region, Kampfechos – nicht begonnen (die CEE nimmt Laufbahn-/Gründungsereignisse bereits entgegen).
+- Produktion/Offline-Produktion und Aufträge/Kunden der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft/Logistik, Spielerstädte, Technologie-Etablierung je Region, Kampfechos – nicht begonnen. Der Unternehmenslevel hat noch keine Wirkung; Golden Vectors für die Weltseite (Registry, Inventar, Handel, Herstellung, Firmen) fehlen.
 - Kampf: nur 1:1, kein Raum/Winkel, keine Unterstützungsaktionen/Gruppen in der Simulation (die CEE kennt `ally_heal`/`ally_shield`), keine konkreten Fähigkeiten.
 - Handwerk: Werkzeuge/Werkstätten, Herstellungsdauer, Materialgewinnung, Experimentieren, Rezepte als Gegenstand fehlen.
 - Wesen/Visual: Wirkung der Modifikatoren auf Kampf/Bewegung; echte Optik/Assets; Ausrüstung/Kosmetik; Übergangsanimationen; Handwerksrichtungen noch nicht an Wesen/Visual angebunden.
@@ -71,10 +72,11 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Diese Sandbox ist eine Cloud-Linux-Umgebung ohne GPU und ohne Zugang zu RunPod/SSH; niemals private Schlüssel, Passwörter oder Tokens anfordern oder im Repo/Chat speichern.
 
 ## 9. Vorgeschlagene nächste Schritte (Vorschläge, nicht beschlossen)
-1. **Firmensimulation** (`mmo_world`): Unternehmensregister, Mitarbeiter/Gehälter/Loyalität/Anteile; sie löst die bereits vorhandenen Laufbahn- und Gründungsereignisse der CEE aus. Danach Märkte/Preisbildung (ersetzen die statische Referenztabelle).
-2. Golden Vectors für die Weltseite; Persistenz-/Snapshot-Konzept und Regel-Migration.
-3. Server-/Protokoll-Schnittstelle planen (PostgreSQL/Redis, Regionen/Instanzen noch offen) und Übergang zur Engine-Phase; Engine-Vergleich nur mit klarem Budget.
-4. Kampf erweitern (Gruppen, Unterstützung, Raum), Kampfechos als eigenes System konzipieren.
+1. **Golden Vectors der Weltseite** (Registry, Inventar, Handel, Herstellung, Firmen – inkl. Floor-Division bei negativen Werten) und Persistenz-/Migrationskonzept, damit auch die Weltlogik portierbar ist.
+2. **Märkte/Preisbildung** (ersetzen die statische Referenztabelle) und **Firmenproduktion/Offline-Produktion** mit Kapazität, Lager, Kosten und Grenzen.
+3. Snapshots/Archivierung und Regel-Migration.
+4. Server-/Protokoll-Schnittstelle planen (PostgreSQL/Redis, Regionen/Instanzen noch offen) und Übergang zur Engine-Phase; Engine-Vergleich nur mit klarem Budget.
+5. Kampf erweitern (Gruppen, Unterstützung, Raum), Kampfechos als eigenes System konzipieren.
 
 ## 10. Arbeitsregeln
 Keine unnötigen Rückfragen bei rein technischen Entscheidungen; Spielentscheidungen nicht eigenmächtig verändern; Vorschläge und Platzhalter deutlich markieren; nichts als fertig deklarieren, was nur Schnittstelle ist; ehrlich über Testergebnisse, Fehlschläge und Grenzen berichten; bestehende Module nicht überschreiben, sondern abwärtskompatibel erweitern.

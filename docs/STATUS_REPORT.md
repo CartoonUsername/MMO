@@ -11,16 +11,16 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 | Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
 | Implementierte Engines | Identity, Element, Profession, Essence, Combat Development, Visual Evolution, Discovery, Crafting, **Economic Profile** + Character History (Event-Log, Hash-Kette, Replay) |
 | Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung), `rules_v4.json` (v3 + Wesensbewertung mit Entscheidungen, ADR-0007), `rules_v5.json` (v4 + Entdeckungen, geheime Wesensform, ADR-0009), `rules_v6.json` (v5 + Handwerk: Rezepte, Techniken, ADR-0010), `rules_v7.json` (v6 + Wirtschaft: Handel, Laufbahn, Gründung, ADR-0011); v1–v6 unverändert, Standard ist v7 |
-| Tests | **379** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
-| Weltzustand | `reference/python/mmo_world/` – `DiscoveryRegistry` (Pionier, Lehrfenster), `DiscoveryService` (transaktional mit der CEE), `Inventory` (atomar), `CraftingService` (Herstellung, ADR-0010) und `TradeService` (Handel, ADR-0011) |
+| Tests | **477** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Weltzustand | `reference/python/mmo_world/` – `DiscoveryRegistry` (Pionier, Lehrfenster), `DiscoveryService` (transaktional mit der CEE), `Inventory` (atomar), `CraftingService` (Herstellung, ADR-0010) `TradeService` (Handel, ADR-0011) sowie `CompanyRegistry`/`CompanyService` (Firmensimulation, ADR-0012; Regeln `company_rules_v1.json`) |
 | Kampfsimulation | `reference/python/mmo_sim/` – deterministischer 1:1-Kampfkern, `EncounterServer` (ADR-0006), `sim_rules_v1.json` (vorläufige Werte) |
 | Golden Test Vectors | `reference/golden/` (CEE, 22 Szenarien, `mmo_cee.golden`) `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`) und `reference/golden_visual/` (Visual Evolution, 21 Fälle, `mmo_cee.golden_visual`); Format: `reference/golden/README.md` |
-| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0011, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
+| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0012, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
 | Unreal-Projekt | nicht vorhanden (bewusst; erst nach Windows-Checkliste und Freigabe) |
 
 ## Noch nicht implementiert
 
-Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Gruppen-/Raumkampf und Unterstützungsaktionen in der Simulation, Firmensimulation (Mitarbeiter, Gehälter, Loyalität, Anteile), Märkte/Preisbildung/NPC-Wirtschaft, Werkzeuge/Werkstätten/Materialgewinnung, Wirkung der Entdeckungen auf Wirtschaft/Städte, Persistenz von Registry und Inventar, echte Optik/Assets zur Visual Evolution (nur Parametermechanik), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
+Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Gruppen-/Raumkampf und Unterstützungsaktionen in der Simulation, Produktion/Offline-Produktion/Aufträge der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft, Werkzeuge/Werkstätten/Materialgewinnung, Wirkung der Entdeckungen auf Wirtschaft/Städte, Persistenz von Registry und Inventar, echte Optik/Assets zur Visual Evolution (nur Parametermechanik), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
 
 ## Nicht bestätigte Inhalte (Vorschläge)
 
@@ -48,6 +48,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 11. `2efc9c3` Visual Evolution Engine, 199 Tests.
 12. `ee32e2c` Discovery Engine (CEE + `mmo_world`), Regeln v5, Schutz vor Replay unter fremder Regelversion, 250 Tests.
 13. `ad54492` Crafting Engine (CEE + Inventar/Herstellung in `mmo_world`), Regeln v6, 315 Tests.
-14. (dieser Stand) Economic Profile (CEE + Handelsdienst in `mmo_world`), Regeln v7, 379 Tests – damit sind alle zehn CEE-Engines als Referenz umgesetzt.
+14. `a4221dc` Economic Profile (CEE + Handelsdienst in `mmo_world`), Regeln v7, 379 Tests – damit sind alle zehn CEE-Engines als Referenz umgesetzt.
+15. (dieser Stand) Firmensimulation in `mmo_world` (ADR-0012), 477 Tests.
 
 Plan: `docs/ROADMAP.md`.

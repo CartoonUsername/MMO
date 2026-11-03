@@ -39,19 +39,22 @@ class Inventory:
         self.apply(owner, {}, {item_key: qty})
 
     def apply(self, owner: str, remove: dict[str, int], add: dict[str, int]) -> None:
-        """Entfernt und fügt hinzu – vollständig oder gar nicht."""
+        """Entfernt und fügt hinzu – vollständig oder gar nicht. Leere Besitzer werden nicht angelegt/entfernt."""
         self._check(remove)
         self._check(add)
-        stacks = self._stacks.setdefault(owner, {})
+        have = self._stacks.get(owner, {})
         for k, n in remove.items():
-            if stacks.get(k, 0) < n:
-                raise WorldError(f"Nicht genug {k}: {stacks.get(k, 0)} < {n}")
+            if have.get(k, 0) < n:
+                raise WorldError(f"Nicht genug {k}: {have.get(k, 0)} < {n}")
+        stacks = self._stacks.setdefault(owner, {})
         for k, n in remove.items():
             stacks[k] -= n
             if stacks[k] == 0:
                 del stacks[k]
         for k, n in add.items():
             stacks[k] = stacks.get(k, 0) + n
+        if not stacks:
+            del self._stacks[owner]
 
     def apply_many(self, ops: list[tuple[str, dict[str, int], dict[str, int]]]) -> None:
         """Mehrere Besitzer atomar ändern: erst alle Entnahmen prüfen, dann alles ausführen (oder nichts)."""

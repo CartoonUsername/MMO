@@ -6,3 +6,5 @@ requires-python = ">=3.11"
 
 [tool.setuptools.package-data]
 mmo_cee = ["data/*.json"]
+mmo_sim = ["data/*.json"]
+mmo_world = ["data/*.json"]

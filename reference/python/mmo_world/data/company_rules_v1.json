@@ -1,0 +1,37 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: alle Zahlen, Schwellen, Gebäudestufen, Ziele und Governance-Werte sind Vorschläge, KEINE bestätigten Spielinhalte. Ganzzahlen; Divisionen als Floor. Mitarbeiter sind Figuren (Spieler und NPCs gleich).",
+  "requires_cee_rules_min": 7,
+  "founding": {"capital_min": 1000, "total_shares": 1000},
+  "building_levels": [
+    {"level": 1, "max_employees": 5, "storage": 200, "upgrade_cost": 0},
+    {"level": 2, "max_employees": 12, "storage": 600, "upgrade_cost": 5000},
+    {"level": 3, "max_employees": 30, "storage": 2000, "upgrade_cost": 20000}
+  ],
+  "company_level_thresholds": [0, 10000, 50000, 200000],
+  "wages": {
+    "min_daily": 5,
+    "base_by_role": {"employee": 20, "specialist": 40, "department_head": 70, "manager": 110, "executive": 180},
+    "per_mastery": 3,
+    "max_profit_share_permille": 300,
+    "max_total_profit_share_permille": 500
+  },
+  "goals": ["wage", "growth", "stability"],
+  "satisfaction": {
+    "initial": 600, "wage_ratio_step": 20, "wage_delta_min": -40, "wage_delta_max": 20,
+    "unpaid_penalty": 30, "profit_share_bonus": 5, "crowding_threshold_permille": 800, "crowding_penalty": 5,
+    "reputation_divisor": 200, "goal_stability_bonus": 3, "goal_growth_bonus": 3, "goal_growth_penalty": 2,
+    "growth_window_days": 30, "wage_goal_numer": 3, "wage_goal_denom": 2
+  },
+  "loyalty": {"initial": 300, "high_satisfaction": 600, "low_satisfaction": 300, "gain": 2, "loss": 3,
+              "tenure_bonus_every_days": 30, "tenure_bonus": 1},
+  "warnings": {"warn_satisfaction": 400, "warned_days": 3, "intent_days": 7, "quit_base_days": 10,
+               "quit_loyalty_divisor": 100, "decay": 1},
+  "reputation": {"initial": 500, "paid_gain": 2, "unpaid_loss": 25, "happy_satisfaction": 600, "happy_gain": 1},
+  "poaching": {"switch_cost": 100, "loyalty_divisor": 2, "satisfaction_divisor": 4, "reputation_divisor": 4,
+               "stability_bonus": 100, "growth_bonus": 150, "max_ratio": 2000},
+  "governance": {"decision_threshold_permille": 500, "founder_veto": true, "founder_veto_min_permille": 100,
+                 "preemption_days": 7, "vote_days": 5, "max_employee_equity_permille": 100},
+  "max_catch_up_days": 30,
+  "log_limit": 200
+}
