@@ -16,7 +16,8 @@ if command -v nvidia-smi >/dev/null && nvidia-smi >/dev/null 2>&1; then
 else
   fail "nvidia-smi nicht nutzbar -> Pod hat keinen GPU-Zugriff. SOFORT STOPPEN (Kosten!)."
 fi
-ls /dev/nvidia0 >/dev/null 2>&1 && ok "/dev/nvidia0 vorhanden" || fail "/dev/nvidia0 fehlt"
+# Geräteknoten sind je nach Container unterschiedlich nummeriert; entscheidend ist, dass nvidia-smi läuft.
+echo "Geräte: $(ls /dev/nvidia* 2>/dev/null | tr '\n' ' ')"
 
 echo "== Grafik (für Engine-Tests)"
 if command -v vulkaninfo >/dev/null; then
@@ -26,6 +27,10 @@ else
   warn "vulkaninfo nicht installiert (apt install vulkan-tools)"
 fi
 [ -d /dev/dri ] && ok "/dev/dri vorhanden" || warn "/dev/dri fehlt (kein direktes Rendering im Desktop)"
+
+echo "Vulkan-ICD-Dateien: $(ls /usr/share/vulkan/icd.d /etc/vulkan/icd.d 2>/dev/null | tr '\n' ' ')"
+echo "NVIDIA-Grafikbibliotheken: $(ldconfig -p 2>/dev/null | grep -c -i -E 'libGLX_nvidia|libnvidia-glcore|libnvidia-vulkan')"
+sudo -n true 2>/dev/null && ok "sudo ohne Passwort verfügbar" || warn "kein sudo (apt install nicht möglich)"
 
 echo "== Werkzeuge"
 for t in git python3 gcc curl; do command -v "$t" >/dev/null && ok "$t $($t --version 2>&1 | head -1)" || warn "$t fehlt"; done
