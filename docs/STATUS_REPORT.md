@@ -10,11 +10,11 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 |---|---|
 | Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
 | Implementierte Engines | Identity, Element, Profession, Essence, **Combat Development** + Character History (Event-Log, Hash-Kette, Replay) |
-| Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung); v1/v2 unverändert, Standard ist v3 |
-| Tests | **140** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung), `rules_v4.json` (v3 + Wesensbewertung mit Entscheidungen, ADR-0007); v1–v3 unverändert, Standard ist v4 |
+| Tests | **166** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
 | Kampfsimulation | `reference/python/mmo_sim/` – deterministischer 1:1-Kampfkern, `EncounterServer` (ADR-0006), `sim_rules_v1.json` (vorläufige Werte) |
-| Golden Test Vectors | `reference/golden/` (CEE, 9 Szenarien, `mmo_cee.golden`) und `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`); Format: `reference/golden/README.md` |
-| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0005, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
+| Golden Test Vectors | `reference/golden/` (CEE, 12 Szenarien, `mmo_cee.golden`) und `reference/golden_sim/` (Simulation, 61 Fälle, `mmo_sim.golden`); Format: `reference/golden/README.md` |
+| Dokumentation | `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, ADR-0001 bis ADR-0007, `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md` |
 | Unreal-Projekt | nicht vorhanden (bewusst; erst nach Windows-Checkliste und Freigabe) |
 
 ## Noch nicht implementiert
@@ -23,7 +23,7 @@ Konkrete Kampffähigkeiten (nur Entwicklungsrichtungen und Stufen), Gruppen-/Rau
 
 ## Nicht bestätigte Inhalte (Vorschläge)
 
-- Wesensformen in den Regeldateien (`ember_kin`, …, `umbral_kin` in v3) sind Platzhalter zur Mechanikprüfung.
+- Wesensformen, Gewichte, Schwellen, Entscheidungen und Vor-/Nachteile in den Regeldateien (`ember_kin`, `umbral_kin`, `stone_born`, `tide_walker`, `grove_warden`) sind Platzhalter zur Mechanikprüfung.
 - Kampfdimensionen (Kraft, Präzision, Mobilität, Kontrolle, Verteidigung, Unterstützung), Aktionstypen, Entwicklungsrichtungen (`vanguard`, `duelist`, …), alle Gewichte, Schwellen, Tageslimits und Raten in `rules_v2.json` sind **vorläufige technische Vorschläge**, kein beschlossenes Balancing.
 - Bestätigte Spielentscheidungen aus dem Briefing (9 Elemente, max. 2 + 1 Endgame-Element, dauerhafte Wesensform, Start als Mensch, serverseitige Entwicklung, Spieler und NPCs gleiche Pipeline) sind unverändert umgesetzt.
 
@@ -42,6 +42,8 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 7. `e608983`..`007b950` RunPod-Prüfskript, Engine-Vergleichsprotokoll (Entwurf).
 7. `c6c5069` Golden Test Vectors, 96 Tests.
 8. `aed6ca6` Serverseitiger Kampfkern `mmo_sim`, 128 Tests.
-9. (dieser Stand) Golden Vectors der Simulation, 140 Tests.
+9. `428e9ba` Golden Vectors der Simulation, 140 Tests.
+10. `4a2a156` Wesensbewertung (rules v4), 166 Tests.
+11. (dieser Stand) Dokumentation zur Wesensbewertung nachgezogen.
 
 Plan: `docs/ROADMAP.md`.

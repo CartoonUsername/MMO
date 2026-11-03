@@ -48,7 +48,7 @@ Schritt: `{type, payload, expect, [seq, event_hash], state_sha256}`
 
 ## Szenarien
 
-`identity_basic`, `element_limits`, `profession_mastery`, `essence_path`, `combat_validation`, `combat_antifarm`, `combat_directions_umbral`, `npc_pipeline`, `rules_v1_without_combat`. Zusammen decken sie jeden Ereignistyp mit akzeptierten **und** abgelehnten Beispielen ab (durch Test erzwungen).
+`identity_basic`, `element_limits`, `profession_mastery`, `essence_path`, `combat_validation`, `combat_antifarm`, `combat_directions_umbral`, `npc_pipeline`, `rules_v1_without_combat` (Regeln v1–v3 bzw. v1) sowie `essence_scoring_ember`, `essence_decision_path`, `essence_npc_two_candidates` (Regeln v4: Wesensbewertung, Entscheidungen; `derived` enthält dort zusätzlich `essence_scores` und `essence_profile`). Zusammen decken sie jeden Ereignistyp mit akzeptierten **und** abgelehnten Beispielen ab (durch Test erzwungen).
 
 ## Simulation (`reference/golden_sim/sim_fights.json`)
 

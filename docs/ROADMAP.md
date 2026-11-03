@@ -9,7 +9,7 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 3 | Identity, Element, Profession, Essence (Basisregeln) | erledigt |
 | 4 | Combat Development Engine: Metriken, Richtungen, Anti-Farming | **erledigt** (Fähigkeiten-Freischaltung bleibt offen, bis Fähigkeiten beschlossen sind) |
 | 4b | Serverseitiger Kampfkern `mmo_sim` (1:1, Berichte aus Simulation) | **erledigt** (ADR-0006); Golden Vectors der Simulation erledigt; offen: Unterstützung/Gruppen, Raum/Geometrie |
-| 5 | Wesensmatrix erweitern (Kampfrichtungen als Wesensvoraussetzung: **erledigt**, rules_v3; offen: mehr Formen, Gewichtung statt harter Schwellen, Entscheidungsereignisse) (mehr Formen, Gewichtung statt harter Schwellen, Entscheidungsereignisse) | offen |
+| 5 | Wesensmatrix erweitern: gewichtete Bewertung, Entscheidungsereignisse, Vor-/Nachteile (rules_v4, ADR-0007) | **erledigt** (Mechanik); offen: echte Formen/Inhalte, Wirkung der Modifikatoren, geheime Formen über Discovery |
 | 6 | Discovery + Crafting (Rezept-/Verfahrensentdeckung, Seltenheit) | offen |
 | 7 | Economic Profile (Handel, Unternehmen, Karriere) | offen |
 | 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | offen |
