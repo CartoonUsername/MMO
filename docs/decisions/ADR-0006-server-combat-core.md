@@ -17,4 +17,4 @@
 - Zeitlimit zählt als `fled` (Vorschlag); Mindestdauer des Berichts 5 s (CEE-Minimum), kürzere Kämpfe werden aufgerundet.
 - Dummy-/Mob-Farming wird durch die CEE-Wiederholungsabnahme auf 10 % des Ertrags begrenzt; das Tageslimit greift gegen *denselben* Gegnertyp praktisch nie. Ob das Spielziel ist, ist eine Balancingfrage.
 - Boosting zwischen kooperierenden Spielern und Mehrfachaccounts bleibt ungelöst.
-- Die Simulation ist noch nicht durch Golden Vectors abgesichert (Portierung später relevant).
+- Die Simulation ist durch Golden Vectors abgesichert (`reference/golden_sim/`, 61 Fälle inkl. ungültiger Eingaben; Ausdauer-, Parade- und Zeitfenster-Mutationen werden erkannt).

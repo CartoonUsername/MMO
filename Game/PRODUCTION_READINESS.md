@@ -17,7 +17,7 @@ Installationsschritte: `Game/WINDOWS_SETUP_CHECKLIST.md`.
 | Punkt | Befund |
 |---|---|
 | Inhalt | `docs/` (Zustandsbericht, Architektur, Roadmap, 2 ADRs), `reference/python/mmo_cee/` (Event-Log, Identity/Element/Profession/Essence-Engine), `README.md` |
-| Tests | 128 `unittest`-Tests (Stand Combat Engine), alle grün |
+| Tests | 140 `unittest`-Tests (Stand Combat Engine), alle grün |
 | Unreal-Projekt | **nicht vorhanden** (`.uproject`, C++-Module, Content fehlen) |
 | Neu in diesem Schritt | `Game/` (diese Doku + Checkliste, `Game/.gitignore`) und `.gitattributes` (Git-LFS-Regeln). Kein bestehender Code geändert. |
 | Branches | `main` unverändert; Arbeit nur auf `claude/awesome-dirac-9k6p3n`; kein Merge |

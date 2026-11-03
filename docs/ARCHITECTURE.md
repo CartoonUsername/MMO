@@ -46,7 +46,7 @@ Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen
 
 ## Serverseitiger Kampfkern `mmo_sim` (ADR-0006)
 
-Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur Befehle; die Simulation entscheidet über Treffer, Ausweichen, Block, Parade, Betäubung und Verlangsamung und erzeugt daraus den Begegnungsbericht für `combat.encounter_resolved`. `EncounterServer` vergibt IDs, Gegner, Stufe und Tag. Die Verträglichkeit mit den CEE-Plausibilitätslimits wird rechnerisch (`check_compatibility`) und durch Spam-Tests geprüft. Alle Zahlen sind vorläufig.
+Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur Befehle; die Simulation entscheidet über Treffer, Ausweichen, Block, Parade, Betäubung und Verlangsamung und erzeugt daraus den Begegnungsbericht für `combat.encounter_resolved`. `EncounterServer` vergibt IDs, Gegner, Stufe und Tag. Die Verträglichkeit mit den CEE-Plausibilitätslimits wird rechnerisch (`check_compatibility`) und durch Spam-Tests geprüft. Alle Zahlen sind vorläufig. Absicherung: `reference/golden_sim/` (Golden Vectors der Simulation).
 
 ## Golden Test Vectors (ADR-0005)
 

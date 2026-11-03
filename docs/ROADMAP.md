@@ -8,7 +8,7 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 2 | Kern: Event-Log mit Hash-Kette, Projector, Regel-Loader | erledigt |
 | 3 | Identity, Element, Profession, Essence (Basisregeln) | erledigt |
 | 4 | Combat Development Engine: Metriken, Richtungen, Anti-Farming | **erledigt** (Fähigkeiten-Freischaltung bleibt offen, bis Fähigkeiten beschlossen sind) |
-| 4b | Serverseitiger Kampfkern `mmo_sim` (1:1, Berichte aus Simulation) | **erledigt** (ADR-0006); offen: Unterstützung/Gruppen, Raum/Geometrie, Golden Vectors für die Simulation |
+| 4b | Serverseitiger Kampfkern `mmo_sim` (1:1, Berichte aus Simulation) | **erledigt** (ADR-0006); Golden Vectors der Simulation erledigt; offen: Unterstützung/Gruppen, Raum/Geometrie |
 | 5 | Wesensmatrix erweitern (Kampfrichtungen als Wesensvoraussetzung: **erledigt**, rules_v3; offen: mehr Formen, Gewichtung statt harter Schwellen, Entscheidungsereignisse) (mehr Formen, Gewichtung statt harter Schwellen, Entscheidungsereignisse) | offen |
 | 6 | Discovery + Crafting (Rezept-/Verfahrensentdeckung, Seltenheit) | offen |
 | 7 | Economic Profile (Handel, Unternehmen, Karriere) | offen |

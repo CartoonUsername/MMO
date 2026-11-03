@@ -50,4 +50,16 @@ Schritt: `{type, payload, expect, [seq, event_hash], state_sha256}`
 
 `identity_basic`, `element_limits`, `profession_mastery`, `essence_path`, `combat_validation`, `combat_antifarm`, `combat_directions_umbral`, `npc_pipeline`, `rules_v1_without_combat`. Zusammen decken sie jeden Ereignistyp mit akzeptierten **und** abgelehnten Beispielen ab (durch Test erzwungen).
 
+## Simulation (`reference/golden_sim/sim_fights.json`)
+
+Erzeugt/geprüft mit `python -m mmo_sim.golden write|check ../golden_sim` (Regeln: `mmo_sim/data/sim_rules_v1.json`, per SHA-256 gebunden).
+
+Datei: Kopfzeile mit `format`, `name`, `rules_file`, `rules_sha256`, dann `cases` (ein Fall pro Zeile). Fall: `{name, opponent_type, player_level, inputs, expect, [result, report]}`.
+
+- `inputs`: Liste `[tick, befehl]`, Befehle `light heavy dodge block stun slow flee`.
+- `expect: "ok"`: `result = {outcome, ticks, actions, player_hp, opponent_hp, ignored_inputs, damage_ticks}`; `report` = erwarteter CEE-Bericht (Begegnungs-ID `golden-<name>`, Tag 1) oder `null`, wenn keine Aktion stattfand.
+- `expect: "error"`: ungültige Eingabe (Typ, Bereich, Reihenfolge, Menge, unbekannter Gegner/Stufe); es wird nichts simuliert.
+- Die Simulation ist rein ganzzahlig (Tick = 100 ms). Ereignisreihenfolge je Tick: Spielerbefehle, schwerer Treffer, Sieg-Prüfung, Gegner, Niederlage-Prüfung, Ausdauer-Regeneration (siehe `mmo_sim/fight.py`).
+- Pseudozufällige Eingabemuster nutzen einen festen LCG (`x' = (1103515245·x + 12345) mod 2^31`); die Eingaben stehen aber ausgeschrieben in der Datei.
+
 Inhalte wie Wesensformen, Kampfrichtungen und Zahlen sind vorläufige Vorschläge; die Vektoren sichern nur, dass Implementierungen sie gleich behandeln.
