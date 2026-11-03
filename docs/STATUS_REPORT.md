@@ -27,3 +27,10 @@ Siehe `docs/ARCHITECTURE.md` und `docs/decisions/`. Die Spielentscheidungen aus 
 ## Priorisierter Entwicklungsplan
 
 Siehe `docs/ROADMAP.md`.
+
+## Stand nach erster Implementierung (Folgecommit)
+
+- `reference/python/mmo_cee/`: Event-Log mit Hash-Kette, Projector (Replay), Identity-, Element-, Profession- und Essence-Engine, versionierte Regeln (`rules_v1.json`).
+- 36 Tests (`unittest`), alle grün.
+- Die vier Wesensformen in `rules_v1.json` sind **Platzhalter-Vorschläge** zur Verifikation der Mechanik, keine bestätigten Spielinhalte.
+- Nicht implementiert: Combat Development, Discovery, Crafting, Economic Profile, Visual Evolution (nur Schnittstellen in `interfaces.py`).

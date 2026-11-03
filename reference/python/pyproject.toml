@@ -1,0 +1,8 @@
+[project]
+name = "mmo-cee"
+version = "0.1.0"
+description = "Character Evolution Engine - Python reference implementation"
+requires-python = ">=3.11"
+
+[tool.setuptools.package-data]
+mmo_cee = ["data/*.json"]

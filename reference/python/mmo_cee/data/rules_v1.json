@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "identity": {
+    "classes": ["warrior", "shaman_alchemist", "archer"],
+    "level_xp_unit": 100,
+    "max_level": 50
+  },
+  "elements": {
+    "all": ["fire", "water", "shadow", "light", "wind", "earth", "electric", "ice", "nature"],
+    "attunement_threshold": 100,
+    "max_regular": 2,
+    "max_total": 3,
+    "third_element_min_level": 40
+  },
+  "professions": {
+    "all": ["smithing", "alchemy", "farming", "mining", "construction", "woodworking", "trade", "logistics", "research", "architecture", "engineering"],
+    "mastery_thresholds": [100, 300, 700, 1500, 3000, 6000, 12000, 24000, 48000, 96000]
+  },
+  "essence": {
+    "_comment": "Platzhalter-Formen zur Verifikation der Mechanik; Namen/Balancing sind Vorschläge, keine bestätigten Spielinhalte.",
+    "forms": {
+      "ember_kin": {"min_level": 10, "attuned_all": ["fire"], "professions": {"smithing": 3}},
+      "stone_born": {"min_level": 10, "attuned_all": ["earth"], "professions": {"mining": 3}},
+      "tide_walker": {"min_level": 10, "attuned_all": ["water"], "professions": {"logistics": 2}},
+      "grove_warden": {"min_level": 10, "attuned_all": ["nature"], "professions": {"farming": 3}}
+    }
+  }
+}
