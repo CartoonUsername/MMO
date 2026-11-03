@@ -20,23 +20,13 @@ from pathlib import Path
 from typing import Any, Callable
 
 from mmo_cee.errors import RuleViolation
-from mmo_cee.golden import state_hash
 from mmo_cee.history import _canonical as canonical_bytes
-from mmo_cee.rules import load_rules
-from mmo_cee.service import CharacterService
 
-from .company import CompanyRegistry, goal_of, load_company_rules
-from .company_service import CompanyService
-from .crafting import CraftingService
-from .discovery import DiscoveryRegistry
+from .company import goal_of, load_company_rules
 from .errors import WorldError
-from .inventory import Inventory
-from .market import TradeService
-from .service import DiscoveryService
+from .world import CEE_RULES, COMPANY_RULES, World
 
 FORMAT_VERSION = 1
-CEE_RULES = "rules_v7.json"
-COMPANY_RULES = "company_rules_v1.json"
 Op = dict[str, Any]
 
 
@@ -49,28 +39,12 @@ def _jsonable(x: Any) -> Any:
 
 
 # ---------------------------------------------------------------- Ausführungsumgebung ----
-class Env:
-    def __init__(self) -> None:
-        self.svc = CharacterService(rules=load_rules(CEE_RULES))
-        self.inv = Inventory()
-        self.day = [1]
-        self.chars: list[str] = []
-        self.saved: dict[str, Any] = {}
-        clock = lambda: self.day[0]  # noqa: E731
-        self.discovery_registry = DiscoveryRegistry(self.svc.rules)
-        self.discovery = DiscoveryService(self.svc, self.discovery_registry, clock)
-        self.crafting = CraftingService(self.svc, self.inv, clock)
-        self.trading = TradeService(self.svc, self.inv, clock)
-        self.company_rules = load_company_rules(COMPANY_RULES)
-        self.company_registry = CompanyRegistry(self.company_rules)
-        self.company = CompanyService(self.svc, self.inv, self.company_registry, clock)
+class Env(World):
+    """Ausführungsumgebung der Skripte: eine Welt plus gemerkte Werte (Platzhalter)."""
 
-    def snapshot(self) -> dict[str, Any]:
-        return {"day": self.day[0], "inventory": json.loads(self.inv.to_json()),
-                "discovery": json.loads(self.discovery_registry.to_json()),
-                "companies": json.loads(self.company_registry.to_json()),
-                "counters": {"trade": self.trading._counter, "craft": self.crafting._counter},
-                "characters": {c: state_hash(json.loads(canonical_bytes(self.svc.state(c).parts))) for c in sorted(self.chars)}}
+    def __init__(self) -> None:
+        super().__init__(CEE_RULES, COMPANY_RULES)
+        self.saved: dict[str, Any] = {}
 
     def resolve(self, value: Any, op: Op) -> Any:
         """Platzhalter: "$disclosure" = aktuelle Offenlegung der Firma des Schritts, "$name" = gemerkter Wert."""
@@ -95,7 +69,6 @@ def _trade(env: Env, a: Op) -> Any:
 
 def _create(env: Env, a: Op) -> Any:
     env.svc.create(a["char"], a.get("kind", "player"))
-    env.chars.append(a["char"])
     return env.svc.log.events(a["char"])[0].hash
 
 

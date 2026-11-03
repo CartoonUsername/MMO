@@ -76,6 +76,10 @@ Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur 
 
 `reference/golden/*.json` enthalten Szenarien mit erwarteten Ereignis-/Zustands-Hashes, abgelehnten Eingaben und abgeleiteten Sichten. Jede Portierung muss sie bit-identisch bestehen; Python-Tests erzwingen, dass die Vektoren mit der Referenz übereinstimmen. Format und Prüfverfahren: `reference/golden/README.md`. Die Weltseite (Inventar, Register, Herstellung, Handel, Firmen) hat eigene Skript-Vektoren mit Welt-Hash nach jedem Schritt: `reference/golden_world/` (ADR-0013).
 
+## Persistenz und Migration (ADR-0014, Vorschlag)
+
+`World` (`mmo_world/world.py`) verdrahtet CEE, Inventar, Register und Dienste. `mmo_world.persistence` speichert Historien (Hash-Ketten) und einen Weltsnapshot (Tag, Inventar, Register, Zähler, Zustands-Hashes) in atomaren Generationen (`Store`); `import_world` prüft beim Laden Format, Regel-Hashes, Ketten, abgeleiteten Zustand und Querbezüge und wirft sonst `PersistenceError`. Format-Migration über `MIGRATIONS`; Regelversionswechsel ist bewusst keine stille Migration (Vorschlag: aufgezeichnetes Migrationsereignis). Bekannte Lücke: Inventar ohne Besitzjournal.
+
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
 Der Python-Prototyp ist die **Referenzimplementierung** für Regeln und Tests. Die produktive Server-Engine (z. B. C++/Rust-Dienst oder Unreal-Dedicated-Server-Modul) übernimmt Datenformat (Event-Schema, Regel-JSON) und die Testvektoren des Prototyps. Die Unreal-Seite konsumiert nur den abgeleiteten State (Visual Evolution), schreibt nie direkt.

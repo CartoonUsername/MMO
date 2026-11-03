@@ -67,6 +67,20 @@ class EventLog:
     def events(self, character_id: str) -> list[Event]:
         return list(self._events.get(character_id, []))
 
+    def character_ids(self) -> list[str]:
+        return sorted(self._events)
+
+    def adopt(self, character_id: str, events: list[Event]) -> None:
+        """Übernimmt eine geladene Kette (z. B. aus dem Speicher) und prüft sie sofort; bei Fehler bleibt der Log unverändert."""
+        if character_id in self._events:
+            raise IntegrityError(f"Historie von {character_id} ist bereits geladen")
+        self._events[character_id] = list(events)
+        try:
+            self.verify(character_id)
+        except IntegrityError:
+            del self._events[character_id]
+            raise
+
     def has(self, character_id: str) -> bool:
         return character_id in self._events
 
