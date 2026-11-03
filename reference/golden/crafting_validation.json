@@ -1,0 +1,761 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 920,
+      "fine_artisan": 900,
+      "glass_alchemist": 100,
+      "inventor": 1500,
+      "mass_producer": 4200
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 132,
+      "infusion": 29,
+      "innovation": 220,
+      "volume": 617
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "profession:alchemy>=2",
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 33,
+          "element_attuned:fire": 250,
+          "profession:smithing": 100
+        },
+        "eligible": false,
+        "score": 383,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_blade",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Herstellungsbericht (rules v6): strikte Felder, Wertebereiche, Rezept-/Technik-/Element-Voraussetzungen, Qualitäts-Plausibilität, Tag monoton, eindeutige craft_id.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {
+        "early": 1,
+        "x11": 2,
+        "x18": 5,
+        "x23": 8
+      },
+      "daily": {
+        "day": 2,
+        "points": {
+          "finesse": 650,
+          "infusion": 200,
+          "innovation": 500,
+          "volume": 1200
+        },
+        "recipes": {
+          "healing_salve": 1,
+          "iron_ingot": 1
+        }
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 200,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 2000,
+        "herb": 200,
+        "metal": 2000,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 900,
+        "infusion": 200,
+        "innovation": 1500,
+        "volume": 4200
+      },
+      "recipes": {
+        "bread": {
+          "best": 0,
+          "count": 1
+        },
+        "healing_salve": {
+          "best": 1,
+          "count": 1
+        },
+        "iron_ingot": {
+          "best": 2,
+          "count": 2
+        }
+      },
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "smithing": 1500
+      }
+    }
+  },
+  "final_state_sha256": "ea73a7b5b6412afb72a816e0cff636c323d0cdda40e63363e20dbaaaf9dcb578",
+  "format": 1,
+  "name": "crafting_validation",
+  "rules_file": "rules_v6.json",
+  "rules_sha256": "7601c5082d2624fc0e7899a942a6e812f1e4fa1b5fd70e3488cba1176978a19d",
+  "steps": [
+    {
+      "event_hash": "fe7507661aa202e3b74ca92ea20777ac5f3ca6746435bb9c642125dc7d025687",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "104c3dbc8b464990c657bd45b10e41552bc24040d2d16f32d4188c7c7717c488",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "abde7d02fa531c2ed0afeeb59f9c70af11bbf3c9aeb6266fbf8d715a79a1f328",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "early",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "seq": 1,
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "early",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "volume": 100
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.grant_points"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x1",
+        "day": 1,
+        "element": null,
+        "points": 99,
+        "quality": "common",
+        "quantity": 5,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x2",
+        "day": 1,
+        "quality": "common",
+        "quantity": 5,
+        "recipe_id": "iron_ingot"
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x3",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "ghost",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x4",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 0,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x5",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 21,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x6",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": true,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x7",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 1.5,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 1,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x8",
+        "day": 1,
+        "element": null,
+        "quality": "legendary",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x9",
+        "day": 1,
+        "element": null,
+        "quality": "fine",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x10",
+        "day": 1,
+        "element": null,
+        "quality": "masterwork",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "8c05ddd13f520d80e3fcac85eea828acb44160144f734e0477a73675141b9f7f",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f9065f83bc1d0248d70400679ba111add1dabe78ca3a68281d1a63a8c4e68e87",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "x11",
+        "day": 1,
+        "element": null,
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "bread",
+        "technique_id": null
+      },
+      "seq": 2,
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x12",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x13",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "frostglass",
+        "technique_id": null
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x14",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": "folded_iron"
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x15",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": "ghost"
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x16",
+        "day": 1,
+        "element": "fire",
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x17",
+        "day": 1,
+        "element": "metal",
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "a51d12932a9822143eb1f16a5291bfaf2cf003e0170c4b6769ad815c974c0671",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "a955027b56bcc778d7902b28690766cb8c317a1772f39dc92aba5dbaf8b40e25",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 3,
+      "state_sha256": "57c637b316d7c97a8ab603dee6d101421c2269456be1a74cae9eca89e03cf433",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "d11a359c0ae6125b69d7ea2bef9b4b8fa70a247a4b9848a66e5ab8dc7dcd8061",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 1500
+      },
+      "seq": 4,
+      "state_sha256": "0d8dd01d733ae5811f6db68373b7d79c0838b104af34ae984c51504c26e705d4",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "edc1eab00344b98cd0d9d3fec534dae8e8a2ccaa590eec8043d7277d42e7026b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "x18",
+        "day": 2,
+        "element": null,
+        "quality": "fine",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "seq": 5,
+      "state_sha256": "9fc381c8869136a9b00b3948ead2aa6d2b13950b3b03b2cfa458f14ab959451a",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x19",
+        "day": 2,
+        "element": null,
+        "quality": "masterwork",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "9fc381c8869136a9b00b3948ead2aa6d2b13950b3b03b2cfa458f14ab959451a",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x20",
+        "day": 1,
+        "element": null,
+        "quality": "fine",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "9fc381c8869136a9b00b3948ead2aa6d2b13950b3b03b2cfa458f14ab959451a",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x21",
+        "day": 2,
+        "element": "fire",
+        "quality": "common",
+        "quantity": 2,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "state_sha256": "9fc381c8869136a9b00b3948ead2aa6d2b13950b3b03b2cfa458f14ab959451a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "e99d6e1c997b36d1bb342017ff8763faad47f11ff90dac62484a237b56073691",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 6,
+      "state_sha256": "fae6b402d6238f8623bc2a0a7940307a356f5888c7fecbeea41ea03bea1b7a89",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "0242bdc67700530e07257b36f6e2dcde2507e11a739598f633b58d298f472ee1",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 7,
+      "state_sha256": "f5247b98a1181604078f7cce6fdb4aa18742b4daca61e2064057a9a784f5f479",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "x22",
+        "day": 2,
+        "element": "fire",
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_ingot",
+        "technique_id": null
+      },
+      "state_sha256": "f5247b98a1181604078f7cce6fdb4aa18742b4daca61e2064057a9a784f5f479",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f3e2ffddae6e18904bc6ef2e77ac26539a785d834aa26bea07b3f3cedca85bbc",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "x23",
+        "day": 2,
+        "element": "fire",
+        "quality": "common",
+        "quantity": 2,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 8,
+      "state_sha256": "ea73a7b5b6412afb72a816e0cff636c323d0cdda40e63363e20dbaaaf9dcb578",
+      "type": "crafting.crafted"
+    }
+  ]
+}

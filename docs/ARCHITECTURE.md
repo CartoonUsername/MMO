@@ -28,7 +28,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | 4 | Element | `element.` | **implementiert** (9 Elemente, Prägung, 2 + 1 Limit) |
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
 | 6 | Discovery | `discovery.` | **implementiert** (Charakterseite in der CEE + Weltseite `mmo_world`, ADR-0009; Inhalte sind Platzhalter) |
-| 7 | Crafting | `crafting.` | Schnittstelle, nicht implementiert |
+| 7 | Crafting | `crafting.` | **implementiert** (Handwerksprofil aus Herstellungsberichten in der CEE + Server-Herstellung/Inventar in `mmo_world`, ADR-0010; Inhalte sind Platzhalter) |
 | 8 | Economic Profile | `economy.` | Schnittstelle, nicht implementiert |
 | 9 | Character History | (Querschnitt) | **implementiert** (`history.py`: Log, Hash-Kette, Verifikation) |
 | 10 | Visual Evolution | (keine Ereignisse) | **implementiert** (reine Ableitung Zustand → Erscheinungsparameter, ADR-0008; Optik ist Platzhalter) |
@@ -43,6 +43,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
+## Crafting Engine (ADR-0010)
+
+*Charakterseite* (`mmo_cee.crafting`): `crafting.crafted` (serverbestätigter Bericht: Rezept, Technik, Element, Menge, Qualität, Tag) → Dimensionen (Menge, Feinarbeit, Innovation, Infusion), Materialfamilien und Element-Infusionen mit Wiederholungsabnahme und Tageslimits; nicht-exklusive Handwerksrichtungen als abgeleitete Sicht. Rezepte/Techniken folgen aus Berufsmeisterschaft und Entdeckungen. Die CEE prüft die Qualität auf Plausibilität (bestmögliche Stufe). *Weltseite* (`mmo_world`): atomares `Inventory` und `CraftingService` (Eingaben verbrauchen → Bericht → Ausgaben, vollständiger Rollback; Berufserfahrung nur aus gedeckelten Punkten). Ohne Eingangsmaterial entsteht keine Produktion.
 
 ## Discovery Engine (ADR-0009)
 

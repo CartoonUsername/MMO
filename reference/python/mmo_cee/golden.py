@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .combat import reached_directions, style_profile
+from .crafting import craft_direction_scores, craft_directions, craft_profile, known_recipes, known_techniques
 from .discovery import discovery_progress, known_discoveries
 from .essence import essence_profile, form_scores
 from .errors import RuleViolation
@@ -403,6 +404,103 @@ def scenario_discovery_secret_form() -> dict[str, Any]:
     }
 
 
+CRAFT = "crafting.crafted"
+
+
+def _cr(cid: str, recipe: str = "iron_ingot", quality: str = "common", quantity: int = 10, technique: Any = None,
+        element: Any = None, day: int = 1) -> Step:
+    return (CRAFT, {"craft_id": cid, "recipe_id": recipe, "technique_id": technique, "element": element,
+                    "quantity": quantity, "quality": quality, "day": day})
+
+
+def scenario_crafting_validation() -> dict[str, Any]:
+    return {
+        "description": "Herstellungsbericht (rules v6): strikte Felder, Wertebereiche, Rezept-/Technik-/Element-Voraussetzungen, Qualitäts-Plausibilität, Tag monoton, eindeutige craft_id.",
+        "rules_file": "rules_v6.json",
+        "steps": [
+            _created(),
+            _cr("early"),  # vor Erstellung gäbe es nichts: hier zulässig (Basisrezept)
+            _cr("early"),  # doppelt
+            ("crafting.grant_points", {"volume": 100}),
+            (CRAFT, {"craft_id": "x1", "recipe_id": "iron_ingot", "technique_id": None, "element": None, "quantity": 5, "quality": "common", "day": 1, "points": 99}),
+            (CRAFT, {"craft_id": "x2", "recipe_id": "iron_ingot", "quantity": 5, "quality": "common", "day": 1}),
+            _cr("x3", recipe="ghost"), _cr("x4", quantity=0), _cr("x5", quantity=21), _cr("x6", quantity=True),
+            _cr("x7", quantity=1.5), _cr("", quantity=1), _cr("x8", quality="legendary"),
+            _cr("x9", quality="fine"),  # Meisterschaft 0: Obergrenze common
+            _cr("x10", quality="masterwork"),
+            _cr("x11", quality="poor", recipe="bread", quantity=20),
+            _cr("x12", recipe="iron_blade"),  # Meisterschaft fehlt
+            _cr("x13", recipe="frostglass"),  # Entdeckung fehlt
+            _cr("x14", technique="folded_iron"),  # Technik unbekannt
+            _cr("x15", technique="ghost"),
+            _cr("x16", element="fire"), _cr("x17", element="metal"),
+            ("identity.xp_gained", {"amount": 10000}),
+            ("profession.work", {"profession": "smithing", "xp": 1500}),  # Meisterschaft 4 -> fine möglich
+            _cr("x18", quality="fine", day=2),
+            _cr("x19", quality="masterwork", day=2),
+            _cr("x20", quality="fine", day=1),  # Tag springt zurück
+            _cr("x21", recipe="healing_salve", quantity=2, element="fire", day=2),  # nicht geprägt
+            *_attune("fire"),
+            _cr("x22", recipe="iron_ingot", element="fire", day=2),  # nicht infusionsfähig
+            _cr("x23", recipe="healing_salve", quantity=2, element="fire", day=2),
+        ],
+    }
+
+
+def scenario_crafting_antifarm() -> dict[str, Any]:
+    steps: list[Step] = [_created()]
+    steps += [_cr(f"w{i}", quantity=20) for i in range(8)]  # gleiche Herstellung: Wiederholungsabnahme
+    steps += [_cr("late", day=0)]  # Tag zurück
+    steps += [_cr("d2", quantity=20, day=2)]  # neuer Tag
+    for i, r in enumerate(["bread", "healing_salve", "wooden_beam"]):
+        steps += [_cr(f"o{i}", recipe=r, quality="poor", quantity=20, day=2)]
+    return {
+        "description": "Anti-Farming beim Herstellen: Wiederholungsabnahme je Rezept und Tag, Erstherstellungsbonus nur einmal, neuer Tag setzt zurück.",
+        "rules_file": "rules_v6.json",
+        "steps": steps,
+    }
+
+
+def scenario_crafting_discovery_techniques() -> dict[str, Any]:
+    return {
+        "description": "Entdeckungen schalten Techniken und Rezepte frei; Technik und Element-Infusion wirken auf Qualität-Plausibilität und Spezialisierung; mehrere Richtungen parallel.",
+        "rules_file": "rules_v6.json",
+        "steps": [
+            _created(), ("identity.xp_gained", {"amount": 10000}),
+            ("profession.work", {"profession": "smithing", "xp": 700}),
+            ("profession.work", {"profession": "alchemy", "xp": 300}),
+            *_attune("fire"), *_attune("ice"),
+            _cr("a1", recipe="iron_blade", technique="folded_iron"),  # Technik unbekannt
+            _cr("a2", recipe="frostglass"),  # Rezept unbekannt
+            *_gather("iron_folding", ["ore_sample_a", "ore_sample_b", "forge_trial"]),
+            ("discovery.made", {"discovery_id": "iron_folding", "day": 1, "credit": "pioneer"}),
+            ("discovery.learned", {"discovery_id": "frostglass_recipe", "day": 1, "from_character": "teacher-1"}),
+            _cr("b1", recipe="iron_blade", technique="folded_iron", element="fire", quantity=8, quality="fine", day=2),
+            _cr("b2", recipe="iron_blade", technique="folded_iron", element="fire", quantity=8, quality="masterwork", day=2),
+            _cr("b3", recipe="iron_ingot", technique="folded_iron", quantity=15, quality="fine", day=2),
+            _cr("b4", recipe="healing_salve", technique="folded_iron", quantity=2, day=2),  # Technik passt nicht
+            _cr("b5", recipe="frostglass", element="ice", quantity=4, quality="common", day=3),
+            _cr("b6", recipe="frostglass", element="ice", quantity=4, quality="common", day=3),
+            _cr("b7", recipe="frostglass", element="fire", quantity=2, quality="poor", day=4),
+            _cr("b8", recipe="shadow_lantern", day=4),  # geheimes Rezept: Entdeckung fehlt
+        ],
+    }
+
+
+def scenario_crafting_directions() -> dict[str, Any]:
+    steps: list[Step] = [_created(), ("identity.xp_gained", {"amount": 10000}),
+                         ("profession.work", {"profession": "smithing", "xp": 10**6}),
+                         ("profession.work", {"profession": "alchemy", "xp": 10**6}), *_attune("fire")]
+    for day in range(1, 41):
+        steps += [_cr(f"b{day}", recipe="iron_blade", quality="poor", quantity=20, element="fire", day=day),
+                  _cr(f"s{day}", recipe="healing_salve", quality="poor", quantity=20, element="fire", day=day)]
+    return {
+        "description": "Handwerks-Spezialisierung: 40 Tage Metall- und Kräuterarbeit mit Feuerinfusion -> mehrere Richtungen gleichzeitig, nicht exklusiv.",
+        "rules_file": "rules_v6.json",
+        "steps": steps,
+    }
+
+
 SCENARIOS = {
     "identity_basic": scenario_identity_basic,
     "element_limits": scenario_element_limits,
@@ -418,6 +516,10 @@ SCENARIOS = {
     "essence_npc_two_candidates": scenario_essence_npc_two_candidates,
     "discovery_research": scenario_discovery_research,
     "discovery_secret_form": scenario_discovery_secret_form,
+    "crafting_validation": scenario_crafting_validation,
+    "crafting_antifarm": scenario_crafting_antifarm,
+    "crafting_discovery_techniques": scenario_crafting_discovery_techniques,
+    "crafting_directions": scenario_crafting_directions,
 }
 
 
@@ -428,6 +530,12 @@ def _derived(svc: CharacterService) -> dict[str, Any]:
     if "combat" in svc.rules:
         out["combat_directions"] = reached_directions(state, svc.rules)
         out["style_profile"] = style_profile(state, svc.rules)
+    if "crafting" in svc.rules:  # ab rules v6
+        out["known_recipes"] = known_recipes(state, svc.rules)
+        out["known_techniques"] = known_techniques(state, svc.rules)
+        out["craft_direction_scores"] = craft_direction_scores(state, svc.rules)
+        out["craft_directions"] = craft_directions(state, svc.rules)
+        out["craft_profile"] = craft_profile(state, svc.rules)
     if "discovery" in svc.rules:  # ab rules v5
         out["known_discoveries"] = known_discoveries(state)
         out["discovery_progress"] = {d: discovery_progress(state, svc.rules, d) for d in svc.rules["discovery"]["discoveries"]}

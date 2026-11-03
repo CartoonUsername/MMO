@@ -1,0 +1,648 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 4000,
+      "fine_artisan": 2460,
+      "glass_alchemist": 2420,
+      "inventor": 3050,
+      "mass_producer": 6100
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 151,
+      "infusion": 283,
+      "innovation": 188,
+      "volume": 376
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": true,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_missing": [],
+        "evidence_needed": 3,
+        "known": true,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 100,
+          "element_affinity:fire": 33,
+          "element_attuned:fire": 250,
+          "profession:smithing": 75
+        },
+        "eligible": false,
+        "score": 458,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 30,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 30,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [
+      "frostglass_recipe",
+      "iron_folding"
+    ],
+    "known_recipes": [
+      "bread",
+      "frostglass",
+      "healing_salve",
+      "iron_blade",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [
+      "folded_iron"
+    ],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Entdeckungen schalten Techniken und Rezepte frei; Technik und Element-Infusion wirken auf Qualität-Plausibilität und Spezialisierung; mehrere Richtungen parallel.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {
+        "b1": 13,
+        "b3": 14,
+        "b5": 15,
+        "b6": 16,
+        "b7": 17
+      },
+      "daily": {
+        "day": 4,
+        "points": {
+          "finesse": 0,
+          "infusion": 600,
+          "innovation": 0,
+          "volume": 600
+        },
+        "recipes": {
+          "frostglass": 1
+        }
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 2200,
+        "ice": 2400,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 3000,
+        "grain": 0,
+        "herb": 0,
+        "metal": 3100,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 2460,
+        "infusion": 4600,
+        "innovation": 3050,
+        "volume": 6100
+      },
+      "recipes": {
+        "frostglass": {
+          "best": 1,
+          "count": 3
+        },
+        "iron_blade": {
+          "best": 2,
+          "count": 1
+        },
+        "iron_ingot": {
+          "best": 2,
+          "count": 1
+        }
+      },
+      "techniques": {
+        "folded_iron": 2
+      }
+    },
+    "discovery": {
+      "evidence": {
+        "iron_folding": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ]
+      },
+      "known": {
+        "frostglass_recipe": {
+          "credit": "learner",
+          "day": 1,
+          "from": "teacher-1",
+          "how": "learned",
+          "seq": 12
+        },
+        "iron_folding": {
+          "credit": "pioneer",
+          "day": 1,
+          "how": "researched",
+          "seq": 11
+        }
+      },
+      "last_day": 1
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 100,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire",
+        "ice"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "alchemy": 300,
+        "smithing": 700
+      }
+    }
+  },
+  "final_state_sha256": "e9d47cf060e01f82e2a46a8135e38c6c0c2c5e285a4af510ce887c1c11154638",
+  "format": 1,
+  "name": "crafting_discovery_techniques",
+  "rules_file": "rules_v6.json",
+  "rules_sha256": "7601c5082d2624fc0e7899a942a6e812f1e4fa1b5fd70e3488cba1176978a19d",
+  "steps": [
+    {
+      "event_hash": "fe7507661aa202e3b74ca92ea20777ac5f3ca6746435bb9c642125dc7d025687",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "104c3dbc8b464990c657bd45b10e41552bc24040d2d16f32d4188c7c7717c488",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "f4ee3f160a4792d9ffaa7b9d2e7ae2f1b4ab5f9b8317166a5ca17cd6b5bab0de",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "8a473905cbfd703d75882a3235807b192f36beca436cbbb726e70bc9f6f43375",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "fb974ef81f693b9deadacec0342edf6c9e61749a81198d6c77a0d599ee8363e8",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 700
+      },
+      "seq": 2,
+      "state_sha256": "98b0ed42484615c6f6bf0575a733f62f8e9bff0cfec9680c92839748b4ba9944",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "d4c137952bcf1f42f5b452d9b3202d1fee19dd11e5b045bb114f9db8f3daa745",
+      "expect": "accepted",
+      "payload": {
+        "profession": "alchemy",
+        "xp": 300
+      },
+      "seq": 3,
+      "state_sha256": "179dee53d7c879874d75da8b7e0c293ad4a48932bd956dd4ec7c3bd6e14b9aff",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "0db5a2f4d2957c651f7654cb08536803b4bc1c40bce540845fdf314321a3f4da",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 4,
+      "state_sha256": "f82466fa0f2e787abf42d4604dd6efb3bae8ec9d4fb021e56c18039fae58367e",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "9e46d163cb1276cf818a73574e1dc6da73329a1370b477161ab907c7a4e9ee0d",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 5,
+      "state_sha256": "9aac7083b13adeaff65bfec8e338ab498804447013d66e1837af9c3d25958ddb",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "f7cfb3a4ba0995ad801ee68245aaace63643a78da4c44c11843227219cbc27b4",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "ice"
+      },
+      "seq": 6,
+      "state_sha256": "1a49c176068408f318fbf0a3a499b4ad5df82371c46d2584071caf7dcb884cd6",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "c5de4c30e216ef380c262e1367514b41c7fb0430cbf7515e97f1aef8a8e25864",
+      "expect": "accepted",
+      "payload": {
+        "element": "ice"
+      },
+      "seq": 7,
+      "state_sha256": "6001809d7b46a99467e7023074c6216004868e516481996cb5760205989b4605",
+      "type": "element.attuned"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "a1",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "iron_blade",
+        "technique_id": "folded_iron"
+      },
+      "state_sha256": "6001809d7b46a99467e7023074c6216004868e516481996cb5760205989b4605",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "a2",
+        "day": 1,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "frostglass",
+        "technique_id": null
+      },
+      "state_sha256": "6001809d7b46a99467e7023074c6216004868e516481996cb5760205989b4605",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "bca39b27ff6d4860cd61326913cb743a46f7151a195934812074a7029258144f",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_a"
+      },
+      "seq": 8,
+      "state_sha256": "34c7df558ea4d4418d99b1484e17aeca05233b42c49e87a131c0ebdd2b35eabe",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "10a61a0858dcf0a8c80677a775e87925d9c69acea3efbced7303ab22764bbba6",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "ore_sample_b"
+      },
+      "seq": 9,
+      "state_sha256": "b6b2306036871970e06f2a932c7cf91e590cbce53e97087e314e0a27eed06d38",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "a54ef722362533e86f7f2f56d3efbbfbb04a4b465f595c12f60c06e1fba7458d",
+      "expect": "accepted",
+      "payload": {
+        "discovery_id": "iron_folding",
+        "evidence_id": "forge_trial"
+      },
+      "seq": 10,
+      "state_sha256": "ebd08a91261b55a11f21b7f8eb0c147a970a9759dc324a3a81755604586e567c",
+      "type": "discovery.evidence_gathered"
+    },
+    {
+      "event_hash": "92feddc77c95a0e6a0364051a6e25c0d0bb19efd9dd5c4b986e09b447be82c1b",
+      "expect": "accepted",
+      "payload": {
+        "credit": "pioneer",
+        "day": 1,
+        "discovery_id": "iron_folding"
+      },
+      "seq": 11,
+      "state_sha256": "a113ea5747f832a952c415c0e6ba038b23a617b74407b5bd337d3e02fb9f03dc",
+      "type": "discovery.made"
+    },
+    {
+      "event_hash": "d9bc245bbd1e246a1dd24c3e087062c7e0b56ee23a614402d856d67eb18a4d76",
+      "expect": "accepted",
+      "payload": {
+        "day": 1,
+        "discovery_id": "frostglass_recipe",
+        "from_character": "teacher-1"
+      },
+      "seq": 12,
+      "state_sha256": "70e39765901c7e258bbb14f0d4e009e4770b18bcdbbf81300d161da73ef78f79",
+      "type": "discovery.learned"
+    },
+    {
+      "event_hash": "602747aa651771b371246b5ceaaf1b2930576c4f08e1f78a3a0ffdf4376d06bb",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b1",
+        "day": 2,
+        "element": "fire",
+        "quality": "fine",
+        "quantity": 8,
+        "recipe_id": "iron_blade",
+        "technique_id": "folded_iron"
+      },
+      "seq": 13,
+      "state_sha256": "4607a61d48e576f0d7ad7c974067e48114aab27ac7af1abd8fe6e2ded373c4e7",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "b2",
+        "day": 2,
+        "element": "fire",
+        "quality": "masterwork",
+        "quantity": 8,
+        "recipe_id": "iron_blade",
+        "technique_id": "folded_iron"
+      },
+      "state_sha256": "4607a61d48e576f0d7ad7c974067e48114aab27ac7af1abd8fe6e2ded373c4e7",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "68a1a28f3abe137abc4744264ca5639f3ff727a1f7304bb4c34b2d1921bb55a4",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b3",
+        "day": 2,
+        "element": null,
+        "quality": "fine",
+        "quantity": 15,
+        "recipe_id": "iron_ingot",
+        "technique_id": "folded_iron"
+      },
+      "seq": 14,
+      "state_sha256": "13957a52485959a9904611ecccca0397ae3fd9768b6af52b68d956d516b8df6e",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "b4",
+        "day": 2,
+        "element": null,
+        "quality": "common",
+        "quantity": 2,
+        "recipe_id": "healing_salve",
+        "technique_id": "folded_iron"
+      },
+      "state_sha256": "13957a52485959a9904611ecccca0397ae3fd9768b6af52b68d956d516b8df6e",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "3851c50545a2e138e04d91992fac9b123473a6dc983c365041c58fb6d795ea1b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b5",
+        "day": 3,
+        "element": "ice",
+        "quality": "common",
+        "quantity": 4,
+        "recipe_id": "frostglass",
+        "technique_id": null
+      },
+      "seq": 15,
+      "state_sha256": "460df34a4f861c236967006014ec0c837e8f9127db4c7bbecaeeefd840db3c30",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f176b5b61a53dd944174cbbb875fa9ce126ee2bc1f7bee12157b92136c170f0a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b6",
+        "day": 3,
+        "element": "ice",
+        "quality": "common",
+        "quantity": 4,
+        "recipe_id": "frostglass",
+        "technique_id": null
+      },
+      "seq": 16,
+      "state_sha256": "55810e2f232f65de77ff6f3e8a45b911acbc31bef7b17650229516eda11b8a89",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "8799a572e8631b83afb5385d44635b8c887640e2eafcbda4666ba182e185cd53",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b7",
+        "day": 4,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 2,
+        "recipe_id": "frostglass",
+        "technique_id": null
+      },
+      "seq": 17,
+      "state_sha256": "e9d47cf060e01f82e2a46a8135e38c6c0c2c5e285a4af510ce887c1c11154638",
+      "type": "crafting.crafted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "craft_id": "b8",
+        "day": 4,
+        "element": null,
+        "quality": "common",
+        "quantity": 10,
+        "recipe_id": "shadow_lantern",
+        "technique_id": null
+      },
+      "state_sha256": "e9d47cf060e01f82e2a46a8135e38c6c0c2c5e285a4af510ce887c1c11154638",
+      "type": "crafting.crafted"
+    }
+  ]
+}

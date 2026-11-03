@@ -30,7 +30,11 @@ class Discovery(Protocol):
 
 
 class Crafting(Protocol):
-    """Prefix 'crafting.': persönliche Herstellungsverfahren und Techniken."""
+    """Prefix 'crafting.': persönliche Herstellungsverfahren und Techniken.
+
+    Umgesetzt in mmo_cee/crafting.py (Charakterseite) und mmo_world (Herstellung/Inventar), ADR-0010;
+    diese Schnittstelle bleibt als Vertrag bestehen.
+    """
 
     def known_techniques(self, state: CharacterState) -> list[str]: ...
 

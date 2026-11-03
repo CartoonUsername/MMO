@@ -13,6 +13,7 @@ ENGINE_EVENT_TYPES = [
     "profession.work",
     "essence.trial_passed", "essence.adopted", "essence.decision_made",
     "discovery.evidence_gathered", "discovery.made", "discovery.learned",
+    "crafting.crafted",
     "combat.encounter_resolved",
 ]
 
@@ -149,6 +150,17 @@ class GoldenVectorTests(unittest.TestCase):
                          ("pioneer", "discoverer", "learner"))
         self.assertEqual(known["frostglass_recipe"]["from"], "teacher-1")
         self.assertEqual(research["final_state"]["discovery"]["evidence"]["iron_folding"], ["ore_sample_a", "ore_sample_b", "forge_trial"])
+        dirs = self.vectors["crafting_directions"]
+        self.assertEqual(dirs["derived"]["craft_directions"], {"elemental_smith": 2, "glass_alchemist": 1, "mass_producer": 2})
+        self.assertEqual(dirs["derived"]["craft_direction_scores"]["mass_producer"], dirs["final_state"]["crafting"]["points"]["volume"])
+        tech = self.vectors["crafting_discovery_techniques"]
+        self.assertEqual(tech["derived"]["known_techniques"], ["folded_iron"])
+        self.assertIn("frostglass", tech["derived"]["known_recipes"])
+        self.assertEqual(tech["final_state"]["crafting"]["techniques"], {"folded_iron": 2})
+        val = self.vectors["crafting_validation"]
+        self.assertEqual(val["final_state"]["crafting"]["recipes"]["iron_ingot"], {"count": 2, "best": 2})  # early(common) + x18(fine)
+        self.assertNotIn("crafting", self.vectors["discovery_research"]["final_state"])  # v5-Vektoren ohne Handwerksteil
+        self.assertNotIn("craft_directions", self.vectors["discovery_research"]["derived"])
         secret = self.vectors["discovery_secret_form"]
         self.assertEqual(secret["final_state"]["essence"]["form"], "twilight_kin")
         self.assertEqual(secret["derived"]["known_discoveries"], ["old_shrine_map", "twilight_rite"])

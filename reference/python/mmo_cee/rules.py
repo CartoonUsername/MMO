@@ -22,6 +22,6 @@ class Rules:
         return key in self.data
 
 
-def load_rules(name: str = "rules_v5.json") -> Rules:
+def load_rules(name: str = "rules_v6.json") -> Rules:
     text = resources.files("mmo_cee").joinpath("data", name).read_text(encoding="utf-8")
     return Rules(json.loads(text))

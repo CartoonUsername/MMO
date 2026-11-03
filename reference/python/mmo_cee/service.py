@@ -5,6 +5,7 @@ from typing import Any
 
 from .combat import CombatEngine, reached_directions
 from .discovery import DiscoveryEngine, discovery_progress, known_discoveries
+from .crafting import CraftingEngine, craft_directions, craft_profile, known_recipes, known_techniques
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
 from .essence import EssenceEngine, eligible_forms, essence_profile, form_scores
@@ -21,6 +22,8 @@ def default_projector(rules: Rules) -> Projector:
         engines.append(CombatEngine(rules))
     if "discovery" in rules:  # ab rules_v5
         engines.append(DiscoveryEngine(rules))
+    if "crafting" in rules:  # ab rules_v6
+        engines.append(CraftingEngine(rules))
     return Projector(engines, rules)
 
 
@@ -82,3 +85,16 @@ class CharacterService:
     def discovery_progress(self, character_id: str, discovery_id: str) -> dict:
         """Beweise, fehlende Voraussetzungen und Abschlussbereitschaft einer Entdeckung."""
         return discovery_progress(self.state(character_id), self.rules, discovery_id)
+
+    def known_recipes(self, character_id: str) -> list[str]:
+        return known_recipes(self.state(character_id), self.rules)
+
+    def known_techniques(self, character_id: str) -> list[str]:
+        return known_techniques(self.state(character_id), self.rules)
+
+    def craft_directions(self, character_id: str) -> dict[str, int]:
+        """Handwerks-Spezialisierungen -> Stufe (mehrere gleichzeitig möglich)."""
+        return craft_directions(self.state(character_id), self.rules)
+
+    def craft_profile(self, character_id: str) -> dict[str, int]:
+        return craft_profile(self.state(character_id), self.rules)

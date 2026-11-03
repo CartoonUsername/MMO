@@ -1,0 +1,1749 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 208000,
+      "fine_artisan": 0,
+      "glass_alchemist": 72000,
+      "inventor": 1000,
+      "mass_producer": 240000
+    },
+    "craft_directions": {
+      "elemental_smith": 2,
+      "glass_alchemist": 1,
+      "mass_producer": 2
+    },
+    "craft_profile": {
+      "finesse": 0,
+      "infusion": 498,
+      "innovation": 2,
+      "volume": 498
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 33,
+          "element_attuned:fire": 250,
+          "profession:smithing": 250
+        },
+        "eligible": false,
+        "score": 533,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 150,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 150,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_blade",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Handwerks-Spezialisierung: 40 Tage Metall- und Kräuterarbeit mit Feuerinfusion -> mehrere Richtungen gleichzeitig, nicht exklusiv.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {
+        "b1": 6,
+        "b10": 24,
+        "b11": 26,
+        "b12": 28,
+        "b13": 30,
+        "b14": 32,
+        "b15": 34,
+        "b16": 36,
+        "b17": 38,
+        "b18": 40,
+        "b19": 42,
+        "b2": 8,
+        "b20": 44,
+        "b21": 46,
+        "b22": 48,
+        "b23": 50,
+        "b24": 52,
+        "b25": 54,
+        "b26": 56,
+        "b27": 58,
+        "b28": 60,
+        "b29": 62,
+        "b3": 10,
+        "b30": 64,
+        "b31": 66,
+        "b32": 68,
+        "b33": 70,
+        "b34": 72,
+        "b35": 74,
+        "b36": 76,
+        "b37": 78,
+        "b38": 80,
+        "b39": 82,
+        "b4": 12,
+        "b40": 84,
+        "b5": 14,
+        "b6": 16,
+        "b7": 18,
+        "b8": 20,
+        "b9": 22,
+        "s1": 7,
+        "s10": 25,
+        "s11": 27,
+        "s12": 29,
+        "s13": 31,
+        "s14": 33,
+        "s15": 35,
+        "s16": 37,
+        "s17": 39,
+        "s18": 41,
+        "s19": 43,
+        "s2": 9,
+        "s20": 45,
+        "s21": 47,
+        "s22": 49,
+        "s23": 51,
+        "s24": 53,
+        "s25": 55,
+        "s26": 57,
+        "s27": 59,
+        "s28": 61,
+        "s29": 63,
+        "s3": 11,
+        "s30": 65,
+        "s31": 67,
+        "s32": 69,
+        "s33": 71,
+        "s34": 73,
+        "s35": 75,
+        "s36": 77,
+        "s37": 79,
+        "s38": 81,
+        "s39": 83,
+        "s4": 13,
+        "s40": 85,
+        "s5": 15,
+        "s6": 17,
+        "s7": 19,
+        "s8": 21,
+        "s9": 23
+      },
+      "daily": {
+        "day": 40,
+        "points": {
+          "finesse": 0,
+          "infusion": 6000,
+          "innovation": 0,
+          "volume": 6000
+        },
+        "recipes": {
+          "healing_salve": 1,
+          "iron_blade": 1
+        }
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 240000,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 0,
+        "herb": 80000,
+        "metal": 160000,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 0,
+        "infusion": 240000,
+        "innovation": 1000,
+        "volume": 240000
+      },
+      "recipes": {
+        "healing_salve": {
+          "best": 0,
+          "count": 40
+        },
+        "iron_blade": {
+          "best": 0,
+          "count": 40
+        }
+      },
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "alchemy": 1000000,
+        "smithing": 1000000
+      }
+    }
+  },
+  "final_state_sha256": "cbc897d8b75bc00aa29fc6fd3991d94b410bab3c12f600ae9f32c95e31e17496",
+  "format": 1,
+  "name": "crafting_directions",
+  "rules_file": "rules_v6.json",
+  "rules_sha256": "7601c5082d2624fc0e7899a942a6e812f1e4fa1b5fd70e3488cba1176978a19d",
+  "steps": [
+    {
+      "event_hash": "fe7507661aa202e3b74ca92ea20777ac5f3ca6746435bb9c642125dc7d025687",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "104c3dbc8b464990c657bd45b10e41552bc24040d2d16f32d4188c7c7717c488",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "f4ee3f160a4792d9ffaa7b9d2e7ae2f1b4ab5f9b8317166a5ca17cd6b5bab0de",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "8a473905cbfd703d75882a3235807b192f36beca436cbbb726e70bc9f6f43375",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "b374fb91da6b58d5403deab4f163e76a938d2ec472aabd4c1b13a76912593928",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 1000000
+      },
+      "seq": 2,
+      "state_sha256": "06668c7288dc85f63e25c8d35ba9f5233899f32928eac648ba488d39ab35dde1",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "feafb537ab62ce2cbbceb148fc1a6ded470842ec8906168f203dc071b2baf158",
+      "expect": "accepted",
+      "payload": {
+        "profession": "alchemy",
+        "xp": 1000000
+      },
+      "seq": 3,
+      "state_sha256": "f9630db3d668c9e5e027080c0cfee8d9567aefaa0229375d6289fed93cdfdc56",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "56ec20635b9430f3033ca6c6ee2fc4265339b8fbabd717098e197b5dd1d99c4f",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 4,
+      "state_sha256": "0459b41579f1f20fc63d078466dec2d73036a7c9b89d1d3784c0ec0e6dfecbc9",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "e6391fb2c7ffd7844e90def8c625f7868580076ea4cb6250a594de5ee2520dd6",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 5,
+      "state_sha256": "f3bb2a59ec4ad95bad1513f6849011f25690dd6b42c47953e7ed4e74f6aba175",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "888c0e453e34b2f2be7e5ee7859b589fdd57bd0772213fe79460ad8675f426c0",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b1",
+        "day": 1,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 6,
+      "state_sha256": "8af05c26958f48ed463ee4d003a49fe40f75b535fa8b2c55c5f7560bdba2619b",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ad218d7833b38f3374468397e752c1210b69748113347c6cdee1b4c0c8909996",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s1",
+        "day": 1,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 7,
+      "state_sha256": "31255be22b685bc601648dc31fd5d44f73d35a3f76eb07f19a42e5456ce1cdc3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "d4beec17e0f650a8275e216f10d1ccabd3f20619dfc9c30d45f869c78ef593da",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b2",
+        "day": 2,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 8,
+      "state_sha256": "084eed43e1f602e8d5d0424232f1fb37e9f1e2909524defc89232614d2eb6d8d",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "baa3d6021c61ca141fb7042a42dd3dfca9127052ce9d1aa2db086fd6c9cdc05b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s2",
+        "day": 2,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 9,
+      "state_sha256": "b484e2679ecae6824badbe7b64ed54126e3af67dea72eb9d9a391100c843c52f",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "61ed97c0138f43ba3e654c4f329cf4ad1d375fc4ab26fc7cc4eb06c9a0045efc",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b3",
+        "day": 3,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 10,
+      "state_sha256": "b328a36da23e078508325e91246e20a9456f60b91b0f199bbd1aa980d81d97ef",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "e4371ab6aed7e479c9ad9c9af303f52c672a8eb4b11cf97c5f2915f9396a3043",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s3",
+        "day": 3,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 11,
+      "state_sha256": "9cfe551cbf373c95e36d6144ece3b15b98f0da5784f9ba5cffc9c2e16bfd73cb",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "4a082e1c1c90ad0f3febbb1de7509c942c0237ed160925eacc273b64e0c3de57",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b4",
+        "day": 4,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 12,
+      "state_sha256": "1bae97a2eb4661d2271da07a315efc0b3082e45d5f932926ebf521baa38cd765",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ec89b47ba1f11b2de0a3e04e06cb3bfedc289de73f01da37f9b0a2387c50a64b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s4",
+        "day": 4,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 13,
+      "state_sha256": "067c59ff988299696df3f1be7fd6984a60f7495c5cdb7b34a67c5252673185f8",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "d4b9b2881ae68f18092cce89baa2e4fe97d605f83f4db132f111a1384175b56c",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b5",
+        "day": 5,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 14,
+      "state_sha256": "38eba1c05b419652145184969e737e7643d4b7d15b5a4944544bfa819a3c30b3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "a826ba9a3f72265d50d002b793cbc56d577c45dfd8defd16263038ff45f3b97a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s5",
+        "day": 5,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 15,
+      "state_sha256": "e5f2da1952d44793e2ec39b4e52a4bd331b94c171b56ff58abb7d04014b8725a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "eb4f6aed63b9e94c30171b3b784ad43a7937dfdbec06c5adcce72b70018cb8f8",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b6",
+        "day": 6,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 16,
+      "state_sha256": "f65dbf60882f20b87be8ff89044e28cf41f9dd37c6e1ad7ffa9ae9669451f6c7",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f0ff3261ee44409fe0ddd00eb81e909f5172ce15567ccd146a80a9e2ce678d4a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s6",
+        "day": 6,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 17,
+      "state_sha256": "aa8156ac7dfd7cf2240ebc399c4531cbafa96903508947c4c66cefddf61434a4",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "9cb6812717467f1455be38e00bb92475bcbe2fe971c3a9c55c5937361df88a39",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b7",
+        "day": 7,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 18,
+      "state_sha256": "2d94859df7d044e35c6c79ca2b36dc4c1ce5139218c24c8fa0a83e23337e32bc",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "824d8adf09868176872f755ab1de2025c57759cfd7897a3eab04aa38259e78e1",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s7",
+        "day": 7,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 19,
+      "state_sha256": "bef968e426c7e3d57ccb95edb0826d7bd2984c47e6521676b3ce0944ddef14f4",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "33a7b37199a32481636ada10df11ff802c7a67e71caaad38ab7039f9b2b0358c",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b8",
+        "day": 8,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 20,
+      "state_sha256": "2853f2cdb88645100fe47423f3ca7aef213b9d36fa5309a063f35357d61cea8c",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "5108c91a77c04808a66a319045ce1e04d7986cafe81b2b0f0e8bb603ff8027c9",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s8",
+        "day": 8,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 21,
+      "state_sha256": "47dd6b01f6624a330a862c999c2537e598641fab2d061802c36d05e8c22064e9",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "50f0adc90683fa1aaaffe16d4157b386687e1b2297f5487d91bbe46d86d59fe0",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b9",
+        "day": 9,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 22,
+      "state_sha256": "9d5c2e5772b2936308afcdc8e096457d0393a989f7ff2e249073833e9ab15bd3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "8a6380162c5642c856fe298b823eea8e35494f7d2c8aadb9e6fc8d8d424f2a5d",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s9",
+        "day": 9,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 23,
+      "state_sha256": "5f2ab5f2278e8f352dd49cec1a53700486d8704c3f103e578ea7e537d0cb98dd",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ce93697a0bdebe9d4f9bc6d12c2796e87d5f8fc884bd00666817f5d3c3c959f9",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b10",
+        "day": 10,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 24,
+      "state_sha256": "c7402330bb9427e5566f2a679a3ea3c994b9546590c91b10c766add2d35c4364",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "6e1474355536924053ec54e00d3046a31c20e784a127543859a137cfd5d7728a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s10",
+        "day": 10,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 25,
+      "state_sha256": "81fbd3c91c817f463fde257218f6d9e23491bf32b11355cbb571c613ba2af8c2",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "0bc55156fe5568be8701cd6529fb82a537f77998d3eef73c2326b94d620d33dd",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b11",
+        "day": 11,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 26,
+      "state_sha256": "28a24e5ae39493158d8097e2830b922b5a73fd227d9f69363b5a8e31acd669ed",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "c6103990d8c45cca00472efc322e705efbb79e1ec2c24a05514ea316413851f6",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s11",
+        "day": 11,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 27,
+      "state_sha256": "9abc9e024609396f59879f4cb100485fe282f3433ffff60c59e93a8335b9cf95",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "8dddcd00a4a8b4708959194540a5467114d87c1e002061d725e76baa5cba154b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b12",
+        "day": 12,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 28,
+      "state_sha256": "1081608e52becfe8a933ee080657b54d3268d48e5399193005fd234918ad4d33",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "e998959383fe9cd7a70383d9f7464a6acf2acf92142e63c9290ff9172ceabb73",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s12",
+        "day": 12,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 29,
+      "state_sha256": "dde1203ed6948a75b7c18beed5e6e9ad79f3ac63397295994ba5174a0ca1f569",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "3717f30476080e03b518836f7bc70155e59ec1f7d6afd4ce6f4e7b60a9d18e76",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b13",
+        "day": 13,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 30,
+      "state_sha256": "1bae18c307e464f4a49430f89f09f572a1a54313e455ea81f8f5558594c8d8c0",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "521210184f80408638dc8a44540e40e60616492fd5551b594f47a00c5b9efdd1",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s13",
+        "day": 13,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 31,
+      "state_sha256": "76f0fad4b1018abf85d49df1ac0b45ba6d5fc34258140b3373245f2ac27370cb",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "8712166f2b722a9451fc442a551b6e4ba33e46acb6712c231c877a6324f5de14",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b14",
+        "day": 14,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 32,
+      "state_sha256": "c3e14e885f0dde715203b8fc125cb62eb70c9af7ec3b6364c39a1117143dbc54",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "605ad9d7b766f48f0fd4e0e4556f4f6315cd82927525391a854c6d2cb2f5a0e9",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s14",
+        "day": 14,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 33,
+      "state_sha256": "bc2e8282272ac0fb713ed6c34ecc18884aac067cd2d6fa11927ed2316c35adb7",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "345d981167e3d244600a61656b7d628ee2556fc539420dfa45d6875ccbc81e0c",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b15",
+        "day": 15,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 34,
+      "state_sha256": "8e79a34d50bce025bb33d7ece0334fc5c6f4487e27ec68e294d7dd0d1084886e",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "6d34debf5cd55d2a17ecb4f12a02ca0ea3a1caf618387ed8b83f8b44dc9d1343",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s15",
+        "day": 15,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 35,
+      "state_sha256": "f1538dce33fbb886128c6ddd5e7caaf27ea313599cbb48af91cb7ddf6780cb02",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "a0bc5316d483bb589778f6fedb8426c139fa8472dbc676da05e94487765750bc",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b16",
+        "day": 16,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 36,
+      "state_sha256": "be51d21d4fa5777534c997e5324d28b00189264ea40aed7505c296990a66ef85",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "53f5d6745068f18a2076359ba7cd823887bb8093c9dcda4ebac132d32fa037e1",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s16",
+        "day": 16,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 37,
+      "state_sha256": "e4959a8afb652d8b4d3d8dc2b414880b4f380315a0bb38b71b4d5331a08191ff",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f7f119dd5c736d7906567cdfa86cc2fccf2df6ec4c9e641b1cd62038d96c1407",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b17",
+        "day": 17,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 38,
+      "state_sha256": "96e3da71c9b349fcfcc2ba9d9fb361696c11a35550061fec0471f52eb4772938",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "c13d95d6ec665903717a1c42a7a81b231398050c794b153bbabeeae0de22605f",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s17",
+        "day": 17,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 39,
+      "state_sha256": "8b776b94408c44770754587474ec4409f9f31d069bc2102e47347443bb787eb9",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f2833fb59e48d2aaf6354e43e4528907422f3c173c39ed04c12487a55ca2ec27",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b18",
+        "day": 18,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 40,
+      "state_sha256": "1c8bfb1329cc92437430631a61a0e893a1f4e1c690ea5a48c7603c6b7c00edb0",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "974ac210a6c110c26d60e3c351e277f0329410889059b34209777a162f344cdb",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s18",
+        "day": 18,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 41,
+      "state_sha256": "685374fddd1b8ebf2c82ea5bfb38dfc6bd252960dd70c9857ef4aa974af7323c",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "fb303425632031a310181b7adc353ce189c424ef17a2042966df6acc3c6c5297",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b19",
+        "day": 19,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 42,
+      "state_sha256": "98f38eed333e7ce1f76e6aa108bff22889edf633d08db2d75b4fc64f33197f91",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "4e090b261aca7044cfd527a3c8432ec11db5950501b773d3c2823f0855fb0fc8",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s19",
+        "day": 19,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 43,
+      "state_sha256": "8fffb401b16ceae59fcd2c077eb1e963122e421d7666a15bcf652c2601f0e886",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ed33e145539c09cb59e0725c1c43a92fb65c5cf13e5698b8d11bb88f31999bfd",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b20",
+        "day": 20,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 44,
+      "state_sha256": "0c50bc38d0a233829c40e7d44887dfca32a4d40a3a83f8af4136709737e6ba32",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "33652e799b875c16ae633a48dc1850d72dfcb962f72162af917aca2b52f8e88e",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s20",
+        "day": 20,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 45,
+      "state_sha256": "89b0016159ad67dfaea19255e574a27da72b9bbef96add0c3e9d7dac77763c61",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "2025ce3c9fc9bf292eb78e1999d94efbe49e670dd199befb45c1ea11da28704d",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b21",
+        "day": 21,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 46,
+      "state_sha256": "1af88628c1d1c5f21f06a3826d6a6256787c95aa86e32786877e74d50545fd4c",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "34410e0b0b82c994248f183bf22c7c1192884a2c50eae182142c99c95a5c031d",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s21",
+        "day": 21,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 47,
+      "state_sha256": "8a8bce8642d07ef45ec56fa136f262b19121e0b2af486fd43897d6beaefb5280",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "5d4ff9068f75bc478b796b6c6a4f1ac96f52fafd7cebbbaddec7dca3c895ad63",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b22",
+        "day": 22,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 48,
+      "state_sha256": "6537265c6fe56be6e5a3a200ecfc748ac150e2e0723f6958fcc2d484542d93c9",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ac370f992c1cc09ed0264b0af66e8e5f9eb154a64c8f3751bae31c7c18ff274b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s22",
+        "day": 22,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 49,
+      "state_sha256": "1565ad41ecb51602e23e604b2a3695582383082354a7fa472bad5a045b9efcf4",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "b7423276dd1c5c1b0856d2978576ab2a179256f8638a5708e13f7a63ee64d5fb",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b23",
+        "day": 23,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 50,
+      "state_sha256": "e9f6757c058b0eedaddb754cc69e5a2fe2a172593090b557dcc387d8dbd4021d",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "6c848bc02dbb45dc80ba7895af91aedd9b014e9de4074c94d4b680ae1beff273",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s23",
+        "day": 23,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 51,
+      "state_sha256": "5650cef190501840009519f1181e96fcda291640d1c4297a242088e8c3cb7ce0",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "be1cc927e27cb633f67b1f6e0578c979f9af966141b6f6e8001e7e61a4c500cc",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b24",
+        "day": 24,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 52,
+      "state_sha256": "41bd0c03abb5e8f891b1dd3a0c6e5b2840a7f93987ef291b9413047464c16807",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "a769ac4dde4590a73111325f7068da2ca1eabfcde61f1681ca4d6db0179c96e2",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s24",
+        "day": 24,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 53,
+      "state_sha256": "dc83bd53c3dfa28d091d4aa9216409abed5f7bf819c6c89a25b642353d3708f3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "38f5018548f6e630971384825f1d59afbd94180b301683fefcfce7825add93cf",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b25",
+        "day": 25,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 54,
+      "state_sha256": "67989360b7a0fd5b1b6620372aaff3276dc323617e7b5b5429cf550c51415736",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "c25f325392f898356277e3b6ff270bdfe9d5cc6e7e9e605d8e24cbd840b370f2",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s25",
+        "day": 25,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 55,
+      "state_sha256": "62c5051432a83e408e484df8a4a6d375ff2dc1b835af429404966df6c046200d",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "40deef59405223e470dde523f3172e4a8055a8a2e6690d237b679dc43e6f55a4",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b26",
+        "day": 26,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 56,
+      "state_sha256": "0cb3e7150b3d3769474f8b46107468317f063ff896c043eb94d72e7ad724138d",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "be8d89fe4a4cbf3d70191c122cb981cfbba7000e52afccab59b21d292bf30d37",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s26",
+        "day": 26,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 57,
+      "state_sha256": "7c33d35bda131d2963441830b5306a84f75edb488589a497f676d6eafaa4b36a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "9c7d108fbc70ea7c39006741da8ba2520a3d70497394281d49a4e5ec6b7e446b",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b27",
+        "day": 27,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 58,
+      "state_sha256": "7e43c31464759fd3b654fa36d13f4fb4f505fcde112230a0dccaa3ce04cdce8f",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "b028a5265a7e9cab9e3e6fd9f851b8f319c2dda0b48eb2d3c233a64c249657a8",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s27",
+        "day": 27,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 59,
+      "state_sha256": "81db6d8ba7acfa6e5d534c71296c00fde2259bd745e2991f99a18a8d9bf5d925",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "69b20469d5c34c81464157a4fdf753a0d5fa6481f7504fad167a0d914f8e67f3",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b28",
+        "day": 28,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 60,
+      "state_sha256": "fd162f6a9c7007b24b0acb7ad4117343b0014efb4ed5113e117204b2d260de9d",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "769d8284c2493597f15b11cdcd4f82faee0d2a15ea24876e3e4e24ef49040b01",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s28",
+        "day": 28,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 61,
+      "state_sha256": "59e585795648d6b7d8fdae0eb7c8538e174502c04c19a509912949177e83481a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "6c2848fd3326d01a4988cdb9324e11f6633986204b59b734d44a04fc309bf629",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b29",
+        "day": 29,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 62,
+      "state_sha256": "1353ee6ee24cab6f474c5f05c0f38550b643306adfa74cf0543fe771bddcd385",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "9bf45efacd6404c14be4b545ff4011b1625c3fab5bdfc3f6ba507d4f2ad87e7d",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s29",
+        "day": 29,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 63,
+      "state_sha256": "85cb2ca77ddc54da550d85007bdc3213d3c7ecbc66e2888883d8652c0565ba48",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "7930e6d5981ec1e00421fbf83a391a657519cc4715ba8efca936f105cf458fdd",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b30",
+        "day": 30,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 64,
+      "state_sha256": "0e8ee5fe55cce4298bc32e871dcf65a2d17418372d3e70144c731d31b34ad2ec",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "bdc4a3658c7447c6e8e8ae6e1de4de64a66df92504028b78e7b2f4b2c1cefa25",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s30",
+        "day": 30,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 65,
+      "state_sha256": "ca82fad2184517020d4cbd9e475d9eb0a0aafb1b2a8158b34fa24b3b1f5d75cc",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "c3cca81b407141cf1321bc532a041017073fc338c597468e4cebd61f5617d0d8",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b31",
+        "day": 31,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 66,
+      "state_sha256": "3574eecb7a6c48dec8d6300e61ed1c77717b50521ce2a188bdcb86c32d9185d7",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f898b5d2fbc39a75c3f4e205a5bc45a5e128e1216453bdf5bd94f9ad8357bb8e",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s31",
+        "day": 31,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 67,
+      "state_sha256": "da64945e13ae0f89e410e16245184d73ed6c9ee4c073a935f262e15214056567",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "82e73b5d40207b3cb833ea751188ca13bd1a24c6febe7511a82b586caf070e6a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b32",
+        "day": 32,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 68,
+      "state_sha256": "fa23e63e62f507f6bc434fbadc58bcba1c3c93da6b44db245758b2326cfe4d0c",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "674efa7f1ad2b8502c7887a8a87863a6165487b4ce9837d3a64c5de4e9724b9f",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s32",
+        "day": 32,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 69,
+      "state_sha256": "e323272eb9fa4137b27392fb650d70378c16cf7f3341c43f614c67c7e1ab7b59",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "c540ab95103608e368530ac0940621d5c6a4176a2112dbb9f9f28026a09ebc6c",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b33",
+        "day": 33,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 70,
+      "state_sha256": "a0b8e78a8367b852e5054bb2483392e7de4667d2b95f7b6333c9a6b12b727ab3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "eda41cae5f32671e4329c33699d8350fc3a22e6fb08343c5840ceec027d308f7",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s33",
+        "day": 33,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 71,
+      "state_sha256": "fd951102654a36cbe50dc04177fcc9307eb57cf0f57240b25768742946e653ed",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "51a622c1d7b238620ed3a2f625653b663848f20601227a861bea49c1d957394a",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b34",
+        "day": 34,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 72,
+      "state_sha256": "9c86a83c2b899bf7922730a0424dcca7c42e8e3c49717f67220cffa9101977ad",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "efa72450abecaa17f3d64dd695ba5ffb8aeccc19ff5423a4984309f8886595f7",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s34",
+        "day": 34,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 73,
+      "state_sha256": "2c5539165d1f946bfb38b7bd349b3c16b96be534561a689f30cab15d276e077f",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "4b97c61871568be5298e8799ffe613c53ffd612829ec48b3fbdb95f4b3826d7c",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b35",
+        "day": 35,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 74,
+      "state_sha256": "f3480c9a83f65dea6cdd130269234f2abe0be8c403bf9befc3eaef87fd9f748a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f0f23e39b643bf14e48cd5164d347ec9d4f2ef49602396d50a96a2cbfffbc2f9",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s35",
+        "day": 35,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 75,
+      "state_sha256": "fa93d215080339e6ff23cb446ed6edc1a06d5aca2ce7fe31cc724331990f1471",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ac7b8b08e07f01b04419973185f2ec9020cc61c75c072bd16260535d53881443",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b36",
+        "day": 36,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 76,
+      "state_sha256": "770ea7301d1e82e23f0b6a1401368f21d72626fccc565e9085515bdbb0b95546",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "06fd7aaed257daaec5cd468d2a61d49c9560ab0b3df18c365734770167614a4d",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s36",
+        "day": 36,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 77,
+      "state_sha256": "e14b0a75fad441c8cff6d4f8a2cb4a9ecbbc6fb4c33c6a7cbf08b589d6017ab5",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "ff6de06f4349c0cf2fcb128ce53828319f57986faa8d82b192804de6ec46fb89",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b37",
+        "day": 37,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 78,
+      "state_sha256": "658f7a73b41ac9fc76413317b044dfb4c379ccc4a5110f5b63c66e38447c6582",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "760fa71b6ad01b1510bcb08839d6bcdda31089fe64eb2a0904bcd384485980ee",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s37",
+        "day": 37,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 79,
+      "state_sha256": "b17092ffdc27b87f3fc45ef6f5edfbb8cc1ec71dcf77fd747c5a29aff58618a5",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "94f0e50978173810bd889321a5b3f53219b46c7c483162d1e9a0d4ace210f639",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b38",
+        "day": 38,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 80,
+      "state_sha256": "e90c3e2190d32165e9f5540692812a3bf8e3f9d233b683cfbd3fb0b529b2bde3",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "45b9020c78a45c4e12d8fc5e95a744e7a70632a1f52c2cf9cc64809f9271cdca",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s38",
+        "day": 38,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 81,
+      "state_sha256": "c045b7c4de5d0917fb3b83d9f47b186bd6fb7c6156c84edc781948e3f80d4f9a",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "68e673d251e530559d663ada2ae7cd1a8c4f6fbbdf81e91e11db9968989867f7",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b39",
+        "day": 39,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 82,
+      "state_sha256": "88ed11471101c0126e45d95fdaff6d01f455419247c9668cfc77ad071d7e5d89",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f887d6a82f0faf730d38e958a580eee6f01dc1e3ec19252e745a64503f0c1b62",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s39",
+        "day": 39,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 83,
+      "state_sha256": "6148fb0b8a373a7444f1f65bb51054954d7139b6f5017d53ad00e3ba67589fcf",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "cee7ad80209a209a23a72b3f427492af56263142de61c9962a55f04c55b054db",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "b40",
+        "day": 40,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "iron_blade",
+        "technique_id": null
+      },
+      "seq": 84,
+      "state_sha256": "dccc23301c237ef8e27ffb35a5812c12cc2ff99c1e84a667f6637cf0cad0342c",
+      "type": "crafting.crafted"
+    },
+    {
+      "event_hash": "f1ff13e5664e14dc2d14e879cd39a0f4dff76596f4d03ff1a2a5abcc8bc718e5",
+      "expect": "accepted",
+      "payload": {
+        "craft_id": "s40",
+        "day": 40,
+        "element": "fire",
+        "quality": "poor",
+        "quantity": 20,
+        "recipe_id": "healing_salve",
+        "technique_id": null
+      },
+      "seq": 85,
+      "state_sha256": "cbc897d8b75bc00aa29fc6fd3991d94b410bab3c12f600ae9f32c95e31e17496",
+      "type": "crafting.crafted"
+    }
+  ]
+}
