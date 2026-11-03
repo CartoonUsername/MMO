@@ -40,7 +40,11 @@ class Crafting(Protocol):
 
 
 class EconomicProfile(Protocol):
-    """Prefix 'economy.': Handels-/Unternehmensspezialisierung und Karriere."""
+    """Prefix 'economy.': Handels-/Unternehmensspezialisierung und Karriere.
+
+    Umgesetzt in mmo_cee/economy.py (Charakterseite) und mmo_world (Handelsdienst), ADR-0011;
+    diese Schnittstelle bleibt als Vertrag bestehen.
+    """
 
     def specializations(self, state: CharacterState) -> list[str]: ...
 

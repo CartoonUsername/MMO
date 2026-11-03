@@ -1,0 +1,765 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 0,
+      "fine_artisan": 0,
+      "glass_alchemist": 0,
+      "inventor": 0,
+      "mass_producer": 0
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 0,
+      "infusion": 0,
+      "innovation": 0,
+      "volume": 0
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "profession:alchemy>=2",
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "profession:smithing>=3"
+        ],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "economic_direction_scores": {
+      "apothecary_trader": 0,
+      "arms_dealer": 99,
+      "grocer": 0,
+      "luxury_trader": 0,
+      "materials_broker": 0,
+      "merchant": 249
+    },
+    "economic_directions": {},
+    "economic_profile": {
+      "best_rung": -1,
+      "companies_founded_total": 0,
+      "companies_open": 0,
+      "company_id": null,
+      "network_size": 3,
+      "role": null,
+      "rung": -1,
+      "trades": 6
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 0,
+          "element_attuned:fire": 0,
+          "profession:smithing": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Handelsbericht (rules v7): strikte Felder, Wertebereiche, kein Handel mit sich selbst, eindeutige trade_id, Tag monoton, Preisband um den exakten Referenzwert.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {},
+      "daily": {
+        "day": 0,
+        "points": {
+          "finesse": 0,
+          "infusion": 0,
+          "innovation": 0,
+          "volume": 0
+        },
+        "recipes": {}
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 0,
+        "herb": 0,
+        "metal": 0,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 0,
+        "infusion": 0,
+        "innovation": 0,
+        "volume": 0
+      },
+      "recipes": {},
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "economy": {
+      "career": {
+        "best_rung": -1,
+        "changes": 0,
+        "company_id": null,
+        "role": null,
+        "since_day": 0
+      },
+      "classes": {
+        "food": 0,
+        "luxury": 0,
+        "materials": 0,
+        "medicine": 0,
+        "weapons": 99
+      },
+      "counterparties": {
+        "b": 1,
+        "p1": 1,
+        "p2": 1
+      },
+      "daily": {
+        "counterparties": {
+          "b": 1,
+          "p1": 1,
+          "p2": 1,
+          "p3": 1,
+          "p4": 1,
+          "p5": 1
+        },
+        "day": 1,
+        "points": {
+          "network": 600,
+          "volume": 99
+        }
+      },
+      "founded": {},
+      "last_day": 1,
+      "points": {
+        "network": 600,
+        "volume": 99
+      },
+      "trades": {
+        "p1": 2,
+        "p2": 3,
+        "p3": 4,
+        "p4": 5,
+        "p5": 6,
+        "t1": 1
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "dc443cf04fb560d380051abf9499cdd72c81e5b9a5b1d0dbda67af5d4ddc016b",
+  "format": 1,
+  "name": "economy_trade_validation",
+  "rules_file": "rules_v7.json",
+  "rules_sha256": "5a82945f69d206371627a28ab8a300c398d1087ae616c954ab2d5c519f5be475",
+  "steps": [
+    {
+      "event_hash": "16f4f9cb7845f9336c770f9b6b8ab985f9d05ab1b81912bd7a0377c552e4b1f0",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "6eca5c77040c632e619872416611fab951932adbdec184c9428f6ca9fededcc0",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "fb72980ec5239b8fae067855a54103d8c42ba81fdf3efca290afc10583daa21b",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t1",
+        "value": 360
+      },
+      "seq": 1,
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "c",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t1",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "c1",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t2",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "points": 99,
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t3",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t4"
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "broker",
+        "trade_id": "t5",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "ghost",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t6",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "legendary",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t7",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 0,
+        "role": "seller",
+        "trade_id": "t8",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 1001,
+        "role": "seller",
+        "trade_id": "t9",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": true,
+        "role": "seller",
+        "trade_id": "t10",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 1.5,
+        "role": "seller",
+        "trade_id": "t11",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t12",
+        "value": 0
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t13",
+        "value": 10000001
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t14",
+        "value": "360"
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "d",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t15",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": -1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "t16",
+        "value": 360
+      },
+      "state_sha256": "3ec39e575f10f2e15ff0c4ee3331ac77e4384aafe473d4e6ffb81740c5afce95",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "6d33881b39000bcf44d184840732bb7588abb29b1b366a2f9bcf22aff7df8839",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "p1",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "p1",
+        "value": 270
+      },
+      "seq": 2,
+      "state_sha256": "818bbbb2b4be3984cfd8a7f9d47fc35a097a89d4f473f6b342b26f04fcff10fd",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "9c1f9a0a7c8660760b7da6d47b89bdd9160a2e810a87566b00253ebfb4ff91cf",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "p2",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "p2",
+        "value": 450
+      },
+      "seq": 3,
+      "state_sha256": "53e19d89403471a306e655ce4477e808e6e3396831aca1ef7d7d3f80f73978a3",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "e5e4da3dfc4f858bb2b02f9e46af97683dead6c6f46c5bb12ea8f2ca60af4a8d",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "p3",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "p3",
+        "value": 269
+      },
+      "seq": 4,
+      "state_sha256": "f71f3c17219fc34415b3e1f14aa19336f70f90ce3b7bae44a061259a64d128a7",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "a6696cd70b45a3d6adbbe8013075379d7fd1512ace41522bc8afebbcf1187da4",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "p4",
+        "day": 1,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "p4",
+        "value": 451
+      },
+      "seq": 5,
+      "state_sha256": "f64d9b60651adc572ea4b469e720958a85b5339d812ad10ad63dcf0d534018e7",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "56ab3fc76caafec48384d99cca4f7c036704ee1d09ae182e7a78b797943bd639",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "p5",
+        "day": 1,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 1,
+        "role": "seller",
+        "trade_id": "p5",
+        "value": 5
+      },
+      "seq": 6,
+      "state_sha256": "dc443cf04fb560d380051abf9499cdd72c81e5b9a5b1d0dbda67af5d4ddc016b",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "counterparty": "b",
+        "day": 0,
+        "grade": "fine",
+        "item_id": "iron_blade",
+        "quantity": 2,
+        "role": "seller",
+        "trade_id": "d0",
+        "value": 360
+      },
+      "state_sha256": "dc443cf04fb560d380051abf9499cdd72c81e5b9a5b1d0dbda67af5d4ddc016b",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "volume": 100
+      },
+      "state_sha256": "dc443cf04fb560d380051abf9499cdd72c81e5b9a5b1d0dbda67af5d4ddc016b",
+      "type": "economy.grant_points"
+    }
+  ]
+}

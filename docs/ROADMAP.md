@@ -11,7 +11,7 @@ Priorität 1 = zuerst. Jeder Schritt: kleiner Commit, Tests grün.
 | 4b | Serverseitiger Kampfkern `mmo_sim` (1:1, Berichte aus Simulation) | **erledigt** (ADR-0006); Golden Vectors der Simulation erledigt; offen: Unterstützung/Gruppen, Raum/Geometrie |
 | 5 | Wesensmatrix erweitern: gewichtete Bewertung, Entscheidungsereignisse, Vor-/Nachteile (rules_v4, ADR-0007) | **erledigt** (Mechanik); offen: echte Formen/Inhalte, Wirkung der Modifikatoren, geheime Formen über Discovery |
 | 6 | Discovery + Crafting | **erledigt** (Mechanik; Discovery ADR-0009, Crafting ADR-0010, Golden Vectors); offen: Werkzeuge/Werkstätten, Materialgewinnung, Märkte, Experimentieren |
-| 7 | Economic Profile (Handel, Unternehmen, Karriere) | offen |
+| 7 | Economic Profile (Handel, Unternehmen, Karriere) | **erledigt** (Mechanik, ADR-0011, Golden Vectors); offen: Firmensimulation (Mitarbeiter, Gehälter, Loyalität, Anteile), Märkte/Preisbildung, NPC-Wirtschaft, Logistik |
 | 8 | Visual Evolution (State → Erscheinungsparameter, deterministisch) | **erledigt** (Mechanik, ADR-0008, Golden Vectors); offen: echte Optik/Assets, Ausrüstung/Kosmetik, Übergänge |
 | 9 | Snapshots, Regel-Migration/Rebuild, Anti-Cheat-Plausibilitätsregeln | offen |
 | 9b | Golden Test Vectors (Referenz ↔ Portierung) | **erledigt** (`reference/golden/`, ADR-0005) |

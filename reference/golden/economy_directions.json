@@ -1,0 +1,1472 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 0,
+      "fine_artisan": 0,
+      "glass_alchemist": 0,
+      "inventor": 0,
+      "mass_producer": 0
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 0,
+      "infusion": 0,
+      "innovation": 0,
+      "volume": 0
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "profession:alchemy>=2",
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "profession:smithing>=3"
+        ],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "economic_direction_scores": {
+      "apothecary_trader": 0,
+      "arms_dealer": 14400,
+      "grocer": 7200,
+      "luxury_trader": 0,
+      "materials_broker": 0,
+      "merchant": 15840
+    },
+    "economic_directions": {
+      "arms_dealer": 1,
+      "grocer": 1,
+      "merchant": 1
+    },
+    "economic_profile": {
+      "best_rung": -1,
+      "companies_founded_total": 0,
+      "companies_open": 0,
+      "company_id": null,
+      "network_size": 12,
+      "role": null,
+      "rung": -1,
+      "trades": 60
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 0,
+          "element_attuned:fire": 0,
+          "profession:smithing": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Handelsrichtungen: Waffen- und Lebensmittelhandel mit vielen Partnern -> merchant, arms_dealer, grocer gleichzeitig (nicht exklusiv).",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {},
+      "daily": {
+        "day": 0,
+        "points": {
+          "finesse": 0,
+          "infusion": 0,
+          "innovation": 0,
+          "volume": 0
+        },
+        "recipes": {}
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 0,
+        "herb": 0,
+        "metal": 0,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 0,
+        "infusion": 0,
+        "innovation": 0,
+        "volume": 0
+      },
+      "recipes": {},
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "economy": {
+      "career": {
+        "best_rung": -1,
+        "changes": 0,
+        "company_id": null,
+        "role": null,
+        "since_day": 0
+      },
+      "classes": {
+        "food": 7200,
+        "luxury": 0,
+        "materials": 0,
+        "medicine": 0,
+        "weapons": 14400
+      },
+      "counterparties": {
+        "f0": 6,
+        "f1": 6,
+        "f2": 6,
+        "f3": 6,
+        "f4": 6,
+        "f5": 6,
+        "w0": 4,
+        "w1": 4,
+        "w2": 4,
+        "w3": 4,
+        "w4": 4,
+        "w5": 4
+      },
+      "daily": {
+        "counterparties": {
+          "f0": 1,
+          "f1": 1,
+          "f2": 1,
+          "f3": 1,
+          "f4": 1,
+          "f5": 1
+        },
+        "day": 10,
+        "points": {
+          "network": 0,
+          "volume": 1200
+        }
+      },
+      "founded": {},
+      "last_day": 10,
+      "points": {
+        "network": 2400,
+        "volume": 21600
+      },
+      "trades": {
+        "f10-0": 55,
+        "f10-1": 56,
+        "f10-2": 57,
+        "f10-3": 58,
+        "f10-4": 59,
+        "f10-5": 60,
+        "f5-0": 25,
+        "f5-1": 26,
+        "f5-2": 27,
+        "f5-3": 28,
+        "f5-4": 29,
+        "f5-5": 30,
+        "f6-0": 31,
+        "f6-1": 32,
+        "f6-2": 33,
+        "f6-3": 34,
+        "f6-4": 35,
+        "f6-5": 36,
+        "f7-0": 37,
+        "f7-1": 38,
+        "f7-2": 39,
+        "f7-3": 40,
+        "f7-4": 41,
+        "f7-5": 42,
+        "f8-0": 43,
+        "f8-1": 44,
+        "f8-2": 45,
+        "f8-3": 46,
+        "f8-4": 47,
+        "f8-5": 48,
+        "f9-0": 49,
+        "f9-1": 50,
+        "f9-2": 51,
+        "f9-3": 52,
+        "f9-4": 53,
+        "f9-5": 54,
+        "w1-0": 1,
+        "w1-1": 2,
+        "w1-2": 3,
+        "w1-3": 4,
+        "w1-4": 5,
+        "w1-5": 6,
+        "w2-0": 7,
+        "w2-1": 8,
+        "w2-2": 9,
+        "w2-3": 10,
+        "w2-4": 11,
+        "w2-5": 12,
+        "w3-0": 13,
+        "w3-1": 14,
+        "w3-2": 15,
+        "w3-3": 16,
+        "w3-4": 17,
+        "w3-5": 18,
+        "w4-0": 19,
+        "w4-1": 20,
+        "w4-2": 21,
+        "w4-3": 22,
+        "w4-4": 23,
+        "w4-5": 24
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "xp": {}
+    }
+  },
+  "final_state_sha256": "ee97edfbeb783e1a5b25d11a21cee5d4ad4eee62f7ff2894966bbe0924eb8d27",
+  "format": 1,
+  "name": "economy_directions",
+  "rules_file": "rules_v7.json",
+  "rules_sha256": "5a82945f69d206371627a28ab8a300c398d1087ae616c954ab2d5c519f5be475",
+  "steps": [
+    {
+      "event_hash": "16f4f9cb7845f9336c770f9b6b8ab985f9d05ab1b81912bd7a0377c552e4b1f0",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "6eca5c77040c632e619872416611fab951932adbdec184c9428f6ca9fededcc0",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "a8474fec7e7cb4e3d1529a78a4286bf26efa221fde4594ac55fad9ab52ca1dcb",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w0",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-0",
+        "value": 6000
+      },
+      "seq": 1,
+      "state_sha256": "782de14261498345d8fcefea18c1419b5f7c5eb8729d08ea367b942cf1fa34b9",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "b96dd6e5cf273808387b8ff1eec278a746bc1dc82ffb150327c5fcb05047f920",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w1",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-1",
+        "value": 6000
+      },
+      "seq": 2,
+      "state_sha256": "42d13ca0b88e8a2985fbcd218157e20244d7989c6f2b101bdcd232e1136b4175",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "4f92930f2e852d4148dbce348612df32dd03fb9bb04880cc20592718b03038e8",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w2",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-2",
+        "value": 6000
+      },
+      "seq": 3,
+      "state_sha256": "b7861901d0f77552eaa917e77777f090f9985d6bb180e9bfc9594926c77719dc",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "8062bc8e95a74a0a0e7978cb605a52e15fbb0aa4d41c6c9d5755d26eb290ba14",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w3",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-3",
+        "value": 6000
+      },
+      "seq": 4,
+      "state_sha256": "b6490fce5f5cdbbe32ffac42e0c69893d0bf4c2d539a39fed480251b0b220f26",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "31e4ff8ea05403f0847b586fb5a98239d8150868f24535bd507749f04592c767",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w4",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-4",
+        "value": 6000
+      },
+      "seq": 5,
+      "state_sha256": "afe84304cddd350568a206773f5451613da23dff27394547de2d8c0bc7f6bae2",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "06634f572d3fcd47b6d8421af261f3b9f1fb6d15c4a51901b93cd5ace36c1671",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w5",
+        "day": 1,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w1-5",
+        "value": 6000
+      },
+      "seq": 6,
+      "state_sha256": "6b4bdca04933eb09c9f18599fe1238ae95cabca82598adf99871e8429b72a18e",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "2c6557b8ef3251f0822aa22456b6f9d05cd04457065f79172ab5e7c4d0e34937",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w0",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-0",
+        "value": 6000
+      },
+      "seq": 7,
+      "state_sha256": "86031a4e0d6d1b6c80f6adc5e1399b07192a893930aee95058505e67c15de458",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "2cf74a82ba561f02b286d8c736541665f519e01c94aea9eaf24ca4f4daf9fa8f",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w1",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-1",
+        "value": 6000
+      },
+      "seq": 8,
+      "state_sha256": "65265583f720e4e473af6da5ce6341c246d66de494b9d0b77dea2cfc0aa7df62",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "e78dfcb7638f2e66e5c03a159ac45f6d326356ce944b2da2350169eb8ee8766c",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w2",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-2",
+        "value": 6000
+      },
+      "seq": 9,
+      "state_sha256": "ed81ea0efca80c2838a8eec3c9cdfacdc1e5d7d88994c5b30adfd0ca1731b383",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "e0856d4b42de47022270bf772f35badfc166d7b6406c40646557c7c1476ef4bd",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w3",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-3",
+        "value": 6000
+      },
+      "seq": 10,
+      "state_sha256": "bb535983e3d58915c2cb758ea5e492f2b5a68438bdd07575b58dc21a308ce585",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "4b3a0f0759150d7ac2233d097e6d874f8851fba7b32f52c6ee8b5d8b2ae3003e",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w4",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-4",
+        "value": 6000
+      },
+      "seq": 11,
+      "state_sha256": "92d515d316c54c4e91454c24419481f43d90b6b15ec63da7dfa1fcc54fe41bd6",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0db3ada94782b2f76aac3a5490f647c71fa169b1e38e1121f01bb5f51a8dfb06",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w5",
+        "day": 2,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w2-5",
+        "value": 6000
+      },
+      "seq": 12,
+      "state_sha256": "25bbc29d7b28a418da67092b931ae663643a35cf75ec765309a1f9a6790b0695",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "f07c638435c853731c0551974fe3faf1673046fe4a502223ebe2356134153d2b",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w0",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-0",
+        "value": 6000
+      },
+      "seq": 13,
+      "state_sha256": "37dde14e35caeef41146e43bc7e8ac5456923c7e844829de24916890ed9c3db4",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "fc3fed18fc67a2751eac1f3db6b8845e09a725d28b1f5d075e528468edacf156",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w1",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-1",
+        "value": 6000
+      },
+      "seq": 14,
+      "state_sha256": "634c24b126d4197727d7cdf7a38bdc1220a857429a9f2b2f05fb6242e4a0d76e",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "1fed5e8fd570efef189a32e384fe52085d20957b46b1a71f368b68a3d13c7649",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w2",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-2",
+        "value": 6000
+      },
+      "seq": 15,
+      "state_sha256": "bd94a8b6966de788ab0cb92ad3818c2639dbddd75a554e9c3eb227fe937b8d10",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "d639f979442c576bd4b2969ba461820e230daee69443bbf2eb08d3c8ffaf1202",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w3",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-3",
+        "value": 6000
+      },
+      "seq": 16,
+      "state_sha256": "4966fede8c926ea1d9c2270dbba24b2eeafc6ba74c20463274c066fca69ca105",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "7c88abb63c2782cb7a97bf63f8a09aeadcae0cacc2782e2fe44771d4af740783",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w4",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-4",
+        "value": 6000
+      },
+      "seq": 17,
+      "state_sha256": "81e1a2e69bc8d6ac64fb81cb846a64726f949d0a0d62b442c9d8b6f583e2407b",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "029a38eff86b0391b6dca4b2ab88f830d9dc8c58cc7a7ea9886a6db917ba6b51",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w5",
+        "day": 3,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w3-5",
+        "value": 6000
+      },
+      "seq": 18,
+      "state_sha256": "68693ffddbf4552653b53f57dd9c423c443b4593c9faaff12fbb7309368b0abc",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "a9a2d6eafaa51acf54e33fada59b996d0e10eb7d224ab5740815c1ae8c90be83",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w0",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-0",
+        "value": 6000
+      },
+      "seq": 19,
+      "state_sha256": "0bac6ed6759f1210a685e6323004ba091ff94b60aa8cb1a8693ba35f7b1dbeb4",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "dbda5935259901590bdfb9da5754d6fd43a0d09b02cdbe25fa37d6b76ec424e9",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w1",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-1",
+        "value": 6000
+      },
+      "seq": 20,
+      "state_sha256": "69a6d7ff3ae07ff7c612ee2c9e5b3df7232955db63051d4da45a07502d082885",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "20544d6b10385c93d22cf6c33e179b52686e76335a616cdde62e8271293ca6b2",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w2",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-2",
+        "value": 6000
+      },
+      "seq": 21,
+      "state_sha256": "8c5c70611894fb246e79965b97582669420d29fffbb6d286585197eff2aa4fbc",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "e05662ec807f230cf4078f5724d1ca35642690f408a2d98d9359ba00660ab5fa",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w3",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-3",
+        "value": 6000
+      },
+      "seq": 22,
+      "state_sha256": "2de8b48d3e857da65454fee977bd7738715bba090a78e80a586482108fbd7a6a",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "73c61469d28fe50d17150bac6cbe1787882a22b627b79b49af569d7f779c8cbf",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w4",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-4",
+        "value": 6000
+      },
+      "seq": 23,
+      "state_sha256": "4f9c62f9bfd8e08ce14fdf7bc2b551ac336b0d64cb0afba1870fe9726478d8df",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "73dfa08a2db7b2dcf36aa595542eee9d33818428e2bba8e2d78ae1e03bdedaef",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "w5",
+        "day": 4,
+        "grade": "common",
+        "item_id": "iron_blade",
+        "quantity": 50,
+        "role": "seller",
+        "trade_id": "w4-5",
+        "value": 6000
+      },
+      "seq": 24,
+      "state_sha256": "4ea55110352ccaf1fd3b03f2d8aa2e8850d0e5931752d2693d963183a99a1d03",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "8ee03e9d9087f914ad0b141ac1ecad3e5ebac5683eb40cc69bb8a1b98fd36878",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-0",
+        "value": 2000
+      },
+      "seq": 25,
+      "state_sha256": "89065f281635ffc95486d2a3dac43ecbfc4ffb79f3bfbb958524db2e93be5391",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0a5d9af5130e642407c5405f844be9a2c4f468e354e88e073fce6637c6e42fbe",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-1",
+        "value": 2000
+      },
+      "seq": 26,
+      "state_sha256": "ab76608accf1bbc5e4bb41c63eae1fbe9bdb7f320edf55e7fff54a9da3064960",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "318fba9750c56504d0d9ae1ae613ca01d53dd3d78d59a2fda53cad82f8fa4e88",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-2",
+        "value": 2000
+      },
+      "seq": 27,
+      "state_sha256": "a44f9355edaffc214461351445220eabc692f8586a5652df46e4def79b566925",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "ccefb5e957576943dfbd096ab8e7b5cb3af38885b26e75c881fca36488ccaed1",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-3",
+        "value": 2000
+      },
+      "seq": 28,
+      "state_sha256": "be267a4d8702bd0c6e0e2323ccbfb5084eff1cac51c5231fc90aba6cb67a7b91",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "53bd4f9530fed33c4d7f18538e20fa5fdc8b6d476baa9e47b14958c702cf6433",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-4",
+        "value": 2000
+      },
+      "seq": 29,
+      "state_sha256": "254f82dcffa9a694938e814ee5ee7a17098f14a4431275c46786e18782fe71fb",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "cf7ea772e2ccf5394a3b7c4a70906df31bd7dc1876df82c61142924bc277d179",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 5,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f5-5",
+        "value": 2000
+      },
+      "seq": 30,
+      "state_sha256": "6bb2bbbcfa698702e1147ede6d3dc6f3f27782762c89e55c2a7be521453500ca",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "50dd80be6627b10e0315579fbc656ac979990ae1426d006b7b747a76f4cbf753",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-0",
+        "value": 2000
+      },
+      "seq": 31,
+      "state_sha256": "a933c1801d0f4bacb607e5b2bb035f20a75d52fbaee0731d2eefc0316e28ba11",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "8d18b3828ff377bc705633d7e0f39933046c4e5c2a5f5e891b170f7c7e6a139b",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-1",
+        "value": 2000
+      },
+      "seq": 32,
+      "state_sha256": "affce31f68f95de62af2616932631ec510080adfe2156eeb048b9091992078a2",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "157a2f6c8019d7c164628c85e5b4c8dc908c0efb5ee17a9b4b35636d1a65b028",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-2",
+        "value": 2000
+      },
+      "seq": 33,
+      "state_sha256": "bca5c51d8dbd87e651a35974a485af0339632320ced06d1671db59ea2efc583a",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "18a5a9d1eb9e3ed56cf5e96383aac003a715d038249286f8d5badbcac5a97a4c",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-3",
+        "value": 2000
+      },
+      "seq": 34,
+      "state_sha256": "5b5f03a684fedea4102c7131e7fc1de362216ba0fb4a5131522d09d78f8fe71f",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "cc4144bae359b9332b7f21c3d474d6a12a1b7ded34f1ef39922908faa8f4d9a2",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-4",
+        "value": 2000
+      },
+      "seq": 35,
+      "state_sha256": "c2860cc99d9d08d7fe2aa4f83e5db6f3b25cb87393a467721b476e3b3ddb97bf",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "51c20c7d7185fd061c9fccea998a54dc9adba72f37478bcd5947a7745d1a5623",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 6,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f6-5",
+        "value": 2000
+      },
+      "seq": 36,
+      "state_sha256": "50d35b688aac5fb6b754ecd8799b867c38a8e8763b0c6f038b8e5eeb8e0ea348",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "44e25ba40e82180427f4b280f53bccb2406019e803fc7b61427049acb3eb9130",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-0",
+        "value": 2000
+      },
+      "seq": 37,
+      "state_sha256": "d10b2c53a3df2081e56a60b764534fb53a9198ded6493d345e1b6c48ea5b5825",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "a21da70da1970a8ce4371cba8556de3161fe7df095162e199bf7f43ca0536f7c",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-1",
+        "value": 2000
+      },
+      "seq": 38,
+      "state_sha256": "20ffda9d68fea7ad9b4bc535e8715bc51218a1712ae56943af156429cd8967de",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "4fed0be8dbbd0bebbad03468a79ee49fc1cea2419a36d7613f169bfee9a560c0",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-2",
+        "value": 2000
+      },
+      "seq": 39,
+      "state_sha256": "3fe71b72f452a9221d27afdbad92b93db1de201432ab6aa93c240bc8bdcdf140",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "00ca99f8ec5883124352b7b36b635c3e4d7522fb13fcebe48c34cd2578a5c69a",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-3",
+        "value": 2000
+      },
+      "seq": 40,
+      "state_sha256": "2d64be2904f3287bf52c7893f4d5da0c96f2019f85ed5559a148e824b07cdffc",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0d6eda5b8305627d855773f59ac6fb16121d6461ed5b31856023ebaec99c1b13",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-4",
+        "value": 2000
+      },
+      "seq": 41,
+      "state_sha256": "ea5fd42cc56b2bff5ab33b5b5fc1e503c2d188fae5783010400024f759a7efe8",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "54847c3654b0eba62a8250d4e6d0a19d43bea76bfd84d51d7fe23a0d8b77ef8a",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 7,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f7-5",
+        "value": 2000
+      },
+      "seq": 42,
+      "state_sha256": "afa18e8dbbb4e1182dabfb6b6ae561315a4bde95fe0aff6f45f12a6caed18a8c",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0039029336a658541008b6b7c0d4808cd6eaced14bb2ddd8f1128d167b9d22bd",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-0",
+        "value": 2000
+      },
+      "seq": 43,
+      "state_sha256": "2a545dd201651462a661d29890f4f1efac1a616649f1f23d5bdefa1423b38e17",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "f1776972668f47076c27676315bc360307066ecc040a6bc100bd867887674d5c",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-1",
+        "value": 2000
+      },
+      "seq": 44,
+      "state_sha256": "f4234c433d37a370439f8f102a5708c607ffb85ae9d2a140aa862cab68676447",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0df64b0ae2150275cc8f559748884773f2e3ee2cfbbae1de201936f05e3adedc",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-2",
+        "value": 2000
+      },
+      "seq": 45,
+      "state_sha256": "7cbc34783129411e0f52268358e7a78caab926e7c6fe02d5f8f5c46608a7cba7",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "b826aa2eaf3ad80848660b606bf6000d2370c5314acbb354dcb686a9435ee389",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-3",
+        "value": 2000
+      },
+      "seq": 46,
+      "state_sha256": "7569ccebf925e490e0e0638cfe368525a1089ec629950c37a120ac395cc59605",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "99ce27a10a679d3326cc89433d29e376e41b34807831f98d84a016f564bf246a",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-4",
+        "value": 2000
+      },
+      "seq": 47,
+      "state_sha256": "e7e6ffd4efdf0eb4f171dfa36eddca8fc215112793154359e8ace6ee00c22ee9",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "49a0db648c1c5aaed81b439ecfe76a19c423a4e3ce0c4d34f4e64088f2e96719",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 8,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f8-5",
+        "value": 2000
+      },
+      "seq": 48,
+      "state_sha256": "1d715e3962a6abfb3aef20437d86af0aea94e93d3d2ee91f32e13ba34d55f905",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "fb58e235cd337d44f0f5a4ad7d765fb68dfc6d2cbc1fcb872cac466fdf7e201e",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-0",
+        "value": 2000
+      },
+      "seq": 49,
+      "state_sha256": "ca9c66884515db680357f2e93bcdb8e6a2ab5e0535c32696ab1a7665a4e5aab6",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "def586ae72ed29a0eccd6a1c7e5034ca2206470800dc195c8dc56e0f7f1680d2",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-1",
+        "value": 2000
+      },
+      "seq": 50,
+      "state_sha256": "65f0e0892e1be9bfcd397d47a878023e5ee4094e175391c3c7593dec305a8c28",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "b7f7576fd2418798b876303a17c294b6b250bfa41e726c53e1f8047b1f661c9d",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-2",
+        "value": 2000
+      },
+      "seq": 51,
+      "state_sha256": "37c381269bccba1c26e7ea3db9c6d01be7648d9faaabbeb9115516a9ff3ad6f0",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "6d80550f76e1da6d3a98ddb31dda1e688c4329e27dbdfeebd90a94480a744e07",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-3",
+        "value": 2000
+      },
+      "seq": 52,
+      "state_sha256": "8210c2006886c4614cfcfccb17937a858c73b66685b032fc663744c8b9e96e51",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "6a0bf4a7598e0c672f7f807782e5a678923504d75fb1920faaa0a234b850e565",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-4",
+        "value": 2000
+      },
+      "seq": 53,
+      "state_sha256": "8377c3c49458b0861eb174e92d6078c4b6cf6cfcd6b11f5a47a631dc357727de",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "0259173a7f238d8e8e67e66298ccb194359828bf59e591fb2c70d44ecdd8ca9d",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 9,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f9-5",
+        "value": 2000
+      },
+      "seq": 54,
+      "state_sha256": "f8827a67515145e5c47c779257831c6656311861e706bcb7e93d2d8c036bc9cd",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "21895bd8ed1f386d542ffebef9b8bdbb3a54565d7f56665acce2609a55c9b1f2",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f0",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-0",
+        "value": 2000
+      },
+      "seq": 55,
+      "state_sha256": "ff8a493d415d8fa2188b1f5afa29042b5938bb440f752cde157626e0951e4a74",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "f91b4609c6c27395557609cf5e8320194fec73630b6d770878f673e66945777f",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f1",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-1",
+        "value": 2000
+      },
+      "seq": 56,
+      "state_sha256": "eea661faa8935578986dabb4e81ec4326dfc552fee5a504e93d950f9ed9a2a7b",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "584cfa8f79dcefe4375525434bfff1906f5a116dc78defcfe9cbed20aa857d0a",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f2",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-2",
+        "value": 2000
+      },
+      "seq": 57,
+      "state_sha256": "b16cb9ce980dc155ae9c2c60a54fd5fd0af484acd260ed74198f6f6d12efb57e",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "01fac09cf1f40b997bdd87861e53b7e4162a5354d28d131d56394bc29770825e",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f3",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-3",
+        "value": 2000
+      },
+      "seq": 58,
+      "state_sha256": "b7721912606e3585af2a4824363839650e1529ed8ade1e0a9f6e62f6e8b4ad63",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "bd7d65eb898c123d5d077ab31b28f4bceb75ac2d1a2c4d7dec632c5887b03fe5",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f4",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-4",
+        "value": 2000
+      },
+      "seq": 59,
+      "state_sha256": "f582f104fe67c27af21e37723cbaa5605bebb5adc2d7b05e031f6e62461f8c6b",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "7cb9ce612dc0712f5de68f160e70d06f8e129a1c5ee5076277d036bd4e51e326",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "f5",
+        "day": 10,
+        "grade": "common",
+        "item_id": "bread",
+        "quantity": 400,
+        "role": "seller",
+        "trade_id": "f10-5",
+        "value": 2000
+      },
+      "seq": 60,
+      "state_sha256": "ee97edfbeb783e1a5b25d11a21cee5d4ad4eee62f7ff2894966bbe0924eb8d27",
+      "type": "economy.trade_completed"
+    }
+  ]
+}

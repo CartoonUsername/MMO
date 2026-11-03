@@ -29,7 +29,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
 | 6 | Discovery | `discovery.` | **implementiert** (Charakterseite in der CEE + Weltseite `mmo_world`, ADR-0009; Inhalte sind Platzhalter) |
 | 7 | Crafting | `crafting.` | **implementiert** (Handwerksprofil aus Herstellungsberichten in der CEE + Server-Herstellung/Inventar in `mmo_world`, ADR-0010; Inhalte sind Platzhalter) |
-| 8 | Economic Profile | `economy.` | Schnittstelle, nicht implementiert |
+| 8 | Economic Profile | `economy.` | **implementiert** (Handelsberichte, Laufbahn, Gründung in der CEE + Handelsdienst in `mmo_world`, ADR-0011; Firmensimulation und Märkte offen; Inhalte sind Platzhalter) |
 | 9 | Character History | (Querschnitt) | **implementiert** (`history.py`: Log, Hash-Kette, Verifikation) |
 | 10 | Visual Evolution | (keine Ereignisse) | **implementiert** (reine Ableitung Zustand → Erscheinungsparameter, ADR-0008; Optik ist Platzhalter) |
 
@@ -43,6 +43,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
+## Economic Profile (ADR-0011)
+
+*Charakterseite* (`mmo_cee.economy`): `economy.trade_completed` (Referenzwert exakt aus Regeltabelle, Preisband, Wiederholungsabnahme je Handelspartner und Tag, Tageslimits, Netzwerkbonus nur für qualifizierte neue Partner), `economy.career_changed` (Karriereleiter mit Meisterschaft, Dienstzeit und Punkten; Beförderung nur eine Stufe; Firmenwechsel nur nach Austritt), `economy.company_founded`/`company_closed` (Gate, Höchstzahl offener Firmen, IDs nie wiederverwendbar). Abgeleitet: nicht-exklusive Handelsrichtungen und `economic_profile`. *Weltseite* (`mmo_world`): `TradeService` (atomare Übertragung von Ware und Münzen, beide Berichte vorab validiert, Rückbuchung bei Ausfall) und `Inventory.apply_many`. Schutz vor Scheinhandel: kein Selbsthandel, absurde Preise und Kleinsthandel bringen weder Volumen noch Netzwerk.
 
 ## Crafting Engine (ADR-0010)
 

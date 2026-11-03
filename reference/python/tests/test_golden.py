@@ -14,6 +14,7 @@ ENGINE_EVENT_TYPES = [
     "essence.trial_passed", "essence.adopted", "essence.decision_made",
     "discovery.evidence_gathered", "discovery.made", "discovery.learned",
     "crafting.crafted",
+    "economy.trade_completed", "economy.career_changed", "economy.company_founded", "economy.company_closed",
     "combat.encounter_resolved",
 ]
 
@@ -153,6 +154,18 @@ class GoldenVectorTests(unittest.TestCase):
         dirs = self.vectors["crafting_directions"]
         self.assertEqual(dirs["derived"]["craft_directions"], {"elemental_smith": 2, "glass_alchemist": 1, "mass_producer": 2})
         self.assertEqual(dirs["derived"]["craft_direction_scores"]["mass_producer"], dirs["final_state"]["crafting"]["points"]["volume"])
+        wash = self.vectors["economy_wash_trading"]
+        self.assertEqual(wash["final_state"]["economy"]["points"], {"network": 800, "volume": 255})
+        self.assertEqual(wash["final_state"]["economy"]["counterparties"]["alt-1"], 9)  # 8 + 1 am neuen Tag
+        val = self.vectors["economy_trade_validation"]
+        self.assertEqual(val["final_state"]["economy"]["points"], {"network": 600, "volume": 99})
+        self.assertEqual(len(val["final_state"]["economy"]["trades"]), 6)  # Preisband: auch Handel ohne Punkte ist gewertet
+        career = self.vectors["economy_career_founding"]
+        self.assertEqual(career["derived"]["economic_profile"]["best_rung"], 4)
+        self.assertEqual((career["derived"]["economic_profile"]["companies_open"], career["derived"]["economic_profile"]["companies_founded_total"]), (3, 4))
+        self.assertEqual(self.vectors["economy_directions"]["derived"]["economic_directions"], {"arms_dealer": 1, "grocer": 1, "merchant": 1})
+        self.assertNotIn("economy", self.vectors["crafting_validation"]["final_state"])  # v6-Vektoren ohne Wirtschaftsteil
+        self.assertNotIn("economic_profile", self.vectors["crafting_validation"]["derived"])
         tech = self.vectors["crafting_discovery_techniques"]
         self.assertEqual(tech["derived"]["known_techniques"], ["folded_iron"])
         self.assertIn("frostglass", tech["derived"]["known_recipes"])

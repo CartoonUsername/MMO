@@ -1,0 +1,26 @@
+# ADR-0011: Economic Profile – Handelsberichte, Laufbahn, Gründung, Schutz vor Scheinhandel
+
+**Status:** akzeptiert als technische Grundlage. **Warenklassen, Basiswerte, Stufenfaktoren, Zahlen, Laufbahn-Voraussetzungen und Handelsrichtungen in `rules_v7.json` sind Platzhalter**, keine bestätigten Spielinhalte.
+
+**Kontext:** Bestätigt (Handover Teil 9–11): Spielerwirtschaft mit Handel, Unternehmen, Mitarbeitern; Karriere Mitarbeiter → Spezialist → Abteilungsleiter → Manager → Geschäftsführer; Eigentümer und Geschäftsführer sind verschiedene Rollen; keine unkontrollierte unendliche Geld-/Warenproduktion; wirtschaftliche Spieler sollen ohne starke Kampfklasse erfolgreich sein.
+
+**Entscheidungen**
+1. **Zwei Ebenen wie bei Kampf, Entdeckung, Handwerk.** *CEE* (`EconomyEngine`, Ereignisse `economy.*`): serverbestätigte Berichte → wirtschaftliches Profil. *Weltseite* (`mmo_world.TradeService`): atomarer Handel zwischen zwei Figuren. Die Firmensimulation selbst (Mitarbeiter, Gehälter, Loyalität, Anteile) ist **noch nicht** umgesetzt; ihre Ergebnisse treffen als Laufbahn-/Gründungsereignisse ein.
+2. **Handelsbericht** (`economy.trade_completed`): Handel aus Sicht einer Seite (Käufer/Verkäufer), mit Gegenstand, Güte/Qualität, Menge, Preis, Tag. **Der Referenzwert wird nicht berichtet, sondern aus einer Regeltabelle exakt berechnet** (Basiswert × Stufenfaktor × Menge); die späteren dynamischen Märkte ersetzen die Tabelle.
+3. **Schutz vor Scheinhandel (Wash Trading):** Handel mit sich selbst unzulässig; Preise außerhalb eines Bands um den Referenzwert bringen **0 Punkte** (der Handel bleibt gewertet und nachvollziehbar); gutgeschrieben wird höchstens der Referenzwert; **Wiederholungsabnahme je Handelspartner und Tag**; Tageslimits (voll → reduziert → hart); der **Netzwerkbonus** für einen neuen Partner gilt nur bei einem *qualifizierten* Handel (Mindestwert, Preis im Band), und das Netzwerk besteht nur aus solchen Partnern. Zweitaccounts, die sich Ware zum Referenzpreis hin- und herreichen, kommen so auf einen Bruchteil des Fortschritts echter Händler mit vielen Partnern (Tests).
+4. **Laufbahn** (`economy.career_changed`): Einstellung nur als Mitarbeiter; Beförderung nur genau eine Stufe, mit Mindest-Meisterschaft, **Dienstzeit** in der aktuellen Rolle und (höhere Stufen) Handelspunkten/Netzwerk; Zurückstufung (Entscheidung der Firma) und Austritt sind zulässig; **Firmenwechsel nur nach Austritt**; die Dienstzeit beginnt nach jeder Änderung neu; der höchste erreichte Rang bleibt gespeichert.
+5. **Gründung** (`economy.company_founded`/`company_closed`): Gate (Stufe, Meisterschaft), Höchstzahl gleichzeitig offener Unternehmen, **Firmen-IDs sind nie wiederverwendbar**. Eigentum ist unabhängig von der Laufbahn (Eigentümer einer Firma, Angestellter einer anderen).
+6. **Abgeleitete Sichten**: nicht-exklusive Handelsrichtungen (`economic_directions`, aus Dimensionen und Warenklassen) und `economic_profile` (Rolle, Rang, Unternehmen, Netzwerkgröße, Anzahl Handel). Punkte sinken nie.
+7. **Währung**: `coin@gold` im Inventar; die Währung ist kein handelbarer Gegenstand. Münzen entstehen nur durch serverinterne Quellen (`Inventory.deposit`), nie durch Clients. `Inventory.apply_many` überträgt atomar über mehrere Besitzer.
+8. **Handelsdienst**: Prüfung → beide Berichte vorab validieren (bei Ablehnung wird nichts angefasst) → atomare Übertragung → beide Berichte aufzeichnen; bei einem Ausfall dazwischen wird das Inventar zurückgebucht. Ware und Münzen werden über viele Handel hinweg erhalten (Test).
+9. **Regelversion v7** (v1–v6 unverändert, Standard jetzt v7). Der Wirtschaftsteil des Zustands existiert nur unter Regeln mit `economy`-Abschnitt; alle älteren Golden Vectors bleiben byte-identisch. Die Regelprüfung verlangt, dass alles Herstellbare und Verbrauchte (Handwerk) einen Handelswert hat.
+10. **Golden Vectors:** `economy_trade_validation`, `economy_wash_trading`, `economy_career_founding`, `economy_directions`; `derived` enthält `economic_profile`, `economic_direction_scores`, `economic_directions`.
+
+**Vertrauensgrenze:** Handel, Laufbahn und Gründung sind serverseitige Ereignisse. Die Engine begrenzt Fehlverhalten, kann aber nicht prüfen, ob ein Handel zwischen zwei von demselben Menschen kontrollierten Accounts stattfand; Mehrfachaccounts und Absprachen sind eine Aufgabe der Account-/Betrugserkennung des Servers.
+
+**Offen / Grenzen**
+- Firmensimulation: Mitarbeiter, Gehälter, Zufriedenheit/Loyalität, Abwerben, Anteile/Stimmrechte, Gewinnbeteiligung, Filialen/Töchter; Unternehmens- und Gebäudelevel.
+- Märkte: Angebot/Nachfrage, Preisbildung, regionale Lager und Transport (Logistik als Berufsprofil), globaler Marktplatz, Gebühren/Steuern, NPC-Wirtschaft und Geldsenken.
+- Der Referenzwert ist eine statische Tabelle; bei dynamischen Preisen müssen Referenzpreise serverseitig versioniert und in den Berichten belegt werden.
+- Zweiseitige Berichte sind nicht atomar über beide Logs (append-only); ein Ausfall zwischen den beiden Aufzeichnungen kann einen einseitigen Bericht hinterlassen (Vorabvalidierung macht das praktisch unmöglich, es bleibt eine dokumentierte Grenze).
+- Golden Vectors für die Weltseite (Handelsdienst, Inventar) fehlen noch.

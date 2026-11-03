@@ -6,6 +6,7 @@ from typing import Any
 from .combat import CombatEngine, reached_directions
 from .discovery import DiscoveryEngine, discovery_progress, known_discoveries
 from .crafting import CraftingEngine, craft_directions, craft_profile, known_recipes, known_techniques
+from .economy import EconomyEngine, economic_directions, economic_profile
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
 from .essence import EssenceEngine, eligible_forms, essence_profile, form_scores
@@ -24,6 +25,8 @@ def default_projector(rules: Rules) -> Projector:
         engines.append(DiscoveryEngine(rules))
     if "crafting" in rules:  # ab rules_v6
         engines.append(CraftingEngine(rules))
+    if "economy" in rules:  # ab rules_v7
+        engines.append(EconomyEngine(rules))
     return Projector(engines, rules)
 
 
@@ -98,3 +101,11 @@ class CharacterService:
 
     def craft_profile(self, character_id: str) -> dict[str, int]:
         return craft_profile(self.state(character_id), self.rules)
+
+    def economic_directions(self, character_id: str) -> dict[str, int]:
+        """Handelsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
+        return economic_directions(self.state(character_id), self.rules)
+
+    def economic_profile(self, character_id: str) -> dict:
+        """Laufbahn, Unternehmen, Netzwerkgröße, Anzahl Handel."""
+        return economic_profile(self.state(character_id), self.rules)

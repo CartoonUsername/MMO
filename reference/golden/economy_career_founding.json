@@ -1,0 +1,879 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 0,
+      "fine_artisan": 0,
+      "glass_alchemist": 0,
+      "inventor": 0,
+      "mass_producer": 0
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 0,
+      "infusion": 0,
+      "innovation": 0,
+      "volume": 0
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "profession:alchemy>=2",
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "profession:smithing>=3"
+        ],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "economic_direction_scores": {
+      "apothecary_trader": 0,
+      "arms_dealer": 18000,
+      "grocer": 0,
+      "luxury_trader": 0,
+      "materials_broker": 0,
+      "merchant": 12960
+    },
+    "economic_directions": {
+      "arms_dealer": 2,
+      "merchant": 1
+    },
+    "economic_profile": {
+      "best_rung": 4,
+      "companies_founded_total": 4,
+      "companies_open": 3,
+      "company_id": "other",
+      "network_size": 6,
+      "role": "employee",
+      "rung": 0,
+      "trades": 6
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 0,
+          "element_attuned:fire": 0,
+          "profession:smithing": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 135
+        },
+        "eligible": false,
+        "score": 135,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Laufbahn (Einstellung nur als Mitarbeiter, Beförderung nur eine Stufe mit Meisterschaft/Dienstzeit/Punkten, Zurückstufung, Austritt, Firmenwechsel nur nach Austritt) und Unternehmensgründung (Gate, Maximum, ID nie wiederverwendbar), Eigentum getrennt von der Laufbahn.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {},
+      "daily": {
+        "day": 0,
+        "points": {
+          "finesse": 0,
+          "infusion": 0,
+          "innovation": 0,
+          "volume": 0
+        },
+        "recipes": {}
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 0,
+        "herb": 0,
+        "metal": 0,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 0,
+        "infusion": 0,
+        "innovation": 0,
+        "volume": 0
+      },
+      "recipes": {},
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "economy": {
+      "career": {
+        "best_rung": 4,
+        "changes": 8,
+        "company_id": "other",
+        "role": "employee",
+        "since_day": 78
+      },
+      "classes": {
+        "food": 0,
+        "luxury": 0,
+        "materials": 0,
+        "medicine": 0,
+        "weapons": 18000
+      },
+      "counterparties": {
+        "b": 1,
+        "net-0": 1,
+        "net-1": 1,
+        "net-2": 1,
+        "net-3": 1,
+        "net-4": 1
+      },
+      "daily": {
+        "counterparties": {
+          "net-4": 1
+        },
+        "day": 54,
+        "points": {
+          "network": 200,
+          "volume": 3000
+        }
+      },
+      "founded": {
+        "co0": {
+          "day": 80,
+          "open": false,
+          "seq": 17
+        },
+        "co1": {
+          "day": 80,
+          "open": true,
+          "seq": 18
+        },
+        "co2": {
+          "day": 80,
+          "open": true,
+          "seq": 19
+        },
+        "co3": {
+          "day": 81,
+          "open": true,
+          "seq": 21
+        }
+      },
+      "last_day": 81,
+      "points": {
+        "network": 1200,
+        "volume": 18000
+      },
+      "trades": {
+        "big": 6,
+        "v0": 8,
+        "v1": 9,
+        "v2": 10,
+        "v3": 11,
+        "v4": 12
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "trade": 48000
+      }
+    }
+  },
+  "final_state_sha256": "e6ec970cc40d95917418715c38de16aa1219f0ee75a1bda8a299eac1bb55ff0e",
+  "format": 1,
+  "name": "economy_career_founding",
+  "rules_file": "rules_v7.json",
+  "rules_sha256": "5a82945f69d206371627a28ab8a300c398d1087ae616c954ab2d5c519f5be475",
+  "steps": [
+    {
+      "event_hash": "16f4f9cb7845f9336c770f9b6b8ab985f9d05ab1b81912bd7a0377c552e4b1f0",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "6eca5c77040c632e619872416611fab951932adbdec184c9428f6ca9fededcc0",
+      "type": "identity.created"
+    },
+    {
+      "event_hash": "a5048c12727b19a4f3f993d31e7e1d3e6644a2ecb033be7ae9f7b2b4efc37951",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "2104e0bfe2d9fd469c86106edbf768fe40c49bc3109c44a65e43279396a2d86d",
+      "type": "identity.xp_gained"
+    },
+    {
+      "event_hash": "6eaf8d480a59386d62e8b16d7fdd9936922bb9480a11d31c77841d073f054e65",
+      "expect": "accepted",
+      "payload": {
+        "profession": "trade",
+        "xp": 48000
+      },
+      "seq": 2,
+      "state_sha256": "75ebf07ad1391bbcc1c777c10316e600bcbcb7815a82da8ba967d1d3bafcb0fc",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 1,
+        "role": "manager"
+      },
+      "state_sha256": "75ebf07ad1391bbcc1c777c10316e600bcbcb7815a82da8ba967d1d3bafcb0fc",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "3d75b3a2d70b11f83932b7b0778955bea8abb91c582be1ce6de474697108ab3e",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 1,
+        "role": "employee"
+      },
+      "seq": 3,
+      "state_sha256": "ba75d9a11b2c6c8287a99b1bd30196aa766e7b90d527ab8165dee8fde890b5ff",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 7,
+        "role": "specialist"
+      },
+      "state_sha256": "ba75d9a11b2c6c8287a99b1bd30196aa766e7b90d527ab8165dee8fde890b5ff",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "fa5e7108bb90efdf818b00cdb719b5a9d70dd21af61156615970573fbdc8dc7e",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 8,
+        "role": "specialist"
+      },
+      "seq": 4,
+      "state_sha256": "e4d903d0d89127647c42d19a4de6774ba7c5513f4867da1c0d1cc7077133acf3",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 30,
+        "role": "manager"
+      },
+      "state_sha256": "e4d903d0d89127647c42d19a4de6774ba7c5513f4867da1c0d1cc7077133acf3",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 21,
+        "role": "department_head"
+      },
+      "state_sha256": "e4d903d0d89127647c42d19a4de6774ba7c5513f4867da1c0d1cc7077133acf3",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "e34b8195ad1786810abe44c3824b994112f3c60e848b941081dc31918bf66eb5",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 22,
+        "role": "department_head"
+      },
+      "seq": 5,
+      "state_sha256": "b44acb9ab8f51320b8791c4b706feab842e28188c5f9bd680a417933198d3909",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 43,
+        "role": "manager"
+      },
+      "state_sha256": "b44acb9ab8f51320b8791c4b706feab842e28188c5f9bd680a417933198d3909",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "64e54969a626165a61ceb534b883ad2dfc5e2f8d0e95bc5996980a79632588c4",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "b",
+        "day": 22,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "big",
+        "value": 30000
+      },
+      "seq": 6,
+      "state_sha256": "5381a92a7d1b7dab9431dfb2fbdf2f2c9807109f79c7b4aacb7c87248132296a",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 42,
+        "role": "manager"
+      },
+      "state_sha256": "5381a92a7d1b7dab9431dfb2fbdf2f2c9807109f79c7b4aacb7c87248132296a",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "4d9b1e0f60442dc9970aa8d5139b478a7f5732e40b7614fa9a35bacb7dd60024",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 43,
+        "role": "manager"
+      },
+      "seq": 7,
+      "state_sha256": "c8f22cd7dfa7fb5ba49f7620eb67ff31f5957b496eca282eb917fb2d0f016297",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 73,
+        "role": "executive"
+      },
+      "state_sha256": "c8f22cd7dfa7fb5ba49f7620eb67ff31f5957b496eca282eb917fb2d0f016297",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "2d360aa337b9b595a2e56f203ab2108860dc96ab1e05e458f5dd616bd7496bf3",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "net-0",
+        "day": 50,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "v0",
+        "value": 30000
+      },
+      "seq": 8,
+      "state_sha256": "8fddf92fd1587b0732ea36f208ce6854313b8687bd6461bb3d51401ab7200d3c",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "7da1d33085e2416aff28ec15cc3f50470e8aa459276691fab5b006c6bdc45f71",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "net-1",
+        "day": 51,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "v1",
+        "value": 30000
+      },
+      "seq": 9,
+      "state_sha256": "3e62e43d4fec4b593e8967fa51986724a56acae661afda2c0da0aaeb7f14c8ef",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "b517687f8dcd1e9433c9888bbd341c8ac14609fa12d3bb78204dcdf751404843",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "net-2",
+        "day": 52,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "v2",
+        "value": 30000
+      },
+      "seq": 10,
+      "state_sha256": "92bf0c7c712881abde8b9f9ca5837dc323e66db749f410b2e9a7b22d4d6c40e6",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "f7711c0fff7f346762ac8ccf00107a7ad00dab7601b41f8f8a15b0c5268b1775",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "net-3",
+        "day": 53,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "v3",
+        "value": 30000
+      },
+      "seq": 11,
+      "state_sha256": "23db6fbcc9cd26b09db1eaafad6a5b600290a72986d9f26c0389a6b53511abbd",
+      "type": "economy.trade_completed"
+    },
+    {
+      "event_hash": "80805fbec4882db8fff1979763b7ac1e2e033c742bb8dc5b0242a82d1e7c5a07",
+      "expect": "accepted",
+      "payload": {
+        "counterparty": "net-4",
+        "day": 54,
+        "grade": "masterwork",
+        "item_id": "iron_blade",
+        "quantity": 100,
+        "role": "seller",
+        "trade_id": "v4",
+        "value": 30000
+      },
+      "seq": 12,
+      "state_sha256": "03604f82b0b771a1d25fe20f87548537460a0f4c4d6cf7dfe38731e8b990e0e6",
+      "type": "economy.trade_completed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 72,
+        "role": "executive"
+      },
+      "state_sha256": "03604f82b0b771a1d25fe20f87548537460a0f4c4d6cf7dfe38731e8b990e0e6",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "a76ae45b0aafbf49ed4bae8385002cf21d9023c139b91850169ddc6e1ecc91da",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 73,
+        "role": "executive"
+      },
+      "seq": 13,
+      "state_sha256": "a68f71564710502ec413af5bfc26264f7eec943921808d72e283941d7b7e20bb",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "1a6df005a74cfeaea1cc0c1775b1a1f451d617230a804caa2d7869ca6978991f",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "acme",
+        "day": 74,
+        "role": "manager"
+      },
+      "seq": 14,
+      "state_sha256": "124a2289725343fb6d49c1f069b396207ca8ac24a98abfc49c9af6b5a2d634d5",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "other",
+        "day": 75,
+        "role": "manager"
+      },
+      "state_sha256": "124a2289725343fb6d49c1f069b396207ca8ac24a98abfc49c9af6b5a2d634d5",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "e89a102f63f0082956847cf8acdca00701318cc6aa2db290207647ca9636522c",
+      "expect": "accepted",
+      "payload": {
+        "company_id": null,
+        "day": 76,
+        "role": null
+      },
+      "seq": 15,
+      "state_sha256": "7f0ba82f5035806b2b2524a94cc9ed70bbd93bba13fa41e95e6493adad24a325",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": null,
+        "day": 77,
+        "role": null
+      },
+      "state_sha256": "7f0ba82f5035806b2b2524a94cc9ed70bbd93bba13fa41e95e6493adad24a325",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "other",
+        "day": 78,
+        "role": "executive"
+      },
+      "state_sha256": "7f0ba82f5035806b2b2524a94cc9ed70bbd93bba13fa41e95e6493adad24a325",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "80985ff0b896c227c92b0f2e00fa6433e9dcb7d5f2d245b4d0d8cbf8d65720c4",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "other",
+        "day": 78,
+        "role": "employee"
+      },
+      "seq": 16,
+      "state_sha256": "06850b57830116ab0a71dd833623bacfc59c3bf709c516bbb26b2f1228b7873e",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 79,
+        "role": "ceo"
+      },
+      "state_sha256": "06850b57830116ab0a71dd833623bacfc59c3bf709c516bbb26b2f1228b7873e",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 79,
+        "role": null
+      },
+      "state_sha256": "06850b57830116ab0a71dd833623bacfc59c3bf709c516bbb26b2f1228b7873e",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": null,
+        "day": 79,
+        "role": "employee"
+      },
+      "state_sha256": "06850b57830116ab0a71dd833623bacfc59c3bf709c516bbb26b2f1228b7873e",
+      "type": "economy.career_changed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "acme",
+        "day": 70,
+        "role": "employee"
+      },
+      "state_sha256": "06850b57830116ab0a71dd833623bacfc59c3bf709c516bbb26b2f1228b7873e",
+      "type": "economy.career_changed"
+    },
+    {
+      "event_hash": "4b710bc09009358ee841826db8a0dbe25ee4d1cfa7eabd569fc265531dfe35cd",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "co0",
+        "day": 80
+      },
+      "seq": 17,
+      "state_sha256": "91f69a23605015c22268533d86afb89c1e6d5c6d62e368f405637539be6e6dd4",
+      "type": "economy.company_founded"
+    },
+    {
+      "event_hash": "4faee628bad99fe89744753e1032f0f07b93958ddbf527f26430f2a8812552f9",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "co1",
+        "day": 80
+      },
+      "seq": 18,
+      "state_sha256": "33ef387896344949d0e459a6581fd4702306a4d792c603a49a95c1045615da9f",
+      "type": "economy.company_founded"
+    },
+    {
+      "event_hash": "01d19cadfe8837066d72931b2a6a4d249623c327ae1abd9ba6df95aa925b84aa",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "co2",
+        "day": 80
+      },
+      "seq": 19,
+      "state_sha256": "310a8bf223f00c23485289ec6d7d6dd6a89b91840a74aeca028965253c7b42d6",
+      "type": "economy.company_founded"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "co3",
+        "day": 80
+      },
+      "state_sha256": "310a8bf223f00c23485289ec6d7d6dd6a89b91840a74aeca028965253c7b42d6",
+      "type": "economy.company_founded"
+    },
+    {
+      "event_hash": "161a4a9b6afe46bdbb1afe2703e39e169ce3c342e02d25efecbf9aae4973a120",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "co0",
+        "day": 81
+      },
+      "seq": 20,
+      "state_sha256": "c2dd09799720b24c0a81d4c9b1f80a6315035156f10fe1741c6b9649966e49cb",
+      "type": "economy.company_closed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "co0",
+        "day": 81
+      },
+      "state_sha256": "c2dd09799720b24c0a81d4c9b1f80a6315035156f10fe1741c6b9649966e49cb",
+      "type": "economy.company_closed"
+    },
+    {
+      "event_hash": "a6fef26aa30a8fc7399ea6ed4450e0fffac42a9cd44ae138583f69e795004a73",
+      "expect": "accepted",
+      "payload": {
+        "company_id": "co3",
+        "day": 81
+      },
+      "seq": 21,
+      "state_sha256": "e6ec970cc40d95917418715c38de16aa1219f0ee75a1bda8a299eac1bb55ff0e",
+      "type": "economy.company_founded"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "co0",
+        "day": 82
+      },
+      "state_sha256": "e6ec970cc40d95917418715c38de16aa1219f0ee75a1bda8a299eac1bb55ff0e",
+      "type": "economy.company_founded"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "company_id": "ghost",
+        "day": 82
+      },
+      "state_sha256": "e6ec970cc40d95917418715c38de16aa1219f0ee75a1bda8a299eac1bb55ff0e",
+      "type": "economy.company_closed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "capital": 5,
+        "company_id": "co9",
+        "day": 82
+      },
+      "state_sha256": "e6ec970cc40d95917418715c38de16aa1219f0ee75a1bda8a299eac1bb55ff0e",
+      "type": "economy.company_founded"
+    }
+  ]
+}

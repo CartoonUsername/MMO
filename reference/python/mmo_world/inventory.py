@@ -53,6 +53,20 @@ class Inventory:
         for k, n in add.items():
             stacks[k] = stacks.get(k, 0) + n
 
+    def apply_many(self, ops: list[tuple[str, dict[str, int], dict[str, int]]]) -> None:
+        """Mehrere Besitzer atomar ändern: erst alle Entnahmen prüfen, dann alles ausführen (oder nichts)."""
+        need: dict[tuple[str, str], int] = {}
+        for owner, remove, add in ops:
+            self._check(remove)
+            self._check(add)
+            for k, n in remove.items():
+                need[(owner, k)] = need.get((owner, k), 0) + n
+        for (owner, k), n in need.items():
+            if self.balance(owner, k) < n:
+                raise WorldError(f"Nicht genug {k} bei {owner}: {self.balance(owner, k)} < {n}")
+        for owner, remove, add in ops:
+            self.apply(owner, remove, add)
+
     def to_json(self) -> str:
         return json.dumps(self._stacks, sort_keys=True, separators=(",", ":"))
 

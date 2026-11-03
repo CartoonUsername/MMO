@@ -23,6 +23,7 @@ from typing import Any
 from .combat import reached_directions, style_profile
 from .crafting import craft_direction_scores, craft_directions, craft_profile, known_recipes, known_techniques
 from .discovery import discovery_progress, known_discoveries
+from .economy import economic_direction_scores, economic_directions, economic_profile
 from .essence import essence_profile, form_scores
 from .errors import RuleViolation
 from .history import _canonical as canonical_bytes
@@ -501,6 +502,100 @@ def scenario_crafting_directions() -> dict[str, Any]:
     }
 
 
+TRADE_EV, CAREER_EV, FOUNDED_EV, CLOSED_EV = ("economy.trade_completed", "economy.career_changed",
+                                              "economy.company_founded", "economy.company_closed")
+
+
+def _tx(tid: str, cp: str = "b", role: str = "seller", item: str = "iron_blade", grade: str = "fine", qty: int = 2,
+        value: int = 360, day: int = 1) -> Step:
+    return (TRADE_EV, {"trade_id": tid, "role": role, "counterparty": cp, "item_id": item, "grade": grade,
+                       "quantity": qty, "value": value, "day": day})
+
+
+def _cx(company: Any, role: Any, day: int) -> Step:
+    return (CAREER_EV, {"company_id": company, "role": role, "day": day})
+
+
+def scenario_economy_trade_validation() -> dict[str, Any]:
+    return {
+        "description": "Handelsbericht (rules v7): strikte Felder, Wertebereiche, kein Handel mit sich selbst, eindeutige trade_id, Tag monoton, Preisband um den exakten Referenzwert.",
+        "rules_file": "rules_v7.json",
+        "steps": [
+            _created(),
+            _tx("t1"),
+            _tx("t1", cp="c"),  # doppelt
+            _tx("t2", cp="c1"),  # Handel mit sich selbst (Figur-ID c1)
+            ("economy.trade_completed", {**_tx("t3")[1], "points": 99}),
+            ("economy.trade_completed", {k: v for k, v in _tx("t4")[1].items() if k != "value"}),
+            _tx("t5", role="broker"), _tx("t6", item="ghost"), _tx("t7", grade="legendary"),
+            _tx("t8", qty=0), _tx("t9", qty=1001), _tx("t10", qty=True), _tx("t11", qty=1.5),
+            _tx("t12", value=0), _tx("t13", value=10_000_001), _tx("t14", value="360"),
+            _tx("", cp="d"), _tx("t15", cp=""), _tx("t16", day=-1),
+            _tx("p1", cp="p1", value=270),  # untere Bandgrenze: gutgeschrieben 270
+            _tx("p2", cp="p2", value=450),  # obere Bandgrenze: gutgeschrieben nur die Referenz 360
+            _tx("p3", cp="p3", value=269),  # außerhalb: 0 Punkte, aber gewertet
+            _tx("p4", cp="p4", value=451),
+            _tx("p5", cp="p5", item="bread", grade="common", qty=1, value=5),  # Wert < Netzwerk-Mindestwert
+            _tx("d0", day=0),  # Tag springt zurück
+            ("economy.grant_points", {"volume": 100}),
+        ],
+    }
+
+
+def scenario_economy_wash_trading() -> dict[str, Any]:
+    steps: list[Step] = [_created()]
+    steps += [_tx(f"w{i}", cp="alt-1", value=360) for i in range(8)]  # gleicher Partner: Wiederholungsabnahme
+    steps += [_tx("n1", cp="alt-2", day=1), _tx("n2", cp="alt-3", day=1)]  # neue Partner: Netzwerkbonus
+    steps += [_tx(f"a{i}", cp=f"laundry-{i}", item="bread", grade="common", qty=1, value=10_000_000, day=2) for i in range(4)]  # absurde Preise
+    steps += [_tx("tiny", cp="tiny-1", item="bread", grade="common", qty=1, value=5, day=2),  # zu klein für Netzwerkbonus
+              _tx("tiny2", cp="tiny-1", item="iron_blade", grade="common", qty=1, value=120, day=2)]  # qualifiziert: Bonus jetzt
+    steps += [_tx("next", cp="alt-1", day=3)]  # neuer Tag: Abnahme zurückgesetzt
+    return {
+        "description": "Scheinhandel: Wiederholung mit demselben Partner verliert an Wert, absurde Preise und Kleinsthandel bringen weder Volumen noch Netzwerk, neue echte Partner schon.",
+        "rules_file": "rules_v7.json",
+        "steps": steps,
+    }
+
+
+def scenario_economy_career_founding() -> dict[str, Any]:
+    big = lambda tid, cp, day: _tx(tid, cp=cp, item="iron_blade", grade="masterwork", qty=100, value=30000, day=day)
+    steps: list[Step] = [_created(), ("identity.xp_gained", {"amount": 10000}), ("profession.work", {"profession": "trade", "xp": 48000}),
+                         _cx("acme", "manager", 1), _cx("acme", "employee", 1),
+                         _cx("acme", "specialist", 7), _cx("acme", "specialist", 8),
+                         _cx("acme", "manager", 30), _cx("acme", "department_head", 21), _cx("acme", "department_head", 22),
+                         _cx("acme", "manager", 43), big("big", "b", 22), _cx("acme", "manager", 42), _cx("acme", "manager", 43),
+                         _cx("acme", "executive", 73)]  # Handelspunkte/Netzwerk fehlen
+    steps += [big(f"v{i}", f"net-{i}", 50 + i) for i in range(5)]
+    steps += [_cx("acme", "executive", 72), _cx("acme", "executive", 73),
+              _cx("acme", "manager", 74),  # Zurückstufung
+              _cx("other", "manager", 75),  # Firmenwechsel ohne Austritt
+              _cx(None, None, 76), _cx(None, None, 77), _cx("other", "executive", 78), _cx("other", "employee", 78),
+              _cx("acme", "ceo", 79), _cx("acme", None, 79), _cx(None, "employee", 79), _cx("acme", "employee", 70)]  # Tag zurück
+    steps += [(FOUNDED_EV, {"company_id": f"co{i}", "day": 80}) for i in range(3)]
+    steps += [(FOUNDED_EV, {"company_id": "co3", "day": 80}),  # max. offene Unternehmen
+              (CLOSED_EV, {"company_id": "co0", "day": 81}), (CLOSED_EV, {"company_id": "co0", "day": 81}),
+              (FOUNDED_EV, {"company_id": "co3", "day": 81}), (FOUNDED_EV, {"company_id": "co0", "day": 82}),
+              (CLOSED_EV, {"company_id": "ghost", "day": 82}), (FOUNDED_EV, {"company_id": "co9", "day": 82, "capital": 5})]
+    return {
+        "description": "Laufbahn (Einstellung nur als Mitarbeiter, Beförderung nur eine Stufe mit Meisterschaft/Dienstzeit/Punkten, Zurückstufung, Austritt, Firmenwechsel nur nach Austritt) und Unternehmensgründung (Gate, Maximum, ID nie wiederverwendbar), Eigentum getrennt von der Laufbahn.",
+        "rules_file": "rules_v7.json",
+        "steps": steps,
+    }
+
+
+def scenario_economy_directions() -> dict[str, Any]:
+    steps: list[Step] = [_created()]
+    for day in range(1, 5):
+        steps += [_tx(f"w{day}-{i}", cp=f"w{i}", item="iron_blade", grade="common", qty=50, value=6000, day=day) for i in range(6)]
+    for day in range(5, 11):
+        steps += [_tx(f"f{day}-{i}", cp=f"f{i}", item="bread", grade="common", qty=400, value=2000, day=day) for i in range(6)]
+    return {
+        "description": "Handelsrichtungen: Waffen- und Lebensmittelhandel mit vielen Partnern -> merchant, arms_dealer, grocer gleichzeitig (nicht exklusiv).",
+        "rules_file": "rules_v7.json",
+        "steps": steps,
+    }
+
+
 SCENARIOS = {
     "identity_basic": scenario_identity_basic,
     "element_limits": scenario_element_limits,
@@ -520,6 +615,10 @@ SCENARIOS = {
     "crafting_antifarm": scenario_crafting_antifarm,
     "crafting_discovery_techniques": scenario_crafting_discovery_techniques,
     "crafting_directions": scenario_crafting_directions,
+    "economy_trade_validation": scenario_economy_trade_validation,
+    "economy_wash_trading": scenario_economy_wash_trading,
+    "economy_career_founding": scenario_economy_career_founding,
+    "economy_directions": scenario_economy_directions,
 }
 
 
@@ -530,6 +629,10 @@ def _derived(svc: CharacterService) -> dict[str, Any]:
     if "combat" in svc.rules:
         out["combat_directions"] = reached_directions(state, svc.rules)
         out["style_profile"] = style_profile(state, svc.rules)
+    if "economy" in svc.rules:  # ab rules v7
+        out["economic_profile"] = economic_profile(state, svc.rules)
+        out["economic_direction_scores"] = economic_direction_scores(state, svc.rules)
+        out["economic_directions"] = economic_directions(state, svc.rules)
     if "crafting" in svc.rules:  # ab rules v6
         out["known_recipes"] = known_recipes(state, svc.rules)
         out["known_techniques"] = known_techniques(state, svc.rules)
