@@ -23,7 +23,7 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 | # | Engine | Ereignis-Präfix | Status |
 |---|---|---|---|
 | 1 | Identity | `identity.` | **implementiert** (Typ Spieler/NPC, Klasse, XP/Level) |
-| 2 | Essence (Wesen) | `essence.` | **implementiert** (Eignung, Prüfung, dauerhafte Annahme) |
+| 2 | Essence (Wesen) | `essence.` | **implementiert** (gewichtete Bewertung aus der Historie, Entscheidungen, Prüfung, dauerhafte Annahme, Vor-/Nachteile; Legacy-Schema weiter gültig) |
 | 3 | Combat Development | `combat.` | **implementiert** (Metriken, Entwicklungsrichtungen, Anti-Farming; konkrete Fähigkeiten offen) |
 | 4 | Element | `element.` | **implementiert** (9 Elemente, Prägung, 2 + 1 Limit) |
 | 5 | Profession | `profession.` | **implementiert** (Erfahrung → Meisterschaftsstufe) |
@@ -43,6 +43,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 - Grenze: Die Engine kann nur prüfen, was der Bericht behauptet. Dass der Bericht echt ist, muss der Gameplay-Server sicherstellen (siehe „Vertrauensgrenze“ in ADR-0003).
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
+
+## Wesensbewertung (ADR-0007)
+
+Regeln v4: Jede Wesensform hat gewichtete Signale (Elementprägung/-affinität, Kampfrichtung, Berufsmeisterschaft, Entscheidungen) und eine Schwelle; kein einzelnes Signal genügt allein. `essence.decision_made` bildet bewusste, einmalige Entscheidungen ab (Wirkung nur aus Regeldaten, vom Server ausgelöst). Abgeleitete Sichten: `form_scores` (Punkte/Beiträge/Prüfbarkeit), `essence_profile` (Vor-/Nachteile). Alle Inhalte sind Platzhalter.
 
 ## Serverseitiger Kampfkern `mmo_sim` (ADR-0006)
 

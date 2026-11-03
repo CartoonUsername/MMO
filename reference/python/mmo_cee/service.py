@@ -6,7 +6,7 @@ from typing import Any
 from .combat import CombatEngine, reached_directions
 from .elements import ElementEngine
 from .engine import CharacterState, Projector
-from .essence import EssenceEngine, eligible_forms
+from .essence import EssenceEngine, eligible_forms, essence_profile, form_scores
 from .history import Event, EventLog
 from .identity import IdentityEngine
 from .professions import ProfessionEngine
@@ -57,3 +57,11 @@ class CharacterService:
     def combat_directions(self, character_id: str) -> dict[str, int]:
         """Erreichte Entwicklungsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
         return reached_directions(self.state(character_id), self.rules)
+
+    def essence_scores(self, character_id: str) -> dict[str, dict]:
+        """Punktzahl/Beiträge/Prüfbarkeit der Bewertungsformen (leer bei Regeln ohne Bewertungsformen)."""
+        return form_scores(self.state(character_id), self.rules)
+
+    def essence_profile(self, character_id: str) -> dict:
+        """Vor-/Nachteile der angenommenen Wesensform."""
+        return essence_profile(self.state(character_id), self.rules)

@@ -21,7 +21,7 @@ def make_skirmisher(svc, cid, kind="player"):
 
 class EssenceCombatTests(unittest.TestCase):
     def setUp(self):
-        self.svc = CharacterService()
+        self.svc = CharacterService(rules=load_rules("rules_v3.json"))  # Legacy-Schema (harte Voraussetzungen)
 
     def test_direction_alone_is_not_enough(self):
         make_skirmisher(self.svc, "p")
@@ -67,7 +67,7 @@ class EssenceCombatTests(unittest.TestCase):
         v2 = load_rules("rules_v2.json")
         self.assertEqual(v2.version, "2")
         self.assertNotIn("umbral_kin", v2["essence"]["forms"])
-        self.assertIn("umbral_kin", load_rules()["essence"]["forms"])
+        self.assertIn("umbral_kin", load_rules("rules_v3.json")["essence"]["forms"])
 
     def test_old_rules_without_combat_still_work(self):
         svc = CharacterService(rules=load_rules("rules_v1.json"))

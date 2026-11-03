@@ -11,7 +11,7 @@ ENGINE_EVENT_TYPES = [
     "identity.created", "identity.class_chosen", "identity.xp_gained",
     "element.exposure", "element.attuned",
     "profession.work",
-    "essence.trial_passed", "essence.adopted",
+    "essence.trial_passed", "essence.adopted", "essence.decision_made",
     "combat.encounter_resolved",
 ]
 
@@ -130,6 +130,19 @@ class GoldenVectorTests(unittest.TestCase):
         anti = self.vectors["combat_antifarm"]
         self.assertEqual(anti["final_state"]["combat"]["points"]["strength"], 111400)  # 11400 + 2 Tage Hardcap
         self.assertEqual(self.vectors["npc_pipeline"]["final_state"]["identity"]["kind"], "npc")
+        ember = self.vectors["essence_scoring_ember"]
+        self.assertEqual(ember["final_state"]["essence"]["form"], "ember_kin")
+        self.assertEqual(ember["derived"]["essence_scores"]["ember_kin"]["score"], 608)
+        self.assertEqual(ember["derived"]["essence_profile"]["form"], "ember_kin")
+        tide = self.vectors["essence_decision_path"]
+        self.assertEqual(tide["final_state"]["essence"]["form"], "tide_walker")
+        self.assertEqual(tide["final_state"]["essence"]["decisions"], {"ember_vow": "refuse"})
+        npc = self.vectors["essence_npc_two_candidates"]
+        self.assertEqual(npc["final_state"]["identity"]["kind"], "npc")
+        self.assertEqual(npc["final_state"]["essence"]["form"], "stone_born")  # zweite Form wird abgelehnt
+        self.assertGreaterEqual(npc["derived"]["essence_scores"]["ember_kin"]["score"], 600)
+        self.assertNotIn("decisions", self.vectors["essence_path"]["final_state"]["essence"])  # Legacy-Schema unverändert
+        self.assertNotIn("essence_scores", self.vectors["essence_path"]["derived"])
         self.assertEqual(self.vectors["rules_v1_without_combat"]["rules_file"], "rules_v1.json")
         self.assertNotIn("combat", self.vectors["rules_v1_without_combat"]["final_state"])
 

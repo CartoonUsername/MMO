@@ -1,0 +1,377 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "combat_directions": {},
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {
+        "cold_resist_permille": 100,
+        "fire_damage_permille": 150
+      },
+      "disadvantages": {
+        "stealth_permille": 100,
+        "water_resist_permille": 150
+      },
+      "form": "ember_kin"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 200,
+          "element_affinity:fire": 33,
+          "element_attuned:fire": 250,
+          "profession:smithing": 125
+        },
+        "eligible": false,
+        "score": 608,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    }
+  },
+  "description": "Wesensbewertung (rules v4): Entscheidungen, gewichtete Punktzahl statt harter Schwelle, Prüfung, dauerhafte Annahme.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 100,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": [
+        "fire"
+      ]
+    },
+    "essence": {
+      "adopted_at_seq": 8,
+      "decisions": {
+        "ember_vow": "accept"
+      },
+      "form": "ember_kin",
+      "trials_passed": [
+        "ember_kin"
+      ]
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 11,
+      "xp": 10000
+    },
+    "profession": {
+      "xp": {
+        "smithing": 3700
+      }
+    }
+  },
+  "final_state_sha256": "89acdec0096ebb4c8c06dbb478f4fa781e3d0a42b7dbb6a10d9e88f4ed52ab75",
+  "format": 1,
+  "name": "essence_scoring_ember",
+  "rules_file": "rules_v4.json",
+  "rules_sha256": "a25e5e5934203291789b4d9db871e64bf8b94c0d3e0808c0fce7c5c4046d5caf",
+  "steps": [
+    {
+      "event_hash": "6ff148e8c1ac395e3c19e93421b1aa0bb15be39d8ab42660bdaa7caa8c37fa4e",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "c95cf7a2de757c0ac1dbb64314527d89a9fa594da3dc41b97197e30c676e0f7d",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "ember_vow"
+      },
+      "state_sha256": "c95cf7a2de757c0ac1dbb64314527d89a9fa594da3dc41b97197e30c676e0f7d",
+      "type": "essence.decision_made"
+    },
+    {
+      "event_hash": "436a412f98d5e453ae3401e971a161dcfbe2bcaf5c664cd7aec6bb7232f3089f",
+      "expect": "accepted",
+      "payload": {
+        "amount": 10000
+      },
+      "seq": 1,
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "identity.xp_gained"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "ghost"
+      },
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "maybe",
+        "decision_id": "ember_vow"
+      },
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "decision_id": "ember_vow"
+      },
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "ember_vow",
+        "points": 9999
+      },
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "d1c4a3f5e65999e23ed08de4fd5655d16da84f4607f88080b32c299b4ba82f15",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "d05ee3ebe59a37fec032e5a1df4217cba7d02d64b73abb873b2dd70c8c9c5c55",
+      "expect": "accepted",
+      "payload": {
+        "amount": 100,
+        "element": "fire"
+      },
+      "seq": 2,
+      "state_sha256": "07b0a2becf403f1f4fcad25474c0216fa016e710b9606d27216c72de954d04cd",
+      "type": "element.exposure"
+    },
+    {
+      "event_hash": "ec596cda99c2d563537d2f75e23acdbbf63f4343b6892a0a3c093f9c4e6bae3c",
+      "expect": "accepted",
+      "payload": {
+        "element": "fire"
+      },
+      "seq": 3,
+      "state_sha256": "3aa30a510f1a992d673ec37e24a45b7bafb14aa49217d5f905abaf796b145ee9",
+      "type": "element.attuned"
+    },
+    {
+      "event_hash": "2c5ea638937038c772ec88d044bfb0dd8faf80da52f31c6145df206abf018bf1",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 700
+      },
+      "seq": 4,
+      "state_sha256": "61bacb70351bf3700415560e2324f565ea2ec335585d13d7142e1762b325997d",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "062e6f635787949de8e62d41e972b88a253210c99e27f1cbb5195bd4aed93b27",
+      "expect": "accepted",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "ember_vow"
+      },
+      "seq": 5,
+      "state_sha256": "7f05bd62b999f1f9cfbf2d8d18b9d3e187e2fb192edeac13bb32f0381bb5a659",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "ember_vow"
+      },
+      "state_sha256": "7f05bd62b999f1f9cfbf2d8d18b9d3e187e2fb192edeac13bb32f0381bb5a659",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "refuse",
+        "decision_id": "ember_vow"
+      },
+      "state_sha256": "7f05bd62b999f1f9cfbf2d8d18b9d3e187e2fb192edeac13bb32f0381bb5a659",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "7f05bd62b999f1f9cfbf2d8d18b9d3e187e2fb192edeac13bb32f0381bb5a659",
+      "type": "essence.trial_passed"
+    },
+    {
+      "event_hash": "fcc7b520570cac9de54371a1f96d914ad316497ada2fb6d0655c422b9e4b4aef",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 3000
+      },
+      "seq": 6,
+      "state_sha256": "1d64593dae3a8c0eb8d00d138155b7ef8139ab665db3aa3ea946ebc99af4a5c8",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "1d64593dae3a8c0eb8d00d138155b7ef8139ab665db3aa3ea946ebc99af4a5c8",
+      "type": "essence.adopted"
+    },
+    {
+      "event_hash": "a78294d29d30fadab3fb76888e3a1b1f01a7e316459eab93461c3a9cc8949b9e",
+      "expect": "accepted",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "seq": 7,
+      "state_sha256": "78b11d504ff43500c0e67cf9a386a4fabb6f16d110dc138840959107a622ffef",
+      "type": "essence.trial_passed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "state_sha256": "78b11d504ff43500c0e67cf9a386a4fabb6f16d110dc138840959107a622ffef",
+      "type": "essence.trial_passed"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "umbral_kin"
+      },
+      "state_sha256": "78b11d504ff43500c0e67cf9a386a4fabb6f16d110dc138840959107a622ffef",
+      "type": "essence.adopted"
+    },
+    {
+      "event_hash": "8bc72b4f7b5a839e63776bdbb8ed76f197f2befd809d7092bbbe61cdbc91da20",
+      "expect": "accepted",
+      "payload": {
+        "form": "ember_kin"
+      },
+      "seq": 8,
+      "state_sha256": "89acdec0096ebb4c8c06dbb478f4fa781e3d0a42b7dbb6a10d9e88f4ed52ab75",
+      "type": "essence.adopted"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "choice": "accept",
+        "decision_id": "shadow_pact"
+      },
+      "state_sha256": "89acdec0096ebb4c8c06dbb478f4fa781e3d0a42b7dbb6a10d9e88f4ed52ab75",
+      "type": "essence.decision_made"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "form": "stone_born"
+      },
+      "state_sha256": "89acdec0096ebb4c8c06dbb478f4fa781e3d0a42b7dbb6a10d9e88f4ed52ab75",
+      "type": "essence.trial_passed"
+    }
+  ]
+}

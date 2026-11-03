@@ -1,6 +1,7 @@
 import unittest
 
 from mmo_cee import CharacterService, RuleViolation
+from mmo_cee.rules import load_rules
 
 from .helpers import attune
 
@@ -14,7 +15,7 @@ def ember_ready(svc, cid, kind="player"):
 
 class EssenceTests(unittest.TestCase):
     def setUp(self):
-        self.svc = CharacterService()
+        self.svc = CharacterService(rules=load_rules("rules_v3.json"))  # Legacy-Schema (harte Voraussetzungen)
 
     def test_new_character_is_human_and_not_eligible(self):
         self.svc.create("p", "player")

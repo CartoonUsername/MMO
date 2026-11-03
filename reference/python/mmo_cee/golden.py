@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .combat import reached_directions, style_profile
+from .essence import essence_profile, form_scores
 from .errors import RuleViolation
 from .history import _canonical as canonical_bytes
 from .rules import load_rules
@@ -250,6 +251,81 @@ def scenario_rules_v1_without_combat() -> dict[str, Any]:
     }
 
 
+VOW = "essence.decision_made"
+
+
+def scenario_essence_scoring_ember() -> dict[str, Any]:
+    return {
+        "description": "Wesensbewertung (rules v4): Entscheidungen, gewichtete Punktzahl statt harter Schwelle, Prüfung, dauerhafte Annahme.",
+        "rules_file": "rules_v4.json",
+        "steps": [
+            _created(),
+            (VOW, {"decision_id": "ember_vow", "choice": "accept"}),  # Stufe 1 -> abgelehnt
+            ("identity.xp_gained", {"amount": 10000}),
+            (VOW, {"decision_id": "ghost", "choice": "accept"}),
+            (VOW, {"decision_id": "ember_vow", "choice": "maybe"}),
+            (VOW, {"decision_id": "ember_vow"}),
+            (VOW, {"decision_id": "ember_vow", "choice": "accept", "points": 9999}),
+            ("essence.trial_passed", {"form": "ember_kin"}),  # Punktzahl 0
+            ("element.exposure", {"element": "fire", "amount": 100}),
+            ("element.attuned", {"element": "fire"}),
+            ("profession.work", {"profession": "smithing", "xp": 700}),
+            (VOW, {"decision_id": "ember_vow", "choice": "accept"}),
+            (VOW, {"decision_id": "ember_vow", "choice": "accept"}),  # doppelt
+            (VOW, {"decision_id": "ember_vow", "choice": "refuse"}),  # keine Umentscheidung
+            ("essence.trial_passed", {"form": "ember_kin"}),  # 558 < 600
+            ("profession.work", {"profession": "smithing", "xp": 3000}),
+            ("essence.adopted", {"form": "ember_kin"}),  # ohne Prüfung
+            ("essence.trial_passed", {"form": "ember_kin"}),
+            ("essence.trial_passed", {"form": "ember_kin"}),
+            ("essence.adopted", {"form": "umbral_kin"}),
+            ("essence.adopted", {"form": "ember_kin"}),
+            (VOW, {"decision_id": "shadow_pact", "choice": "accept"}),  # nach Annahme
+            ("essence.trial_passed", {"form": "stone_born"}),
+        ],
+    }
+
+
+def scenario_essence_decision_path() -> dict[str, Any]:
+    steps: list[Step] = [_created(), ("identity.xp_gained", {"amount": 10000}),
+                         ("element.exposure", {"element": "water", "amount": 100}), ("element.attuned", {"element": "water"}),
+                         ("profession.work", {"profession": "logistics", "xp": 3000}),
+                         ("profession.work", {"profession": "trade", "xp": 1500})]
+    for day in range(1, 7):
+        steps += _train(day, {"ally_heal": 20}, n=6)
+    steps += [
+        ("essence.trial_passed", {"form": "tide_walker"}),  # ohne Entscheidung zu wenig Punkte
+        (VOW, {"decision_id": "ember_vow", "choice": "refuse"}),
+        ("essence.trial_passed", {"form": "tide_walker"}),
+        ("essence.adopted", {"form": "tide_walker"}),
+    ]
+    return {
+        "description": "Anderer Weg zu einer anderen Form: Wasser + Berufe + Unterstützungsrichtung + Ablehnung eines Gelübdes -> tide_walker (Platzhalter).",
+        "rules_file": "rules_v4.json",
+        "steps": steps,
+    }
+
+
+def scenario_essence_npc_two_candidates() -> dict[str, Any]:
+    steps: list[Step] = [_created("npc"), ("identity.xp_gained", {"amount": 10000}),
+                         ("element.exposure", {"element": "fire", "amount": 100}), ("element.attuned", {"element": "fire"}),
+                         ("profession.work", {"profession": "smithing", "xp": 3700}),
+                         (VOW, {"decision_id": "ember_vow", "choice": "accept"}),
+                         ("element.exposure", {"element": "earth", "amount": 300}), ("element.attuned", {"element": "earth"}),
+                         ("profession.work", {"profession": "mining", "xp": 1000000}),
+                         ("profession.work", {"profession": "construction", "xp": 1000000}),
+                         (VOW, {"decision_id": "mountain_oath", "choice": "accept"})]
+    for day in range(1, 8):
+        steps += _train(day, {"parry": 15, "block": 33}, n=6)
+    steps += [("essence.trial_passed", {"form": "stone_born"}), ("essence.adopted", {"form": "stone_born"}),
+              ("essence.trial_passed", {"form": "ember_kin"}), ("essence.adopted", {"form": "ember_kin"})]
+    return {
+        "description": "NPC erfüllt zwei Formen gleichzeitig, wählt eine; Wahl ist dauerhaft (Wesensform wird nicht gewechselt).",
+        "rules_file": "rules_v4.json",
+        "steps": steps,
+    }
+
+
 SCENARIOS = {
     "identity_basic": scenario_identity_basic,
     "element_limits": scenario_element_limits,
@@ -260,6 +336,9 @@ SCENARIOS = {
     "combat_directions_umbral": scenario_combat_directions_umbral,
     "npc_pipeline": scenario_npc_pipeline,
     "rules_v1_without_combat": scenario_rules_v1_without_combat,
+    "essence_scoring_ember": scenario_essence_scoring_ember,
+    "essence_decision_path": scenario_essence_decision_path,
+    "essence_npc_two_candidates": scenario_essence_npc_two_candidates,
 }
 
 
@@ -270,6 +349,9 @@ def _derived(svc: CharacterService) -> dict[str, Any]:
     if "combat" in svc.rules:
         out["combat_directions"] = reached_directions(state, svc.rules)
         out["style_profile"] = style_profile(state, svc.rules)
+    if "decisions" in svc.rules["essence"]:  # Bewertungsschema (rules v4+)
+        out["essence_scores"] = form_scores(state, svc.rules)
+        out["essence_profile"] = essence_profile(state, svc.rules)
     return out
 
 
