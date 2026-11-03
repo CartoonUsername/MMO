@@ -4,8 +4,8 @@ Du übernimmst die technische Entwicklung eines langfristig geplanten Free-to-Pl
 
 ## 1. Repository und Zustand (verifiziert)
 - Repo `CartoonUsername/MMO`, Arbeitsbranch `claude/awesome-dirac-9k6p3n` (aktueller Stand: `git log -1`). Niemals direkt auf `main` arbeiten, kein Force-Push, keine Merges/PRs ohne Auftrag, kleine nachvollziehbare Commits (Co-Author-Zeilen laut Systemvorgabe).
-- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **477 Tests, alle grün.** Golden Vectors: `reference/golden` (22 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle).
-- Prüfen vor jeder Arbeit: `git status`, dann `cd reference/python && python -m unittest discover -s . -t . -v`, `python -m mmo_cee.golden check ../golden`, `python -m mmo_sim.golden check ../golden_sim`, `python -m mmo_cee.golden_visual check ../golden_visual`.
+- Alles liegt unter `reference/python/` (nur Python-Standardbibliothek, `unittest`, keine externen Abhängigkeiten). **491 Tests, alle grün.** Golden Vectors: `reference/golden` (22 CEE-Szenarien), `reference/golden_sim` (61 Fälle), `reference/golden_visual` (21 Fälle), `reference/golden_world` (8 Weltseiten-Szenarien, Welt-Hash je Schritt).
+- Prüfen vor jeder Arbeit: `git status`, dann `cd reference/python && python -m unittest discover -s . -t . -v`, `python -m mmo_cee.golden check ../golden`, `python -m mmo_sim.golden check ../golden_sim`, `python -m mmo_cee.golden_visual check ../golden_visual`, `python -m mmo_world.golden check ../golden_world`.
 - Dokumentation: `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/STATUS_REPORT.md`, `docs/decisions/ADR-0001…0012`, `reference/golden/README.md` (Format und Prüfverfahren für Portierungen), `Game/PRODUCTION_READINESS.md`, `Game/WINDOWS_SETUP_CHECKLIST.md`, `Game/ENGINE_COMPARISON_PROTOCOL.md`.
 - Wichtige Commits: `ba3d1b0` Kern + Identity/Element/Profession/Essence · `062b52c` Combat Development · `c6c5069` Golden Vectors · `aed6ca6` Kampfsimulation `mmo_sim` · `4a2a156` Wesensbewertung · `2efc9c3` Visual Evolution · `ee32e2c` Discovery · `ad54492` Crafting · danach Economic Profile (siehe `git log`).
 
@@ -59,11 +59,11 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Vor jedem Commit: gesamte Suite + alle Golden-Prüfungen grün; neue Verhaltensänderung = neue Regelversion + Vektoren neu erzeugen; bisherige Vektoren müssen byte-identisch bleiben.
 
 ## 7. Bekannte offene Punkte
-- Produktion/Offline-Produktion und Aufträge/Kunden der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft/Logistik, Spielerstädte, Technologie-Etablierung je Region, Kampfechos – nicht begonnen. Der Unternehmenslevel hat noch keine Wirkung; Golden Vectors für die Weltseite (Registry, Inventar, Handel, Herstellung, Firmen) fehlen.
+- Produktion/Offline-Produktion und Aufträge/Kunden der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft/Logistik, Spielerstädte, Technologie-Etablierung je Region, Kampfechos – nicht begonnen. Der Unternehmenslevel hat noch keine Wirkung; Golden Vectors der Weltseite sind vorhanden (ADR-0013).
 - Kampf: nur 1:1, kein Raum/Winkel, keine Unterstützungsaktionen/Gruppen in der Simulation (die CEE kennt `ally_heal`/`ally_shield`), keine konkreten Fähigkeiten.
 - Handwerk: Werkzeuge/Werkstätten, Herstellungsdauer, Materialgewinnung, Experimentieren, Rezepte als Gegenstand fehlen.
 - Wesen/Visual: Wirkung der Modifikatoren auf Kampf/Bewegung; echte Optik/Assets; Ausrüstung/Kosmetik; Übergangsanimationen; Handwerksrichtungen noch nicht an Wesen/Visual angebunden.
-- Persistenz (Datenbank, Snapshots, Archivierung gewerteter Begegnungs-IDs), Migration zwischen Regelversionen, Server-Protokoll, Mehrfachaccounts/Boosting, Golden Vectors für die Weltseite (Registry, Inventar, Herstellung).
+- Persistenz (Datenbank, Snapshots, Archivierung gewerteter Begegnungs-IDs), Migration zwischen Regelversionen, Server-Protokoll, Mehrfachaccounts/Boosting.
 - Balancing-Hinweise: Wiederholungsabnahme dominiert Tageslimits; Ausdauer begrenzt in der Kampfsimulation kaum.
 
 ## 8. Engine- und Infrastrukturstand
@@ -72,7 +72,7 @@ Regelversionen: v1 Basis ohne Kampf · v2 + `combat` · v3 + Wesensform mit Kamp
 - Diese Sandbox ist eine Cloud-Linux-Umgebung ohne GPU und ohne Zugang zu RunPod/SSH; niemals private Schlüssel, Passwörter oder Tokens anfordern oder im Repo/Chat speichern.
 
 ## 9. Vorgeschlagene nächste Schritte (Vorschläge, nicht beschlossen)
-1. **Golden Vectors der Weltseite** (Registry, Inventar, Handel, Herstellung, Firmen – inkl. Floor-Division bei negativen Werten) und Persistenz-/Migrationskonzept, damit auch die Weltlogik portierbar ist.
+1. **Persistenz-/Migrationskonzept** (Snapshots, Archivierung, Regelversions-Migration); Golden Vectors der Weltseite sind erledigt (ADR-0013).
 2. **Märkte/Preisbildung** (ersetzen die statische Referenztabelle) und **Firmenproduktion/Offline-Produktion** mit Kapazität, Lager, Kosten und Grenzen.
 3. Snapshots/Archivierung und Regel-Migration.
 4. Server-/Protokoll-Schnittstelle planen (PostgreSQL/Redis, Regionen/Instanzen noch offen) und Übergang zur Engine-Phase; Engine-Vergleich nur mit klarem Budget.

@@ -22,5 +22,5 @@
 - Produktion und Offline-Produktion mit Kapazität, Lager, Kosten und Grenzen; Aufträge/Kunden; Produktionsketten; der Unternehmenslevel hat noch keine Wirkung (nur abgeleitet aus Umsatz); Lagerkapazität des Gebäudes ist nur Datum.
 - Filialen, Tochtergesellschaften, Unternehmensgruppen; weitere Beschlussarten (Verfassungsänderung, Kapitalmaßnahmen); Dividenden; Steuern und Gebühren.
 - Spezialisten-NPCs mit eigenen Geschichten und Verfahren (Content); echte Inhalte der persönlichen Ziele; Gehaltsverhandlung.
-- Persistenz (Register und Inventar sind JSON-Snapshots ohne Datenbank), Migration von Regelversionen, Golden Vectors für die Weltseite (inkl. Floor-Division bei negativen Werten) vor einer Portierung.
+- Persistenz (Register und Inventar sind JSON-Snapshots ohne Datenbank), Migration von Regelversionen, Golden Vectors der Weltseite: erledigt in ADR-0013.
 - Betrug über Mehrfachaccounts (z. B. Scheingesellschafter, Eigenanstellung) kann das System nicht erkennen.

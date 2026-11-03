@@ -74,7 +74,7 @@ Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur 
 
 ## Golden Test Vectors (ADR-0005)
 
-`reference/golden/*.json` enthalten Szenarien mit erwarteten Ereignis-/Zustands-Hashes, abgelehnten Eingaben und abgeleiteten Sichten. Jede Portierung muss sie bit-identisch bestehen; Python-Tests erzwingen, dass die Vektoren mit der Referenz übereinstimmen. Format und Prüfverfahren: `reference/golden/README.md`.
+`reference/golden/*.json` enthalten Szenarien mit erwarteten Ereignis-/Zustands-Hashes, abgelehnten Eingaben und abgeleiteten Sichten. Jede Portierung muss sie bit-identisch bestehen; Python-Tests erzwingen, dass die Vektoren mit der Referenz übereinstimmen. Format und Prüfverfahren: `reference/golden/README.md`. Die Weltseite (Inventar, Register, Herstellung, Handel, Firmen) hat eigene Skript-Vektoren mit Welt-Hash nach jedem Schritt: `reference/golden_world/` (ADR-0013).
 
 ## Zielarchitektur (Vorschlag, nicht bestätigt)
 
