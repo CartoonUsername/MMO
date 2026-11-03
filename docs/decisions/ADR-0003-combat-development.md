@@ -14,7 +14,7 @@
 7. **Regeln versioniert**: neue Datei `rules_v2.json`; `rules_v1.json` bleibt unverändert und lauffähig (ohne Kampf).
 8. Regeldaten werden beim Start validiert (`validate_combat_rules`), Fehlkonfiguration bricht früh ab.
 
-**Vertrauensgrenze (wichtig):** Die Engine kann keine gefälschten Berichte erkennen, die plausibel aussehen. Sie begrenzt den Schaden (Raten, Tageslimits, Einmaligkeit). Der Gameplay-Server muss Berichte selbst aus seiner Kampfsimulation erzeugen; Clients dürfen sie nie senden. Globale Eindeutigkeit der `encounter_id` über Charaktere hinweg und die Teilnehmerzuordnung sind Aufgabe des Servers (offen).
+**Vertrauensgrenze (wichtig):** Die Engine kann keine gefälschten Berichte erkennen, die plausibel aussehen. Sie begrenzt den Schaden (Raten, Tageslimits, Einmaligkeit). Der Gameplay-Server muss Berichte selbst aus seiner Kampfsimulation erzeugen; Clients dürfen sie nie senden. Globale Eindeutigkeit der `encounter_id` über Charaktere hinweg und die Teilnehmerzuordnung sind Aufgabe des Servers. **Seit ADR-0006** erzeugt `mmo_sim` die Berichte und vergibt die IDs (Teilnehmerzuordnung/Gruppen weiter offen).
 
 **Bekannte Grenzen / offen**
 - `state.encounters` wächst unbegrenzt; Snapshots/Archivierung folgen mit Persistenz (Roadmap 9). Pruning würde Replay-Schutz schwächen und braucht eigene Entscheidung.

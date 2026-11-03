@@ -44,6 +44,10 @@ load(character)       → Replay des Logs durch dieselben Engines (deterministis
 
 Querverbindung: Wesensformen können Mindeststufen von Kampfrichtungen verlangen (`combat_directions` in den Essence-Regeln); die Essence Engine liest dafür nur die abgeleitete Sicht der Combat Engine.
 
+## Serverseitiger Kampfkern `mmo_sim` (ADR-0006)
+
+Deterministische 1:1-Simulation (Ganzzahlen, 10 Ticks/s). Der Client sendet nur Befehle; die Simulation entscheidet über Treffer, Ausweichen, Block, Parade, Betäubung und Verlangsamung und erzeugt daraus den Begegnungsbericht für `combat.encounter_resolved`. `EncounterServer` vergibt IDs, Gegner, Stufe und Tag. Die Verträglichkeit mit den CEE-Plausibilitätslimits wird rechnerisch (`check_compatibility`) und durch Spam-Tests geprüft. Alle Zahlen sind vorläufig.
+
 ## Golden Test Vectors (ADR-0005)
 
 `reference/golden/*.json` enthalten Szenarien mit erwarteten Ereignis-/Zustands-Hashes, abgelehnten Eingaben und abgeleiteten Sichten. Jede Portierung muss sie bit-identisch bestehen; Python-Tests erzwingen, dass die Vektoren mit der Referenz übereinstimmen. Format und Prüfverfahren: `reference/golden/README.md`.
