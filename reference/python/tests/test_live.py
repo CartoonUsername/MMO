@@ -55,6 +55,14 @@ class LiveTests(unittest.TestCase):
         self.assertTrue(e.done)
         self.assertFalse(e.submit(0, "flee"))
 
+    def test_a_player_who_left_cannot_submit_while_the_others_fight_on(self):
+        e = LiveEncounter(C, ["training_dummy"], [{"level": 1}, {"level": 1}])
+        e.submit(0, "flee")
+        e.advance()
+        self.assertFalse(e.done)
+        self.assertFalse(e.submit(0, "light"))
+        self.assertTrue(e.submit(1, "light"))
+
     def test_input_limit(self):
         cfg = dict(C, max_inputs=3)
         e = LiveEncounter(cfg, ["training_dummy"], [{"level": 1}])
@@ -90,8 +98,17 @@ class LiveTests(unittest.TestCase):
         self.assertEqual(v["stagger"], [False, False])
 
     def test_dead_opponents_show_zero_hp(self):
-        e = play(["training_dummy"], [{"level": 1}], 3, p=0.6)
-        self.assertEqual(e.view()["opponents"][0]["hp"] == 0, e.result.outcome == "victory")
+        cfg = dict(C, opponents={**C["opponents"], "frail": {"level": 1, "hp": 50, "attack_interval": 0, "windup": 0, "damage": 0, "stagger": 0}})
+        e = LiveEncounter(cfg, ["frail"], [{"level": 1}])
+        e.submit(0, "light")
+        for _ in range(8):
+            e.advance()
+        e.submit(0, "light")
+        for _ in range(2):
+            e.advance()
+        self.assertEqual(e.result.outcome, "victory")
+        self.assertLess(e._sim.es[0].hp, 0)
+        self.assertEqual(e.view()["opponents"][0], {"type": "frail", "hp": 0, "alive": False})
 
 
 if __name__ == "__main__":

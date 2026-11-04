@@ -465,5 +465,258 @@ class NetworkTests(unittest.IsolatedAsyncioTestCase):
         await c2.close()
 
 
+def rules_with(**changes):
+    R = copy.deepcopy(load_game_rules())
+    R.update(changes)
+    return R
+
+
+class SurvivorTests(unittest.TestCase):
+    """Fälle, die zuvor nur durch Mutationstests auffielen."""
+
+    def test_drain_empties_the_queue(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        g.tick()
+        g.tick()
+        first = g.drain(a.sid)
+        self.assertTrue(first)
+        self.assertEqual(g.drain(a.sid), [])
+
+    def test_oversized_but_valid_json_is_refused(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        big = json.dumps({"cmd": "game.join", "args": {"char": "anna", "pad": "x" * 5000}})
+        r = g.handle(a.sid, big)
+        self.assertEqual((r["ok"], r["error"]["message"]), (False, "Nachricht zu groß"))
+        self.assertNotIn("anna", g.players)
+
+    def test_joining_twice_keeps_the_position(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        a.call("game.move", dx=1, dy=0)
+        for _ in range(5):
+            g.tick()
+        pos = a.pos()
+        r = a.call("game.join")
+        self.assertEqual((a.pos(), r["result"]["you"]["pos"]), (pos, list(pos)))
+
+    def test_gather_is_refused_in_a_fight_even_next_to_a_node(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        walk(g, [a], [WOLVES])
+        g.players["anna"]["pos"] = (1100, 700)                                  # neben ore1, aber im Kampf
+        r = a.call("game.gather", node="ore1")
+        self.assertEqual((r["error"]["code"], r["error"]["message"]), ("rejected", "Im Kampf nicht möglich"))
+
+    def test_gather_reach_is_inclusive(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        reach = g.R["gather_reach"]
+        g.players["anna"]["pos"] = (1100 + reach, 700)
+        self.assertTrue(a.call("game.gather", node="ore1")["ok"])
+        g.players["anna"]["pos"] = (1300 + reach + 1, 1000)
+        self.assertFalse(a.call("game.gather", node="ore2")["ok"])
+
+    def test_new_day_expires_invites_and_offers(self):
+        g = GameServer()
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        g.world.inv.deposit("anna", "iron_blade@fine", 2)
+        a.call("party.form")
+        a.call("party.invite", target="ben")
+        o = a.call("trade.offer", to="ben", side="sell", item_key="iron_blade@fine", qty=2, price=300)["result"]
+        self.assertEqual(g.world.inv.balance("anna", "iron_blade@fine"), 0)       # hinterlegt
+        for _ in range(g.R["ticks_per_day"] * 4):
+            g.tick()
+        self.assertEqual(g.world.parties.invites, {})
+        self.assertEqual(g.world.inv.balance("anna", "iron_blade@fine"), 2)       # Hinterlegung zurück
+        self.assertEqual(b.call("trade.accept", offer=o)["error"]["code"], "rejected")
+
+    def test_stop_after_a_fight_and_no_walking_on_with_the_old_direction(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        a.call("game.move", dx=1, dy=1)
+        g.players["anna"]["pos"] = (WOLVES[0] - 200, WOLVES[1] - 200)
+        for _ in range(3):
+            g.tick()
+        self.assertIn("anna", g.fight_of)
+        fight_until_end(g, [a])
+        pos = a.pos()
+        for _ in range(10):
+            g.tick()
+        self.assertEqual(a.pos(), pos)
+
+    def test_fleeing_moves_away_and_the_pause_lasts_exactly_as_long_as_configured(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        walk(g, [a], [WOLVES])
+        before = a.pos()
+        a.call("game.fight", input="flee")
+        g.tick()
+        r = g.R["aggro_radius"]
+        self.assertEqual(a.pos(), (before[0] - r, before[1] - r))
+        left_at = g.tick_no
+        a.call("game.move", dx=1, dy=1)
+        entered = None
+        for _ in range(200):
+            g.tick()
+            if "anna" in g.fight_of:
+                entered = g.tick_no
+                break
+        self.assertIsNotNone(entered)
+        self.assertGreaterEqual(entered - left_at, g.R["aggro_immunity_ticks"] - 1)    # frühestens nach der Schonfrist
+        self.assertLessEqual(entered - left_at, g.R["aggro_immunity_ticks"] + 40)
+
+    def test_no_second_fight_while_fighting(self):
+        R = rules_with(enemies=[{"type": "wolf", "at": [2000, 1800]}, {"type": "wolf", "at": [2000, 1850]}, {"type": "wolf", "at": [2000, 2500]}])
+        g = GameServer(R)
+        a = Bot(g, "anna")
+        a.call("game.join")
+        g.players["anna"]["pos"] = (2000, 2150)                                  # beide Rudel in Aggro-Reichweite, das dritte Tier außerhalb des Rudelradius
+        for _ in range(5):
+            g.tick()
+        self.assertEqual(len(g.fights), 1)
+        self.assertEqual(g.fights[g.fight_of["anna"]]["types"], ["wolf", "wolf"])
+        self.assertIsNone(g.enemies[2]["fight"])
+
+    def test_party_members_far_away_or_busy_do_not_join(self):
+        R = rules_with(join_radius=1000, enemies=[{"type": "wolf", "at": [2000, 1800]}])
+        g = GameServer(R)
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        for x in (a, b):
+            x.call("game.join")
+        a.call("party.form")
+        b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.players["ben"]["pos"] = (2000 + 1001, 1800)                           # knapp außerhalb des Beitrittsradius
+        g.players["anna"]["pos"] = (2000, 1800)
+        g.tick()
+        self.assertEqual(g.fights[g.fight_of["anna"]]["chars"], ["anna"])
+        self.assertNotIn("ben", g.fight_of)
+
+    def test_party_member_inside_the_radius_joins_exactly_at_the_border(self):
+        R = rules_with(join_radius=1000, enemies=[{"type": "wolf", "at": [2000, 1800]}])
+        g = GameServer(R)
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        for x in (a, b):
+            x.call("game.join")
+        a.call("party.form")
+        b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.players["ben"]["pos"] = (2000 + 1000, 1800)
+        g.players["anna"]["pos"] = (2000, 1800)
+        g.tick()
+        self.assertEqual(g.fights[g.fight_of["anna"]]["chars"], ["anna", "ben"])
+
+    def test_a_member_in_another_fight_is_not_pulled_in(self):
+        R = rules_with(join_radius=4000, enemies=[{"type": "wolf", "at": [500, 5000]}, {"type": "wolf", "at": [3000, 5000]}])
+        g = GameServer(R)
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        for x in (a, b):
+            x.call("game.join")
+        a.call("party.form")
+        b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.players["anna"]["pos"] = (5900, 5900)
+        g.players["ben"]["pos"] = (500, 5000)
+        g.tick()
+        self.assertIn("ben", g.fight_of)
+        g.players["anna"]["pos"] = (3000, 5000)
+        g.tick()
+        self.assertEqual(g.fights[g.fight_of["anna"]]["chars"], ["anna"])
+        self.assertNotEqual(g.fight_of["anna"], g.fight_of["ben"])
+
+    def test_loot_is_shared_round_robin_and_coins_split_with_remainder(self):
+        R = rules_with(enemies=[{"type": "wolf", "at": [2000, 1800]}], drops={"wolf": {"coin@gold": 7, "healing_herb@standard": 2}})
+        g = GameServer(R)
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        for x in (a, b):
+            x.call("game.join")
+        a.call("party.form")
+        b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.players["anna"]["pos"] = (2000, 1800)
+        g.players["ben"]["pos"] = (2100, 1800)
+        g.tick()
+        fight_until_end(g, [a, b])
+        ea, eb = kinds(a, "fight_end")[0], kinds(b, "fight_end")[0]
+        self.assertEqual((ea["loot"]["coin@gold"], eb["loot"]["coin@gold"]), (4, 3))
+        self.assertEqual((ea["loot"]["healing_herb@standard"], eb["loot"]["healing_herb@standard"]), (1, 1))
+        self.assertEqual(g.world.inv.balance("anna", "coin@gold"), 204)
+
+    def test_a_participant_who_fled_gets_no_loot_but_keeps_the_report(self):
+        R = rules_with(enemies=[{"type": "wolf", "at": [2000, 1800]}])
+        g = GameServer(R)
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        for x in (a, b):
+            x.call("game.join")
+        a.call("party.form")
+        b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.players["anna"]["pos"] = (2000, 1800)
+        g.players["ben"]["pos"] = (2100, 1800)
+        g.tick()
+        b.call("game.fight", input="light")
+        for _ in range(9):
+            g.tick()
+        b.call("game.fight", input="flee")
+        fight_until_end(g, [a])
+        b.pull()
+        self.assertEqual(kinds(b, "fight_left")[0]["reason"], "fled")
+        self.assertEqual(kinds(a, "fight_end")[0]["loot"]["coin@gold"], 6)         # alles an anna
+        eb = kinds(b, "fight_end")[0]
+        self.assertEqual((eb["outcome"], eb["loot"], eb["report"] is not None), ("fled", {}, True))      # Bericht ja, Beute nein
+
+    def test_a_mismatch_between_live_and_replay_is_logged(self):
+        import dataclasses
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        walk(g, [a], [WOLVES])
+        real = g.encounters.finish_pack
+
+        def tampered(eid, inputs):
+            fin = real(eid, inputs)
+            return dataclasses.replace(fin, result=dataclasses.replace(fin.result, ticks=fin.result.ticks + 1))
+        g.encounters.finish_pack = tampered
+        fight_until_end(g, [a])
+        self.assertTrue(any("weicht" in m for m in g.log))
+
+
+class NetSurvivorTests(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        self.srv = NetServer(port=0, tick_seconds=0.002)
+        self.port = await self.srv.start()
+
+    async def asyncTearDown(self):
+        await self.srv.stop()
+
+    async def hello(self, line):
+        r, w = await asyncio.open_connection("127.0.0.1", self.port)
+        w.write(line + b"\n")
+        await w.drain()
+        out = json.loads(await asyncio.wait_for(r.readline(), 2))
+        w.close()
+        return out
+
+    async def test_hello_must_be_an_object_with_cmd_hello(self):
+        for line in (b"[]", b'{"cmd":"join","account":"anna"}', b'{"account":"anna"}', b"5"):
+            out = await self.hello(line)
+            self.assertEqual((out["ev"], out["code"]), ("error", "bad_hello"), line)
+        self.assertEqual((await self.hello(b'{"cmd":"hello","account":"anna"}'))["ev"], "welcome")
+
+    async def test_server_full(self):
+        clients = []
+        for i in range(16):
+            c = Client("127.0.0.1", self.port, f"p{i}")
+            await c.connect()
+            clients.append(c)
+        out = await self.hello(b'{"cmd":"hello","account":"extra"}')
+        self.assertEqual(out["code"], "server_full")
+        for c in clients:
+            await c.close()
+
+
 if __name__ == "__main__":
     unittest.main()
