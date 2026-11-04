@@ -16,6 +16,7 @@ from mmo_cee.service import CharacterService
 from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
+from .equipment import EquipmentService, load_equipment_rules
 from .echo import EchoService, load_echo_rules
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
@@ -36,6 +37,7 @@ PRICING_RULES = "pricing_rules_v1.json"
 TRADE_RULES = "trade_rules_v1.json"
 PARTY_RULES = "party_rules_v1.json"
 ECHO_RULES = "echo_rules_v1.json"
+EQUIPMENT_RULES = "equipment_rules_v1.json"
 
 
 class World:
@@ -88,6 +90,10 @@ class World:
         if olde is not None:
             for a in ("_counter", "_listing_counter", "echoes", "listings", "equipped", "mastery", "mastery_day", "awards"):
                 setattr(self.echo, a, getattr(olde, a))
+        oldq2 = getattr(self, "equipment", None)
+        self.equipment = EquipmentService(self.svc, self.inv, load_equipment_rules(EQUIPMENT_RULES))
+        if oldq2 is not None:
+            self.equipment.worn, self.equipment.look, self.equipment.wardrobe = oldq2.worn, oldq2.look, oldq2.wardrobe
         for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties, self.echo):
             svc.notify = self.outbox.emit  # Benachrichtigungen (abgeleitet, nicht Teil des Weltzustands/der Vektor-Hashes)
 
@@ -101,6 +107,8 @@ class World:
             snap["trade_offers"] = json.loads(self.offers.to_json())
         if self.production.active:
             snap["production"] = json.loads(self.production.to_json())
+        if self.equipment.active:
+            snap["equipment"] = json.loads(self.equipment.to_json())
         if self.echo.active:
             snap["echoes"] = json.loads(self.echo.to_json())
         if self.pricing is not None and self.pricing.active:

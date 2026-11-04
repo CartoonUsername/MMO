@@ -22,7 +22,7 @@ from typing import Any
 
 from .errors import SimError
 from .fight import EncounterResult, validate_inputs
-from .rules import COMMANDS, GROUP_COMMANDS, combine_effects
+from .rules import COMMANDS, GROUP_COMMANDS, combine_effects, merge_gear
 
 
 @dataclass(frozen=True)
@@ -40,7 +40,7 @@ class _P:
         p = cfg["player"]
         self.max_hp = p["base_hp"] + p["hp_per_level"] * level
         self.hp, self.stam = self.max_hp, p["stamina_max"]
-        self.fx = combine_effects(cfg, spec.get("equipped"))
+        self.fx = merge_gear(cfg, combine_effects(cfg, spec.get("equipped")), spec.get("gear"))
         allowed = spec.get("allowed")
         self.allowed = None if allowed is None else frozenset(allowed)
         self.inputs, self.i = inputs, 0
@@ -79,8 +79,8 @@ def _validated(cfg: dict[str, Any], players: Any, extra_commands: tuple[str, ...
         raise SimError(f"Die Gruppe muss aus 1..{g['max_party']} Spielern bestehen")
     out = []
     for spec in players:
-        if not isinstance(spec, dict) or set(spec) - {"level", "inputs", "allowed", "equipped"} or not {"level", "inputs"} <= set(spec):
-            raise SimError("Spieler: level und inputs erforderlich, optional allowed/equipped")
+        if not isinstance(spec, dict) or set(spec) - {"level", "inputs", "allowed", "equipped", "gear"} or not {"level", "inputs"} <= set(spec):
+            raise SimError("Spieler: level und inputs erforderlich, optional allowed/equipped/gear")
         level = spec["level"]
         if not isinstance(level, int) or isinstance(level, bool) or level < 1:
             raise SimError("level muss eine positive ganze Zahl sein")
@@ -88,7 +88,7 @@ def _validated(cfg: dict[str, Any], players: Any, extra_commands: tuple[str, ...
         if allowed is not None and (not isinstance(allowed, (list, tuple, set, frozenset))
                                     or any(c not in COMMANDS + GROUP_COMMANDS + extra_commands for c in allowed)):
             raise SimError("allowed muss eine Liste bekannter Befehle sein")
-        combine_effects(cfg, spec.get("equipped"))  # prüft equipped
+        merge_gear(cfg, combine_effects(cfg, spec.get("equipped")), spec.get("gear"))  # prüft equipped und gear
         out.append((spec, level, validate_inputs(cfg, spec["inputs"], COMMANDS + GROUP_COMMANDS + extra_commands)))
     return out
 

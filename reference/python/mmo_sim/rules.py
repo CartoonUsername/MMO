@@ -55,6 +55,30 @@ def combine_effects(cfg: dict[str, Any], equipped: Any) -> dict[str, int]:
     return out
 
 
+def merge_gear(cfg: dict[str, Any], fx: dict[str, int], gear: Any) -> dict[str, int]:
+    """Wirkungen getragener Ausrüstung (Schlüssel wie `EFFECT_KEYS`, bereits zusammengefasst) auf die Fähigkeitswirkung legen und prüfen."""
+    if gear is None:
+        return fx
+    if not isinstance(gear, dict):
+        raise SimError("gear muss ein Objekt sein")
+    out = dict(fx)
+    for key, val in gear.items():
+        if key not in EFFECT_KEYS:
+            raise SimError(f"gear: unbekannte Wirkung {key!r}")
+        kind, lo, hi = EFFECT_KEYS[key]
+        if not isinstance(val, int) or isinstance(val, bool) or not lo <= val <= hi:
+            raise SimError(f"gear.{key}: Wert außerhalb {lo}..{hi}")
+        if key not in out:
+            out[key] = val
+        elif kind == "mul":
+            out[key] = out[key] * val // 1000
+        elif kind == "min":
+            out[key] = min(out[key], val)
+        else:
+            out[key] += val
+    return out
+
+
 def validate_group_rules(cfg: dict[str, Any]) -> None:
     g = cfg["group"]
 

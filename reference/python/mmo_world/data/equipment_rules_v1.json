@@ -1,0 +1,126 @@
+{
+ "version": 1,
+ "_comment": "PLATZHALTER (AP 8, ADR-0047): Slots, Gegenstände, Gewichtsklassen, Wirkungen und Kappen sind Vorschläge; Slots, Seltenheiten, Setboni und Rezepte sind laut Blueprint §31 OFFEN. Wirkungen nutzen die Schlüssel der Kampfsimulation (EFFECT_KEYS) plus move_permille (Spielschicht). Aussehen (Transmog) ist von Werten getrennt.",
+ "slots": [
+  "weapon",
+  "offhand",
+  "chest",
+  "feet"
+ ],
+ "weight_classes": {
+  "light": {
+   "name": "Leicht"
+  },
+  "medium": {
+   "name": "Mittel"
+  },
+  "heavy": {
+   "name": "Schwer"
+  }
+ },
+ "grade_scaling": "economy.grade_permille",
+ "caps": {
+  "damage_taken_permille_min": 600,
+  "heavy_damage_permille_max": 1800,
+  "light_damage_permille_max": 1800,
+  "block_damage_permille_min": 300,
+  "move_permille_min": 700,
+  "move_permille_max": 1200,
+  "dodge_cost_delta_max": 20
+ },
+ "items": {
+  "iron_blade": {
+   "name": "Eisenklinge",
+   "slot": "weapon",
+   "weight": "medium",
+   "classes": null,
+   "min_level": 1,
+   "effects": {
+    "light_damage_permille": 1100,
+    "heavy_damage_permille": 1100
+   },
+   "style": "Schwert: ausgewogene Schläge",
+   "look": "gear/iron_blade"
+  },
+  "hunter_bow": {
+   "name": "Jagdbogen",
+   "slot": "weapon",
+   "weight": "light",
+   "classes": [
+    "archer"
+   ],
+   "min_level": 1,
+   "effects": {
+    "light_damage_permille": 1180,
+    "heavy_damage_permille": 950
+   },
+   "style": "Bogen: schnelle Schüsse, schwache schwere Treffer",
+   "look": "gear/hunter_bow"
+  },
+  "ember_staff": {
+   "name": "Glutstab",
+   "slot": "weapon",
+   "weight": "light",
+   "classes": [
+    "shaman_alchemist"
+   ],
+   "min_level": 1,
+   "effects": {
+    "light_damage_permille": 1120
+   },
+   "style": "Stab: Fokus für Elementarfähigkeiten",
+   "look": "gear/ember_staff"
+  },
+  "wooden_buckler": {
+   "name": "Holzbuckler",
+   "slot": "offhand",
+   "weight": "medium",
+   "classes": null,
+   "min_level": 1,
+   "effects": {
+    "block_damage_permille": 700
+   },
+   "style": "Buckler: gute Blockwirkung",
+   "look": "gear/wooden_buckler"
+  },
+  "leather_jerkin": {
+   "name": "Lederwams",
+   "slot": "chest",
+   "weight": "light",
+   "classes": null,
+   "min_level": 1,
+   "effects": {
+    "damage_taken_permille": 950,
+    "move_permille": 1030
+   },
+   "style": "Leichte Rüstung: schnell, wenig Schutz",
+   "look": "gear/leather_jerkin"
+  },
+  "iron_cuirass": {
+   "name": "Eisenküraß",
+   "slot": "chest",
+   "weight": "heavy",
+   "classes": null,
+   "min_level": 5,
+   "effects": {
+    "damage_taken_permille": 820,
+    "dodge_cost_delta": 6,
+    "move_permille": 930
+   },
+   "style": "Schwere Rüstung: viel Schutz, teures Ausweichen, langsamer",
+   "look": "gear/iron_cuirass"
+  },
+  "traveler_boots": {
+   "name": "Wanderstiefel",
+   "slot": "feet",
+   "weight": "light",
+   "classes": null,
+   "min_level": 1,
+   "effects": {
+    "move_permille": 1040
+   },
+   "style": "Stiefel: schneller unterwegs",
+   "look": "gear/traveler_boots"
+  }
+ }
+}

@@ -136,6 +136,10 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `echo.cancel` | char:s, listing:s | char | schreibend | default |
 | `echo.buy` | char:s, listing:s | char | schreibend | default |
 | `query.echoes` | char:s | char | lesend | query |
+| `equip.wear` | char:s, item_key:s | char | schreibend | default |
+| `equip.remove` | char:s, slot:s | char | schreibend | default |
+| `equip.look` | char:s, slot:s, item?:s | char | schreibend | default |
+| `query.equipment` | char:s | char | lesend | query |
 | `query.element_catalog` |  | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 

@@ -187,6 +187,10 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("echo.cancel", "char:s listing:s", "char", lambda w, a: w.echo.cancel_listing(a["char"], a["listing"])),
     _c("echo.buy", "char:s listing:s", "char", lambda w, a: w.echo.buy(a["char"], a["listing"])),
     _c("query.echoes", "char:s", "char", lambda w, a: w.echo.view(a["char"]), mutating=False),
+    _c("equip.wear", "char:s item_key:s", "char", lambda w, a: w.equipment.equip(a["char"], a["item_key"])),
+    _c("equip.remove", "char:s slot:s", "char", lambda w, a: w.equipment.unequip(a["char"], a["slot"])),
+    _c("equip.look", "char:s slot:s item:s?", "char", lambda w, a: w.equipment.set_look(a["char"], a["slot"], a.get("item"))),
+    _c("query.equipment", "char:s", "char", lambda w, a: w.equipment.view(a["char"]), mutating=False),
     _c("query.element_catalog", "", None, lambda w, a: _element_catalog(w), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}

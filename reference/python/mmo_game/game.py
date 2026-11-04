@@ -7,6 +7,7 @@ Referenz (`mmo_sim.pack`), die Berichte laufen durch die CEE.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -33,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v5.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v6.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -328,11 +329,29 @@ class GameServer:
             after = self.world.svc.state(c).parts["identity"]["level"]
             if after > before:
                 g["level"] = after
+            gg = self._gear_gains(c, types)
+            if gg:
+                g["gear"] = gg
             eg = self._echo_gains(c, types)
             if eg:
                 g["echo"] = eg
             gains[c] = g
         return gains
+
+    def _gear_gains(self, c: str, types: list[str]) -> dict[str, int]:
+        """Ausrüstungsfunde (AP 8): je besiegtem Gegner mit fester Wahrscheinlichkeit, deterministisch aus Figur, Tag, Art und Kill-Zähler."""
+        G = self.R.get("gear")
+        if not G:
+            return {}
+        out: dict[str, int] = {}
+        for t in types:
+            for key, qty in G["per_victory"].get(t, {}).items():
+                n = self.kills.get(f"{c}|{t}", 0)
+                h = int(hashlib.sha256(f"gear|{c}|{self.world.day[0]}|{t}|{key}|{n}".encode()).hexdigest()[:8], 16) % 1000
+                if h < G["chance_permille"]:
+                    self.world.inv.deposit(c, key, qty)
+                    out[key] = out.get(key, 0) + qty
+        return out
 
     def _echo_gains(self, c: str, types: list[str]) -> dict[str, Any]:
         """Kampfechos (AP 7): einmaliges Echo beim ersten Sieg über bestimmte Gegner, Resonanzmaterial, persönliche Meisterschaft."""
@@ -425,7 +444,7 @@ class GameServer:
             if c in self.fight_of or p["dir"] == (0, 0):
                 continue
             dx, dy = p["dir"]
-            p["pos"] = self.terrain.step(p["pos"], dx, dy)
+            p["pos"] = self.terrain.step(p["pos"], dx, dy, self.R["speed_cm_per_tick"] * self.world.equipment.move_permille(c) // 1000)
 
     def _respawn(self) -> None:
         for e in self.enemies:
@@ -528,7 +547,7 @@ class GameServer:
                         and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
                     chars.append(m)
         chars = chars[: self.sim["group"]["max_party"]]
-        specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars})
+        specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars}, {c: self.world.equipment.sim_gear(c) for c in chars})
         types = [e["type"] for e in pack]
         # Fähigkeiten: feste der Vorlage plus Baukasten je Spawn-Punkt und Tag (reproduzierbar, ADR-0032/0033)
         abilities = [roll_abilities(self.sim, e["type"], e["id"], self.world.day[0]) for e in pack] if "enemy_abilities" in self.sim else None
@@ -668,7 +687,7 @@ class GameServer:
     def _snapshot_for(self, char: str) -> dict[str, Any]:
         me = self.players[char]
         r2 = self.R["view_radius"] ** 2
-        others = [{"char": c, "pos": list(p["pos"]), "fight": c in self.fight_of} for c, p in sorted(self.players.items())
+        others = [{"char": c, "pos": list(p["pos"]), "fight": c in self.fight_of, "look": {s: v["look"] for s, v in self.world.equipment.appearance(c).items() if v["look"]}} for c, p in sorted(self.players.items())
                   if c != char and _dist2(p["pos"], me["pos"]) <= r2]
         enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None, "state": e["state"]}
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]

@@ -160,7 +160,7 @@ class EncounterServer:
         """Eigene Fähigkeitsbefehle (ADR-0027): nur die der ausgerüsteten Fähigkeiten."""
         return {name for name, sk in skills(self.cfg).items() if sk["ability"] in (equipped or [])}
 
-    def pack_specs(self, party: Any, inputs_by_character: Any, extra_equipped: Any = None) -> list[dict[str, Any]]:
+    def pack_specs(self, party: Any, inputs_by_character: Any, extra_equipped: Any = None, gear: Any = None) -> list[dict[str, Any]]:
         """Spielerangaben (Stufe, Eingaben, freigegebene Befehle, Ausrüstung) für die Mehrgegnersimulation – für Abschluss und Live-Kampf gleich."""
         specs = []
         for c in party:
@@ -178,6 +178,8 @@ class EncounterServer:
                 spec["allowed"] = allowed
             if equipped is not None:
                 spec["equipped"] = equipped
+            if (gear or {}).get(c):                                        # getragene Ausrüstung (AP 8): zusammengefasste Wirkungen
+                spec["gear"] = dict(gear[c])
             specs.append(spec)
         return specs
 

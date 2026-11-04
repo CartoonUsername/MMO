@@ -11,7 +11,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 5 | Berufe: Spezialisierungszweige, Techniken, Meisterstücke | §14–16, §71 | 2/3 | **fertig** (Zweige & Meisterstücke abgeleitet, ADR-0044); Experimente/Respezialisierung offen |
 | 6 | Fähigkeiten und Wesensformen als Definitionen; Prüfung, Vorschau, irreversible Annahme im Client | §11, §72 | 2 | **fertig** (Definitionen, Vorschau, bestätigte Annahme, ADR-0045) |
 | 7 | Kampfecho und Resonanz +0..+30 (atomar, Schutz, Pechschutz), Handelbarkeit, Meisterschaft | §17–21, §73 | 2/3 | **fertig** (Datenmodell, atomare Resonanz, Handel, Meisterschaft, Client; ADR-0046); Kampfwirkung der Echos offen |
-| 8 | Ausrüstung und Transmog | §31 | 2/3 | offen |
+| 8 | Ausrüstung und Transmog | §31 | 2/3 | **fertig** (Slots, Wirkung in Kampf/Bewegung, Transmog, Client; ADR-0047); Rezepte/Sets/Darstellung offen |
 | 9 | Welt: Regionen, Gegnervielfalt, Dungeon, Weltboss, Gefahrenstufen | §32–35, §60–61 | 2 | offen |
 | 10 | Wirtschaft: NPC-Wirtschaft, Unternehmen (Filialen, Töchter, Offline-Betrieb mit Deckel) | §38–41, §75 | 3 | offen |
 | 11 | Besitz: Grundstücke, Spielerstädte, Gemeinschaftsprojekte | §36–37 | 2/3 | offen |
