@@ -17,6 +17,7 @@ from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
 from .equipment import EquipmentService, load_equipment_rules
+from .community import Chronicle, GuildService, load_community_rules
 from .research import ResearchService, load_research_rules
 from .settlements import SettlementService, load_settlement_rules
 from .branches import BranchService, load_branch_rules
@@ -44,6 +45,7 @@ EQUIPMENT_RULES = "equipment_rules_v1.json"
 BRANCH_RULES = "branch_rules_v1.json"
 SETTLEMENT_RULES = "settlement_rules_v1.json"
 RESEARCH_RULES = "research_rules_v1.json"
+COMMUNITY_RULES = "community_rules_v1.json"
 
 
 class World:
@@ -95,6 +97,15 @@ class World:
         if oldr is not None:
             for a in ("epoch", "known", "projects", "world", "titles", "history", "last_day"):
                 setattr(self.research, a, getattr(oldr, a))
+        crules = load_community_rules(COMMUNITY_RULES)
+        oldc, oldg2 = getattr(self, "chronicle", None), getattr(self, "guilds", None)
+        self.chronicle = Chronicle(crules, clock)
+        self.guilds = GuildService(self.inv, self.trading.coin, crules, clock, lambda c: c in set(self.svc.log.character_ids()))
+        if oldc is not None:
+            self.chronicle.entries, self.chronicle.firsts, self.chronicle.titles = oldc.entries, oldc.firsts, oldc.titles
+        if oldg2 is not None:
+            self.guilds._counter, self.guilds.guilds, self.guilds.member_of, self.guilds.invites = oldg2._counter, oldg2.guilds, oldg2.member_of, oldg2.invites
+        self.settlements.record = self.research.record = self.guilds.record = self.chronicle.record
         oldp = getattr(self, "production", None)
         self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
         self.production.extra_lines, self.production.extra_storage, self.production.offline_cap = (
@@ -134,6 +145,10 @@ class World:
             snap["branches"] = json.loads(self.branches.to_json())
         if self.settlements.active:
             snap["settlements"] = json.loads(self.settlements.to_json())
+        if self.chronicle.active:
+            snap["chronicle"] = json.loads(self.chronicle.to_json())
+        if self.guilds.active:
+            snap["guilds"] = json.loads(self.guilds.to_json())
         if self.research.active:
             snap["research"] = json.loads(self.research.to_json())
         if self.equipment.active:

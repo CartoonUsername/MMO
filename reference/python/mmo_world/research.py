@@ -67,6 +67,7 @@ class ResearchService:
         self.titles: dict[str, list[str]] = {}
         self.history: list[dict[str, Any]] = []
         self.last_day = 0
+        self.record: Callable[..., Any] = lambda *a, **k: None                    # Chronik (AP 13)
         settlements.tech_known = self.knows
 
     @property
@@ -90,6 +91,7 @@ class ResearchService:
         self.epoch = n
         if n > 0:
             self.history.append({"day": self.day(), "kind": "epoch", "epoch": self.R["epochs"][n]["id"]})
+            self.record("epoch", [], key=f"epoch:{n}", name=self.R["epochs"][n]["name"])
 
     def lead_active(self, tech: str, today: int | None = None) -> bool:
         w = self.world.get(tech)
@@ -223,6 +225,7 @@ class ResearchService:
             self.titles.setdefault(top, []).append(f"Erfinder: {self._tech(tech)['name']}")
             ev["pioneer"] = top
             self.history.append({"day": day, "kind": "discovery", "tech": tech, "site": site, "char": top})
+            self.record("tech_discovered", [top], key=f"tech:{tech}", name=self._tech(tech)["name"], site=site)
         return ev
 
     # -- Sicht -------------------------------------------------------------------------------

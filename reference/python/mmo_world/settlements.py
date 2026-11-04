@@ -59,6 +59,7 @@ class SettlementService:
         self.projects: dict[str, dict[str, Any]] = {}     # "ort:projekt" -> {level, have}
         self.contrib: dict[str, dict[str, int]] = {}      # Figur -> {Ort: Wert}
         self.last_day = 0
+        self.record: Callable[..., Any] = lambda *a, **k: None                    # Chronik (AP 13)
         self.tech_known: Callable[[str, str], bool] = lambda site, tech: True      # von ResearchService überschrieben (AP 12)
 
     @property
@@ -151,6 +152,7 @@ class SettlementService:
             raise WorldError("Name schon vergeben")
         self._take(char, self.R["found_cost"], {})
         self.founded[site] = {"name": name.strip(), "founder": char, "day": self.day()}
+        self.record("settlement_founded", [char], key=f"site:{site}", name=name.strip())
 
     def buy_plot(self, char: str, site: str, n: int) -> None:
         s = self._need_open(site)

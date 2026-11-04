@@ -567,6 +567,15 @@ class GameServer:
         for c in list(self.players):
             self._emit_to(c, ev)
 
+    def _chron(self, kind: str, chars: list[str], key: str, points: str, **data: Any) -> None:
+        """Weltchronik (AP 13): Erstleistungen werden aufgezeichnet und gemeldet; Gilden der Beteiligten erhalten Punkte."""
+        w = self.world
+        entry = w.chronicle.record(kind, chars, key=key, **data)
+        for c in chars:
+            w.guilds.activity(c, points)
+        if entry is not None:
+            self._broadcast({"ev": "chronicle", "kind": kind, "chars": entry["chars"], "name": data.get("name")})
+
     def _boss_defeated(self, chars: list[str], result: Any, types: list[str]) -> None:
         """Weltboss besiegt: serverweite Meldung, Teilnehmerkiste für alle mit Beitrag."""
         for t in dict.fromkeys(types):
@@ -579,6 +588,7 @@ class GameServer:
                     self.world.inv.deposit(c, key, qty)
                 self._emit_to(c, {"ev": "world_boss_chest", "boss": t, "items": dict(wb["chest"])})
             self._broadcast({"ev": "world_boss", "boss": t, "name": wb["name"], "state": "defeated", "by": part})
+            self._chron("boss_defeated", part, f"boss:{t}", "boss", name=wb["name"])
 
     # ---------------------------------------------------------------- Dungeon (AP 9) ----
     def _cmd_world(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
@@ -669,6 +679,8 @@ class GameServer:
         if run is None:
             return
         dg = self.R["dungeons"][run["dungeon"]]
+        if why == "cleared":
+            self._chron("dungeon_cleared", list(run["chars"]), f"dungeon:{run['dungeon']}", "dungeon", name=dg["name"])
         for c in run["chars"]:
             if self.dungeon_of.get(c) == rid:
                 del self.dungeon_of[c]

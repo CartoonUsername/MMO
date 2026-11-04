@@ -147,6 +147,20 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `research.start` | char:s, site:s, tech:s | char | schreibend | default |
 | `research.license` | char:s, site:s, tech:s | char | schreibend | default |
 | `research.contribute` | char:s, site:s, tech:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
+| `query.guild` | char:s | char | lesend | query |
+| `guild.found` | char:s, name:s, tag:s | char | schreibend | default |
+| `guild.invite` | char:s, target:s | char | schreibend | default |
+| `guild.accept` | char:s, guild:s | char | schreibend | default |
+| `guild.decline` | char:s, guild:s | char | schreibend | default |
+| `guild.leave` | char:s | char | schreibend | default |
+| `guild.kick` | char:s, target:s | char | schreibend | default |
+| `guild.role` | char:s, target:s, role:s | char | schreibend | default |
+| `guild.disband` | char:s | char | schreibend | default |
+| `guild.stash` | char:s, item_key:s, qty:i | char | schreibend | default |
+| `guild.take` | char:s, item_key:s, qty:i | char | schreibend | default |
+| `guild.contribute` | char:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
+| `query.chronicle` | offset?:i, limit?:i, kind?:s | – | lesend | query |
+| `query.prestige` | char:s | char | lesend | query |
 | `query.echoes` | char:s | char | lesend | query |
 | `equip.wear` | char:s, item_key:s | char | schreibend | default |
 | `equip.remove` | char:s, slot:s | char | schreibend | default |

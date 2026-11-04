@@ -114,6 +114,12 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
     <details class="panel win" id="wTech"><summary>Forschung</summary>
       <div class="hint">Jede Siedlung erforscht selbst. Wer eine Technik zuerst fertigstellt, wird als Erfinder geehrt und hat zwei Wochen Vorsprung; andere können eine Lizenz kaufen oder später günstig übernehmen. Spätere Epochen sind gesperrt, bis die Welt dort ist. Zahlen und Namen sind Entwürfe.</div>
       <div id="techBox"></div><div id="techMsg" class="msg" role="status"></div></details>
+    <details class="panel win" id="wGuild"><summary>Gilde</summary>
+      <div class="hint">Eine Gilde ist freiwillig: gemeinsame Kasse, ein Gildenhaus (mehr Mitglieder) und Punkte für gemeinsame Siege. Nichts Grundlegendes hängt an einer Gilde. Zahlen sind Entwürfe.</div>
+      <div id="guildBox"></div><div id="guildMsg" class="msg" role="status"></div></details>
+    <details class="panel win" id="wChron"><summary>Chronik und Ruhm</summary>
+      <div class="hint">Die Weltchronik hält Erstleistungen fest. Titel sind Anerkennung; sie sperren keine Inhalte für andere.</div>
+      <div id="chronBox"></div></details>
     <details class="panel win" id="wGear"><summary>Ausrüstung</summary>
       <div class="hint">Getragene Stücke verändern Schaden, Schutz, Ausweichkosten und Lauftempo – schwere Rüstung schützt mehr, macht aber langsamer. Das Aussehen (Transmog) ist von den Werten getrennt. Zahlen sind Entwürfe.</div>
       <div id="gearBox"></div><div id="gearMsg" class="msg" role="status"></div></details>
@@ -176,6 +182,7 @@ function onMessage(m){
     case"economy_event":log("📰 "+m.headline+" (bis Tag "+m.until+")","g");if($("wMarket").open)refreshMarket().catch(()=>{});break;
     case"plot_forfeit":log("⚠ Grundstück "+m.n+" in "+m.site+" ist verfallen (Steuer nicht gezahlt); Lager zurückgegeben","b");if($("wTown").open)refreshTown().catch(()=>{});break;
     case"tech":log("🔬 "+m.site+" kennt jetzt "+m.tech+(m.first?" – Weltneuheit! Entdecker: "+m.pioneer:""),"g");if($("wTech").open)refreshTech().catch(()=>{});break;
+    case"chronicle":log("📜 Weltchronik: "+m.chars.join(", ")+" – "+m.name,"g");if($("wChron").open)refreshChron().catch(()=>{});break;
     case"region":log((m.warning?"⚠ ":"")+"Region: "+m.name+" – Gefahr "+m.danger+"/5, empfohlen ab Stufe "+m.level+(m.warning?" (sehr gefährlich, aber begehbar)":""),m.warning?"e":"g");break;
     case"region_blocked":log("🔒 "+m.name+": "+m.reason,"e");break;
     case"world_boss":log("🌍 Weltboss "+m.name+(m.state==="spawned"?" ist erschienen"+(m.region?" in "+m.region:"")+"!":" wurde besiegt"+((m.by||[]).length?" von "+m.by.join(", "):"")+"!"),"g");beep(m.state==="spawned"?330:660,.2,"sawtooth");break;
@@ -270,6 +277,38 @@ async function refreshTech(){
       box.appendChild(li(s+": "+(run.done_day===null?need:"Forschung läuft, fertig an Tag "+run.done_day),acts))}}
   if(v.history.length)box.appendChild(el("div","Chronik: "+v.history.map(h=>"Tag "+h.day+" "+(h.kind==="discovery"?h.tech+" in "+h.site:"Epoche "+h.epoch)).join(" · "),"hint"))
 }
+// ---------- Gilde, Chronik, Ruhm (Anzeige und Absichten) ----------
+async function refreshGuild(){
+  const r=await call("query.guild",{});if(!r.ok){$("guildBox").textContent=errMsg(r);return}
+  const v=r.result,box=$("guildBox");box.textContent="";kv(box,"Münzen",v.coins);
+  const done=async(cmd,args,ok)=>{await callAct("guildMsg",cmd,Object.assign({char:me},args),ok);refreshGuild()};
+  for(const i of v.invites)box.appendChild(li("Einladung: "+i.name+" ["+i.tag+"]",[["Annehmen",()=>done("guild.accept",{guild:i.id},"Beigetreten")],["Ablehnen",()=>done("guild.decline",{guild:i.id},"Abgelehnt")]]));
+  const g=v.mine;
+  if(!g){const a=el("div","","row2"),n=textInput("Gildenname"),tg=textInput("Kürzel"),b=el("button","Gründen ("+v.found_cost+")");b.onclick=()=>done("guild.found",{name:n.value.trim(),tag:tg.value.trim()},"Gilde gegründet");a.append(n,tg,b);box.appendChild(a);
+    sect(box,"Gilden der Welt");for(const x of v.directory)box.appendChild(el("div",x.name+" ["+x.tag+"] · "+x.members+" Mitglieder · "+x.points+" Punkte","hint"));return}
+  sect(box,g.name+" ["+g.tag+"] · "+g.role);kv(box,"Punkte",g.points);kv(box,"Mitglieder",g.members.length+"/"+g.capacity);
+  const lead=g.role==="leader",off=lead||g.role==="officer";
+  for(const m of g.members){const acts=[];
+    if(lead&&m.char!==me){acts.push([m.role==="officer"?"Zum Mitglied":"Zum Offizier",()=>done("guild.role",{target:m.char,role:m.role==="officer"?"member":"officer"},"Rolle geändert")],["Leitung übergeben",()=>{if(confirm("Leitung an "+m.char+" übergeben?"))done("guild.role",{target:m.char,role:"leader"},"Übergeben")}])}
+    if(off&&m.char!==me&&m.role!=="leader")acts.push(["Entfernen",()=>{if(confirm(m.char+" entfernen?"))done("guild.kick",{target:m.char},"Entfernt")}]);
+    box.appendChild(li(m.char+" ("+m.role+") · Beitrag "+m.contributed,acts))}
+  if(off){const a=el("div","","row2"),n=textInput("Figur einladen"),b=el("button","Einladen");b.onclick=()=>done("guild.invite",{target:n.value.trim()},"Eingeladen");a.append(n,b);box.appendChild(a)}
+  sect(box,"Gildenhaus Stufe "+g.house.level+"/"+g.house.max);
+  if(g.house.next){box.appendChild(li(Object.entries(g.house.next).map(([k,x])=>k.split("@")[0]+" "+x.have+"/"+x.need).join(", "),[["Beitragen",()=>{const k=prompt("Was? Münzen: coin@gold, sonst z. B. timber@standard",Object.keys(g.house.next)[0]);const q=parseInt(prompt("Menge"),10);if(k&&q)done("guild.contribute",k==="coin@gold"?{coins:q}:{item_key:k,qty:q},"Beigetragen")}]]))}
+  if(g.treasury){sect(box,"Kasse");for(const [k,q] of Object.entries(g.treasury))kv(box,k,q)}
+  const d=el("div","","row2"),ik=textInput("Ware, z. B. coin@gold"),iq=numInput("Menge",100),bd=el("button","Einzahlen");bd.onclick=()=>done("guild.stash",{item_key:ik.value.trim(),qty:parseInt(iq.value,10)||0},"Eingezahlt");d.append(ik,iq,bd);box.appendChild(d);
+  if(off){const w=el("button","Auszahlen");w.onclick=()=>done("guild.take",{item_key:ik.value.trim(),qty:parseInt(iq.value,10)||0},"Ausgezahlt");box.appendChild(w)}
+  const lv=el("button",lead?"Gilde auflösen":"Gilde verlassen");lv.onclick=()=>{if(confirm(lead?"Gilde auflösen? Die Kasse geht an dich.":"Gilde verlassen?"))done(lead?"guild.disband":"guild.leave",{},"Erledigt")};box.appendChild(lv)
+}
+const CHRON_TXT={settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name};
+async function refreshChron(){
+  const box=$("chronBox");box.textContent="";
+  const p=await call("query.prestige",{});if(p.ok){kv(box,"Ruhmpunkte",p.result.points);const ts=p.result.titles.map(t=>t.name).concat(p.result.research_titles);box.appendChild(el("div","Titel: "+(ts.length?ts.join(", "):"noch keine"),"hint"))}
+  const c=await callRaw("query.chronicle",{limit:20});if(!c.ok){box.appendChild(el("div",errMsg(c)));return}
+  sect(box,"Weltchronik ("+c.result.total+")");
+  for(const e of c.result.entries)box.appendChild(el("div","Tag "+e.day+": "+(e.chars.length?e.chars.join(", ")+" ":"")+(CHRON_TXT[e.kind]?CHRON_TXT[e.kind](e):e.kind),"hint"));
+  if(!c.result.entries.length)box.appendChild(el("div","Noch nichts verzeichnet.","hint"))
+}
 // ---------- Markt und Firma (nur Anzeige und Absichten; der Server entscheidet) ----------
 let marketInit=false;
 function itemKey(){return $("mItem").value+"@"+$("mGrade").value}
@@ -357,7 +396,7 @@ async function refreshEcho(){
   if(v.market.length){sect(box,"Angebote anderer");for(const m of v.market){const row=el("div","","row2");row.append(el("span",m.echo.name+" +"+m.echo.resonance+" · "+m.price+" Münzen"));
     const b=el("button","Kaufen");b.onclick=async()=>{if(!confirm(m.echo.name+" +"+m.echo.resonance+" für "+m.price+" Münzen kaufen?"))return;await act("echoMsg","echo.buy",{listing:m.id},"Gekauft");refreshEcho()};row.appendChild(b);box.appendChild(row)}}
 }
-function refreshWins(){if($("wMarket")&&$("wMarket").open)refreshMarket().catch(()=>{});if($("wCo")&&$("wCo").open)refreshCo().catch(()=>{});if($("wTown")&&$("wTown").open)refreshTown().catch(()=>{});if($("wTech")&&$("wTech").open)refreshTech().catch(()=>{});if($("wGear")&&$("wGear").open)refreshGear().catch(()=>{});if($("wEcho")&&$("wEcho").open)refreshEcho().catch(()=>{});if($("wChar").open)refreshChar().catch(()=>{});if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
+function refreshWins(){if($("wMarket")&&$("wMarket").open)refreshMarket().catch(()=>{});if($("wCo")&&$("wCo").open)refreshCo().catch(()=>{});if($("wTown")&&$("wTown").open)refreshTown().catch(()=>{});if($("wTech")&&$("wTech").open)refreshTech().catch(()=>{});if($("wGuild")&&$("wGuild").open)refreshGuild().catch(()=>{});if($("wChron")&&$("wChron").open)refreshChron().catch(()=>{});if($("wGear")&&$("wGear").open)refreshGear().catch(()=>{});if($("wEcho")&&$("wEcho").open)refreshEcho().catch(()=>{});if($("wChar").open)refreshChar().catch(()=>{});if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
 function buildCraft(){
   const s=$("cRecipe");for(const [id,[n]] of Object.entries(RECIPES)){const o=document.createElement("option");o.value=id;o.textContent=n;s.appendChild(o)}
   const info=()=>{const [n,inp,out]=RECIPES[s.value];$("cInfo").textContent="Zutaten je Stück: "+Object.entries(inp).map(([k,v])=>v+" × "+k).join(", ")+" → "+out+" ×"};
@@ -373,7 +412,7 @@ function wireWins(){
   $("tSend").onclick=()=>{const to=$("tTo").value.trim(),item=$("tItem").value.trim(),qty=Math.floor(+$("tQty").value),price=Math.floor(+$("tPrice").value);
     if(!to||!item||!(qty>0)||!(price>0)){setMsg("tradeMsg","Figur, Ware, Menge und Preis ausfüllen.",false);return}
     act("tradeMsg","trade.offer",{to,side:$("tSide").value,item_key:item,qty,price},"Angebot gesendet")};
-  refreshChar().catch(()=>{});initElem().catch(()=>{});loadWorld().catch(()=>{});$("bDungeon").onclick=async()=>{const id=nearDungeon();if(!id)return;const r=await call("game.dungeon_enter",{dungeon:id});if(!r.ok)log("Dungeon: "+errMsg(r),"e")};$("wChar").ontoggle=refreshWins;$("wEcho").ontoggle=refreshWins;$("wGear").ontoggle=refreshWins;$("wMarket").ontoggle=refreshWins;$("wCo").ontoggle=refreshWins;$("wTown").ontoggle=refreshWins;$("wTech").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
+  refreshChar().catch(()=>{});initElem().catch(()=>{});loadWorld().catch(()=>{});$("bDungeon").onclick=async()=>{const id=nearDungeon();if(!id)return;const r=await call("game.dungeon_enter",{dungeon:id});if(!r.ok)log("Dungeon: "+errMsg(r),"e")};$("wChar").ontoggle=refreshWins;$("wEcho").ontoggle=refreshWins;$("wGear").ontoggle=refreshWins;$("wMarket").ontoggle=refreshWins;$("wCo").ontoggle=refreshWins;$("wTown").ontoggle=refreshWins;$("wTech").ontoggle=refreshWins;$("wGuild").ontoggle=refreshWins;$("wChron").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
 }
 const NOTE={"trade.offer_received":"Neues Handelsangebot","trade.offer_accepted":"Handelsangebot angenommen","trade.offer_declined":"Handelsangebot abgelehnt","trade.offer_cancelled":"Handelsangebot zurückgezogen","trade.offer_expired":"Handelsangebot abgelaufen","party.invited":"Gruppeneinladung","party.joined":"Jemand ist der Gruppe beigetreten","party.left":"Jemand hat die Gruppe verlassen"};
 function notifyText(i){const k=i&&(i.kind||i.type);return (NOTE[k]||k||"Nachricht")+(i&&i.data?" "+JSON.stringify(i.data):"")}
