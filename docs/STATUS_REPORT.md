@@ -75,6 +75,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 38. `5b0cba7` Balancing: deterministische Testspieler (`mmo_sim.balance`), Bericht `docs/BALANCE_REPORT.md`, `sim_rules_v7` (Lebenspunkte, Rudelwelpen, Boss-Fähigkeiten, Ankündigung normaler Angriffe), Zielbänder als Tests, ADR-0034, 1212 Tests.
 39. `b3dc697` Beute auf die Schwierigkeit abgestimmt (Wertbänder gegen das Balancing), Beuteabnahme je Figur/Art/Tag, Wiedererscheinen je Gegnerart (ADR-0035), 1228 Tests.
 40. `e74b97c` Browser-Testclient: WebSocket (RFC 6455) und Spielseite direkt vom Spielserver, Herkunftsprüfung, Rauchtest mit zwei Browser-Spielern (ADR-0036).
-41. (dieser Stand) Unity-Client als Projekt öffnbar mit Anmeldemaske; Deployment auf einen VPS (`deploy/`, Caddy-HTTPS, Systemdienst, `--behind-proxy`).
+41. `caa6a4f`/`4f3c198` Unity-Client als Projekt öffnbar mit Anmeldemaske; Deployment auf einen VPS (`deploy/`, Caddy-HTTPS, Systemdienst, `--behind-proxy`).
+42. (dieser Stand) Sicherung/Wiederherstellung (`mmo_game.backup`, `scripts/`, `docs/BACKUP_AND_RESTORE.md`), Kampf-Audit-Tests, Anleitung für Codex als zweiten Entwickler (ADR-0037), 1268 Tests.
 
 Plan: `docs/ROADMAP.md`.

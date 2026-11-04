@@ -46,13 +46,14 @@ ${DOMAIN} {
 }
 C
 
-# Tägliche Sicherung des Spielstands (14 Tage)
-cat > /etc/cron.daily/mmo-backup <<'B'
-#!/bin/sh
-tar -czf /var/backups/mmo/spielstand-$(date +%F).tgz -C /var/lib mmo
-find /var/backups/mmo -name 'spielstand-*.tgz' -mtime +14 -delete
+# Sicherung: geprüfte, datierte Archive (ADR-0037); Skripte liegen unter /opt/mmo/scripts, Aufbewahrung 14 Tage + 8 Wochen
+mkdir -p /opt/mmo/scripts && cp "$REPO_DIR"/scripts/*.sh /opt/mmo/scripts/ && chmod 755 /opt/mmo/scripts/*.sh
+printf 'commit=%s\ndeployed=%s\n' "$(git -C "$REPO_DIR" rev-parse HEAD 2>/dev/null || echo unbekannt)" "$(date -u +%FT%TZ)" > /opt/mmo/DEPLOY_INFO
+rm -f /etc/cron.daily/mmo-backup
+cat > /etc/cron.d/mmo-backup <<'B'
+17 3 * * * root /opt/mmo/scripts/backup_mmo.sh >> /var/log/mmo-backup.log 2>&1
 B
-chmod +x /etc/cron.daily/mmo-backup
+chmod 644 /etc/cron.d/mmo-backup
 
 # Firewall: nur SSH, HTTP, HTTPS
 ufw allow OpenSSH >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null; ufw --force enable >/dev/null
