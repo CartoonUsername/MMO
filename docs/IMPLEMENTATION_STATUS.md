@@ -24,8 +24,8 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 |---|---|---|
 | Kampfecho (Haupttradition + Hybrid) | vorhanden (neu) | `mmo_world/echo.py`, ADR-0046; Kampfwirkung der Echos in der Simulation fehlt noch |
 | Resonanz +0..+30, Rückschritt, Schutz, Pechschutz, atomar | vorhanden (neu), Raten/Kosten Platzhalter | Erfolgsraten/Kosten bewusst offen (Frage 8) → konfigurierbar bauen |
-| Handelbarkeit: unaktiviert handelbar, aktiviert gebunden, Freigabe | **fehlt** | direkter Handel (ADR-0023) und Markt (ADR-0015) existieren als Grundlage |
-| Persönliche Meisterschaft getrennt vom Objekt | fehlt | – |
+| Handelbarkeit: unaktiviert handelbar, aktiviert gebunden, Freigabe | vorhanden (neu) | direkter Handel (ADR-0023) und Markt (ADR-0015) existieren als Grundlage |
+| Persönliche Meisterschaft getrennt vom Objekt | vorhanden (neu) | `grant_mastery` je Figur × Tradition, nicht am Objekt |
 | 9 Elemente, Paare, Dreifach-Endgame | teilweise | `elements`: alle 9, max. 2 regulär + 1 Endgame-Element ab Stufe 40; **Interaktionen/Klassenabhängigkeit nur als 4 Beispiele** (ADR-0027) |
 | Kombinationskatalog 36/84, klassenabhängige Umsetzung, Gegenspiel, Anzeige im Spiel | vorhanden (neu) | ADR-0042; nur beschreibend, Kampfwirkung = AP 4b |
 | Elementschaden im Kampf (Stärke/Schwäche/gleich, Sofort- und Zeitschaden) | vorhanden (neu) | `sim_rules_v8` `elements`, ADR-0043; bisher nur `cast_ember` (Feuer); weitere Elementskills offen |
