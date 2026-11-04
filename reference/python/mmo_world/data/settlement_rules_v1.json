@@ -139,7 +139,8 @@
           "coins": 3500,
           "items": {
             "iron_ingot@standard": 30
-          }
+          },
+          "requires_tech": "pflasterstrasse"
         }
       ],
       "effect": {
@@ -215,7 +216,8 @@
           "items": {
             "timber@standard": 50,
             "iron_ingot@standard": 10
-          }
+          },
+          "requires_tech": "mauerbau"
         },
         {
           "coins": 3000,
@@ -240,7 +242,8 @@
           "items": {
             "wooden_beam@standard": 40,
             "iron_ingot@standard": 10
-          }
+          },
+          "requires_tech": "seefahrt"
         },
         {
           "coins": 6000,

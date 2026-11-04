@@ -143,6 +143,10 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `plot.stash_in` | char:s, site:s, n:i, item_key:s, qty:i | char | schreibend | default |
 | `plot.stash_out` | char:s, site:s, n:i, item_key:s, qty:i | char | schreibend | default |
 | `project.contribute` | char:s, site:s, project:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
+| `query.research` | char:s | char | lesend | query |
+| `research.start` | char:s, site:s, tech:s | char | schreibend | default |
+| `research.license` | char:s, site:s, tech:s | char | schreibend | default |
+| `research.contribute` | char:s, site:s, tech:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
 | `query.echoes` | char:s | char | lesend | query |
 | `equip.wear` | char:s, item_key:s | char | schreibend | default |
 | `equip.remove` | char:s, slot:s | char | schreibend | default |

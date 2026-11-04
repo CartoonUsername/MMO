@@ -128,6 +128,7 @@ def check_consistency(world: World) -> list[str]:
     errs += [f"Kampfechos: {m}" for m in world.echo.check()]
     errs += [f"Ausrüstung: {m}" for m in world.equipment.check()]
     errs += [f"Siedlungen: {m}" for m in world.settlements.check()]
+    errs += [f"Forschung: {m}" for m in world.research.check()]
     errs += [f"Filialen: {m}" for m in world.branches.check()]
     errs += [f"Produktion: {m}" for m in world.production.check()]
     if world.pricing is not None:
@@ -214,6 +215,8 @@ def _import(envelope: Envelope, logs: Logs) -> World:
         world.branches.load(json.dumps(snap["branches"]))
     if "settlements" in snap:
         world.settlements.load(json.dumps(snap["settlements"]))
+    if "research" in snap:
+        world.research.load(json.dumps(snap["research"]))
     if "equipment" in snap:
         world.equipment.load(json.dumps(snap["equipment"]))
     if "echoes" in snap:

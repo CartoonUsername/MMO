@@ -267,9 +267,9 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         html = (Path(__file__).parent.parent / "mmo_game" / "web" / "index.html").read_text(encoding="utf-8")
         for marker in ("onCanvasClick", "profession_detail", "renderEssence", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
             self.assertIn(marker, html)
-        for fid in ("wChar", "wParty", "wTrade", "wCraft", "wMarket", "wCo", "wTown"):
+        for fid in ("wChar", "wParty", "wTrade", "wCraft", "wMarket", "wCo", "wTown", "wTech"):
             self.assertIn(f'id="{fid}"', html)
-        for cmd in ("query.market", "query.market_quote", "query.my_companies", "company.branch_open", "company.found", "query.settlements", "plot.buy", "project.contribute"):
+        for cmd in ("query.market", "query.market_quote", "query.my_companies", "company.branch_open", "company.found", "query.settlements", "plot.buy", "project.contribute", "query.research", "research.license"):
             self.assertIn(cmd, COMMANDS); self.assertIn(cmd, html)
         used = set(re.findall(r'(?:call|act)\((?:"[A-Za-z]+",)?"((?:party|trade|craft|query|maker)[A-Za-z_.]*)"', html))
         self.assertTrue({"party.form", "trade.offer", "craft", "query.offers", "query.party"} <= used, used)

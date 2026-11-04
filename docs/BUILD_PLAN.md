@@ -15,7 +15,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 9 | Welt: Regionen, Gegnervielfalt, Dungeon, Weltboss, Gefahrenstufen | §32–35, §60–61 | 2 | **fertig** (Regionen/Gefahr, Zugangsbedingung, Dungeon, Weltboss; ADR-0048); echte Instanzen/Reisepunkte offen |
 | 10 | Wirtschaft: NPC-Wirtschaft, Unternehmen (Filialen, Töchter, Offline-Betrieb mit Deckel) | §38–41, §75 | 3 | fertig (ADR-0049; Töchter offen) |
 | 11 | Besitz: Grundstücke, Spielerstädte, Gemeinschaftsprojekte | §36–37 | 2/3 | fertig (ADR-0050; Teilwirkungen offen) |
-| 12 | Forschung, Epochen, Entdecker | §42–44 | 3/5 | offen |
+| 12 | Forschung, Epochen, Entdecker | §42–44 | 3/5 | fertig (ADR-0051; Epochen-Inhalte offen) |
 | 13 | Gilden, Prestige, Weltchronik (Stadtpolitik zurückgestellt) | §45, §47–49 | 3 | offen |
 | 14 | Server: Regionen/Instanzen, Skalierung, Last- und Exploit-Tests | §50–55, §63 | 4 | offen |
 | 15 | Engine-Client (Unity oder Unreal – Entscheidung des Nutzers, Frage 23) | §50, §77 | 1–2 | wartet auf Entscheidung |

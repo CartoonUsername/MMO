@@ -452,6 +452,8 @@ class GameServer:
         for f in w.settlements.advance(day):             # Steuer für Grundstücke (AP 11); Verfall wird gemeldet
             if f["owner"] in self.players:
                 self._emit_to(f["owner"], {"ev": "plot_forfeit", "site": f["site"], "n": f["n"]})
+        for ev in w.research.advance(day):               # Forschung abgeschlossen (AP 12)
+            self._broadcast({"ev": "tech", **ev})
         for c in self.players:                           # Aktivität der Leitung für den Offline-Deckel der Firmen (AP 10)
             w.branches.touch(c, day)
         self._economy_event(day)

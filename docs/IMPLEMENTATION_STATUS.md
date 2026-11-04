@@ -40,10 +40,11 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 |---|---|---|
 | Gemeinsame Welt, serverautoritativ | vorhanden (Referenz) | Spielserver `mmo_game`, ein Prozess; Mehrregion-Betrieb **fehlt** |
 | Gelände, Kollision, Wegfindung | vorhanden | ADR-0030/0031; eine Zone 6000×6000 cm |
-| Regionen, Gefahrenstufen, Fortbewegung/Epochen | teilweise (neu) | 7 Regionen mit Gefahr 1–5, Zugangsbedingung, Bonus (ADR-0048); Fortbewegungsstufen/Epochen fehlen |
+| Regionen, Gefahrenstufen, Fortbewegung/Epochen | teilweise (neu) | 7 Regionen mit Gefahr 1–5, Zugangsbedingung, Bonus (ADR-0048); Fortbewegungsstufen fehlen; Weltepochen als Mechanik vorhanden (ADR-0051) |
 | Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017), Weltereignisse mit Preisschocks, Markt-Fenster (ADR-0049); keine NPC-Lebensprofile |
 | Spielerunternehmen: Gründung, Personal, Beteiligungen, Produktion | vorhanden (Referenz) | ADR-0012/0016, `company.*`, `production.*` |
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
+| Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte, Spezialisierung, Produktionsvorsprung offen |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
 | Gilden | fehlt | Gruppen (Party, ADR-0025) existieren |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |

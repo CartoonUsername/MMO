@@ -59,6 +59,7 @@ class SettlementService:
         self.projects: dict[str, dict[str, Any]] = {}     # "ort:projekt" -> {level, have}
         self.contrib: dict[str, dict[str, int]] = {}      # Figur -> {Ort: Wert}
         self.last_day = 0
+        self.tech_known: Callable[[str, str], bool] = lambda site, tech: True      # von ResearchService überschrieben (AP 12)
 
     @property
     def active(self) -> bool:
@@ -239,6 +240,8 @@ class SettlementService:
         if st["level"] >= len(pr["levels"]):
             raise WorldError("Projekt ist voll ausgebaut")
         need = pr["levels"][st["level"]]
+        if need.get("requires_tech") and not self.tech_known(site, need["requires_tech"]):
+            raise WorldError(f"Dieser Ort kennt die Technik {need['requires_tech']} noch nicht")
         want = dict(items or {})
         if coins:
             want[self.coin] = want.get(self.coin, 0) + coins
@@ -307,7 +310,8 @@ class SettlementService:
                 if lv["coins"]:
                     need[self.coin] = lv["coins"]
                 nxt = {k: {"need": q, "have": st["have"].get(k, 0)} for k, q in need.items()}
-            projs[pid] = {"name": pr["name"], "level": st["level"], "max": len(pr["levels"]), "next": nxt}
+            projs[pid] = {"name": pr["name"], "level": st["level"], "max": len(pr["levels"]), "next": nxt,
+                          "requires_tech": (pr["levels"][st["level"]].get("requires_tech") if st["level"] < len(pr["levels"]) else None)}
         return {"id": site, "name": self.founded.get(site, {}).get("name", s["name"]), "region": s["region"], "capital": bool(s.get("capital")),
                 "open": opened, "found_cost": None if opened else self.R["found_cost"], "founder": self.founded.get(site, {}).get("founder"),
                 "stage": self.stage(site) if opened else None, "effects": self.effects(site) if opened else {},
