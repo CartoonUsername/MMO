@@ -190,6 +190,55 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(m["result"]["you"]["pos"][0], 500)
         a.w.close()
 
+    async def _call(self, c, n, cmd, **args):
+        await c.send({"v": 1, "id": f"x{n}", "cmd": cmd, "args": args})
+        while (m := await c.msg()).get("id") != f"x{n}":
+            pass
+        return m
+
+    async def test_fenster_gruppe_handel_herstellen_befehle(self):
+        """Dieselben Befehle wie die Fenster im Browserclient (Gruppe, Handel, Herstellen), inklusive verständlicher Ablehnung."""
+        cs = {}
+        for name in ("anna", "ben"):
+            c, _, _ = await WsClient.open(self.port)
+            await c.send({"cmd": "register", "account": name, "password": "passwort123"})
+            await c.msg()
+            await self._call(c, 0, "game.join", char=name)
+            cs[name] = c
+        a, b = cs["anna"], cs["ben"]
+        self.assertTrue((await self._call(a, 1, "party.form", char="anna"))["ok"])
+        self.assertTrue((await self._call(a, 2, "party.invite", char="anna", target="ben"))["ok"])
+        inv = (await self._call(b, 3, "query.party_invites", char="ben"))["result"]
+        self.assertEqual([i["from"] for i in inv], ["anna"])
+        self.assertTrue((await self._call(b, 4, "party.accept", char="ben", invite=inv[0]["id"]))["ok"])
+        v = (await self._call(a, 5, "query.party", char="anna"))["result"]
+        self.assertEqual((v["leader"], sorted(v["members"])), ("anna", ["anna", "ben"]))
+        self.assertTrue((await self._call(b, 6, "party.leave", char="ben"))["ok"])
+        # Handel: Kaufangebot hinterlegt Münzen; Gegenseite sieht es und lehnt ab
+        o = await self._call(a, 7, "trade.offer", char="anna", to="ben", side="buy", item_key="iron_ore@standard", qty=2, price=20)
+        self.assertTrue(o["ok"], o)
+        seen = (await self._call(b, 8, "query.offers", char="ben"))["result"]["incoming"]
+        self.assertEqual([(x["from"], x["qty"], x["price"]) for x in seen], [("anna", 2, 20)])
+        self.assertTrue((await self._call(b, 9, "trade.decline", char="ben", offer=seen[0]["id"]))["ok"])
+        self.assertEqual((await self._call(a, 10, "query.offers", char="anna"))["result"]["outgoing"], [])
+        # Herstellen ohne Zutaten: abgelehnt, mit Meldung statt Absturz
+        r = await self._call(a, 11, "craft", char="anna", recipe="iron_ingot", qty=1, grade="standard")
+        self.assertFalse(r["ok"])
+        self.assertTrue(r["error"]["message"])
+        for c in cs.values():
+            c.w.close()
+
+    def test_client_enthaelt_fenster_und_nur_bekannte_befehle(self):
+        import re
+        from mmo_server.protocol import COMMANDS
+        html = (Path(__file__).parent.parent / "mmo_game" / "web" / "index.html").read_text(encoding="utf-8")
+        for fid in ("wParty", "wTrade", "wCraft"):
+            self.assertIn(f'id="{fid}"', html)
+        used = set(re.findall(r'(?:call|act)\((?:"[A-Za-z]+",)?"((?:party|trade|craft|query|maker)[A-Za-z_.]*)"', html))
+        self.assertTrue({"party.form", "trade.offer", "craft", "query.offers", "query.party"} <= used, used)
+        known = set(COMMANDS) if not isinstance(COMMANDS, dict) else set(COMMANDS)
+        self.assertEqual(used - known, set())
+
     async def test_zwei_spieler_sehen_sich(self):
         cs = []
         for name in ("anna", "ben"):

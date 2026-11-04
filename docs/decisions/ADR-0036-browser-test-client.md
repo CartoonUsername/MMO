@@ -15,4 +15,5 @@ Das Basisspiel soll zuerst im Spiel getestet werden, bevor weiter ausgebaut wird
 ## Folgen
 - Test im echten Browser (Playwright/Chromium) als Rauchtest; ohne Node/Playwright wird er übersprungen.
 - Der Unity-Client bleibt das Ziel für die spätere Darstellung; der Browserclient ist Testwerkzeug und Referenz für das Protokoll.
-- Offene Punkte: Seite ist nur eine Testoberfläche (keine Gruppen-/Handelsfenster); Verschlüsselung bei Fernzugriff bleibt TLS-Pflicht des Servers.
+- Nachtrag: Die Seite hat einklappbare Fenster **Gruppe** (gründen, einladen, annehmen/ablehnen, verlassen, auflösen, kicken, Anführer), **Handel** (Angebote senden, eingehende annehmen/ablehnen, ausgehende zurückziehen; Preis gilt für die ganze Menge) und **Herstellen** (feste Rezeptliste als Platzhalter, Güte, Menge). Sie senden nur vorhandene Befehle und zeigen Serverantworten; Fehler erscheinen als Text unter dem Fenster. Getestet auf Protokollebene (`test_fenster_gruppe_handel_herstellen_befehle`) und per Syntax-/Befehlsprüfung der Seite, **nicht** im echten Browser (Playwright fehlt auf dem VPS).
+- Offene Punkte: Seite ist nur eine Testoberfläche; Verschlüsselung bei Fernzugriff bleibt TLS-Pflicht des Servers.
