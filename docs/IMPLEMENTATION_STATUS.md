@@ -54,6 +54,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 ## Technik (Teil XIV–XVII)
 | Blueprint | Stand | Beleg / Lücke |
 |---|---|---|
+| Lastmessung, Interessenverwaltung, Missbrauchstests | teilweise (neu) | `mmo_game.loadtest`, Sichtgrenze 60 Mitspieler, Fuzz-Invarianten (ADR-0053); echte Netz-/Mehrprozess-Last offen |
 | Persistenz, Migration, Backup | vorhanden | ADR-0014/0018/0037, geprüftes Backup + Restore |
 | Konten, TLS, Rate-Limits | vorhanden | ADR-0029 |
 | Regelversionierung, Golden Vectors | vorhanden | v1–v9 (CEE), sim_rules bis v7 |

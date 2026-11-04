@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import signal
 import ssl
 from pathlib import Path
@@ -85,8 +86,13 @@ class WsConn:
 class NetServer:
     def __init__(self, game: GameServer | None = None, host: str = "127.0.0.1", port: int = 7777, tick_seconds: float = TICK_SECONDS,
                  store: Store | None = None, autosave_ticks: int = 600, auth: AccountStore | None = None,
-                 ssl_context: ssl.SSLContext | None = None, max_per_ip: int = MAX_PER_IP, trust_proxy: bool = False) -> None:
+                 ssl_context: ssl.SSLContext | None = None, max_per_ip: int = MAX_PER_IP, trust_proxy: bool = False,
+                 max_connections: int | None = None) -> None:
         self.game, self.host, self.port, self.tick_seconds = game or GameServer(), host, port, tick_seconds
+        env = os.environ.get("MMO_MAX_CONNECTIONS")                # Betrieb kann die Grenze nach Lastmessung (ADR-0053) anheben
+        self.max_connections = max_connections if max_connections is not None else (int(env) if env and env.isdigit() else MAX_CONNECTIONS)
+        if not 1 <= self.max_connections <= 5000:
+            raise ValueError("max_connections 1..5000")
         self.store, self.autosave_ticks, self.auth, self.ssl, self.max_per_ip = store, autosave_ticks, auth, ssl_context, max_per_ip
         if host not in LOOPBACK and (auth is None or ssl_context is None):
             raise ValueError("Nicht-lokale Adressen verlangen Konten (auth) und TLS (ssl_context)")
@@ -146,7 +152,7 @@ class NetServer:
         counted = False
         sid: str | None = None
         try:
-            if len(self._writers) >= MAX_CONNECTIONS or self._ips.get(ip, 0) >= self.max_per_ip:
+            if len(self._writers) >= self.max_connections or self._ips.get(ip, 0) >= self.max_per_ip:
                 await conn.send({"ev": "error", "code": "server_full"})
                 return
             self._ips[ip] = self._ips.get(ip, 0) + 1

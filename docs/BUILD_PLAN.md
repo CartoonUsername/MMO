@@ -17,7 +17,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 11 | Besitz: Grundstücke, Spielerstädte, Gemeinschaftsprojekte | §36–37 | 2/3 | fertig (ADR-0050; Teilwirkungen offen) |
 | 12 | Forschung, Epochen, Entdecker | §42–44 | 3/5 | fertig (ADR-0051; Epochen-Inhalte offen) |
 | 13 | Gilden, Prestige, Weltchronik (Stadtpolitik zurückgestellt) | §45, §47–49 | 3 | fertig (ADR-0052; Raids, Gildenforschung offen) |
-| 14 | Server: Regionen/Instanzen, Skalierung, Last- und Exploit-Tests | §50–55, §63 | 4 | offen |
+| 14 | Server: Regionen/Instanzen, Skalierung, Last- und Exploit-Tests | §50–55, §63 | 4 | fertig (ADR-0053; Verteilung bewusst nicht gebaut) |
 | 15 | Engine-Client (Unity oder Unreal – Entscheidung des Nutzers, Frage 23) | §50, §77 | 1–2 | wartet auf Entscheidung |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)

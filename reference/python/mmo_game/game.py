@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v8.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v9.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -422,6 +422,7 @@ class GameServer:
     # ---------------------------------------------------------------- Zeit ----
     def tick(self) -> None:
         self.tick_no += 1
+        self._looks: dict[str, dict[str, Any]] = {}          # Aussehen je Tick nur einmal berechnen (AP 14)
         for c in self._bucket:                              # Befehlsbudget füllt sich ein Befehl je Tick
             self._bucket[c] = min(self.R["game_commands_per_burst"], self._bucket[c] + 1)
         if self.tick_no % self.R["ticks_per_day"] == 0:
@@ -938,11 +939,21 @@ class GameServer:
         self.sess_of.pop(char, None)
 
     # ---------------------------------------------------------------- Ansicht ----
+    def _look(self, c: str) -> dict[str, Any]:
+        lk = getattr(self, "_looks", None)
+        if lk is None:
+            lk = self._looks = {}
+        if c not in lk:
+            lk[c] = {s: v["look"] for s, v in self.world.equipment.appearance(c).items() if v["look"]}
+        return lk[c]
+
     def _snapshot_for(self, char: str) -> dict[str, Any]:
         me = self.players[char]
         r2 = self.R["view_radius"] ** 2
-        others = [{"char": c, "pos": list(p["pos"]), "fight": c in self.fight_of, "look": {s: v["look"] for s, v in self.world.equipment.appearance(c).items() if v["look"]}} for c, p in sorted(self.players.items())
-                  if c != char and _dist2(p["pos"], me["pos"]) <= r2]
+        near = sorted(((d, c) for c, p in self.players.items() if c != char and (d := _dist2(p["pos"], me["pos"])) <= r2))
+        cap = self.R.get("interest", {}).get("max_visible_players", 10 ** 9)
+        others = [{"char": c, "pos": list(self.players[c]["pos"]), "fight": c in self.fight_of, "look": self._look(c)} for _, c in near[:cap]]
+        others.sort(key=lambda o: o["char"])
         enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None, "state": e["state"]}
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]
         nodes = [{"id": n["id"], "item": n["item"], "pos": list(n["pos"]), "ready": self.tick_no >= n["ready_at"]}
