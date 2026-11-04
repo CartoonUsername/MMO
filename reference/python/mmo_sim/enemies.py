@@ -25,6 +25,11 @@ def _is_int(v: Any) -> bool:
     return isinstance(v, int) and not isinstance(v, bool)
 
 
+def extra_commands(cfg: dict[str, Any]) -> tuple[str, ...]:
+    """Zusätzliche Zielbefehle für beschworene Gegner (`target_4` ..), solange die Regeln Gegnerfähigkeiten kennen."""
+    return ("target_4", "target_5", "target_6") if "enemy_abilities" in cfg else ()
+
+
 def ability_table(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return dict(cfg.get("enemy_abilities", {}).get("abilities", {}))
 
@@ -40,6 +45,9 @@ def validate_enemy_rules(cfg: dict[str, Any]) -> None:
     for name, o in cfg["opponents"].items():
         if o["attack_interval"] > 0 and o["attack_interval"] + o["windup"] < mc:
             raise SimError(f"Gegner {name}: Angriffstakt + Vorwarnzeit unter dem Boden min_attack_cycle")
+    for key, lo, hi in (("player_slow_permille", 1000, 5000), ("heal_threshold_permille", 1, 999), ("max_enemies", 2, 12)):
+        if not _is_int(ea.get(key)) or not lo <= ea[key] <= hi:
+            raise SimError(f"enemy_abilities.{key} muss {lo}..{hi} sein")
     table = ea["abilities"]
     if not table:
         raise SimError("enemy_abilities.abilities darf nicht leer sein")

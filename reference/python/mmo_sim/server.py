@@ -52,6 +52,17 @@ def build_report(cfg: dict[str, Any], encounter_id: str, opponent_type: str, day
     }
 
 
+def clamp_actions(cee_combat: dict[str, Any], actions: dict[str, int], duration_s: int) -> dict[str, int]:
+    """Begrenzt Aktionszähler auf die Plausibilitätsgrenze der CEE (`max_per_minute * Dauer // 60 + Spielraum`). Überschüsse zählen nicht
+    (Server-Entscheidung, damit lange Kämpfe mit vielen Gegnern nicht als Ganzes abgelehnt werden)."""
+    out = {}
+    for name, n in actions.items():
+        limit = cee_combat["actions"][name]["max_per_minute"] * duration_s // 60 + cee_combat["encounter"]["burst_allowance"]
+        if min(n, limit) > 0:
+            out[name] = min(n, limit)
+    return out
+
+
 class EncounterServer:
     def __init__(self, cfg: dict[str, Any], service: CharacterService,
                  day_provider: Callable[[], int], server_id: str = "srv1") -> None:
@@ -59,7 +70,7 @@ class EncounterServer:
         self._counter = 0
         self._pending: dict[str, tuple[str, str, int]] = {}  # id -> (Charakter, Gegner, Tag)
         self._groups: dict[str, tuple[tuple[str, ...], str, int]] = {}  # id -> (Teilnehmer, Gegner, Tag)
-        self._packs: dict[str, tuple[tuple[str, ...], tuple[str, ...], int]] = {}  # id -> (Teilnehmer, Gegner, Tag)
+        self._packs: dict[str, tuple[tuple[str, ...], tuple[str, ...], int, Any, Any]] = {}  # id -> (Teilnehmer, Gegner, Tag, Fähigkeiten je Gegner, Spielerangaben)
         self._finished: set[str] = set()
 
     def start(self, character_id: str, opponent_type: str) -> str:
@@ -166,7 +177,7 @@ class EncounterServer:
         return specs
 
     # -- Kampf gegen mehrere Gegner (ADR-0026) ---------------------------------------------------
-    def start_pack(self, character_ids: Any, opponent_types: Any) -> str:
+    def start_pack(self, character_ids: Any, opponent_types: Any, abilities: Any = None, specs: Any = None) -> str:
         m = self.cfg.get("multi")
         if m is None:
             raise SimError("Diese Regeln kennen keinen Kampf gegen mehrere Gegner")
@@ -182,7 +193,7 @@ class EncounterServer:
                 raise SimError("Charakter existiert nicht")
         self._counter += 1
         eid = f"{self.server_id}-enc-{self._counter:08d}"
-        self._packs[eid] = (tuple(character_ids), tuple(opponent_types), self.day_provider())
+        self._packs[eid] = (tuple(character_ids), tuple(opponent_types), self.day_provider(), abilities, specs)
         return eid
 
     def finish_pack(self, encounter_id: str, inputs_by_character: Any) -> PackFinish:
@@ -193,13 +204,22 @@ class EncounterServer:
         entry = self._packs.get(encounter_id)
         if entry is None:
             raise SimError("Mehrgegnerbegegnung unbekannt")
-        party, opponents, day = entry
+        party, opponents, day, abilities, fixed_specs = entry
         if not isinstance(inputs_by_character, dict) or set(inputs_by_character) - set(party):
             raise SimError("Eingaben nur von Teilnehmern der Gruppe")
-        specs = self.pack_specs(party, inputs_by_character)
-        result = simulate_pack(self.cfg, list(opponents), specs)
+        if fixed_specs is not None:                               # beim Start festgehaltene Angaben (Stufe, Freigaben, Ausrüstung): spätere Änderungen wirken nicht in den Kampf
+            specs = [{**sp, "inputs": inputs_by_character.get(c, [])} for sp, c in zip(fixed_specs, party)]
+        else:
+            specs = self.pack_specs(party, inputs_by_character)
+        result = simulate_pack(self.cfg, list(opponents), specs, abilities)
         main = strongest(self.cfg, opponents)
-        reports = {c: build_report(self.cfg, encounter_id, main, day, r) for c, r in zip(party, result.players) if r.actions}
+        reports = {}
+        for c, r in zip(party, result.players):
+            if r.actions:
+                rep = build_report(self.cfg, encounter_id, main, day, r)
+                rep["actions"] = clamp_actions(self.service.rules_of(c)["combat"], rep["actions"], rep["duration_s"])
+                if rep["actions"]:
+                    reports[c] = rep
         for c, rep in reports.items():
             self.service.projector.validate(self.service.state(c), "combat.encounter_resolved", rep)
         del self._packs[encounter_id]

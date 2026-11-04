@@ -84,7 +84,7 @@ class RulesTests(unittest.TestCase):
         R = load_game_rules()
         g = GameServer()
         self.assertEqual(g.world.svc.rules.version, "9")
-        self.assertEqual(g.sim["version"], "5")
+        self.assertEqual(g.sim["version"], "6")
         self.assertTrue(R["speed_cm_per_tick"] > 0 and R["aggro_radius"] > 0)
         # Beute nur aus bekannten Gegnern und handelbaren Gegenständen
         for t, items in R["drops"].items():
@@ -792,7 +792,7 @@ class PersistenceTests(unittest.TestCase):
             x.call("game.join")
         walk(g, [b], [PATH_TO_WOLVES])
         fight_until_end(g, [b])
-        g.players["ben"]["pos"] = (5000, 5000)
+        g.players["ben"]["pos"] = (3000, 5700)
         for _ in range(g.R["respawn_ticks"] + 5):
             g.tick()
         walk(g, [a], [PATH_TO_WOLVES])

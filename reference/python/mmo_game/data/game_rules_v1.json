@@ -2,7 +2,7 @@
   "version": "1",
   "_comment": "PLATZHALTER für den Vertical Slice: Größen, Geschwindigkeiten, Orte, Beute und Zeiten sind Vorschläge, KEINE beschlossenen Spielinhalte. Ganzzahlen; Längen in Zentimetern; 1 Tick = 100 ms.",
   "cee_rules": "rules_v9.json",
-  "sim_rules": "sim_rules_v5.json",
+  "sim_rules": "sim_rules_v6.json",
   "zone": {
     "width": 6000,
     "height": 6000,
@@ -66,6 +66,69 @@
         1500,
         4200
       ]
+    },
+    {
+      "type": "wisp_healer",
+      "at": [
+        3000,
+        700
+      ]
+    },
+    {
+      "type": "bog_witch",
+      "at": [
+        3250,
+        800
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        4700,
+        1300
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        4900,
+        1250
+      ]
+    },
+    {
+      "type": "alpha_wolf",
+      "at": [
+        4800,
+        1150
+      ]
+    },
+    {
+      "type": "shadow_hunter",
+      "at": [
+        5200,
+        3000
+      ]
+    },
+    {
+      "type": "totem_caller",
+      "at": [
+        800,
+        3300
+      ]
+    },
+    {
+      "type": "stone_warden",
+      "at": [
+        4800,
+        4800
+      ]
+    },
+    {
+      "type": "stone_heart_colossus",
+      "at": [
+        5200,
+        5200
+      ]
     }
   ],
   "nodes": [
@@ -115,6 +178,35 @@
     },
     "bear": {
       "coin@gold": 20
+    },
+    "alpha_wolf": {
+      "coin@gold": 30,
+      "healing_herb@standard": 2
+    },
+    "wisp_healer": {
+      "coin@gold": 8,
+      "healing_herb@standard": 2
+    },
+    "bog_witch": {
+      "coin@gold": 14,
+      "frost_lily@standard": 1
+    },
+    "stone_warden": {
+      "coin@gold": 25,
+      "iron_ore@standard": 3
+    },
+    "shadow_hunter": {
+      "coin@gold": 16,
+      "charcoal@standard": 2
+    },
+    "totem_caller": {
+      "coin@gold": 15,
+      "timber@standard": 2
+    },
+    "stone_heart_colossus": {
+      "coin@gold": 120,
+      "iron_ingot@standard": 4,
+      "glass_sand@standard": 3
     }
   },
   "terrain": {
@@ -256,7 +348,15 @@
     "speed_cm_per_tick": {
       "wolf": 40,
       "bear": 28,
-      "default": 30
+      "default": 30,
+      "alpha_wolf": 42,
+      "wisp_healer": 30,
+      "bog_witch": 28,
+      "stone_warden": 22,
+      "shadow_hunter": 38,
+      "totem_caller": 26,
+      "stone_imp": 34,
+      "stone_heart_colossus": 24
     }
   }
 }

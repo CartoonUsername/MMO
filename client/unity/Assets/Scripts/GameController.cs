@@ -26,6 +26,7 @@ namespace Mmo
         Vector2Int lastDir = new Vector2Int(99, 99);
         string inventory = "";
         float nextInvPoll;
+        string warning = ""; float warningUntil;
         string partyTarget = "", tradeTo = "", tradeItem = "iron_ingot@common", recipe = "iron_ingot";
 
         const float CmToM = 0.01f;
@@ -89,6 +90,15 @@ namespace Mmo
                 case "state": state = ev; break;
                 case "fight_start": fight = new JObject(); log.Add("Kampf beginnt gegen " + string.Join(", ", ev["opponents"])); break;
                 case "fight": fight = ev; break;
+                case "telegraph":                                  // Gegner kündigt eine Fähigkeit an: Vorwarnzeit und mögliche Antworten
+                    warning = ev["ability"] + " (" + ev["kind"] + ") in " + ((float)ev["ticks"] / 10f).ToString("0.0") + " s – Antwort: " + string.Join("/", ev["answers"]);
+                    warningUntil = Time.time + (float)ev["ticks"] / 10f + 0.5f;
+                    break;
+                case "enemy_event":
+                    if ((string)ev["type"] == "interrupted") log.Add("Unterbrochen: " + ev["ability"]);
+                    else if ((string)ev["type"] == "shield_broken") log.Add("Schild gebrochen (" + ev["by"] + ")");
+                    else if ((string)ev["type"] == "phase") log.Add("Gegner wechselt in Phase " + ev["phase"]);
+                    break;
                 case "fight_left": fight = null; log.Add("Kampf verlassen: " + ev["reason"]); break;
                 case "fight_end":
                     fight = null;
@@ -198,9 +208,21 @@ namespace Mmo
             if (fight != null && fight["players"] != null)
             {
                 var f = new StringBuilder("KAMPF  (LMB leicht, RMB schwer, Leertaste ausweichen, Q blocken, 1 betäuben, 2 verlangsamen, 3 Rundumschlag, 4 heilen, 5 Schild, Tab Ziel 2, F fliehen, R/C/V Fähigkeiten)\n");
-                foreach (var o in fight["opponents"]) f.AppendLine(o["type"] + "  LP " + o["hp"] + (bool.Parse(o["alive"].ToString()) ? "" : "  (gefallen)"));
+                foreach (var o in fight["opponents"])
+                {
+                    var cast = o["casting"] != null && o["casting"].Type != JTokenType.Null ? "  wirkt " + o["casting"]["ability"] + " (" + o["casting"]["ticks"] + ")" : "";
+                    var shield = o["shield"] != null && (int)o["shield"] > 0 ? "  Schild " + o["shield"] : "";
+                    f.AppendLine(o["type"] + "  LP " + o["hp"] + (bool.Parse(o["alive"].ToString()) ? "" : "  (gefallen)") + cast + shield);
+                }
+                if (Time.time < warningUntil) f.AppendLine("ACHTUNG: " + warning);
                 int i = 0;
-                foreach (var p in fight["players"]) f.AppendLine("Spieler " + (i++) + "  LP " + p["hp"] + "/" + p["max_hp"] + "  Ausdauer " + p["stamina"] + "  " + p["state"]);
+                foreach (var p in fight["players"])
+                {
+                    string st = p["stunned"] != null && (int)p["stunned"] > 0 ? "  BETÄUBT" : "";
+                    if (p["slowed"] != null && (int)p["slowed"] > 0) st += "  verlangsamt";
+                    if (p["burning"] != null && bool.Parse(p["burning"].ToString())) st += "  brennt";
+                    f.AppendLine("Spieler " + (i++) + "  LP " + p["hp"] + "/" + p["max_hp"] + "  Ausdauer " + p["stamina"] + "  " + p["state"] + st);
+                }
                 GUI.Box(new Rect(10, 140, 560, 130), f.ToString());
             }
             GUI.Box(new Rect(10, Screen.height - 180, 560, 170), string.Join("\n", log) + "\n" + lastEnd);

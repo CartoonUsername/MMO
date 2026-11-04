@@ -19,6 +19,7 @@ from mmo_server import Gateway, Sessions
 from mmo_server.gateway import ID_RE, _fail
 from mmo_sim import EncounterServer, SimError
 from mmo_sim.live import LiveEncounter
+from mmo_sim.enemies import roll_abilities
 from mmo_sim.rules import load_sim_rules
 from mmo_world import WorldError
 from mmo_world.persistence import PersistenceError, Store
@@ -396,17 +397,19 @@ class GameServer:
         chars = chars[: self.sim["group"]["max_party"]]
         specs = self.encounters.pack_specs(chars, {})
         types = [e["type"] for e in pack]
-        live = LiveEncounter(self.sim, types, specs)
+        # Fähigkeiten: feste der Vorlage plus Baukasten je Spawn-Punkt und Tag (reproduzierbar, ADR-0032/0033)
+        abilities = [roll_abilities(self.sim, e["type"], e["id"], self.world.day[0]) for e in pack] if "enemy_abilities" in self.sim else None
+        live = LiveEncounter(self.sim, types, specs, abilities)
         self._fight_counter += 1
         fid = f"fight-{self._fight_counter:06d}"
-        self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "started": self.tick_no}
+        self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "abilities": abilities, "specs": specs, "started": self.tick_no}
         for e in pack:
             e["fight"] = fid
             e["state"], e["target"], e["path"] = "fight", None, []
         for c in chars:
             self.fight_of[c] = fid
             self.players[c]["dir"] = (0, 0)
-            self._emit_to(c, {"ev": "fight_start", "fight": fid, "opponents": types, "party": chars, "you": chars.index(c)})
+            self._emit_to(c, {"ev": "fight_start", "fight": fid, "opponents": types, "abilities": abilities, "party": chars, "you": chars.index(c)})
 
     def _advance_fights(self) -> None:
         for fid in list(self.fights):
@@ -414,6 +417,11 @@ class GameServer:
             live = f["live"]
             # Spieler, die geflohen oder ausgefallen sind, verlassen den Kampf sofort
             res = live.advance()
+            for ev in live.drain_events():                            # Ankündigungen und Ergebnisse der Gegnerfähigkeiten (Vorwarnzeit sichtbar)
+                kind = "telegraph" if ev["type"] == "telegraph" else "enemy_event"
+                for c in f["chars"]:
+                    if self.fight_of.get(c) == fid:
+                        self._emit_to(c, {"ev": kind, "fight": fid, **ev})
             for i, c in enumerate(f["chars"]):
                 st = live._sim.ps[i].state
                 if st != "active" and self.fight_of.get(c) == fid:
@@ -447,7 +455,7 @@ class GameServer:
         inputs = {c: live.inputs_of(i) for i, c in enumerate(chars)}
         report: dict[str, Any] = {}
         try:
-            eid = self.encounters.start_pack(chars, f["types"])
+            eid = self.encounters.start_pack(chars, f["types"], f["abilities"], f["specs"])
             fin = self.encounters.finish_pack(eid, inputs)
             if fin.result != result:
                 self.log.append(f"{fid}: Live-Ergebnis weicht von der Neuberechnung ab")

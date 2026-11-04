@@ -1,4 +1,4 @@
-{"format":1,"name":"enemy_rolls","rules_file":"sim_rules_v6.json","rules_sha256":"e515e366c3bc073201c78986c9133853b60002fa4df100071701fd9ef5f97237","cases":[
+{"format":1,"name":"enemy_rolls","rules_file":"sim_rules_v6.json","rules_sha256":"6045d293e9dd81c0fcda2799d3326a5197bc5b33fa6f014a670589290c35f432","cases":[
 {"day":0,"expect":"ok","kind":"roll","name":"roll_training_dummy_sp1_0","result":{"abilities":[]},"spawn":"sp1","type":"training_dummy"},
 {"day":1,"expect":"ok","kind":"roll","name":"roll_training_dummy_sp1_1","result":{"abilities":[]},"spawn":"sp1","type":"training_dummy"},
 {"day":2,"expect":"ok","kind":"roll","name":"roll_training_dummy_sp1_2","result":{"abilities":[]},"spawn":"sp1","type":"training_dummy"},

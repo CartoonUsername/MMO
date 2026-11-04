@@ -485,7 +485,7 @@
     }
   },
   "enemy_abilities": {
-    "_comment": "Gegnerfähigkeiten. Jede gefährliche Fähigkeit hat eine Vorwarnzeit (`windup` >= 1 Tick, wird dem Client angekündigt) und mindestens eine Antwort der Spieler (`answers`). `danger` zählt gegen die Gefahrengrenze einer Vorlage; `group` erlaubt höchstens eine Fähigkeit je Gruppe; `rollable: false` = nur feste Fähigkeiten oder Phasen. Wirkung folgt in der Simulation (ADR-0033). `min_attack_cycle`: Boden für Angriffstakt + Vorwarnzeit in Ticks, den auch Phasen und Verstärkungen nicht unterschreiten (hält die möglichen Aktionsraten unter den Plausibilitätslimits der CEE).",
+    "_comment": "Gegnerfähigkeiten. Jede gefährliche Fähigkeit hat eine Vorwarnzeit (`windup` >= 1 Tick, wird dem Client angekündigt) und mindestens eine Antwort der Spieler (`answers`). `danger` zählt gegen die Gefahrengrenze einer Vorlage; `group` erlaubt höchstens eine Fähigkeit je Gruppe; `rollable: false` = nur feste Fähigkeiten oder Phasen. Wirkung folgt in der Simulation (ADR-0033). `min_attack_cycle`: Boden für Angriffstakt + Vorwarnzeit in Ticks, den auch Phasen und Verstärkungen nicht unterschreiten (hält die möglichen Aktionsraten unter den Plausibilitätslimits der CEE). `player_slow_permille`: Verlangsamung von Spielern streckt Sperr- und Abklingzeiten; `heal_threshold_permille`: Heiler heilen Verbündete unter diesem Lebensanteil; `max_enemies`: höchstens so viele lebende Gegner zugleich (Beschwörungen).",
     "answers": [
       "dodge",
       "block",
@@ -643,6 +643,9 @@
         "rollable": false
       }
     },
-    "min_attack_cycle": 40
+    "min_attack_cycle": 40,
+    "player_slow_permille": 1500,
+    "heal_threshold_permille": 700,
+    "max_enemies": 6
   }
 }
