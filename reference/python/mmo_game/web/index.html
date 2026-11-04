@@ -32,6 +32,9 @@ h2{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;c
 #log .e{color:var(--bad)}#log .g{color:var(--ok)}
 table{width:100%;border-collapse:collapse}td{padding:2px 0}td:last-child{text-align:right}
 .hint{font-size:12px;color:var(--dim)}
+#chv h3{margin:8px 0 2px;font-size:12px;color:var(--acc);text-transform:uppercase;letter-spacing:.05em}
+#chv .k{display:flex;justify-content:space-between;gap:8px;font-size:13px}#chv .k b{font-weight:600}
+#chv .bar{margin:1px 0 4px}#chv .bar.nd i{background:var(--acc)}
 .win select,.win input{width:100%;margin:2px 0;padding:5px 8px}
 .win .row{margin-top:4px}.win .row2{display:flex;gap:6px}.win .row2>*{flex:1;min-width:0}
 .win ul{list-style:none;margin:4px 0;padding:0}.win li{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:2px 0;border-bottom:1px solid var(--line)}
@@ -59,6 +62,8 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
   <div id="right">
     <div class="panel"><h2>Figur</h2><div id="me"></div>
       <div id="hpwrap" style="display:none">LP <span id="hptxt"></span><div class="bar"><i id="hp"></i></div>Ausdauer <span id="sttxt"></span><div class="bar st"><i id="st"></i></div></div></div>
+    <details class="panel win" id="wChar" open><summary>Charakter</summary><div id="chv" class="hint">Lade …</div>
+      <div id="chClass" class="row2"></div><div id="charMsg" class="msg" role="status"></div></details>
     <div class="panel" id="fightpanel" style="display:none"><h2>Kampf</h2><div id="opps"></div><div id="tele"></div><div id="fightbtns"></div></div>
     <div class="panel"><h2>Inventar</h2><table id="inv"></table><div class="hint">Verkaufen an den Händler: Klick auf „verkaufen“.</div></div>
     <details class="panel win" id="wParty"><summary>Gruppe</summary>
@@ -159,7 +164,7 @@ async function refreshTrade(){
   for(const o of r.result.incoming)a.appendChild(li(offerText(o),[["Annehmen",()=>act("tradeMsg","trade.accept",{offer:o.id},"Angenommen")],["Ablehnen",()=>act("tradeMsg","trade.decline",{offer:o.id},"Abgelehnt")]]));
   for(const o of r.result.outgoing)b.appendChild(li(offerText(o),[["Zurückziehen",()=>act("tradeMsg","trade.cancel",{offer:o.id},"Zurückgezogen")]]));
 }
-function refreshWins(){if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
+function refreshWins(){if($("wChar").open)refreshChar().catch(()=>{});if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
 function buildCraft(){
   const s=$("cRecipe");for(const [id,[n]] of Object.entries(RECIPES)){const o=document.createElement("option");o.value=id;o.textContent=n;s.appendChild(o)}
   const info=()=>{const [n,inp,out]=RECIPES[s.value];$("cInfo").textContent="Zutaten je Stück: "+Object.entries(inp).map(([k,v])=>v+" × "+k).join(", ")+" → "+out+" ×"};
@@ -175,10 +180,43 @@ function wireWins(){
   $("tSend").onclick=()=>{const to=$("tTo").value.trim(),item=$("tItem").value.trim(),qty=Math.floor(+$("tQty").value),price=Math.floor(+$("tPrice").value);
     if(!to||!item||!(qty>0)||!(price>0)){setMsg("tradeMsg","Figur, Ware, Menge und Preis ausfüllen.",false);return}
     act("tradeMsg","trade.offer",{to,side:$("tSide").value,item_key:item,qty,price},"Angebot gesendet")};
-  $("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
+  refreshChar().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
 }
 const NOTE={"trade.offer_received":"Neues Handelsangebot","trade.offer_accepted":"Handelsangebot angenommen","trade.offer_declined":"Handelsangebot abgelehnt","trade.offer_cancelled":"Handelsangebot zurückgezogen","trade.offer_expired":"Handelsangebot abgelaufen","party.invited":"Gruppeneinladung","party.joined":"Jemand ist der Gruppe beigetreten","party.left":"Jemand hat die Gruppe verlassen"};
 function notifyText(i){const k=i&&(i.kind||i.type);return (NOTE[k]||k||"Nachricht")+(i&&i.data?" "+JSON.stringify(i.data):"")}
+
+// ---------- Charakter-Fenster: zeigt die serverseitig berechnete Entwicklung (query.character) ----------
+const CLASS_NAME={warrior:"Krieger",shaman_alchemist:"Schamane/Alchemist",archer:"Bogenschütze"};
+const ELEM_NAME={fire:"Feuer",water:"Wasser",shadow:"Schatten",light:"Licht",wind:"Wind",earth:"Erde",electric:"Elektro",ice:"Eis",nature:"Natur"};
+const PROF_NAME={smithing:"Schmiedekunst",alchemy:"Alchemie",farming:"Landwirtschaft",mining:"Bergbau",construction:"Bau",woodworking:"Holzverarbeitung",trade:"Handel",logistics:"Logistik",research:"Forschung",architecture:"Architektur",engineering:"Ingenieurwesen"};
+const DIR_NAME={strength:"Kraft",precision:"Präzision",mobility:"Mobilität",control:"Kontrolle",defense:"Verteidigung",support:"Unterstützung"};
+const FORM_NAME={human:"Mensch",ember_kin:"Glutblut",umbral_kin:"Schattenblut",stone_born:"Steingeboren",tide_walker:"Gezeitenwandler",grove_warden:"Hainwächter",twilight_kin:"Zwielichtblut"};
+function el(tag,txt,cls){const e=document.createElement(tag);if(txt!==undefined)e.textContent=txt;if(cls)e.className=cls;return e}
+function kv(box,k,v){const d=el("div","","k");d.append(el("span",k),el("b",String(v)));box.appendChild(d)}
+function barRow(box,label,val,max,cls){kv(box,label,val);const b=el("div","","bar "+(cls||""));const i=el("i");i.style.width=Math.min(100,100*val/Math.max(1,max))+"%";b.appendChild(i);box.appendChild(b)}
+function sect(box,t){box.appendChild(el("h3",t))}
+async function refreshChar(){
+  const r=await call("query.character",{});if(!r.ok){$("chv").textContent=errMsg(r);return}
+  const c=r.result,box=$("chv");box.textContent="";const id=c.identity;
+  sect(box,"Identität");kv(box,"Klasse",id.base_class?CLASS_NAME[id.base_class]||id.base_class:"noch keine gewählt");kv(box,"Stufe",id.level+" (EP "+id.xp+")");kv(box,"Wesen",FORM_NAME[c.essence.form]||c.essence.form+(c.essence.form==="human"?"":" (dauerhaft)"));
+  const cl=$("chClass");cl.textContent="";
+  if(!id.base_class){for(const k of c.classes){const b=el("button",CLASS_NAME[k]||k);b.onclick=async()=>{if(!confirm("Grundklasse „"+(CLASS_NAME[k]||k)+"“ wählen? Das ist dauerhaft."))return;await act("charMsg","character.choose_class",{base_class:k},"Klasse gewählt");refreshChar()};cl.appendChild(b)}}
+  const aff=Object.entries(c.elements.affinity).filter(([,v])=>v>0);sect(box,"Elemente");
+  if(!aff.length)box.appendChild(el("div","Noch keine Prägung – Elemente entstehen aus deinen Handlungen (Kampf, Herstellen, Entdecken).","hint"));
+  for(const [k,v] of aff.sort((a,b)=>b[1]-a[1]))barRow(box,(ELEM_NAME[k]||k)+(c.elements.attuned.includes(k)?" ✔ gebunden":""),v,100,"nd");
+  const pr=Object.entries(c.professions);sect(box,"Berufe");
+  if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
+  for(const [k,v] of pr.sort((a,b)=>b[1]-a[1]))kv(box,PROF_NAME[k]||k,v+" EP");
+  const dirs=Object.entries(c.combat.directions||{});sect(box,"Kampfentwicklung");
+  if(!dirs.length)box.appendChild(el("div","Noch keine Kampferfahrung – kämpfe gegen Gegner.","hint"));
+  for(const [k,v] of dirs.sort((a,b)=>b[1]-a[1]))kv(box,DIR_NAME[k]||k,v);
+  const ab=Object.entries(c.combat.abilities||{});if(ab.length){sect(box,"Fähigkeiten (Plätze: "+c.combat.loadout_slots+")");
+    for(const [k,v] of ab)kv(box,k,(v.missing&&v.missing.length)?"gesperrt ("+v.missing.length+" offen)":(v.equipped?"ausgerüstet":"freigeschaltet"))}
+  sect(box,"Wesenspfad");const el2=c.essence.eligible||[];
+  box.appendChild(el("div",el2.length?"Prüfung möglich für: "+el2.map(f=>FORM_NAME[f]||f).join(", "):"Noch keine Wesensform erreichbar – sie entsteht aus deiner Spielgeschichte.","hint"));
+  sect(box,"Wissen");kv(box,"Rezepte",c.knowledge.recipes.length);kv(box,"Entdeckungen",c.knowledge.discoveries.length);kv(box,"Techniken",c.knowledge.techniques.length);
+  const ec=c.economy||{};if(ec.trades||ec.companies_open)kv(box,"Handel / Firmen",(ec.trades||0)+" / "+(ec.companies_open||0));
+}
 function endFightUi(){fight=null;teleNow=null;$("fightpanel").style.display="none";$("hpwrap").style.display="none"}
 function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" · Tag "+state.day+" · Tick "+state.tick+" · Gelände: "+y.ground+" · Pos "+Math.round(y.pos[0]/100)+","+Math.round(y.pos[1]/100)+" m"}
 function tele(){const t=teleNow;$("tele").textContent=t?"⚠ "+t.ability+" – wirkt in "+t.ticks+" Ticks. Antwort: "+(t.answers||[]).join(", "):""}
@@ -195,7 +233,7 @@ function buildButtons(){
   FIGHT_KEYS.forEach(([c,l],i)=>{const b=document.createElement("button");b.textContent=(i<9?(i+1)+" ":"")+l;b.onclick=()=>fightCmd(c);w.appendChild(b)});
 }
 async function fightCmd(c){if(!fight)return;const r=await call("game.fight",{input:c});if(!r.ok)log("Befehl "+c+": "+r.error.message,"e")}
-async function refreshInv(){
+async function refreshInv(){if(typeof refreshChar==="function"&&$("wChar")&&$("wChar").open)refreshChar().catch(()=>{});
   const r=await call("query.inventory",{});const t=$("inv");t.textContent="";if(!r.ok)return;const dl=$("itemKeys");if(dl){dl.textContent="";for(const k of Object.keys(r.result)){if(k.startsWith("coin@"))continue;const o=document.createElement("option");o.value=k;dl.appendChild(o)}}
   for(const [k,n] of Object.entries(r.result).sort()){
     const tr=document.createElement("tr"),a=document.createElement("td"),b=document.createElement("td");a.textContent=k.replace("@"," · ")+" × "+n;

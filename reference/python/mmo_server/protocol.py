@@ -37,6 +37,36 @@ def _res(x: Any) -> Any:
     return x
 
 
+def _character_view(w: Any, char: str) -> dict[str, Any]:
+    """Lesende Gesamtsicht auf die Charakterentwicklung (Identität, Elemente, Berufe, Wesen, Kampf, Wissen). Reine Ableitung aus dem Zustand."""
+    svc = w.svc
+    st = svc.state(char)
+    p = st.parts
+
+    def safe(f: Callable[[], Any], default: Any) -> Any:
+        try:
+            return f()
+        except Exception:                      # ältere Regelversionen kennen manche Teile nicht
+            return default
+    ident = dict(p["identity"])
+    return {
+        "identity": ident,
+        "rules_version": st.rules_version,
+        "classes": list(svc.rules_of(char)["identity"]["classes"]),
+        "elements": {"affinity": dict(p["element"]["affinity"]), "attuned": list(p["element"]["attuned"])},
+        "professions": dict(p["profession"]["xp"]),
+        "essence": {"form": p["essence"]["form"], "trials_passed": list(p["essence"]["trials_passed"]),
+                    "profile": safe(lambda: svc.essence_profile(char), {}), "eligible": safe(lambda: svc.eligible_essences(char), []),
+                    "scores": safe(lambda: svc.essence_scores(char), {})},
+        "combat": {"directions": safe(lambda: svc.combat_directions(char), {}), "abilities": safe(lambda: svc.abilities(char), {}),
+                   "loadout_slots": safe(lambda: svc.loadout_slots(char), 0), "equipped": safe(lambda: svc.equipped_abilities(char), None)},
+        "knowledge": {"discoveries": safe(lambda: svc.known_discoveries(char), []), "recipes": safe(lambda: svc.known_recipes(char), []),
+                      "techniques": safe(lambda: svc.known_techniques(char), []), "craft_profile": safe(lambda: svc.craft_profile(char), {})},
+        "economy": safe(lambda: svc.economic_profile(char), {}),
+        "appearance": safe(lambda: svc.appearance(char), {}),
+    }
+
+
 def _c(name: str, args: str, actor: str | None, call: Callable[[World, dict[str, Any]], Any], mutating: bool = True,
        group: str | None = None) -> Command:
     schema = {k: v for k, v in (a.split(":") for a in args.split())} if args else {}
@@ -121,6 +151,8 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.party", "char:s", "char", lambda w, a: w.parties.view(a["char"]), mutating=False),
     _c("query.party_invites", "char:s", "char", lambda w, a: w.parties.incoming(a["char"]), mutating=False),
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
+    _c("query.character", "char:s", "char", lambda w, a: _character_view(w, a["char"]), mutating=False),
+    _c("character.choose_class", "char:s base_class:s", "char", lambda w, a: _res(w.svc.record(a["char"], "identity.class_chosen", {"base_class": a["base_class"]}))),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}
 

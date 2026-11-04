@@ -228,13 +228,29 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         for c in cs.values():
             c.w.close()
 
+    async def test_charakter_sicht_und_klassenwahl(self):
+        c, _, _ = await WsClient.open(self.port)
+        await c.send({"cmd": "register", "account": "anna", "password": "passwort123"})
+        await c.msg()
+        await self._call(c, 0, "game.join", char="anna")
+        v = (await self._call(c, 1, "query.character", char="anna"))["result"]
+        self.assertEqual((v["identity"]["base_class"], v["essence"]["form"], v["identity"]["level"]), (None, "human", 1))
+        self.assertEqual(sorted(v["classes"]), ["archer", "shaman_alchemist", "warrior"])
+        self.assertEqual(set(v["elements"]["affinity"]), {"fire", "water", "shadow", "light", "wind", "earth", "electric", "ice", "nature"})
+        self.assertTrue((await self._call(c, 2, "character.choose_class", char="anna", base_class="warrior"))["ok"])
+        self.assertEqual((await self._call(c, 3, "query.character", char="anna"))["result"]["identity"]["base_class"], "warrior")
+        again = await self._call(c, 4, "character.choose_class", char="anna", base_class="archer")      # dauerhaft
+        self.assertFalse(again["ok"])
+        self.assertFalse((await self._call(c, 5, "character.choose_class", char="anna", base_class="paladin"))["ok"])
+        c.w.close()
+
     def test_client_enthaelt_fenster_und_nur_bekannte_befehle(self):
         import re
         from mmo_server.protocol import COMMANDS
         html = (Path(__file__).parent.parent / "mmo_game" / "web" / "index.html").read_text(encoding="utf-8")
         for marker in ("onCanvasClick", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
             self.assertIn(marker, html)
-        for fid in ("wParty", "wTrade", "wCraft"):
+        for fid in ("wChar", "wParty", "wTrade", "wCraft"):
             self.assertIn(f'id="{fid}"', html)
         used = set(re.findall(r'(?:call|act)\((?:"[A-Za-z]+",)?"((?:party|trade|craft|query|maker)[A-Za-z_.]*)"', html))
         self.assertTrue({"party.form", "trade.offer", "craft", "query.offers", "query.party"} <= used, used)

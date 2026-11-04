@@ -122,6 +122,8 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.party` | char:s | char | lesend | query |
 | `query.party_invites` | char:s | char | lesend | query |
 | `query.abilities` | char:s | – | lesend | query |
+| `query.character` | char:s | char | lesend | query |
+| `character.choose_class` | char:s, base_class:s | char | schreibend | default |
 | `query.appearance` | char:s | – | lesend | query |
 
 Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste von Zeichenketten (höchstens 16), `?` optional.

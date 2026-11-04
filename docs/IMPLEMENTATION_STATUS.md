@@ -9,6 +9,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 |---|---|---|
 | Alle starten als Mensch, 3 Startklassen | vorhanden | `mmo_cee/identity`, Regeln; Klassennamen sind Arbeitsbezeichnungen |
 | Wesensmatrix aus validierter Historie, Hash-Kette, Replay | vorhanden | Character History, Golden Vectors |
+| Charakter im Spiel sichtbar (Klasse wählen, Entwicklung ansehen) | vorhanden (neu) | ADR-0038, Fenster „Charakter“ |
 | Wesensform dauerhaft, bewusste Annahme | vorhanden | `mmo_cee/essence.py` (Annahme nur einmal, Fehler „dauerhaft“); Vorschau der Folgen im Client **fehlt** |
 | Drei Schichten: Lebensgeschichte / aktuelles Profil / Wesenidentität sauber getrennt | teilweise | Event-Log und Projektion getrennt; explizite Dreiteilung als Datenmodell nicht dokumentiert (`DOMAIN_MODEL.md` fehlt) |
 | Wesensformen nicht nur elementar (Beruf, Forschung, Erkundung) | teilweise | 5 Platzhalterformen (`ember_kin` …), Berufs-/Forschungspfade nicht im Detail geprüft |
