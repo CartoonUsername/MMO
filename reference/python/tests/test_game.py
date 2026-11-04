@@ -718,5 +718,177 @@ class NetSurvivorTests(unittest.IsolatedAsyncioTestCase):
             await c.close()
 
 
+class PersistenceTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from mmo_world.persistence import Store
+        self.tmp = tempfile.TemporaryDirectory()
+        self.store = Store(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def played(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        walk(g, [a], [(1100, 700)], reach=200)
+        a.call("game.gather", node="ore1")
+        walk(g, [a], [WOLVES])
+        fight_until_end(g, [a])
+        return g, a
+
+    def test_save_and_load_restore_world_and_game_state(self):
+        from mmo_game import GameServer as GS
+        g, a = self.played()
+        pos = a.pos()
+        gen = g.save(self.store)
+        h = GS.load(self.store)
+        self.assertEqual(h.world.snapshot(), g.world.snapshot())
+        self.assertEqual(h.world.svc.log.events("anna")[-1].hash, g.world.svc.log.events("anna")[-1].hash)
+        self.assertEqual(h.tick_no, g.tick_no)
+        self.assertEqual([(e["alive"], e["respawn_at"]) for e in h.enemies], [(e["alive"], e["respawn_at"]) for e in g.enemies])
+        self.assertEqual([n["ready_at"] for n in h.nodes], [n["ready_at"] for n in g.nodes])
+        self.assertEqual(h.world.inv.balance("anna", "coin@gold"), g.world.inv.balance("anna", "coin@gold"))
+        self.assertEqual(gen, 1)
+        b = Bot(h, "anna")                                      # nach dem Neustart wieder verbinden: alte Position
+        self.assertEqual(b.call("game.join")["result"]["you"]["pos"], list(pos))
+
+    def test_encounter_ids_do_not_repeat_after_a_restart(self):
+        from mmo_game import GameServer as GS
+        g, a = self.played()
+        g.save(self.store)
+        h = GS.load(self.store)
+        self.assertEqual(h.encounters._counter, 1)
+        b = Bot(h, "anna")
+        b.call("game.join")
+        for _ in range(h.R["respawn_ticks"] + 5):
+            h.tick()
+        walk(h, [b], [WOLVES])
+        fight_until_end(h, [b])
+        self.assertEqual(h.log, [])                              # CEE hat den Bericht mit neuer ID angenommen
+        self.assertEqual(kinds(b, "fight_end")[0]["outcome"], "victory")
+        self.assertEqual(h.world.svc.state("anna").parts["combat"]["stats"]["victory"], 2)
+
+    def test_the_encounter_counter_is_the_maximum_over_all_characters(self):
+        from mmo_game import GameServer as GS
+        g = GameServer()
+        a, b = Bot(g, "anna"), Bot(g, "ben")                    # anna ist vor ben angelegt, kämpft aber später (höhere ID)
+        for x in (a, b):
+            x.call("game.join")
+        walk(g, [b], [WOLVES])
+        fight_until_end(g, [b])
+        g.players["ben"]["pos"] = (5000, 5000)
+        for _ in range(g.R["respawn_ticks"] + 5):
+            g.tick()
+        walk(g, [a], [WOLVES])
+        fight_until_end(g, [a])
+        g.save(self.store)
+        self.assertEqual(GS.load(self.store).encounters._counter, 2)
+
+    def test_offline_positions_survive_a_save(self):
+        from mmo_game import GameServer as GS
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        a.call("game.move", dx=1, dy=0)
+        for _ in range(9):
+            g.tick()
+        pos = a.pos()
+        g.disconnect(a.sid)
+        g.save(self.store)
+        h = GS.load(self.store)
+        self.assertEqual(Bot(h, "anna").call("game.join")["result"]["you"]["pos"], list(pos))
+
+    def test_state_from_another_generation_is_ignored_but_the_world_stays(self):
+        from mmo_game import GameServer as GS
+        g, a = self.played()
+        g.save(self.store)
+        g.save(self.store)
+        f = self.store.path / "game_state.json"
+        data = json.loads(f.read_text())
+        data["generation"] = 1                                    # gehört nicht zur aktuellen Generation
+        f.write_text(json.dumps(data))
+        h = GS.load(self.store)
+        self.assertEqual(h.tick_no, 0)
+        self.assertTrue(all(e["alive"] for e in h.enemies))
+        self.assertEqual(h.world.inv.balance("anna", "coin@gold"), g.world.inv.balance("anna", "coin@gold"))
+        f.write_text("kaputt")
+        self.assertEqual(GS.load(self.store).tick_no, 0)
+
+    def test_a_damaged_latest_generation_falls_back_to_the_previous_one(self):
+        from mmo_game import GameServer as GS
+        g, a = self.played()
+        g.save(self.store)
+        coins = g.world.inv.balance("anna", "coin@gold")
+        g.world.inv.deposit("anna", "coin@gold", 5)
+        g.save(self.store)
+        (self.store.path / "gen-000002" / "snapshot.json").write_text("{}")
+        h = GS.load(self.store)
+        self.assertEqual(h.world.inv.balance("anna", "coin@gold"), coins)
+
+    def test_load_without_a_save_fails_clearly(self):
+        from mmo_game import GameServer as GS
+        from mmo_world.persistence import PersistenceError
+        with self.assertRaises(PersistenceError):
+            GS.load(self.store)
+
+    def test_disconnect_remembers_the_position(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        a.call("game.move", dx=1, dy=1)
+        for _ in range(7):
+            g.tick()
+        pos = a.pos()
+        g.disconnect(a.sid)
+        b = Bot(g, "anna")
+        self.assertEqual(b.call("game.join")["result"]["you"]["pos"], list(pos))
+        g.disconnect(b.sid)
+        c = Bot(g, "anna")
+        self.assertEqual(c.call("game.join")["result"]["you"]["pos"], list(pos))     # auch nach nochmaligem Trennen
+
+
+class NetPersistenceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_autosave_and_save_on_stop(self):
+        import tempfile
+        from mmo_world.persistence import Store
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(tmp)
+            srv = NetServer(port=0, tick_seconds=0.001, store=store, autosave_ticks=20)
+            port = await srv.start()
+            c = Client("127.0.0.1", port, "anna")
+            await c.connect()
+            await c.call("game.join", char="anna")
+            for _ in range(200):
+                await asyncio.sleep(0.01)
+                if store.generations():
+                    break
+            self.assertTrue(store.generations())
+            await c.close()
+            await srv.stop()
+            n = len(store.generations())
+            self.assertGreaterEqual(n, 1)
+            self.assertTrue((store.path / "game_state.json").exists())
+            from mmo_game import GameServer as GS
+            self.assertEqual(GS.load(store).world.inv.balance("anna", "coin@gold"), 200)
+
+    async def test_stopping_saves_even_without_autosave(self):
+        import tempfile
+        from mmo_world.persistence import Store
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(tmp)
+            srv = NetServer(port=0, tick_seconds=0.001, store=store, autosave_ticks=0)
+            await srv.start()
+            await asyncio.sleep(0.05)
+            self.assertEqual(store.generations(), [])
+            await srv.stop()
+            self.assertEqual(store.generations(), [1])
+
+    async def test_no_store_means_no_files_and_no_error(self):
+        srv = NetServer(port=0, tick_seconds=0.001)
+        await srv.start()
+        await asyncio.sleep(0.05)
+        await srv.stop()
+
+
 if __name__ == "__main__":
     unittest.main()

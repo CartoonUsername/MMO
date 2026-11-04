@@ -8,7 +8,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+import signal
 from typing import Any
+
+from mmo_world.persistence import Store
 
 from .game import MAX_LINE, GameServer
 
@@ -17,8 +20,10 @@ MAX_CONNECTIONS = 16
 
 
 class NetServer:
-    def __init__(self, game: GameServer | None = None, host: str = "127.0.0.1", port: int = 7777, tick_seconds: float = TICK_SECONDS) -> None:
+    def __init__(self, game: GameServer | None = None, host: str = "127.0.0.1", port: int = 7777, tick_seconds: float = TICK_SECONDS,
+                 store: Store | None = None, autosave_ticks: int = 600) -> None:
         self.game, self.host, self.port, self.tick_seconds = game or GameServer(), host, port, tick_seconds
+        self.store, self.autosave_ticks = store, autosave_ticks
         self._writers: dict[str, asyncio.StreamWriter] = {}
         self._server: asyncio.AbstractServer | None = None
         self._ticker: asyncio.Task[None] | None = None
@@ -32,6 +37,8 @@ class NetServer:
     async def stop(self) -> None:
         if self._ticker:
             self._ticker.cancel()
+        if self.store is not None:
+            self.game.save(self.store)                         # beim Beenden speichern
         for w in list(self._writers.values()):
             w.close()
         if self._server:
@@ -50,6 +57,9 @@ class NetServer:
         while True:
             await asyncio.sleep(self.tick_seconds)
             self.game.tick()
+            if self.store is not None and self.autosave_ticks and self.game.tick_no % self.autosave_ticks == 0:
+                self.game.save(self.store)
+                self.store.prune(5)
             for sid, w in list(self._writers.items()):
                 for ev in self.game.drain(sid):
                     await self._send(w, ev)
@@ -88,13 +98,31 @@ class NetServer:
             writer.close()
 
 
-async def serve(host: str = "127.0.0.1", port: int = 7777) -> None:
-    srv = NetServer(host=host, port=port)
+async def serve(host: str = "127.0.0.1", port: int = 7777, data: str | None = None) -> None:
+    store = Store(data) if data else None
+    game = GameServer.load(store) if store is not None and store.current() is not None else GameServer()
+    srv = NetServer(game, host=host, port=port, store=store)
     p = await srv.start()
-    print(f"Spielserver läuft auf {host}:{p} (Entwicklungsstufe, ohne Verschlüsselung)", flush=True)
-    await asyncio.Event().wait()
+    print(f"Spielserver läuft auf {host}:{p} (Entwicklungsstufe, ohne Verschlüsselung)" + (f", Speicher: {data}" if data else ", ohne Speicherung"), flush=True)
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop.set)          # geordnetes Beenden: speichern, dann schließen
+        except (NotImplementedError, RuntimeError):         # z. B. Windows
+            pass
+    try:
+        await stop.wait()
+    finally:
+        await srv.stop()
 
 
 if __name__ == "__main__":
     import sys
-    asyncio.run(serve(*(["127.0.0.1", int(sys.argv[1])] if len(sys.argv) > 1 else [])))
+    args = sys.argv[1:]
+    data = args[args.index("--data") + 1] if "--data" in args else None
+    port = int(args[0]) if args and args[0].isdigit() else 7777
+    try:
+        asyncio.run(serve("127.0.0.1", port, data))
+    except KeyboardInterrupt:
+        pass

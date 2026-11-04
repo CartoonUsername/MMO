@@ -13,8 +13,10 @@
 6. **Vertrauensgrenze:** Client sendet nur Richtungen, Sammelabsichten und Kampfbefehle; Figur muss zur Sitzung gehören; Befehlsbudget; Nachrichtengröße begrenzt; Kampfbefehle werden gegen die Befehlsmenge der Regeln und das Fähigkeitsfreigabesystem geprüft.
 7. **Anmeldung (nur Entwicklung):** Kontoname = Figur; keine Passwörter, Standardbindung 127.0.0.1. Echte Anmeldung/TLS sind offen und vor jedem Mehrspieler-Test außerhalb des lokalen Netzes zu ergänzen.
 
+8. **Persistenz:** `GameServer.save/load` nutzt den vorhandenen `Store` (Generationen, atomarer Zeigerwechsel, Rückfall auf die letzte gültige Generation) für die Welt und eine Datei `game_state.json` (an die Generation gebunden; passt sie nicht, starten Gegner, Sammelpunkte und Positionen frisch). Begegnungszähler werden nach einem Neustart aus den Berichten der Figuren abgeleitet, damit keine ID doppelt vergeben wird. Autosave alle 600 Ticks und beim geordneten Beenden; Laufende Kämpfe sind nicht Teil des Speicherstands (Verbindungsende gilt als Flucht).
+
 **Absicherung:** `tests/test_live.py`, `tests/test_game.py` (Bewegung, Sammeln, Herstellen, Handel, Solo- und Gruppenkampf, Abbruch, Tageswechsel, zwei TCP-Clients), Mutationstests (siehe Statusbericht).
 
 **Offen / Grenzen**
-- Keine Persistenz des Spielstands beim Neustart, keine Kollision/Hindernisse/Höhen, keine Interpolation/Vorhersage im Client, kein Chat, Markt ortsunabhängig, eine Zone.
+- Keine Kollision/Hindernisse/Höhen, keine Interpolation/Vorhersage im Client, kein Chat, Markt ortsunabhängig, eine Zone.
 - Gegner-KI ist nur „stehen und kämpfen"; Tempo/Aggro sind ungetestete Platzhalter.

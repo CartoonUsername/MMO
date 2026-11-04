@@ -15,7 +15,7 @@
 | 2 | Spielserver ohne Netzwerk (`mmo_game.game`): Raum 60 × 60 m, Bewegung mit Tempolimit, Gegner mit Aggro und Wiedererscheinen, Sammelpunkte, Kampf mit Gruppe und Beute, Tageswechsel | **fertig** |
 | 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON, Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
 | 4 | Unity-Client (`client/unity`): Verbindung, Bewegung/Kamera, Kampfeingaben + Anzeige, Inventar/Herstellung/Handel-Oberfläche | **Quellcode vorhanden, nicht in Unity geprüft** (Unity läuft in dieser Umgebung nicht) |
-| 5 | Persistenz des Spielstands beim Beenden/Neustart | offen |
+| 5 | Persistenz: Welt (CEE, Inventar, Märkte, Gruppen) als Generationen im `Store`, Spielzustand (Tick, Gegner, Sammelpunkte, Positionen) daneben; Autosave und Speichern beim Beenden | **fertig** |
 | 6 | Echte Anmeldung (Token), Verschlüsselung (TLS) | offen |
 
 ## Spielablauf (End-to-End)
@@ -29,7 +29,8 @@
 ## Bedienung (Entwicklung)
 ```bash
 cd reference/python
-python -m mmo_game.net 7777         # Spielserver auf 127.0.0.1:7777
+python -m mmo_game.net 7777                    # Spielserver auf 127.0.0.1:7777 (ohne Speicherung)
+python -m mmo_game.net 7777 --data ./spielstand   # mit Speicherung (Neustart setzt dort fort; Beenden mit Strg+C/SIGTERM speichert)
 python -m unittest tests.test_game  # Ende-zu-Ende-Tests inkl. zwei TCP-Clients
 ```
 Protokoll: `docs/PROTOCOL.md` (Weltbefehle) und `docs/VERTICAL_SLICE_PROTOCOL.md` (Spielschicht).

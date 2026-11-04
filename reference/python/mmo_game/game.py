@@ -8,7 +8,10 @@ Referenz (`mmo_sim.pack`), die Berichte laufen durch die CEE.
 from __future__ import annotations
 
 import json
+import os
+import re
 from importlib import resources
+from pathlib import Path
 from typing import Any
 
 from mmo_cee.errors import RuleViolation
@@ -18,6 +21,7 @@ from mmo_sim import EncounterServer, SimError
 from mmo_sim.live import LiveEncounter
 from mmo_sim.rules import load_sim_rules
 from mmo_world import WorldError
+from mmo_world.persistence import PersistenceError, Store
 from mmo_world.world import World
 
 COIN = "coin@gold"
@@ -32,6 +36,19 @@ def _dist2(a: tuple[int, int], b: tuple[int, int]) -> int:
     return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
 
 
+def _max_encounter_counter(world: World) -> int:
+    """Höchster vergebener Begegnungszähler (aus den Berichten der Figuren) – damit nach einem Neustart keine ID doppelt vergeben wird."""
+    pat = re.compile(re.escape(world.server_id) + r"-enc-(\d+)$")
+    best = 0
+    for c in world.svc.log.character_ids():
+        for ev in world.svc.log.events(c):
+            if ev.type == "combat.encounter_resolved":
+                m = pat.match(str(ev.payload.get("encounter_id", "")))
+                if m:
+                    best = max(best, int(m.group(1)))
+    return best
+
+
 def _ok(req_id: Any, result: Any) -> dict[str, Any]:
     return {"v": 1, "id": req_id if isinstance(req_id, str) else None, "ok": True, "result": result}
 
@@ -43,9 +60,9 @@ class _Err(Exception):
 
 
 class GameServer:
-    def __init__(self, rules: dict[str, Any] | None = None) -> None:
+    def __init__(self, rules: dict[str, Any] | None = None, world: World | None = None, saved: dict[str, Any] | None = None) -> None:
         self.R = rules or load_game_rules()
-        self.world = World(self.R["cee_rules"])
+        self.world = world if world is not None else World(self.R["cee_rules"])
         self.sim = load_sim_rules(self.R["sim_rules"])
         self.tick_no = 0
         self.sessions = Sessions()
@@ -62,6 +79,47 @@ class GameServer:
         self._fight_counter = 0
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
+        self.saved_pos: dict[str, tuple[int, int]] = {}
+        if world is not None:                                # Neustart: Zähler und Zustand aus dem gespeicherten Spiel
+            self.encounters._counter = _max_encounter_counter(world)
+        if saved:
+            self.tick_no = int(saved.get("tick", 0))
+            for e in self.enemies:
+                st = saved.get("enemies", {}).get(e["id"])
+                if st:
+                    e["alive"], e["respawn_at"] = bool(st["alive"]), int(st["respawn_at"])
+            for n in self.nodes:
+                n["ready_at"] = int(saved.get("nodes", {}).get(n["id"], 0))
+            self.saved_pos = {c: (int(x), int(y)) for c, (x, y) in saved.get("positions", {}).items()}
+
+    # ---------------------------------------------------------------- Speichern ----
+    def save(self, store: Store) -> int:
+        """Schreibt eine neue Generation der Welt (CEE, Inventar, Märkte, Gruppen ...) und den Zustand der Spielschicht."""
+        gen = store.commit(self.world)
+        state = {"generation": gen, "tick": self.tick_no, "format": 1,
+                 "nodes": {n["id"]: n["ready_at"] for n in self.nodes},
+                 "enemies": {e["id"]: {"alive": e["alive"], "respawn_at": e["respawn_at"]} for e in self.enemies},
+                 "positions": {**{c: list(p) for c, p in self.saved_pos.items()}, **{c: list(p["pos"]) for c, p in self.players.items()}}}
+        tmp = store.path / "game_state.json.tmp"
+        tmp.write_text(json.dumps(state, sort_keys=True, separators=(",", ":")), encoding="utf-8")
+        os.replace(tmp, store.path / "game_state.json")
+        return gen
+
+    @classmethod
+    def load(cls, store: Store, rules: dict[str, Any] | None = None) -> "GameServer":
+        """Stellt den letzten gültigen Speicherpunkt wieder her; fehlt der Spielzustand oder gehört er zu einer anderen Generation, starten
+        Gegner, Sammelpunkte und Positionen frisch (die Welt selbst bleibt vollständig)."""
+        gen, world = store.load_latest_valid()
+        saved = None
+        f = store.path / "game_state.json"
+        if f.exists():
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                if data.get("generation") == gen and data.get("format") == 1:
+                    saved = data
+            except ValueError:
+                saved = None
+        return cls(rules, world=world, saved=saved)
 
     # ---------------------------------------------------------------- Verbindung ----
     def connect(self, account: str) -> tuple[str, list[str]]:
@@ -143,7 +201,7 @@ class GameServer:
     # ---------------------------------------------------------------- Befehle ----
     def _cmd_join(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         if char not in self.players:
-            sp = tuple(self.R["zone"]["spawn"])
+            sp = self.saved_pos.pop(char, None) or tuple(self.R["zone"]["spawn"])
             self.players[char] = {"pos": sp, "dir": (0, 0), "immune_until": 0}
             self.sess_of[char] = sid
         return self._snapshot_for(char)
@@ -363,7 +421,9 @@ class GameServer:
         if fid is not None:                                 # Verbindungsabbruch im Kampf = Flucht
             f = self.fights[fid]
             f["live"].submit(f["chars"].index(char), "flee")
-        self.players.pop(char, None)
+        gone = self.players.pop(char, None)
+        if gone is not None:
+            self.saved_pos[char] = gone["pos"]
         self.sess_of.pop(char, None)
 
     # ---------------------------------------------------------------- Ansicht ----
