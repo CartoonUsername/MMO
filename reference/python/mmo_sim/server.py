@@ -15,6 +15,8 @@ from mmo_cee.service import CharacterService
 from .errors import SimError
 from .fight import EncounterResult, simulate
 from .group import GroupResult, simulate_group
+from .pack import PackResult, simulate_pack, strongest
+from .rules import MULTI_COMMANDS
 
 
 @dataclass(frozen=True)
@@ -27,6 +29,12 @@ class FinishResult:
 class GroupFinish:
     result: GroupResult
     events: dict[str, Event | None]  # je Teilnehmer; None, wenn er keine bewertbare Aktion hatte
+
+
+@dataclass(frozen=True)
+class PackFinish:
+    result: PackResult
+    events: dict[str, Event | None]
 
 
 def build_report(cfg: dict[str, Any], encounter_id: str, opponent_type: str, day: int,
@@ -51,6 +59,7 @@ class EncounterServer:
         self._counter = 0
         self._pending: dict[str, tuple[str, str, int]] = {}  # id -> (Charakter, Gegner, Tag)
         self._groups: dict[str, tuple[tuple[str, ...], str, int]] = {}  # id -> (Teilnehmer, Gegner, Tag)
+        self._packs: dict[str, tuple[tuple[str, ...], tuple[str, ...], int]] = {}  # id -> (Teilnehmer, Gegner, Tag)
         self._finished: set[str] = set()
 
     def start(self, character_id: str, opponent_type: str) -> str:
@@ -135,3 +144,56 @@ class EncounterServer:
         self._finished.add(encounter_id)
         events = {c: (self.service.record(c, "combat.encounter_resolved", reports[c]) if c in reports else None) for c in party}
         return GroupFinish(result, events)
+
+    # -- Kampf gegen mehrere Gegner (ADR-0026) ---------------------------------------------------
+    def start_pack(self, character_ids: Any, opponent_types: Any) -> str:
+        m = self.cfg.get("multi")
+        if m is None:
+            raise SimError("Diese Regeln kennen keinen Kampf gegen mehrere Gegner")
+        if (not isinstance(opponent_types, (list, tuple)) or not 1 <= len(opponent_types) <= m["max_opponents"]
+                or any(not isinstance(t, str) or t not in self.cfg["opponents"] for t in opponent_types)):
+            raise SimError(f"Es müssen 1..{m['max_opponents']} bekannte Gegner sein")
+        g = self.cfg["group"]
+        if (not isinstance(character_ids, (list, tuple)) or not 1 <= len(character_ids) <= g["max_party"]
+                or len(set(character_ids)) != len(character_ids) or any(not isinstance(c, str) for c in character_ids)):
+            raise SimError(f"Die Gruppe muss aus 1..{g['max_party']} verschiedenen Figuren bestehen")
+        for c in character_ids:
+            if not self.service.log.has(c):
+                raise SimError("Charakter existiert nicht")
+        self._counter += 1
+        eid = f"{self.server_id}-enc-{self._counter:08d}"
+        self._packs[eid] = (tuple(character_ids), tuple(opponent_types), self.day_provider())
+        return eid
+
+    def finish_pack(self, encounter_id: str, inputs_by_character: Any) -> PackFinish:
+        """Wie `finish_group`; der Bericht nennt den stärksten Gegner (höchste Stufe, bei Gleichstand der erste) – zusätzliche
+        Gegner bringen keine zusätzlichen Punkte (Platzhalter, ADR-0026)."""
+        if encounter_id in self._finished:
+            raise SimError("Begegnung bereits abgeschlossen")
+        entry = self._packs.get(encounter_id)
+        if entry is None:
+            raise SimError("Mehrgegnerbegegnung unbekannt")
+        party, opponents, day = entry
+        if not isinstance(inputs_by_character, dict) or set(inputs_by_character) - set(party):
+            raise SimError("Eingaben nur von Teilnehmern der Gruppe")
+        specs = []
+        for c in party:
+            equipped = self.service.equipped_abilities(c)
+            allowed = self.service.allowed_commands(c)
+            if allowed is not None:
+                allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS))
+            spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
+            if allowed is not None:
+                spec["allowed"] = allowed
+            if equipped is not None:
+                spec["equipped"] = equipped
+            specs.append(spec)
+        result = simulate_pack(self.cfg, list(opponents), specs)
+        main = strongest(self.cfg, opponents)
+        reports = {c: build_report(self.cfg, encounter_id, main, day, r) for c, r in zip(party, result.players) if r.actions}
+        for c, rep in reports.items():
+            self.service.projector.validate(self.service.state(c), "combat.encounter_resolved", rep)
+        del self._packs[encounter_id]
+        self._finished.add(encounter_id)
+        events = {c: (self.service.record(c, "combat.encounter_resolved", reports[c]) if c in reports else None) for c in party}
+        return PackFinish(result, events)

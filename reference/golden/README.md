@@ -109,3 +109,11 @@ Erzeugt/geprüft mit `python -m mmo_sim.golden_group write|check ../golden_group
 - **Ausgang je Spieler:** `victory` (kämpfte bis zum Sieg), `defeat` (ausgefallen), `fled` (geflohen oder Zeitlimit); Gruppe: `victory`; sonst `defeat`, wenn jemand ausgefallen ist und keiner mehr kämpft, sonst `fled`.
 - Mit genau einem Spieler und ohne `heal`/`shield` ist das Ergebnis identisch zum Einzelkampf (Fall `solo_equals_single_player_group` und der Äquivalenztest der Referenz).
 
+## Kampf gegen mehrere Gegner (`reference/golden_pack/sim_packs.json`)
+
+Erzeugt/geprüft mit `python -m mmo_sim.golden_pack write|check ../golden_pack` (Regeln: `mmo_sim/data/sim_rules_v4.json`, per SHA-256 gebunden). Kopf wie beim Gruppenkampf; `cases`: `{name, opponents, players, expect, [result, reports]}`.
+
+- `opponents`: Liste von 1 bis `multi.max_opponents` Gegnertypen. `players` wie beim Gruppenkampf; zusätzliche Befehle `sweep`, `target_1`, `target_2`, `target_3`.
+- `result` wie beim Gruppenkampf, zusätzlich `opponents` (Lebenspunkte je Gegner; `opponent_hp` = Summe). `reports`: je Spieler der CEE-Bericht mit dem **stärksten Gegner** (höchste Stufe, Gleichstand: der erste).
+- **Ablauf** wie beim Gruppenkampf; Gegner in Indexreihenfolge. Leben je Gegner = `hp · (1000 + p · (n − 1)) // 1000`. Jeder Spieler hat einen Fokus (Start: Gegner 0). `target_k` setzt ihn, wenn Gegner `k−1` existiert und lebt (sonst ignoriert, ohne Kosten/Sperrzeit). Leichter Schlag, Betäubung, Verlangsamung und schwerer Schlag wirken auf den Fokus (schwerer Schlag: auf den bei Beginn gewählten Gegner, bei dessen Fall auf den ersten lebenden; ist keiner mehr am Leben, auf den Fokus). `sweep`: `damage` an jedem lebenden Gegner, Bedrohung += Summe, zählt einmal `light_hit`; Kosten/Sperrzeit/Abklingzeit aus `multi.sweep`. Verwundbarkeit (Taumeln/Betäubung) und Takt gelten je Gegner; gefallene Gegner greifen nicht an; Parade lässt nur den parierten Gegner taumeln. Sieg, wenn kein Gegner mehr lebt (Prüfung nach den schweren Treffern).
+- Mit genau einem Gegner und ohne die neuen Befehle ist das Ergebnis identisch zum Gruppenkampf (Fall `solo_one_opponent` und der Äquivalenztest der Referenz).

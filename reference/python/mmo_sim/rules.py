@@ -10,6 +10,7 @@ from .errors import SimError
 
 COMMANDS = ("light", "heavy", "dodge", "block", "stun", "slow", "flee")
 GROUP_COMMANDS = ("heal", "shield")  # nur im Gruppenkampf (ADR-0022)
+MULTI_COMMANDS = ("sweep", "target_1", "target_2", "target_3")  # nur im Kampf gegen mehrere Gegner (ADR-0026)
 
 
 def load_sim_rules(name: str = "sim_rules_v1.json") -> dict[str, Any]:
@@ -76,6 +77,21 @@ def validate_group_rules(cfg: dict[str, Any]) -> None:
         raise SimError("group.ability_commands: nur heal/shield, je Befehl höchstens eine Fähigkeit")
 
 
+def validate_multi_rules(cfg: dict[str, Any]) -> None:
+    if "group" not in cfg:
+        raise SimError("multi braucht group")
+    m = cfg["multi"]
+
+    def ok(v: Any, lo: int = 1) -> bool:
+        return isinstance(v, int) and not isinstance(v, bool) and v >= lo
+
+    if not ok(m["max_opponents"]) or m["max_opponents"] > len(MULTI_COMMANDS) - 1:
+        raise SimError(f"multi.max_opponents muss 1..{len(MULTI_COMMANDS) - 1} sein")
+    s = m["sweep"]
+    if not (ok(s["cost"], 0) and ok(s["busy"]) and ok(s["cooldown"], 0) and ok(s["damage"])):
+        raise SimError("multi.sweep ungültig")
+
+
 def validate_sim_rules(cfg: dict[str, Any]) -> None:
     def positive(v: Any) -> bool:
         return isinstance(v, int) and not isinstance(v, bool) and v > 0
@@ -91,6 +107,8 @@ def validate_sim_rules(cfg: dict[str, Any]) -> None:
         raise SimError("precise.busy darf nicht kürzer sein als light.busy")
     if "group" in cfg:
         validate_group_rules(cfg)
+    if "multi" in cfg:
+        validate_multi_rules(cfg)
     for name, eff in ability_effects(cfg).items():
         if not isinstance(eff, dict) or not eff or set(eff) - set(EFFECT_KEYS):
             raise SimError(f"ability_effects.{name}: unbekannte oder fehlende Wirkung")

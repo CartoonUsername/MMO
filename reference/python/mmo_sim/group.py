@@ -71,7 +71,7 @@ class _P:
         return self.state == "active"
 
 
-def _validated(cfg: dict[str, Any], players: Any) -> list[tuple[dict[str, Any], int, list[tuple[int, str]]]]:
+def _validated(cfg: dict[str, Any], players: Any, extra_commands: tuple[str, ...] = ()) -> list[tuple[dict[str, Any], int, list[tuple[int, str]]]]:
     g = cfg.get("group")
     if g is None:
         raise SimError("Diese Regeln kennen keinen Gruppenkampf")
@@ -86,10 +86,10 @@ def _validated(cfg: dict[str, Any], players: Any) -> list[tuple[dict[str, Any], 
             raise SimError("level muss eine positive ganze Zahl sein")
         allowed = spec.get("allowed")
         if allowed is not None and (not isinstance(allowed, (list, tuple, set, frozenset))
-                                    or any(c not in COMMANDS + GROUP_COMMANDS for c in allowed)):
+                                    or any(c not in COMMANDS + GROUP_COMMANDS + extra_commands for c in allowed)):
             raise SimError("allowed muss eine Liste bekannter Befehle sein")
         combine_effects(cfg, spec.get("equipped"))  # prüft equipped
-        out.append((spec, level, validate_inputs(cfg, spec["inputs"], COMMANDS + GROUP_COMMANDS)))
+        out.append((spec, level, validate_inputs(cfg, spec["inputs"], COMMANDS + GROUP_COMMANDS + extra_commands)))
     return out
 
 
