@@ -252,7 +252,7 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         import re
         from mmo_server.protocol import COMMANDS
         html = (Path(__file__).parent.parent / "mmo_game" / "web" / "index.html").read_text(encoding="utf-8")
-        for marker in ("onCanvasClick", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
+        for marker in ("onCanvasClick", "profession_detail", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
             self.assertIn(marker, html)
         for fid in ("wChar", "wParty", "wTrade", "wCraft"):
             self.assertIn(f'id="{fid}"', html)

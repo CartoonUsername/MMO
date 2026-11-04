@@ -254,7 +254,10 @@ async function refreshChar(){
     if(v>=100&&!c.elements.attuned.includes(k)){const b=el("button","Prägen: "+(ELEM_NAME[k]||k));b.onclick=async()=>{if(!confirm("Element „"+(ELEM_NAME[k]||k)+"“ dauerhaft prägen?"))return;await act("charMsg","game.attune",{element:k},"Element geprägt");refreshChar()};box.appendChild(b)}}
   const pr=Object.entries(c.professions);sect(box,"Berufe");
   if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
-  for(const [k,v] of pr.sort((a,b)=>b[1]-a[1]))kv(box,PROF_NAME[k]||k,v+" EP");
+  for(const [k,v] of pr.sort((a,b)=>b[1]-a[1])){kv(box,PROF_NAME[k]||k,v+" EP");const pd=(c.profession_detail||{})[k];
+    if(pd){for(const [bid,b] of Object.entries(pd.branches))if(b.points>0)barRow(box,"  Zweig: "+b.name+" (Stufe "+b.level+")",b.points,b.next||b.points,"nd");
+      if(pd.masterpieces.length)kv(box,"  Meisterstücke",pd.masterpieces.join(", "));
+      if(v>0&&pd.masterpiece_goals.length)box.appendChild(el("div","  Ziel Meisterstück (beste Güte): "+pd.masterpiece_goals.join(", "),"hint"))}}
   const dirs=Object.entries(c.combat.directions||{});sect(box,"Kampfentwicklung");
   if(!dirs.length)box.appendChild(el("div","Noch keine Kampferfahrung – kämpfe gegen Gegner.","hint"));
   for(const [k,v] of dirs.sort((a,b)=>b[1]-a[1]))kv(box,DIR_NAME[k]||k,v);

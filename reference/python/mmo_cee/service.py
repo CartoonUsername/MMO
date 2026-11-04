@@ -178,6 +178,11 @@ class CharacterService:
         from .combos import unlocked
         return unlocked(self.state(character_id), self.rules_of(character_id))
 
+    def profession_branches(self, character_id: str) -> dict:
+        """Berufszweige und Meisterstücke der Figur, aus Herstellungsberichten abgeleitet (AP 5, ADR-0044)."""
+        from .branches import profession_view
+        return profession_view(self.state(character_id), self.rules_of(character_id))
+
     def economic_profile(self, character_id: str) -> dict:
         """Laufbahn, Unternehmen, Netzwerkgröße, Anzahl Handel."""
         return economic_profile(self.state(character_id), self.rules_of(character_id))

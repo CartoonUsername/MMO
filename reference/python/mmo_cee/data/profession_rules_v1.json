@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "_comment": "PLATZHALTER (AP 5, ADR-0044): Spezialisierungszweige und Meisterstücke je Beruf. Zweige sind aus Herstellungsberichten abgeleitet (Rezepte, Techniken, Elementinfusion), nicht exklusiv und ohne Wechselmechanik – Berufsrespezialisierung/Wechsel ist offene Frage 10 und wird hier NICHT entschieden. Punkte je Zweig: Rezepteinsätze x Stufe x 100 + Technikeinsätze x technique_points + Infusionspunkte / element_divisor.",
+  "branch_thresholds": [1000, 4000, 12000],
+  "technique_points": 300,
+  "element_divisor": 10,
+  "professions": {
+    "smithing": {
+      "name": "Schmiedekunst",
+      "branches": {
+        "refining": {"name": "Erzveredelung", "recipes": ["iron_ingot"], "techniques": ["folded_iron"], "elements": []},
+        "heavy_arms": {"name": "Schwere Waffen & Hitze", "recipes": ["iron_blade"], "techniques": ["folded_iron"], "elements": ["fire", "earth"]},
+        "shadow_alloys": {"name": "Schattenlegierungen", "recipes": ["iron_blade", "shadow_lantern"], "techniques": ["twilight_binding"], "elements": ["shadow"]}
+      }
+    },
+    "alchemy": {
+      "name": "Alchemie",
+      "branches": {
+        "remedies": {"name": "Heilmittel & Elixiere", "recipes": ["healing_salve"], "techniques": [], "elements": ["nature", "light"]},
+        "glasswork": {"name": "Glas & Frost", "recipes": ["frostglass"], "techniques": [], "elements": ["ice", "water"]},
+        "twilight": {"name": "Schattenrezepturen", "recipes": ["shadow_lantern"], "techniques": ["twilight_binding"], "elements": ["shadow"]}
+      }
+    },
+    "woodworking": {
+      "name": "Holzverarbeitung",
+      "branches": {"beams": {"name": "Balken & Bau", "recipes": ["wooden_beam"], "techniques": [], "elements": []}}
+    },
+    "farming": {
+      "name": "Landwirtschaft",
+      "branches": {"baking": {"name": "Backwaren", "recipes": ["bread"], "techniques": [], "elements": ["nature"]}}
+    }
+  }
+}

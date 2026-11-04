@@ -8,7 +8,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 2 | Datenmodell Charakter: Lebensgeschichte / aktuelles Profil / Wesenidentität (`docs/DOMAIN_MODEL.md`, Tests) | §12, §70.1–2 | 0/1 | fertig, wartet auf Bereitstellung (ADR-0040) |
 | 3 | Spielgeschehen füttert die Profile (Sammeln→Beruf, Erkundung, Elemente), Anti-Farming bleibt | §9, §10, §70.3 | 1/2 | fertig, wartet auf Bereitstellung (ADR-0041) |
 | 4 | Elementarsystem: 36 Paare / 84 Dreier, Interaktionen, klassenabhängige Wirkung, Elementmanagement im Kampf | §22–26, §74 | 2/3 | **4a fertig** (Katalog, ADR-0042); **4b fertig** (Elementschaden, ADR-0043); Rest: Dreier-/Domänenskills und Elementmanagement (Frage 6 offen) |
-| 5 | Berufe: Spezialisierungszweige, Techniken, Meisterstücke | §14–16, §71 | 2/3 | offen |
+| 5 | Berufe: Spezialisierungszweige, Techniken, Meisterstücke | §14–16, §71 | 2/3 | **fertig** (Zweige & Meisterstücke abgeleitet, ADR-0044); Experimente/Respezialisierung offen |
 | 6 | Fähigkeiten und Wesensformen als Definitionen; Prüfung, Vorschau, irreversible Annahme im Client | §11, §72 | 2 | offen |
 | 7 | Kampfecho und Resonanz +0..+30 (atomar, Schutz, Pechschutz), Handelbarkeit, Meisterschaft | §17–21, §73 | 2/3 | offen |
 | 8 | Ausrüstung und Transmog | §31 | 2/3 | offen |

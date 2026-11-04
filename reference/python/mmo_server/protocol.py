@@ -71,6 +71,7 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
         "appearance": safe(lambda: svc.appearance(char), {}),
         "layers": safe(lambda: svc.layers(char), {}),
         "combinations": safe(lambda: svc.element_combinations(char), []),
+        "profession_detail": safe(lambda: svc.profession_branches(char), {}),
         "discoveries": safe(lambda: {d: pr for d in svc.rules_of(char)["discovery"]["discoveries"]
                                      for pr in [svc.discovery_progress(char, d)] if pr["known"] or pr["evidence"]}, {}),
     }
