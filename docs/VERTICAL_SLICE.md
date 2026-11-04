@@ -13,7 +13,7 @@
 |---|---|---|
 | 1 | Live-Kampf (`mmo_sim.live`): Eingaben während des Kampfes, Server vergibt den Tick, Ergebnis = Neuberechnung aus dem Eingabeprotokoll | **fertig** |
 | 2 | Spielserver ohne Netzwerk (`mmo_game.game`): Raum 60 × 60 m, Bewegung mit Tempolimit, Gegner mit Aggro und Wiedererscheinen, Sammelpunkte, Kampf mit Gruppe und Beute, Tageswechsel | **fertig** |
-| 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON, Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
+| 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON und WebSocket mit Browser-Testclient (ADR-0036), Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
 | 4 | Unity-Client (`client/unity`): Verbindung, Bewegung/Kamera, Kampfeingaben + Anzeige, Inventar/Herstellung/Handel-Oberfläche | **Quellcode vorhanden, nicht in Unity geprüft** (Unity läuft in dieser Umgebung nicht) |
 | 4b | Gelände und Kollision (`mmo_game.terrain`): Geländearten mit Tempo, Fluss mit Brücke, Fels, Wasser, Zonenrand; Gleiten an Hindernissen; Aggro nur mit freier Strecke | **fertig** (ADR-0030) |
 | 4c | Gegnerbewegung (`mmo_game.navigation`, KI in `mmo_game.game`): Aufmerksamkeit, Verfolgung über die Brücke (A*), Kampf ab Kampfradius, Leine, Heimkehr | **fertig** (ADR-0031) |
@@ -39,5 +39,7 @@ python -m mmo_game.net 7777 --insecure-dev        # ohne Konten, nur zum Testen 
 # außerhalb des eigenen Rechners (Konten + TLS sind Pflicht):
 python -m mmo_game.net 7777 --host 0.0.0.0 --data ./spielstand --cert cert.pem --key key.pem
 python -m unittest tests.test_game  # Ende-zu-Ende-Tests inkl. zwei TCP-Clients
+python -m unittest tests.test_web   # WebSocket, Seite, Herkunftsprüfung, Rauchtest mit zwei Browser-Spielern (falls Node/Playwright da sind)
 ```
+**Im Browser spielen:** Server starten (`python -m mmo_game.net 7777 --data ./spielstand`), dann `http://127.0.0.1:7777/` öffnen, Konto anlegen und anmelden (zweiter Spieler: zweites Browserfenster/Profil). Bewegen WASD, Sammeln E, Kampf Tasten 1–9 oder Knöpfe, Verkaufen im Inventar (ADR-0036).
 Protokoll: `docs/PROTOCOL.md` (Weltbefehle) und `docs/VERTICAL_SLICE_PROTOCOL.md` (Spielschicht).

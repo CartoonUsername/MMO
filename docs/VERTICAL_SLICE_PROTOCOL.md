@@ -1,6 +1,6 @@
 # Protokoll der Spielschicht (Vertical Slice)
 
-Transport: TCP, UTF-8, **eine JSON-Nachricht je Zeile**, höchstens 4096 Bytes. Verschlüsselung: optional TLS (Server mit `--cert`/`--key`), Pflicht außerhalb von 127.0.0.1. Alle Zahlen sind Platzhalter.
+Transport: TCP, UTF-8, **eine JSON-Nachricht je Zeile**, höchstens 4096 Bytes; alternativ WebSocket auf `/ws` desselben Ports (eine JSON-Nachricht je Text-Nachricht, gleiche Grenze, `Origin` muss zum `Host` passen, ADR-0036). Verschlüsselung: optional TLS (Server mit `--cert`/`--key`), Pflicht außerhalb von 127.0.0.1. Alle Zahlen sind Platzhalter.
 
 ## Anmeldung
 Erste Zeile des Clients (Server mit Konten, Standard):

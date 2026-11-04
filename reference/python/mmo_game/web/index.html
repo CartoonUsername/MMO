@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MMO Testclient</title>
+<style>
+:root{--bg:#10141a;--panel:#1a212b;--line:#2b3644;--fg:#e6edf3;--dim:#8b98a8;--acc:#4aa3ff;--bad:#ff6b6b;--ok:#5fd68a;--warn:#ffc857}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif}
+#login{max-width:340px;margin:12vh auto;padding:20px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+#login h1{margin:0 0 4px;font-size:20px}
+input,button{font:inherit;color:var(--fg);background:#0e1218;border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+#login input{width:100%;margin:6px 0}
+button{cursor:pointer}button:hover{border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:8px;margin-top:8px}.row button{flex:1}
+#err{color:var(--bad);min-height:20px;margin-top:8px}
+.dim{color:var(--dim)}
+#game{display:none;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;height:100vh}
+@media(max-width:900px){#game{grid-template-columns:1fr;height:auto}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px}
+#left{display:flex;flex-direction:column;gap:10px;min-height:0}
+canvas{width:100%;max-height:70vh;aspect-ratio:1;background:#0b0f14;border-radius:6px;display:block}
+#right{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+h2{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)}
+.bar{height:10px;background:#0e1218;border-radius:5px;overflow:hidden;margin:2px 0 6px}.bar i{display:block;height:100%;background:var(--ok)}
+.bar.st i{background:var(--warn)}.bar.en i{background:var(--bad)}
+#fightbtns{display:flex;flex-wrap:wrap;gap:6px}
+#fightbtns button{padding:6px 9px}
+#tele{min-height:44px;color:var(--warn)}
+#log{height:150px;overflow:auto;font:12px/1.35 ui-monospace,monospace;white-space:pre-wrap}
+#log .e{color:var(--bad)}#log .g{color:var(--ok)}
+table{width:100%;border-collapse:collapse}td{padding:2px 0}td:last-child{text-align:right}
+.hint{font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="login">
+  <h1>MMO Testclient</h1>
+  <div class="dim">Platzhalter-Spielstand · nur zum Testen</div>
+  <input id="acc" placeholder="Kontoname" autocomplete="username" maxlength="32">
+  <input id="pw" type="password" placeholder="Passwort (mind. 8 Zeichen)" autocomplete="current-password" maxlength="128">
+  <div class="row"><button id="bLogin">Anmelden</button><button id="bReg">Konto anlegen</button></div>
+  <div id="err" role="alert"></div>
+</div>
+
+<div id="game">
+  <div id="left">
+    <div class="panel"><canvas id="cv" width="720" height="720"></canvas>
+      <div class="hint">Bewegen: WASD/Pfeile · Sammeln: E (am Sammelpunkt) · Kampf: Tasten 1–9 oder Knöpfe · Gegner in der Nähe starten den Kampf von selbst.</div></div>
+  </div>
+  <div id="right">
+    <div class="panel"><h2>Figur</h2><div id="me"></div>
+      <div id="hpwrap" style="display:none">LP <span id="hptxt"></span><div class="bar"><i id="hp"></i></div>Ausdauer <span id="sttxt"></span><div class="bar st"><i id="st"></i></div></div></div>
+    <div class="panel" id="fightpanel" style="display:none"><h2>Kampf</h2><div id="opps"></div><div id="tele"></div><div id="fightbtns"></div></div>
+    <div class="panel"><h2>Inventar</h2><table id="inv"></table><div class="hint">Verkaufen an den Händler: Klick auf „verkaufen“.</div></div>
+    <div class="panel"><h2>Ereignisse</h2><div id="log"></div></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+let ws=null,seq=0,pending=new Map(),map=null,state=null,me=null,fight=null,teleNow=null,dir=[0,0],joined=false,maxHp={},sessionToken=null;
+const FIGHT_KEYS=[["light","Leicht"],["heavy","Schwer"],["dodge","Ausweichen"],["block","Blocken"],["stun","Betäuben"],["slow","Verlangsamen"],["flee","Fliehen"],["sweep","Rundumschlag"],["target_1","Ziel 1"],["target_2","Ziel 2"],["target_3","Ziel 3"],["heal","Heilen"],["shield","Schild"],["cast_ember","Glut"],["dash","Satz"],["veil","Schleier"],["focus_surge","Fokus"]];
+const COLORS={grass:"#27422b",road:"#5b4f3a",mud:"#4a3a2a",water:"#1f4a73",rock:"#555a62"};
+
+function log(t,c){const d=$("log"),e=document.createElement("div");if(c)e.className=c;e.textContent=t;d.appendChild(e);while(d.childNodes.length>200)d.removeChild(d.firstChild);d.scrollTop=d.scrollHeight}
+function send(o){if(ws&&ws.readyState===1)ws.send(JSON.stringify(o))}
+function call(cmd,args){return new Promise((res,rej)=>{const id="c"+(++seq);pending.set(id,res);send({v:1,id,cmd,args:{char:me,...args}});setTimeout(()=>{if(pending.delete(id))rej(new Error("Zeitüberschreitung"))},8000)})}
+
+function connect(register){
+  const account=$("acc").value.trim(),password=$("pw").value;$("err").textContent="";
+  if(!account||!password){$("err").textContent="Name und Passwort eingeben.";return}
+  ws=new WebSocket((location.protocol==="https:"?"wss://":"ws://")+location.host+"/ws");
+  let welcomed=false;
+  ws.onopen=()=>ws.send(JSON.stringify({cmd:register?"register":"hello",account,password}));
+  ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch{return}
+    if(m.ev==="welcome"){welcomed=true;me=m.characters[0];sessionToken=m.token;start();return}
+    if(m.ev==="error"&&!welcomed){$("err").textContent=errText(m);return}
+    onMessage(m)};
+  ws.onclose=()=>{if(welcomed){log("Verbindung getrennt – Seite neu laden.","e");$("fightbtns").querySelectorAll("button").forEach(b=>b.disabled=true)}else if(!$("err").textContent)$("err").textContent="Verbindung fehlgeschlagen."};
+}
+function errText(m){return ({auth_failed:"Name oder Passwort falsch.",account_exists:"Konto existiert schon.",weak_password:"Passwort zu kurz (mind. 8 Zeichen).",locked:"Zu viele Fehlversuche – später erneut.",rate_limited:"Zu viele Versuche.",server_full:"Server voll.",bad_request:m.message||"Ungültige Eingabe."})[m.code]||(m.message||m.code)}
+
+async function start(){
+  $("login").style.display="none";$("game").style.display="grid";
+  const m=await call("game.map",{});map=m.result;
+  const j=await call("game.join",{});if(!j.ok){log("Beitritt abgelehnt: "+j.error.message,"e");return}
+  joined=true;state=j.result;refreshInv();buildButtons();draw();
+}
+function onMessage(m){
+  if(m.id&&pending.has(m.id)){pending.get(m.id)(m);pending.delete(m.id);return}
+  switch(m.ev){
+    case"state":state=m;if(!m.you.fight&&fight)endFightUi();draw();hud();break;
+    case"fight_start":fight={id:m.fight,opp:m.opponents,abilities:m.abilities,you:m.you,view:null};maxHp={};$("fightpanel").style.display="block";
+      log("Kampf gegen "+m.opponents.join(", ")+(m.party.length>1?" (Gruppe: "+m.party.join(", ")+")":""),"g");break;
+    case"fight":if(fight){fight.view=m;fightUi()}break;
+    case"telegraph":teleNow=m;if(m.kind!=="basic")log("⚠ "+m.ability+" ("+m.kind+") in "+m.ticks+" Ticks – Antworten: "+(m.answers||[]).join("/"));tele();break;
+    case"enemy_event":log("· "+m.type+(m.ability?" "+m.ability:"")+(m.outcome?" → "+m.outcome:""));if(m.type!=="phase")teleNow=null,tele();break;
+    case"fight_left":log("Kampf verlassen ("+(m.reason==="defeat"?"besiegt":"geflohen")+")","e");endFightUi();refreshInv();break;
+    case"fight_end":log("Kampfende: "+m.outcome+" ("+m.ticks+" Ticks)"+(m.loot?" · Beute: "+JSON.stringify(m.loot):"")+(m.loot_factor?" · Faktor "+JSON.stringify(m.loot_factor):""),m.outcome==="victory"?"g":"e");endFightUi();refreshInv();break;
+    case"notify":log("Nachricht: "+JSON.stringify(m.item));break;
+    case"error":log("Fehler: "+(m.message||m.code),"e");break;
+  }
+}
+function endFightUi(){fight=null;teleNow=null;$("fightpanel").style.display="none";$("hpwrap").style.display="none"}
+function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" · Tag "+state.day+" · Tick "+state.tick+" · Gelände: "+y.ground+" · Pos "+Math.round(y.pos[0]/100)+","+Math.round(y.pos[1]/100)+" m"}
+function tele(){const t=teleNow;$("tele").textContent=t?"⚠ "+t.ability+" – wirkt in "+t.ticks+" Ticks. Antwort: "+(t.answers||[]).join(", "):""}
+function fightUi(){
+  const v=fight.view,o=$("opps");o.textContent="";
+  v.opponents.forEach((e,i)=>{const k=fight.opp[i]||"?";maxHp[i]=Math.max(maxHp[i]||0,e.hp);
+    const d=document.createElement("div");d.textContent=(i+1)+". "+k+(e.alive?"":" ✝")+(e.casting?" ✦"+e.casting.ability:"")+(e.shield?" 🛡":"")+(e.hasted?" ⚡":"");
+    const b=document.createElement("div");b.className="bar en";const f=document.createElement("i");f.style.width=(maxHp[i]?100*e.hp/maxHp[i]:0)+"%";b.appendChild(f);o.append(d,b)});
+  const p=v.players[fight.you];if(p){$("hpwrap").style.display="block";$("hptxt").textContent=p.hp+"/"+p.max_hp+(p.stunned?" · betäubt":"")+(p.slowed?" · verlangsamt":"")+(p.burning?" · brennt":"");
+    $("hp").style.width=(100*p.hp/Math.max(1,p.max_hp))+"%";$("sttxt").textContent=String(p.stamina);$("st").style.width=Math.min(100,p.stamina)+"%"}
+}
+function buildButtons(){
+  const w=$("fightbtns");w.textContent="";
+  FIGHT_KEYS.forEach(([c,l],i)=>{const b=document.createElement("button");b.textContent=(i<9?(i+1)+" ":"")+l;b.onclick=()=>fightCmd(c);w.appendChild(b)});
+}
+async function fightCmd(c){if(!fight)return;const r=await call("game.fight",{input:c});if(!r.ok)log("Befehl "+c+": "+r.error.message,"e")}
+async function refreshInv(){
+  const r=await call("query.inventory",{});const t=$("inv");t.textContent="";if(!r.ok)return;
+  for(const [k,n] of Object.entries(r.result).sort()){
+    const tr=document.createElement("tr"),a=document.createElement("td"),b=document.createElement("td");a.textContent=k.replace("@"," · ")+" × "+n;
+    if(!k.startsWith("coin@")){const s=document.createElement("button");s.textContent="verkaufen";s.onclick=async()=>{const x=await call("maker.sell",{item_key:k,qty:n});log(x.ok?"Verkauft: "+k+" × "+n+" → "+JSON.stringify(x.result):"Verkauf: "+x.error.message,x.ok?"g":"e");refreshInv()};b.appendChild(s)}
+    tr.append(a,b);t.appendChild(tr)}
+}
+async function gather(){
+  if(!state||fight)return;const my=state.you.pos;
+  const n=state.nodes.filter(n=>n.ready).sort((a,b)=>d2(a.pos,my)-d2(b.pos,my))[0];
+  if(!n){log("Kein bereiter Sammelpunkt in Sicht.");return}
+  const r=await call("game.gather",{node:n.id});log(r.ok?"Gesammelt: "+r.result.item+" × "+r.result.qty:"Sammeln: "+r.error.message,r.ok?"g":"e");if(r.ok)refreshInv();
+}
+const d2=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2;
+
+function draw(){
+  const cv=$("cv"),g=cv.getContext("2d");if(!map||!state)return;
+  const S=cv.width,k=S/Math.max(map.w,map.h);g.clearRect(0,0,S,S);
+  g.fillStyle=COLORS[map.default]||"#27422b";g.fillRect(0,0,map.w*k,map.h*k);
+  for(const r of map.regions){g.fillStyle=COLORS[r.kind]||"#444";const[a,b,c,d]=r.rect;g.fillRect(a*k,b*k,(c-a)*k,(d-b)*k)}
+  g.fillStyle="#3a3f47";for(const o of map.obstacles){g.beginPath();g.arc(o.at[0]*k,o.at[1]*k,o.r*k,0,7);g.fill()}
+  for(const n of state.nodes){g.fillStyle=n.ready?"#ffc857":"#6b5f3a";g.fillRect(n.pos[0]*k-5,n.pos[1]*k-5,10,10);g.fillStyle="#cfd6dd";g.font="11px sans-serif";g.fillText(n.item.split("@")[0],n.pos[0]*k+8,n.pos[1]*k+4)}
+  for(const e of state.enemies){if(!e.alive)continue;g.fillStyle=e.fight?"#ff9f43":e.state==="chase"?"#ff4d4d":"#c0392b";g.beginPath();g.arc(e.pos[0]*k,e.pos[1]*k,7,0,7);g.fill();g.fillStyle="#fff";g.font="11px sans-serif";g.fillText(e.type,e.pos[0]*k+9,e.pos[1]*k+4)}
+  for(const p of state.players){g.fillStyle="#5fd68a";g.beginPath();g.arc(p.pos[0]*k,p.pos[1]*k,6,0,7);g.fill();g.fillStyle="#fff";g.fillText(p.char,p.pos[0]*k+9,p.pos[1]*k+4)}
+  const y=state.you;g.fillStyle="#4aa3ff";g.beginPath();g.arc(y.pos[0]*k,y.pos[1]*k,7,0,7);g.fill();g.strokeStyle="#fff";g.stroke();
+}
+const KEYDIR={w:[0,-1],arrowup:[0,-1],s:[0,1],arrowdown:[0,1],a:[-1,0],arrowleft:[-1,0],d:[1,0],arrowright:[1,0]};
+const held=new Set();
+function recalc(){let x=0,y=0;for(const k of held){x+=KEYDIR[k][0];y+=KEYDIR[k][1]}x=Math.sign(x);y=Math.sign(y);if(x!==dir[0]||y!==dir[1]){dir=[x,y];if(joined&&!fight)call("game.move",{dx:x,dy:y}).catch(()=>{})}}
+addEventListener("keydown",e=>{if(!joined||/INPUT/.test(e.target.tagName))return;const k=e.key.toLowerCase();
+  if(KEYDIR[k]){e.preventDefault();held.add(k);recalc()}
+  else if(k==="e"&&!e.repeat)gather();
+  else if(/^[1-9]$/.test(k)&&fight){const f=FIGHT_KEYS[+k-1];if(f)fightCmd(f[0])}});
+addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(held.delete(k))recalc()});
+addEventListener("blur",()=>{held.clear();recalc()});
+$("bLogin").onclick=()=>connect(false);$("bReg").onclick=()=>connect(true);
+$("pw").addEventListener("keydown",e=>{if(e.key==="Enter")connect(false)});
+</script>
+</body>
+</html>

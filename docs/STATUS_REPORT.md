@@ -73,6 +73,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 36. `0780ea4` Gegnerfähigkeiten, Schritt 1: Regeln `sim_rules_v6` (Fähigkeiten, Vorlagen, Phasen, Takt-Boden), reproduzierbarer Baukasten je Spawn-Punkt und Tag (`mmo_sim.enemies`, Golden Vectors `golden_enemies`, ADR-0032); Wirkung im Kampf folgt, 1116 Tests.
 37. `fa26eef` Gegnerfähigkeiten, Schritte 2–5: Wirkung in der Simulation (Ankündigungen, Zustände auf Spielern, Unterbrechen, Schilde, Heilen, Verstärken, Beschwören, Phasen), Berichte mit Plausibilitätsgrenze, Spielserver (Baukasten je Spawn und Tag, `telegraph`/`enemy_event`, neue Gegner und Boss), Golden Vectors `golden_enemy_fights`, ADR-0033, 1193 Tests.
 38. `5b0cba7` Balancing: deterministische Testspieler (`mmo_sim.balance`), Bericht `docs/BALANCE_REPORT.md`, `sim_rules_v7` (Lebenspunkte, Rudelwelpen, Boss-Fähigkeiten, Ankündigung normaler Angriffe), Zielbänder als Tests, ADR-0034, 1212 Tests.
-39. (dieser Stand) Beute auf die Schwierigkeit abgestimmt (Wertbänder gegen das Balancing), Beuteabnahme je Figur/Art/Tag, Wiedererscheinen je Gegnerart (ADR-0035), 1228 Tests.
+39. `b3dc697` Beute auf die Schwierigkeit abgestimmt (Wertbänder gegen das Balancing), Beuteabnahme je Figur/Art/Tag, Wiedererscheinen je Gegnerart (ADR-0035), 1228 Tests.
+40. (dieser Stand) Browser-Testclient: WebSocket (RFC 6455) und Spielseite direkt vom Spielserver, Herkunftsprüfung, Rauchtest mit zwei Browser-Spielern (ADR-0036).
 
 Plan: `docs/ROADMAP.md`.
