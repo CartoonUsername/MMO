@@ -65,6 +65,8 @@ class WorldGoldenTests(unittest.TestCase):
             "company_rules_hash": lambda v: v.update(company_rules_sha256="0" * 64),
             "market_rules_hash": lambda v: v.update(market_rules_sha256="0" * 64),
             "trade_rules_hash": lambda v: v.update(trade_rules_sha256="0" * 64),
+            "party_rules_hash": lambda v: v.update(party_rules_sha256="0" * 64),
+            "pricing_rules_hash": lambda v: v.update(pricing_rules_sha256="0" * 64),
             "production_rules_hash": lambda v: v.update(production_rules_sha256="0" * 64),
             "format": lambda v: v.update(format=2),
         }

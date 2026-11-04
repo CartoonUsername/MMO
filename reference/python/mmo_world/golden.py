@@ -27,7 +27,7 @@ from . import persistence
 from .company import goal_of, load_company_rules
 from .errors import WorldError
 from .persistence import PersistenceError
-from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PRICING_RULES, PRODUCTION_RULES, TRADE_RULES, World
+from .world import CEE_RULES, COMPANY_RULES, MARKET_RULES, PARTY_RULES, PRICING_RULES, PRODUCTION_RULES, TRADE_RULES, World
 
 CEE_RULES_V8 = "rules_v8.json"
 
@@ -169,6 +169,19 @@ OPS: dict[str, Callable[[Env, Op], Any]] = {
     "notify_ack": lambda e, a: e.outbox.ack(a["char"], a["upto"]),
     "notify_mute": lambda e, a: e.outbox.mute(a["char"], a["kinds"]),
     "notify_unmute": lambda e, a: e.outbox.unmute(a["char"], a["kinds"]),
+    "party_create": lambda e, a: e.parties.create(a["char"]),
+    "party_invite": lambda e, a: e.parties.invite(a["actor"], a["target"]),
+    "party_accept": lambda e, a: e.parties.accept(a["char"], a["invite"]),
+    "party_decline": lambda e, a: e.parties.decline(a["char"], a["invite"]),
+    "party_expire": lambda e, a: e.parties.expire(a["value"]),
+    "party_leave": lambda e, a: e.parties.leave(a["char"]),
+    "party_kick": lambda e, a: e.parties.kick(a["actor"], a["member"]),
+    "party_promote": lambda e, a: e.parties.promote(a["actor"], a["member"]),
+    "party_set_loot": lambda e, a: e.parties.set_loot(a["actor"], a["mode"]),
+    "party_disband": lambda e, a: e.parties.disband(a["actor"]),
+    "party_loot": lambda e, a: e.parties.distribute_loot(a["party"], a["item_key"], a["qty"], a["eligible"], a.get("finder")),
+    "party_view": lambda e, a: e.parties.view(a["char"]),
+    "party_incoming": lambda e, a: e.parties.incoming(a["char"]),
     "offer_make": lambda e, a: e.offers.make(a["char"], a["to"], a["side"], a["item_key"], a["qty"], a["price"]),
     "offer_accept": lambda e, a: _accept(e, a),
     "offer_decline": lambda e, a: e.offers.decline(a["char"], a["offer"]),
@@ -640,6 +653,46 @@ def scenario_notifications() -> list[Op]:
     ]
 
 
+def scenario_parties() -> list[Op]:
+    PI = lambda a, t: S("party_invite", actor=a, target=t)  # noqa: E731
+    PA = lambda c, n: S("party_accept", char=c, invite=f"srv1-inv-{n:08d}")  # noqa: E731
+    pty = "srv1-party-00000001"
+    L = lambda q, el, fin=None: S("party_loot", party=pty, item_key="iron_ore@standard", qty=q, eligible=el, **({"finder": fin} if fin else {}))  # noqa: E731
+    return [
+        *[op for c in "abcdef" for op in person(c)], C("low"), *person("high"),
+        R("high", "identity.xp_gained", {"amount": 90000}),
+        S("party_view", char="a"), S("party_view", char="ghost"), S("party_incoming", char="ghost"), S("party_leave", char="a"), S("party_create", char="ghost"),
+        S("party_create", char="a"), S("party_create", char="a"),                       # a führt; die zweite Gruppe scheitert
+        PI("b", "c"), PI("a", "ghost"), PI("a", "a"),                                   # b ist in keiner Gruppe; unbekannt; selbst
+        PI("a", "b"), PI("a", "b"),                                                     # inv 1; doppelt
+        PI("a", "high"),                                                                # Stufenabstand zu groß
+        PA("c", 1), S("party_decline", char="c", invite="srv1-inv-00000001"), S("party_accept", char="c", invite="nope"),
+        PA("b", 1), PA("b", 1),                                                         # b tritt bei
+        PI("a", "c"), PI("a", "d"), PI("a", "e"),                                       # inv 2, 3, 4 (e)
+        PA("c", 2), S("party_incoming", char="d"), PA("d", 3), PI("a", "e"), PI("a", "f"),
+        S("party_create", char="e"), S("party_invite", actor="e", target="f"),          # e führt eine zweite Gruppe (inv 4 a→e bleibt offen)
+        S("party_view", char="a"), S("party_view", char="f"),
+        # Beute: reihum, Anführer, Finder
+        L(5, ["a", "b", "c", "d"]), L(2, ["b", "d"]), L(3, ["a", "c"]), L(1, ["x"]), L(0, ["a"]), L(1, []),
+        S("party_loot", party="nope", item_key="iron_ore@standard", qty=1, eligible=["a"]),
+        S("party_loot", party=pty, item_key="bad", qty=1, eligible=["a"]),
+        S("party_set_loot", actor="b", mode="leader"), S("party_set_loot", actor="a", mode="xx"), S("party_set_loot", actor="a", mode="leader"),
+        L(4, ["b", "c"]), L(4, ["a", "b"]),
+        S("party_set_loot", actor="a", mode="finder"), L(3, ["b", "c"], "c"), L(3, ["b", "c"], "a"), L(3, ["b", "c"]),
+        S("party_set_loot", actor="a", mode="round_robin"), L(3, ["c", "d"]),
+        # Mitglieder
+        S("party_kick", actor="b", member="c"), S("party_kick", actor="a", member="a"), S("party_kick", actor="a", member="f"),
+        S("party_kick", actor="a", member="b"), L(2, ["a", "c", "d"]),                  # Zeiger bleibt bei derselben Figur
+        S("party_promote", actor="c", member="d"), S("party_promote", actor="a", member="a"), S("party_promote", actor="a", member="b"),
+        S("party_promote", actor="a", member="d"), S("party_leave", char="d"),         # d gibt ab und geht: Führung an das dienstälteste Mitglied
+        S("party_view", char="a"), S("party_leave", char="a"), S("party_view", char="c"),   # nur noch eine Figur: aufgelöst
+        # Fristen und Auflösen
+        S("party_create", char="a"), PI("a", "b"), S("party_expire", value=1),           # Einladung 6 (Frist bis Tag 3), noch gültig
+        DAY(3), PA("b", 6), S("party_expire", value=-1), S("party_expire", value=3), S("party_incoming", char="b"),
+        PI("a", "b"), S("party_decline", char="b", invite="srv1-inv-00000007"), PI("a", "b"), PA("b", 8), S("party_disband", actor="b"), S("party_disband", actor="a"), S("party_view", char="b"),
+    ]
+
+
 def scenario_market() -> list[Op]:
     fine = "iron_blade@fine"  # Referenz 180 je Stück, Band 135..225
     return [
@@ -960,6 +1013,8 @@ SCENARIOS: list[tuple[str, str, Callable[[], list[Op]]]] = [
      scenario_direct_trade),
     ("notifications", "Benachrichtigungen: Arten und Empfänger aus Markt, Angeboten, Firma, Produktion, Wissen; Abruf, Quittung, Stummschaltung",
      scenario_notifications),
+    ("parties", "Gruppen: Einladungen, Annahme/Ablehnung, Größe, Stufenabstand, Anführerwechsel, Beuteverteilung (reihum/Anführer/Finder), Fristen, Auflösung",
+     scenario_parties),
     ("market_orderbook", "Markt: Orderbuch, Preis-Zeit-Priorität, Teilausführung, IOC, Preisband, Limits, Verfall, Preisindex",
      scenario_market),
     ("random_market_3", "Zustandsbewusstes Zufallsskript nur für den Markt (Seed 3, 220 Aktionen), ausgeschrieben",
@@ -997,6 +1052,7 @@ def build_vector() -> dict[str, Any]:
             "production_rules_file": PRODUCTION_RULES, "production_rules_sha256": _sha("mmo_world", PRODUCTION_RULES),
             "trade_rules_file": TRADE_RULES, "trade_rules_sha256": _sha("mmo_world", TRADE_RULES),
             "pricing_rules_file": PRICING_RULES, "pricing_rules_sha256": _sha("mmo_world", PRICING_RULES),
+            "party_rules_file": PARTY_RULES, "party_rules_sha256": _sha("mmo_world", PARTY_RULES),
             "extra_cee_rules": {f: _sha("mmo_cee", f) for f in sorted(set(SCENARIO_RULES.values()))},
             "scenarios": [run_scenario(n, d, f()) for n, d, f in SCENARIOS]}
 
@@ -1022,6 +1078,8 @@ def verify_vector(vec: dict[str, Any]) -> list[str]:
         errs.append("Handelsregeln haben sich geändert (SHA-256 weicht ab)")
     if _sha("mmo_world", vec["pricing_rules_file"]) != vec["pricing_rules_sha256"]:
         errs.append("Preisregeln haben sich geändert (SHA-256 weicht ab)")
+    if _sha("mmo_world", vec["party_rules_file"]) != vec["party_rules_sha256"]:
+        errs.append("Gruppenregeln haben sich geändert (SHA-256 weicht ab)")
     for f, h in vec["extra_cee_rules"].items():
         if _sha("mmo_cee", f) != h:
             errs.append(f"CEE-Regeldatei {f} hat sich geändert (SHA-256 weicht ab)")

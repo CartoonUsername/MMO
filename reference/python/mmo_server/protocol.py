@@ -63,6 +63,16 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("trade.accept", "char:s offer:s", "char", lambda w, a: _settle(w.offers.accept(a["char"], a["offer"]))),
     _c("trade.decline", "char:s offer:s", "char", lambda w, a: w.offers.decline(a["char"], a["offer"])),
     _c("trade.cancel", "char:s offer:s", "char", lambda w, a: w.offers.cancel(a["char"], a["offer"])),
+    # Gruppen: bilden, einladen, Anführer, Beutemodus (die Beute selbst verteilt der Server nach dem Kampf)
+    _c("party.form", "char:s", "char", lambda w, a: w.parties.create(a["char"])),
+    _c("party.invite", "char:s target:s", "char", lambda w, a: w.parties.invite(a["char"], a["target"])),
+    _c("party.accept", "char:s invite:s", "char", lambda w, a: w.parties.accept(a["char"], a["invite"])),
+    _c("party.decline", "char:s invite:s", "char", lambda w, a: w.parties.decline(a["char"], a["invite"])),
+    _c("party.leave", "char:s", "char", lambda w, a: w.parties.leave(a["char"])),
+    _c("party.kick", "char:s member:s", "char", lambda w, a: w.parties.kick(a["char"], a["member"])),
+    _c("party.promote", "char:s member:s", "char", lambda w, a: w.parties.promote(a["char"], a["member"])),
+    _c("party.set_loot", "char:s mode:s", "char", lambda w, a: w.parties.set_loot(a["char"], a["mode"])),
+    _c("party.disband", "char:s", "char", lambda w, a: w.parties.disband(a["char"])),
     # Benachrichtigungen: Postfach abrufen, quittieren, Arten stummschalten (Push läuft über den Transport; Abruf holt Verpasstes)
     _c("notify.ack", "char:s upto:i", "char", lambda w, a: w.outbox.ack(a["char"], a["upto"])),
     _c("notify.mute", "char:s kinds:l", "char", lambda w, a: w.outbox.mute(a["char"], a["kinds"])),
@@ -108,6 +118,8 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
        mutating=False),
     _c("notify.fetch", "char:s after:i? limit:i?", "char", lambda w, a: w.outbox.fetch(a["char"], a.get("after", 0), a.get("limit", 50)),
        mutating=False),
+    _c("query.party", "char:s", "char", lambda w, a: w.parties.view(a["char"]), mutating=False),
+    _c("query.party_invites", "char:s", "char", lambda w, a: w.parties.incoming(a["char"]), mutating=False),
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}
@@ -118,6 +130,7 @@ INTERNAL_ONLY: dict[str, str] = {
     "discovery.gather": "Beweise vergibt der Server aus Spielereignissen",
     "trade (direkt, ohne Zustimmung)": "Der Handelsdienst selbst ist intern; Clients handeln nur über Orderbuch oder Angebot/Annahme (`trade.*`)",
     "deposit/revenue": "Münzquellen sind serverintern",
+    "party.loot (Beuteverteilung) / party_expire": "Beute verteilt der Server nach dem Kampf an Teilnehmer mit Beitrag; Einladungsfristen räumt der Tagesschritt ab",
     "advance_day/price_advance/market_expire": "Tagesschritte macht der Server nach seiner Uhr",
     "price_shock/rules_upgrade/rules_migrate": "Weltereignisse und Betriebsaktionen",
     "persistence (export/import/commit)": "Betrieb",

@@ -78,6 +78,15 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `trade.accept` | char:s, offer:s | char | schreibend | default |
 | `trade.decline` | char:s, offer:s | char | schreibend | default |
 | `trade.cancel` | char:s, offer:s | char | schreibend | default |
+| `party.form` | char:s | char | schreibend | default |
+| `party.invite` | char:s, target:s | char | schreibend | default |
+| `party.accept` | char:s, invite:s | char | schreibend | default |
+| `party.decline` | char:s, invite:s | char | schreibend | default |
+| `party.leave` | char:s | char | schreibend | default |
+| `party.kick` | char:s, member:s | char | schreibend | default |
+| `party.promote` | char:s, member:s | char | schreibend | default |
+| `party.set_loot` | char:s, mode:s | char | schreibend | default |
+| `party.disband` | char:s | char | schreibend | default |
 | `notify.ack` | char:s, upto:i | char | schreibend | default |
 | `notify.mute` | char:s, kinds:l | char | schreibend | default |
 | `notify.unmute` | char:s, kinds:l | char | schreibend | default |
@@ -110,6 +119,8 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.economic_profile` | char:s | char | lesend | query |
 | `query.offers` | char:s | char | lesend | query |
 | `notify.fetch` | char:s, after?:i, limit?:i | char | lesend | query |
+| `query.party` | char:s | char | lesend | query |
+| `query.party_invites` | char:s | char | lesend | query |
 | `query.abilities` | char:s | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 
@@ -121,6 +132,7 @@ Argumentkürzel: `s` Zeichenkette, `i` Ganzzahl, `b` Wahrheitswert, `l` Liste vo
 - **discovery.gather** – Beweise vergibt der Server aus Spielereignissen
 - **trade (direkt, ohne Zustimmung)** – Der Handelsdienst selbst ist intern; Clients handeln nur über Orderbuch oder Angebot/Annahme (`trade.*`)
 - **deposit/revenue** – Münzquellen sind serverintern
+- **party.loot (Beuteverteilung) / party_expire** – Beute verteilt der Server nach dem Kampf an Teilnehmer mit Beitrag; Einladungsfristen räumt der Tagesschritt ab
 - **advance_day/price_advance/market_expire** – Tagesschritte macht der Server nach seiner Uhr
 - **price_shock/rules_upgrade/rules_migrate** – Weltereignisse und Betriebsaktionen
 - **persistence (export/import/commit)** – Betrieb
@@ -167,7 +179,7 @@ Arten: `market.fill`, `market.expired`, `trade.offer_received/accepted/declined/
 
 1. Transport und Format im Detail (WebSocket+JSON für Befehle ist die Referenz; Binärformat und QUIC für den Kampf?).
 2. Direkter Zwei-Parteien-Handel: Angebot/Annahme umgesetzt (ADR-0023); offen sind Gegenangebote und Tausch mehrerer Gegenstände.
-3. Push-Nachrichten: Postfach mit Abruf/Quittung/Stummschaltung umgesetzt (ADR-0024); offen sind der Transport des Live-Push (Verbindung, Wiederaufbau), Benachrichtigung außerhalb des Spiels (Mobilgerät/E-Mail) und weitere Ereignisarten (Kampf, Gruppeneinladungen).
+3. Push-Nachrichten: Postfach mit Abruf/Quittung/Stummschaltung umgesetzt (ADR-0024); offen sind der Transport des Live-Push (Verbindung, Wiederaufbau), Benachrichtigung außerhalb des Spiels (Mobilgerät/E-Mail) und weitere Ereignisarten (Kampf; Gruppenereignisse `party.*` sind umgesetzt, ADR-0025).
 4. Konten, Anmeldung, Token-Lebensdauer, Sperren, Jugendschutz/Rechtliches (nicht Teil der Referenz).
 5. Reihenfolge und Fairness bei gleichzeitigen Befehlen vieler Spieler (Tick-Batching oder strikte Ankunftsreihenfolge).
 6. Rückgängigmachen/Entschädigung bei Serverfehlern, Behandlung von `server_error` mit teilweise geänderter Welt.

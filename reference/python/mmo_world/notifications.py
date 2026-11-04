@@ -22,6 +22,8 @@ KINDS = (
     "company.hired", "company.left", "company.employee_left", "company.promoted", "company.demoted", "company.warning",
     "company.closed", "company.shares_offered", "company.proposal_opened", "company.proposal_resolved",
     "production.job_done", "discovery.taught",
+    "party.invited", "party.invite_declined", "party.joined", "party.left", "party.kicked", "party.leader_changed",
+    "party.disbanded", "party.loot",
 )
 MAILBOX_LIMIT = 200
 FETCH_DEFAULT, FETCH_MAX = 50, 100

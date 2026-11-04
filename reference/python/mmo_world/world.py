@@ -19,6 +19,7 @@ from .crafting import CraftingService
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
 from .notifications import Outbox
+from .party import PartyService, load_party_rules
 from .exchange import Exchange, load_market_rules
 from .inventory import Inventory
 from .market import TradeService
@@ -32,6 +33,7 @@ MARKET_RULES = "market_rules_v1.json"
 PRODUCTION_RULES = "production_rules_v1.json"
 PRICING_RULES = "pricing_rules_v1.json"
 TRADE_RULES = "trade_rules_v1.json"
+PARTY_RULES = "party_rules_v1.json"
 
 
 class World:
@@ -59,6 +61,11 @@ class World:
         self.exchange = Exchange(self.svc, self.inv, self.trading, load_market_rules(MARKET_RULES), clock, sid)
         if old is not None:
             self.exchange._counter, self.exchange.orders, self.exchange.stats = old._counter, old.orders, old.stats
+        oldg = getattr(self, "parties", None)
+        self.parties = PartyService(self.svc, self.inv, self.trading, load_party_rules(PARTY_RULES), clock, sid)
+        if oldg is not None:
+            self.parties._counters, self.parties.parties, self.parties.invites = oldg._counters, oldg.parties, oldg.invites
+            self.parties.member_of = oldg.member_of
         oldt = getattr(self, "offers", None)
         self.offers = DirectTrade(self.svc, self.inv, self.trading, load_trade_rules(TRADE_RULES), clock, sid)
         if oldt is not None:
@@ -74,13 +81,15 @@ class World:
             if oldq is not None:
                 self.pricing.factors, self.pricing.shocks = oldq.factors, oldq.shocks
                 self.pricing.maker_used, self.pricing.last_day = oldq.maker_used, oldq.last_day
-        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production):
+        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties):
             svc.notify = self.outbox.emit  # Benachrichtigungen (abgeleitet, nicht Teil des Weltzustands/der Vektor-Hashes)
 
     def snapshot(self) -> dict[str, Any]:
         snap = self._base_snapshot()
         if self.exchange.active:  # ältere Snapshots/Vektoren ohne Markt bleiben unverändert
             snap["exchange"] = json.loads(self.exchange.to_json())
+        if self.parties.active:
+            snap["parties"] = json.loads(self.parties.to_json())
         if self.offers.active:
             snap["trade_offers"] = json.loads(self.offers.to_json())
         if self.production.active:

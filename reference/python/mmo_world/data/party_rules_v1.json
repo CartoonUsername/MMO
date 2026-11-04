@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER zur Verifikation der Mechanik: Gruppengröße, Fristen, Stufenabstand und Beuteregeln sind Vorschläge, KEINE bestätigten Spielinhalte. Der Stufenabstand ist ein vorläufiger Vorschlag gegen Boosting und nicht entschieden.",
+  "requires_cee_rules_min": 7,
+  "max_size": 4,
+  "invite_days": 2,
+  "max_pending_invites_per_target": 5,
+  "max_level_gap": 20,
+  "loot_modes": ["round_robin", "leader", "finder"],
+  "default_loot_mode": "round_robin"
+}
