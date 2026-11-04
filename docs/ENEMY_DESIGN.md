@@ -1,6 +1,16 @@
 # Gegnerdesign – Analyse und Vorschlag
 
-**Status:** Vorschlag zur gemeinsamen Ausarbeitung. Nichts hier ist beschlossen; alle Zahlen, Namen und Fähigkeiten sind **Platzhalter**. Bestätigte Entscheidungen aus der Projektübergabe sind als solche gekennzeichnet.
+**Status:** Vorschlag zur gemeinsamen Ausarbeitung; die Entscheidungen des Produktverantwortlichen stehen in Abschnitt 0. Nichts hier ist beschlossen; alle Zahlen, Namen und Fähigkeiten sind **Platzhalter**. Bestätigte Entscheidungen aus der Projektübergabe sind als solche gekennzeichnet.
+
+## 0. Entscheidungen des Produktverantwortlichen (bestätigt)
+1. **Erste Familien:** Wolfsrudel mit Alpha, Höhlenbär, Irrlicht-Heiler, Moorhexe – **und viele weitere Gegner mit „zufälligen" Fähigkeiten, ähnlich der Charaktererstellung.**
+2. **Zufall nur reproduzierbar:** Fähigkeiten werden aus einem Baukasten **je Spawn-Punkt neu, aber pro Tag fest** bestimmt (aus Spawn-Punkt, Tag und Gegnerart, ganzzahlig und ohne unkontrollierten Zufall, nach dem Vorbild der stabilen Variation in der Visual Evolution). Im Kampf selbst gibt es keinen Zufall.
+3. **Verhalten:** feste Muster mit sichtbarer Ankündigung (Vorwarnzeit) für alle Gegner.
+4. **Entwicklungspunkte:** nur die bisherigen Aktionen (`perfect_dodge`, `parry`, `stun_applied`, …) mit ihren Raten- und Tageslimits; keine neuen Punktequellen.
+5. **„Gegner mit Historie":** erst nach dem Basisspiel; die Architektur soll es später erlauben.
+6. **Schwierigkeit:** normale Mobs solo schaffbar, Elite (Alpha) zu zweit, Boss ab 3–4 Spielern.
+
+**Folgerungen:** Der Fähigkeiten-Baukasten (Abschnitt 3) wird zur Grundlage; Familien (Abschnitt 4) sind nur *Vorlagen* (Basiswerte, Element, Rolle), die der Baukasten je Spawn-Punkt und Tag mit 1–3 Zusatzfähigkeiten ausstattet. Die Zufallsauswahl braucht gewichtete, rollenverträgliche Regeln (keine unlösbaren Kombinationen, Bosse nicht zufällig). Ein Tageswechsel ändert die Fähigkeiten nur für Gegner, die gerade nicht kämpfen.
 
 ## 1. Was das Spiel ist (Analyse)
 
@@ -62,7 +72,7 @@ Jede Familie bekommt ein **Element** als Charakter (z. B. Moorhexe Natur/Schatte
 4. **Spielserver und Client:** Ereignis `telegraph` (Fähigkeit, Ziel, Ticks bis zur Wirkung) für die Anzeige; Beute je Familie.
 5. **Golden Vectors, Mutationstests, Doku (ADR) je Schritt.**
 
-## 7. Offene Fragen an den Produktverantwortlichen
+## 7. Bisher offene Fragen (jetzt in Abschnitt 0 beantwortet)
 1. Welche Familien/Rollen zuerst (Vorschlag: Wolfsrudel mit Alpha, Höhlenbär, Irrlicht-Heiler, Moorhexe als erste Welle)?
 2. Feste Muster mit Ankündigung für alle, oder Bosse mit Prioritätsregeln?
 3. Sollen Unterbrechen, perfektes Ausweichen und Parieren **eigene Entwicklungspunkte** bringen (wirkt auf die CEE und braucht Anti-Farming)?
