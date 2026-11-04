@@ -67,7 +67,8 @@ chmod 644 /etc/cron.d/mmo-backup
 ufw allow OpenSSH >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null; ufw --force enable >/dev/null
 
 systemctl daemon-reload
-systemctl enable --now mmo
+systemctl enable mmo
+systemctl restart mmo   # nicht "enable --now": das startet einen laufenden Dienst nicht neu, der alte Code bliebe aktiv
 systemctl restart caddy
 sleep 2
 systemctl is-active mmo caddy
