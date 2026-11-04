@@ -686,7 +686,7 @@ class SurvivorTests(unittest.TestCase):
 
 class NetSurvivorTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.srv = NetServer(port=0, tick_seconds=0.002)
+        self.srv = NetServer(port=0, tick_seconds=0.002, max_per_ip=100)
         self.port = await self.srv.start()
 
     async def asyncTearDown(self):

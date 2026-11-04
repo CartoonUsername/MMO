@@ -12,6 +12,9 @@ namespace Mmo
         public string host = "127.0.0.1";
         public int port = 7777;
         public string account = "spieler1";
+        public string password = "";                       // nur für den Test im Editor; ein echter Client fragt das Passwort ab
+        public bool register = false;                      // beim ersten Start einmal anhaken, danach wieder aus
+        public bool useTls = false;
 
         NetClient net;
         JObject state;                                   // letzter "state"-Ereignisinhalt
@@ -35,7 +38,7 @@ namespace Mmo
             ground = g.transform;
             net = new NetClient();
             net.OnEvent += OnServerEvent;
-            net.Connect(host, port, account);
+            net.Connect(host, port, account, password.Length > 0 ? password : null, register, useTls);
             net.Send("game.join", new JObject());
         }
 
@@ -53,7 +56,8 @@ namespace Mmo
                     fight = null;
                     lastEnd = ev["outcome"] + "  Beute: " + ev["loot"]; log.Add("Kampf beendet: " + lastEnd); break;
                 case "notify": log.Add("Nachricht: " + ev["item"]["kind"]); break;
-                case "error": info = "Fehler: " + ev["code"]; break;
+                case "error": info = "Fehler: " + ev["code"] + " " + ev["message"]; break;
+                case "welcome": info = "Angemeldet"; break;
             }
             while (log.Count > 8) log.RemoveAt(0);
         }

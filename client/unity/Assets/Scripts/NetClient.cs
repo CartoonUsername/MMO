@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -21,12 +22,21 @@ namespace Mmo
 
         public bool Connected => running;
 
-        public void Connect(string host, int port, string account)
+        public string Token { get; private set; }                     // Sitzungs-Token für die Wiederanmeldung (kommt mit "welcome")
+
+        // Anmeldung: register = neues Konto anlegen; sonst Passwort oder (nach Verbindungsabbruch) Token. useTls: verschlüsselt (Zertifikat muss dem System vertrauen).
+        public void Connect(string host, int port, string account, string password = null, bool register = false, bool useTls = false, string token = null)
         {
             Account = account;
             tcp = new TcpClient { NoDelay = true };
             tcp.Connect(host, port);
-            var stream = tcp.GetStream();
+            System.IO.Stream stream = tcp.GetStream();
+            if (useTls)
+            {
+                var ssl = new SslStream(stream, false);
+                ssl.AuthenticateAsClient(host);
+                stream = ssl;
+            }
             writer = new StreamWriter(stream, new UTF8Encoding(false)) { AutoFlush = true, NewLine = "\n" };
             running = true;
             reader = new Thread(() =>
@@ -44,7 +54,10 @@ namespace Mmo
                 running = false;
             }) { IsBackground = true };
             reader.Start();
-            writer.WriteLine(new JObject { ["cmd"] = "hello", ["account"] = account }.ToString(Newtonsoft.Json.Formatting.None));
+            var hello = new JObject { ["cmd"] = register ? "register" : "hello", ["account"] = account };
+            if (password != null) hello["password"] = password;
+            if (token != null) hello["token"] = token;
+            writer.WriteLine(hello.ToString(Newtonsoft.Json.Formatting.None));
         }
 
         // Befehl senden; der Rückruf läuft im Hauptthread (in Update -> Pump).
@@ -63,7 +76,11 @@ namespace Mmo
         {
             while (inbox.TryDequeue(out var msg))
             {
-                if (msg["ev"] != null) { OnEvent?.Invoke(msg); continue; }
+                if (msg["ev"] != null)
+                {
+                    if ((string)msg["ev"] == "welcome" && msg["token"] != null) Token = (string)msg["token"];
+                    OnEvent?.Invoke(msg); continue;
+                }
                 var id = (string)msg["id"];
                 if (id != null && pending.TryGetValue(id, out var cb)) { pending.Remove(id); cb(msg); }
             }

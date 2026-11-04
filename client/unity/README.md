@@ -6,8 +6,8 @@
 1. Neues Projekt „3D (URP)“ anlegen.
 2. Package Manager → „Add package by name“ → `com.unity.nuget.newtonsoft-json` (für JSON).
 3. Den Ordner `Assets/Scripts` aus diesem Verzeichnis in das Projekt kopieren.
-4. Leere Szene öffnen, ein leeres GameObject anlegen, `GameController` anhängen, dort `account` setzen (z. B. `spieler1` bzw. `spieler2` im zweiten Editor/Build).
-5. Server starten: `cd reference/python && python -m mmo_game.net 7777`, dann in Unity Play drücken.
+4. Leere Szene öffnen, ein leeres GameObject anlegen, `GameController` anhängen, dort `account` und `password` setzen (z. B. `spieler1` bzw. `spieler2` im zweiten Editor/Build, Passwort mindestens 8 Zeichen). Beim allerersten Start `register` anhaken, danach wieder abhaken.
+5. Server starten: `cd reference/python && python -m mmo_game.net 7777 --data ./spielstand` (mit Konten, lokal), dann in Unity Play drücken. Ohne Konten nur zum Testen: `--insecure-dev`. `useTls` nur mit einem Serverzertifikat, dem das System vertraut (ein selbst signiertes Zertifikat muss erst im System als vertrauenswürdig eingetragen werden).
 
 ## Steuerung
 WASD laufen · E sammeln · im Kampf: Linksklick leicht, Rechtsklick schwer, Leertaste ausweichen, Q blocken, 1 betäuben, 2 verlangsamen, 3 Rundumschlag, 4 heilen, 5 Schild, Tab zweites Ziel, F fliehen, R/C/V Fähigkeiten (nur mit Ausrüstung). Seitenleiste: Gruppe, Herstellen, Handel.

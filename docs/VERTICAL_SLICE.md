@@ -16,7 +16,7 @@
 | 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON, Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
 | 4 | Unity-Client (`client/unity`): Verbindung, Bewegung/Kamera, Kampfeingaben + Anzeige, Inventar/Herstellung/Handel-Oberfläche | **Quellcode vorhanden, nicht in Unity geprüft** (Unity läuft in dieser Umgebung nicht) |
 | 5 | Persistenz: Welt (CEE, Inventar, Märkte, Gruppen) als Generationen im `Store`, Spielzustand (Tick, Gegner, Sammelpunkte, Positionen) daneben; Autosave und Speichern beim Beenden | **fertig** |
-| 6 | Echte Anmeldung (Token), Verschlüsselung (TLS) | offen |
+| 6 | Anmeldung: Konten mit PBKDF2-Hash, Sperren, Sitzungs-Token, TLS-Option | **fertig** (ADR-0029); offen: E-Mail/Passwort-Zurücksetzen, Kontoverwaltung |
 
 ## Spielablauf (End-to-End)
 1. Beide Spieler verbinden sich (`hello`), treten bei (`game.join`) und erscheinen am Startpunkt.
@@ -29,8 +29,10 @@
 ## Bedienung (Entwicklung)
 ```bash
 cd reference/python
-python -m mmo_game.net 7777                    # Spielserver auf 127.0.0.1:7777 (ohne Speicherung)
-python -m mmo_game.net 7777 --data ./spielstand   # mit Speicherung (Neustart setzt dort fort; Beenden mit Strg+C/SIGTERM speichert)
+python -m mmo_game.net 7777 --data ./spielstand   # Spielserver mit Konten und Speicherung auf 127.0.0.1:7777 (Beenden mit Strg+C/SIGTERM speichert)
+python -m mmo_game.net 7777 --insecure-dev        # ohne Konten, nur zum Testen auf dem eigenen Rechner
+# außerhalb des eigenen Rechners (Konten + TLS sind Pflicht):
+python -m mmo_game.net 7777 --host 0.0.0.0 --data ./spielstand --cert cert.pem --key key.pem
 python -m unittest tests.test_game  # Ende-zu-Ende-Tests inkl. zwei TCP-Clients
 ```
 Protokoll: `docs/PROTOCOL.md` (Weltbefehle) und `docs/VERTICAL_SLICE_PROTOCOL.md` (Spielschicht).

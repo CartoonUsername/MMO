@@ -1,9 +1,16 @@
 # Protokoll der Spielschicht (Vertical Slice)
 
-Transport: TCP, UTF-8, **eine JSON-Nachricht je Zeile**, höchstens 4096 Bytes. Entwicklungsstufe: keine Verschlüsselung, Anmeldung nur per Kontoname (nur lokal binden!). Alle Zahlen sind Platzhalter.
+Transport: TCP, UTF-8, **eine JSON-Nachricht je Zeile**, höchstens 4096 Bytes. Verschlüsselung: optional TLS (Server mit `--cert`/`--key`), Pflicht außerhalb von 127.0.0.1. Alle Zahlen sind Platzhalter.
 
 ## Anmeldung
-Client → `{"cmd":"hello","account":"anna"}`; Server → `{"ev":"welcome","session":"sess-…","characters":["anna"],"tick":N}`. Ungültig: `{"ev":"error","code":"bad_hello"}` und Verbindungsende. Ein Konto kann nur einmal gleichzeitig verbunden sein; neue Konten erhalten eine Figur gleichen Namens (Mensch, 200 Münzen).
+Erste Zeile des Clients (Server mit Konten, Standard):
+- Neues Konto: `{"cmd":"register","account":"anna","password":"…"}`
+- Anmeldung: `{"cmd":"hello","account":"anna","password":"…"}`
+- Wiederanmeldung nach Verbindungsabbruch: `{"cmd":"hello","account":"anna","token":"…"}`
+
+Antwort: `{"ev":"welcome","session":"sess-…","characters":["anna"],"tick":N,"token":"…"}`. Das `token` ist kurz gültig (Platzhalter: 1 Stunde), wird bei jeder Anmeldung erneuert und gilt nur einmal; es ersetzt das Passwort nur zum Wiederverbinden. Fehler: `{"ev":"error","code":…,"message":…}` und Verbindungsende. Codes: `bad_hello`, `bad_request` (Kontoname), `weak_password` (8–128 Zeichen), `account_exists`, `auth_failed` (gleiche Meldung für falsches Passwort, unbekanntes Konto und falsches Token), `locked` (zu viele Fehlversuche je Konto bzw. Adresse), `rate_limited` (zu viele Registrierungen von einer Adresse), `server_full` (zu viele Verbindungen insgesamt oder je Adresse).
+
+Eine neue Anmeldung desselben Kontos verdrängt die alte Verbindung. Neue Konten erhalten eine Figur gleichen Namens (Mensch, 200 Münzen). Nur zum Testen kann der Server mit `--insecure-dev` ohne Konten laufen (`{"cmd":"hello","account":"anna"}`); das ist nur auf 127.0.0.1 erlaubt. Nicht-lokale Adressen verlangen Konten **und** TLS.
 
 ## Befehle (Client → Server)
 Hülle wie `docs/PROTOCOL.md`: `{"v":1,"id":"<1-64 Zeichen>","cmd":"…","args":{"char":"anna",…}}`; Antwort `{"v":1,"id":…,"ok":true,"result":…}` oder `{"ok":false,"error":{"code","message"}}`. `args.char` muss zur Sitzung gehören (`forbidden`). Alle Befehle ohne Präfix `game.` laufen unverändert durch das Gateway (Handel, Markt, Gruppen, Herstellen, Abfragen).
