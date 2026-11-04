@@ -449,6 +449,9 @@ class GameServer:
         w.parties.expire(day)
         if w.pricing is not None:
             w.pricing.advance(day)
+        for f in w.settlements.advance(day):             # Steuer für Grundstücke (AP 11); Verfall wird gemeldet
+            if f["owner"] in self.players:
+                self._emit_to(f["owner"], {"ev": "plot_forfeit", "site": f["site"], "n": f["n"]})
         for c in self.players:                           # Aktivität der Leitung für den Offline-Deckel der Firmen (AP 10)
             w.branches.touch(c, day)
         self._economy_event(day)
@@ -530,7 +533,7 @@ class GameServer:
                 self._note_region(c, p)
                 continue
             dx, dy = p["dir"]
-            new = self.terrain.step(p["pos"], dx, dy, self.R["speed_cm_per_tick"] * self.world.equipment.move_permille(c) // 1000)
+            new = self.terrain.step(p["pos"], dx, dy, self.R["speed_cm_per_tick"] * (self.world.equipment.move_permille(c) + self.world.settlements.road_permille((self._region_at(p["pos"]) or {}).get("id"))) // 1000)
             reg = self._region_at(new)
             why = self._access(c, reg) if reg is not (self._region_at(p["pos"])) else None
             if why:                                              # besondere Region ohne Zutritt: Schritt entfällt

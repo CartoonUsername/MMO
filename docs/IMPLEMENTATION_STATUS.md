@@ -44,7 +44,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017), Weltereignisse mit Preisschocks, Markt-Fenster (ADR-0049); keine NPC-Lebensprofile |
 | Spielerunternehmen: Gründung, Personal, Beteiligungen, Produktion | vorhanden (Referenz) | ADR-0012/0016, `company.*`, `production.*` |
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
-| Spielerstädte, Grundstücke, Gemeinschaftsprojekte | fehlt | keine Treffer |
+| Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
 | Gilden | fehlt | Gruppen (Party, ADR-0025) existieren |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |
 | Weltchronik, Prestige | fehlt | – |

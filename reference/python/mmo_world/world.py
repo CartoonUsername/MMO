@@ -17,6 +17,7 @@ from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
 from .equipment import EquipmentService, load_equipment_rules
+from .settlements import SettlementService, load_settlement_rules
 from .branches import BranchService, load_branch_rules
 from .echo import EchoService, load_echo_rules
 from .direct_trade import DirectTrade, load_trade_rules
@@ -40,6 +41,7 @@ PARTY_RULES = "party_rules_v1.json"
 ECHO_RULES = "echo_rules_v1.json"
 EQUIPMENT_RULES = "equipment_rules_v1.json"
 BRANCH_RULES = "branch_rules_v1.json"
+SETTLEMENT_RULES = "settlement_rules_v1.json"
 
 
 class World:
@@ -80,6 +82,12 @@ class World:
         self.branches = BranchService(self.company, load_branch_rules(BRANCH_RULES), clock)    # vor der Produktion: Betriebskosten zuerst
         if oldb is not None:
             self.branches._counter, self.branches.branches, self.branches.last_active = oldb._counter, oldb.branches, oldb.last_active
+        olds = getattr(self, "settlements", None)
+        self.settlements = SettlementService(self.inv, self.trading.coin, load_settlement_rules(SETTLEMENT_RULES), clock,
+                                             lambda c: c in set(self.svc.log.character_ids()))
+        if olds is not None:
+            self.settlements.founded, self.settlements.plots, self.settlements.projects = olds.founded, olds.plots, olds.projects
+            self.settlements.contrib, self.settlements.last_day = olds.contrib, olds.last_day
         oldp = getattr(self, "production", None)
         self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
         self.production.extra_lines, self.production.extra_storage, self.production.offline_cap = (
@@ -117,6 +125,8 @@ class World:
             snap["production"] = json.loads(self.production.to_json())
         if self.branches.active:
             snap["branches"] = json.loads(self.branches.to_json())
+        if self.settlements.active:
+            snap["settlements"] = json.loads(self.settlements.to_json())
         if self.equipment.active:
             snap["equipment"] = json.loads(self.equipment.to_json())
         if self.echo.active:

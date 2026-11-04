@@ -135,6 +135,14 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `echo.list` | char:s, echo:s, price:i | char | schreibend | default |
 | `echo.cancel` | char:s, listing:s | char | schreibend | default |
 | `echo.buy` | char:s, listing:s | char | schreibend | default |
+| `query.settlements` | char:s | char | lesend | query |
+| `settlement.found` | char:s, site:s, name:s | char | schreibend | default |
+| `plot.buy` | char:s, site:s, n:i | char | schreibend | default |
+| `plot.abandon` | char:s, site:s, n:i | char | schreibend | default |
+| `plot.build` | char:s, site:s, n:i, building:s | char | schreibend | default |
+| `plot.stash_in` | char:s, site:s, n:i, item_key:s, qty:i | char | schreibend | default |
+| `plot.stash_out` | char:s, site:s, n:i, item_key:s, qty:i | char | schreibend | default |
+| `project.contribute` | char:s, site:s, project:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
 | `query.echoes` | char:s | char | lesend | query |
 | `equip.wear` | char:s, item_key:s | char | schreibend | default |
 | `equip.remove` | char:s, slot:s | char | schreibend | default |

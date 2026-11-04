@@ -1,0 +1,302 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER (AP 11, ADR-0050): Grundstücke, Spielersiedlungen, Gemeinschaftsprojekte. Alle Zahlen sind Vorschläge, KEINE bestätigten Spielinhalte. Offen laut Blueprint Frage 18: Grundstücksgrößen, Besitzgrenzen, Bauregeln. Stadtpolitik ist zurückgestellt (§46): Gründer*in hat keine Sonderrechte.",
+  "found_cost": 5000,
+  "name_len": [
+    3,
+    24
+  ],
+  "max_catch_up_days": 60,
+  "sites": {
+    "hauptstadt": {
+      "name": "Hauptstadt",
+      "region": "crossing",
+      "capital": true,
+      "plots": 12,
+      "price_permille": 1500,
+      "coast": true
+    },
+    "sonnenwiese_ost": {
+      "name": "Sonnenwiese Ost",
+      "region": "sunmeadow",
+      "capital": false,
+      "plots": 8,
+      "price_permille": 1000,
+      "coast": true
+    },
+    "moorufer": {
+      "name": "Moorufer",
+      "region": "moor",
+      "capital": false,
+      "plots": 6,
+      "price_permille": 1000,
+      "coast": false
+    },
+    "fangtal_pass": {
+      "name": "Fangtal-Pass",
+      "region": "fangvale",
+      "capital": false,
+      "plots": 6,
+      "price_permille": 1000,
+      "coast": false
+    }
+  },
+  "plot_sizes": {
+    "small": {
+      "price": 300,
+      "tax_per_day": 5,
+      "building_levels": 2,
+      "stash": 100
+    },
+    "medium": {
+      "price": 800,
+      "tax_per_day": 12,
+      "building_levels": 3,
+      "stash": 250
+    }
+  },
+  "medium_every": 3,
+  "max_plots_per_player": 3,
+  "forfeit_after_unpaid_days": 7,
+  "buildings": {
+    "house": {
+      "name": "Haus",
+      "levels": [
+        {
+          "coins": 200,
+          "items": {
+            "timber@standard": 10
+          }
+        },
+        {
+          "coins": 500,
+          "items": {
+            "timber@standard": 20,
+            "wooden_beam@standard": 5
+          }
+        },
+        {
+          "coins": 1200,
+          "items": {
+            "wooden_beam@standard": 20,
+            "iron_ingot@standard": 5
+          }
+        }
+      ],
+      "stash_permille": [
+        1000,
+        1500,
+        2500
+      ]
+    },
+    "shop": {
+      "name": "Geschäft",
+      "levels": [
+        {
+          "coins": 400,
+          "items": {
+            "timber@standard": 15
+          }
+        },
+        {
+          "coins": 900,
+          "items": {
+            "wooden_beam@standard": 10
+          }
+        },
+        {
+          "coins": 2000,
+          "items": {
+            "wooden_beam@standard": 25,
+            "iron_ingot@standard": 10
+          }
+        }
+      ],
+      "stash_permille": [
+        1500,
+        2500,
+        4000
+      ]
+    }
+  },
+  "projects": {
+    "road": {
+      "name": "Straße",
+      "levels": [
+        {
+          "coins": 600,
+          "items": {
+            "timber@standard": 30
+          }
+        },
+        {
+          "coins": 1500,
+          "items": {
+            "wooden_beam@standard": 30
+          }
+        },
+        {
+          "coins": 3500,
+          "items": {
+            "iron_ingot@standard": 30
+          }
+        }
+      ],
+      "effect": {
+        "move_permille": [
+          0,
+          40,
+          80,
+          120
+        ]
+      }
+    },
+    "market_square": {
+      "name": "Marktplatz",
+      "levels": [
+        {
+          "coins": 800,
+          "items": {
+            "timber@standard": 40
+          }
+        },
+        {
+          "coins": 2000,
+          "items": {
+            "wooden_beam@standard": 40
+          }
+        }
+      ],
+      "effect": {
+        "fee_discount_permille": [
+          0,
+          100,
+          200
+        ]
+      }
+    },
+    "warehouse": {
+      "name": "Lagerhaus",
+      "levels": [
+        {
+          "coins": 700,
+          "items": {
+            "timber@standard": 40
+          }
+        },
+        {
+          "coins": 1800,
+          "items": {
+            "wooden_beam@standard": 30
+          }
+        },
+        {
+          "coins": 4000,
+          "items": {
+            "iron_ingot@standard": 30,
+            "wooden_beam@standard": 30
+          }
+        }
+      ],
+      "effect": {
+        "stash_bonus": [
+          0,
+          50,
+          120,
+          250
+        ]
+      }
+    },
+    "wall": {
+      "name": "Mauer",
+      "levels": [
+        {
+          "coins": 1000,
+          "items": {
+            "timber@standard": 50,
+            "iron_ingot@standard": 10
+          }
+        },
+        {
+          "coins": 3000,
+          "items": {
+            "iron_ingot@standard": 40
+          }
+        }
+      ],
+      "effect": {
+        "raid_defence_permille": [
+          0,
+          150,
+          350
+        ]
+      }
+    },
+    "harbor": {
+      "name": "Hafen",
+      "levels": [
+        {
+          "coins": 2500,
+          "items": {
+            "wooden_beam@standard": 40,
+            "iron_ingot@standard": 10
+          }
+        },
+        {
+          "coins": 6000,
+          "items": {
+            "wooden_beam@standard": 80,
+            "iron_ingot@standard": 30
+          }
+        }
+      ],
+      "effect": {
+        "trade_reach": [
+          0,
+          1,
+          2
+        ]
+      },
+      "needs_coast": true
+    },
+    "town_hall": {
+      "name": "Rathaus",
+      "levels": [
+        {
+          "coins": 1500,
+          "items": {
+            "wooden_beam@standard": 30
+          }
+        },
+        {
+          "coins": 4000,
+          "items": {
+            "wooden_beam@standard": 60,
+            "iron_ingot@standard": 20
+          }
+        }
+      ],
+      "effect": {
+        "plot_limit_bonus": [
+          0,
+          1,
+          2
+        ]
+      }
+    }
+  },
+  "stages": [
+    [
+      "lager",
+      0
+    ],
+    [
+      "dorf",
+      3
+    ],
+    [
+      "stadt",
+      8
+    ]
+  ]
+}
