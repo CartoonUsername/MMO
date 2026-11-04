@@ -80,6 +80,47 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
     }
 
 
+def _company_view(w: World, cid: str, char: str) -> dict[str, Any]:
+    from mmo_world.company import company_level, building
+    c = w.company_registry.companies[cid]
+    cr = w.company.cr
+    jobs = [w.production.jobs[j] for j in w.production.jobs_of(cid)] if w.production.active or w.production.jobs else []
+    return {"id": cid, "open": c["open"], "founder": c["founder"], "ceo": c["ceo"], "can_manage": c["open"] and w.company.can_manage(cid, char),
+            "balance": w.company.balance(cid), "building_level": c["building_level"], "max_building_level": len(cr["building_levels"]),
+            "level": company_level(cr, c["revenue_total"]), "reputation": c["reputation"],
+            "max_employees": building(cr, c["building_level"])["max_employees"],
+            "employees": [{"char": e, "wage": v["wage"], "satisfaction": v["satisfaction"], "loyalty": v["loyalty"], "status": v["status"]}
+                          for e, v in sorted(c["employees"].items())],
+            "shares": dict(sorted(c["shares"].items())),
+            "stock": w.production.stock(cid), "capacity": w.production.capacity(c), "used": w.production.used_capacity(cid),
+            "lines": w.production.lines(c), "jobs": [{k: j[k] for k in ("id", "worker", "recipe", "batches", "done", "progress", "stalled")} for j in jobs],
+            "branches": w.branches.view(cid), "log": c["log"][-8:]}
+
+
+def _my_companies(w: World, char: str) -> dict[str, Any]:
+    mine = [cid for cid, c in sorted(w.company_registry.companies.items())
+            if c["open"] and (char in c["employees"] or c["founder"] == char or c["ceo"] == char or c["shares"].get(char, 0) > 0)]
+    return {"companies": [_company_view(w, cid, char) for cid in mine], "capital_min": w.company.cr["founding"]["capital_min"],
+            "coins": w.inv.balance(char, w.trading.coin), "recipes": sorted(w.svc.rules["crafting"]["recipes"])}
+
+
+def _market(w: World, char: str) -> dict[str, Any]:
+    items = w.svc.rules["economy"]["items"]
+    maker = w.pricing.pr["maker"]["items"] if w.pricing is not None else []
+    return {"items": {k: v["class"] for k, v in items.items()}, "grades": sorted(w.svc.rules["economy"]["grade_permille"]),
+            "maker_items": maker, "coin": w.trading.coin,
+            "orders": [dict(w.exchange.orders[o]) for o in w.exchange.open_orders(char)], "band_permille": w.exchange.mr["band_permille"]}
+
+
+def _market_quote(w: World, item_key: str) -> dict[str, Any]:
+    item, grade = w.trading.parse(item_key)
+    out = {**w.exchange.quote(item_key), "reference": w.trading.reference(item, grade, 1)}
+    if w.pricing is not None and item in w.pricing.pr["maker"]["items"]:
+        out["maker_buys_at"], out["maker_sells_at"] = w.pricing.quote(item_key, 1, "sell"), w.pricing.quote(item_key, 1, "buy")
+        out["factor_permille"] = w.pricing.factor(item_key)
+    return out
+
+
 def _adopt(w: World, a: dict[str, Any]) -> Any:
     """Dauerhafte Annahme nur mit ausdrücklicher Bestätigung: `ack` muss `adopt:<form>` lauten (ADR-0045)."""
     if a["ack"] != "adopt:" + a["form"]:
@@ -191,6 +232,12 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("equip.remove", "char:s slot:s", "char", lambda w, a: w.equipment.unequip(a["char"], a["slot"])),
     _c("equip.look", "char:s slot:s item:s?", "char", lambda w, a: w.equipment.set_look(a["char"], a["slot"], a.get("item"))),
     _c("query.equipment", "char:s", "char", lambda w, a: w.equipment.view(a["char"]), mutating=False),
+    _c("query.my_companies", "char:s", "char", lambda w, a: _my_companies(w, a["char"]), mutating=False),
+    _c("query.market", "char:s", "char", lambda w, a: _market(w, a["char"]), mutating=False),
+    _c("query.market_quote", "item_key:s", None, lambda w, a: _market_quote(w, a["item_key"]), mutating=False),
+    _c("company.branch_open", "actor:s company:s region:s", "actor", lambda w, a: {"branch": w.branches.open_branch(a["actor"], a["company"], a["region"])}),
+    _c("company.branch_close", "actor:s company:s branch:s", "actor", lambda w, a: w.branches.close_branch(a["actor"], a["company"], a["branch"])),
+    _c("company.branch_reopen", "actor:s company:s branch:s", "actor", lambda w, a: w.branches.reopen_branch(a["actor"], a["company"], a["branch"])),
     _c("query.element_catalog", "", None, lambda w, a: _element_catalog(w), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}

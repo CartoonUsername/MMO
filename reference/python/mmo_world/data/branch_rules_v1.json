@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER (AP 10, ADR-0049): Filialen und Offline-Betrieb mit Deckel. Alle Zahlen sind Vorschläge, KEINE bestätigten Spielinhalte. Größe bringt Kosten und Risiko: Eröffnung ist eine Geldsenke, laufende Betriebskosten, ruhende Filialen bei leerer Kasse. Offline läuft nur begrenzte Routineproduktion weiter (keine unbegrenzte passive Geldmaschine).",
+  "regions": ["sunmeadow", "crossing", "moor", "fangvale"],
+  "open_cost": 3000,
+  "reopen_cost": 600,
+  "upkeep_per_day": 40,
+  "extra_lines": 1,
+  "extra_storage": 300,
+  "max_branches_by_company_level": [0, 1, 2, 3],
+  "dormant_after_unpaid_days": 3,
+  "offline": {"active_within_days": 3, "offline_lines": 1}
+}

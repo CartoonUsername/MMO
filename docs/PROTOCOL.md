@@ -140,6 +140,12 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `equip.remove` | char:s, slot:s | char | schreibend | default |
 | `equip.look` | char:s, slot:s, item?:s | char | schreibend | default |
 | `query.equipment` | char:s | char | lesend | query |
+| `query.my_companies` | char:s | char | lesend | query |
+| `query.market` | char:s | char | lesend | query |
+| `query.market_quote` | item_key:s | – | lesend | query |
+| `company.branch_open` | actor:s, company:s, region:s | actor | schreibend | default |
+| `company.branch_close` | actor:s, company:s, branch:s | actor | schreibend | default |
+| `company.branch_reopen` | actor:s, company:s, branch:s | actor | schreibend | default |
 | `query.element_catalog` |  | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 

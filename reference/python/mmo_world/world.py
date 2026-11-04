@@ -17,6 +17,7 @@ from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
 from .equipment import EquipmentService, load_equipment_rules
+from .branches import BranchService, load_branch_rules
 from .echo import EchoService, load_echo_rules
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
@@ -38,6 +39,7 @@ TRADE_RULES = "trade_rules_v1.json"
 PARTY_RULES = "party_rules_v1.json"
 ECHO_RULES = "echo_rules_v1.json"
 EQUIPMENT_RULES = "equipment_rules_v1.json"
+BRANCH_RULES = "branch_rules_v1.json"
 
 
 class World:
@@ -74,8 +76,14 @@ class World:
         self.offers = DirectTrade(self.svc, self.inv, self.trading, load_trade_rules(TRADE_RULES), clock, sid)
         if oldt is not None:
             self.offers._counter, self.offers.offers = oldt._counter, oldt.offers
+        oldb = getattr(self, "branches", None)
+        self.branches = BranchService(self.company, load_branch_rules(BRANCH_RULES), clock)    # vor der Produktion: Betriebskosten zuerst
+        if oldb is not None:
+            self.branches._counter, self.branches.branches, self.branches.last_active = oldb._counter, oldb.branches, oldb.last_active
         oldp = getattr(self, "production", None)
         self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
+        self.production.extra_lines, self.production.extra_storage, self.production.offline_cap = (
+            self.branches.extra_lines, self.branches.extra_storage, self.branches.offline_cap)
         if oldp is not None:
             self.production._counter, self.production.jobs, self.production.npc_sold = oldp._counter, oldp.jobs, oldp.npc_sold
         oldq = getattr(self, "pricing", None)
@@ -107,6 +115,8 @@ class World:
             snap["trade_offers"] = json.loads(self.offers.to_json())
         if self.production.active:
             snap["production"] = json.loads(self.production.to_json())
+        if self.branches.active:
+            snap["branches"] = json.loads(self.branches.to_json())
         if self.equipment.active:
             snap["equipment"] = json.loads(self.equipment.to_json())
         if self.echo.active:

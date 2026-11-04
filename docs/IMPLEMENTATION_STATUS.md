@@ -41,9 +41,9 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Gemeinsame Welt, serverautoritativ | vorhanden (Referenz) | Spielserver `mmo_game`, ein Prozess; Mehrregion-Betrieb **fehlt** |
 | Gelände, Kollision, Wegfindung | vorhanden | ADR-0030/0031; eine Zone 6000×6000 cm |
 | Regionen, Gefahrenstufen, Fortbewegung/Epochen | teilweise (neu) | 7 Regionen mit Gefahr 1–5, Zugangsbedingung, Bonus (ADR-0048); Fortbewegungsstufen/Epochen fehlen |
-| Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017); NPC-Händler minimal, keine NPC-Lebensprofile |
+| Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017), Weltereignisse mit Preisschocks, Markt-Fenster (ADR-0049); keine NPC-Lebensprofile |
 | Spielerunternehmen: Gründung, Personal, Beteiligungen, Produktion | vorhanden (Referenz) | ADR-0012/0016, `company.*`, `production.*` |
-| Filialen, Töchter, Offline-Betrieb mit Deckel | fehlt | Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
+| Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | fehlt | keine Treffer |
 | Gilden | fehlt | Gruppen (Party, ADR-0025) existieren |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |

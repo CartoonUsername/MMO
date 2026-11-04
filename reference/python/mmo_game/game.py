@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v7.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v8.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -94,6 +94,7 @@ class GameServer:
         self._dungeon_counter = 0
         self._region_of: dict[str, str | None] = {}
         self._blocked_notice: dict[str, int] = {}
+        self.economy_news: list[dict[str, Any]] = []      # aktive Wirtschaftsereignisse (AP 10); werden mit dem Spielzustand gesichert
         self._check_world_rules()
         self._fight_counter = 0
         self._bucket: dict[str, int] = {}
@@ -112,6 +113,7 @@ class GameServer:
             for n in self.nodes:
                 n["ready_at"] = int(saved.get("nodes", {}).get(n["id"], 0))
             self.saved_pos = {c: (int(x), int(y)) for c, (x, y) in saved.get("positions", {}).items()}
+            self.economy_news = [n for n in saved.get("economy_news", []) if n["until"] > self.world.day[0]]
             if saved.get("kills_day") == self.world.day[0]:
                 self.kills = {k: int(v) for k, v in saved.get("kills", {}).items()}
                 self.daily = {k: int(v) for k, v in saved.get("daily", {}).items()}
@@ -123,7 +125,7 @@ class GameServer:
         state = {"generation": gen, "tick": self.tick_no, "format": 1,
                  "nodes": {n["id"]: n["ready_at"] for n in self.nodes},
                  "enemies": {e["id"]: {"alive": e["alive"], "respawn_at": e["respawn_at"]} for e in self.enemies},
-                 "kills_day": self.world.day[0], "kills": dict(sorted(self.kills.items())), "daily": dict(sorted(self.daily.items())),
+                 "kills_day": self.world.day[0], "kills": dict(sorted(self.kills.items())), "daily": dict(sorted(self.daily.items())), "economy_news": self.economy_news,
                  "positions": {**{c: list(p) for c, p in self.saved_pos.items()}, **{c: list(p["pos"]) for c, p in self.players.items()}}}
         tmp = store.path / "game_state.json.tmp"
         tmp.write_text(json.dumps(state, sort_keys=True, separators=(",", ":")), encoding="utf-8")
@@ -225,6 +227,7 @@ class GameServer:
 
     # ---------------------------------------------------------------- Befehle ----
     def _cmd_join(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        self.world.branches.touch(char)
         if char not in self.players:
             sp = self.saved_pos.pop(char, None) or tuple(self.R["zone"]["spawn"])
             if self.terrain.blocked(*sp):                       # z. B. nach einer Kartenänderung
@@ -446,6 +449,9 @@ class GameServer:
         w.parties.expire(day)
         if w.pricing is not None:
             w.pricing.advance(day)
+        for c in self.players:                           # Aktivität der Leitung für den Offline-Deckel der Firmen (AP 10)
+            w.branches.touch(c, day)
+        self._economy_event(day)
 
     # ---------------------------------------------------------------- Welt (AP 9, ADR-0048) ----
     def _check_world_rules(self) -> None:
@@ -493,6 +499,30 @@ class GameServer:
         if not table or not self.regions:
             return 1000
         return max(table[(self._region_at(p) or {"danger": 1})["danger"] - 1] for p in pos_list)
+
+    def _economy_event(self, day: int) -> None:
+        """NPC-Weltwirtschaft (AP 10): ein deterministisches Tagesereignis verschiebt Referenzpreise für einige Tage."""
+        E = self.R.get("economy_events")
+        w = self.world
+        self.economy_news = [n for n in self.economy_news if n["until"] > day]
+        if not E or w.pricing is None:
+            return
+        h = int(hashlib.sha256(f"economy|{day}".encode()).hexdigest()[:12], 16)
+        if h % 1000 >= E["chance_permille"]:
+            return
+        ev = E["list"][(h // 1000) % len(E["list"])]
+        applied = {}
+        for key, permille in ev["shocks"].items():
+            try:
+                w.pricing.set_shock(key, permille, ev["days"])
+                applied[key] = permille
+            except WorldError:
+                continue
+        if not applied:
+            return
+        news = {"id": ev["id"], "day": day, "until": day + ev["days"], "headline": ev["headline"], "region": ev["region"], "shocks": applied}
+        self.economy_news = [n for n in self.economy_news if not set(n["shocks"]) & set(applied)] + [news]
+        self._broadcast({"ev": "economy_event", **news})
 
     def _move_players(self) -> None:
         for c, p in self.players.items():
@@ -551,7 +581,7 @@ class GameServer:
         return {"regions": [{k: v for k, v in r.items() if k != "hint"} for r in self.regions],
                 "dungeons": {d: {"name": g["name"], "entrance": g["entrance"], "radius": g["radius"], "stages": len(g["stages"]), "region": g["region"]}
                              for d, g in self.dungeon_rules.items()},
-                "world_bosses": {b: {"name": v["name"]} for b, v in self.boss_rules.items()}}
+                "world_bosses": {b: {"name": v["name"]} for b, v in self.boss_rules.items()}, "economy_news": self.economy_news}
 
     def _cmd_dungeon_enter(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         self._need_joined(char)

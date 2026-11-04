@@ -78,6 +78,9 @@ class ProductionService:
         self.npc_sold: dict[str, dict[str, int]] = {}
         self._counter = 0
         companies.day_hooks.append(self._tick)
+        self.extra_lines: Callable[[dict[str, Any]], int] = lambda c: 0          # Filialen (AP 10): zusätzliche Linien/Lager
+        self.extra_storage: Callable[[dict[str, Any]], int] = lambda c: 0
+        self.offline_cap: Callable[[dict[str, Any], int], int | None] = lambda c, d: None   # Offline-Deckel: höchstens so viele Aufträge laufen
         companies.close_hooks.append(self._on_close)
 
     @property
@@ -95,7 +98,7 @@ class ProductionService:
         return sum(self.stock(company_id).values())
 
     def capacity(self, c: dict[str, Any]) -> int:
-        return building(self.reg.cr, c["building_level"])["storage"]
+        return building(self.reg.cr, c["building_level"])["storage"] + self.extra_storage(c)
 
     def _item(self, item_key: str) -> tuple[str, str]:
         if item_key == self.coin:
@@ -131,7 +134,7 @@ class ProductionService:
 
     # -- Aufträge --------------------------------------------------------------------------
     def lines(self, c: dict[str, Any]) -> int:
-        return self.pr["lines_by_building_level"][c["building_level"] - 1]
+        return self.pr["lines_by_building_level"][c["building_level"] - 1] + self.extra_lines(c)
 
     def jobs_of(self, company_id: str) -> list[str]:
         return sorted(k for k, j in self.jobs.items() if j["company"] == company_id)
@@ -239,8 +242,11 @@ class ProductionService:
     # -- Tagesabschluss (Haken in CompanyService) ---------------------------------------------
     def _tick(self, c: dict[str, Any], d: int, paid: dict[str, bool]) -> list[dict[str, Any]]:
         out: list[dict[str, Any]] = []
-        for jid in self.jobs_of(c["id"]):
+        cap = self.offline_cap(c, d)
+        for n, jid in enumerate(self.jobs_of(c["id"])):
             j = self.jobs[jid]
+            if cap is not None and n >= cap:                 # Leitung offline: nur begrenzte Routineproduktion, der Rest ruht
+                continue
             if not paid.get(j["worker"], False):  # entlassen, gekündigt oder unbezahlt
                 j["stalled"] += 1
                 continue
