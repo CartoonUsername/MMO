@@ -220,44 +220,51 @@ class _Pack(_Group):
         e.next_start = t + self._interval_of(e, t) + extra
 
     # -- Ablauf --------------------------------------------------------------------
-    def run(self) -> PackResult:  # type: ignore[override]
+    def tick(self, t: int) -> PackResult | None:
+        """Ein Simulationstick; Ergebnis, wenn der Kampf in diesem Tick endet (sonst None)."""
         cfg = self.cfg
-        for t in range(cfg["max_ticks"]):
-            for idx, p in enumerate(self.ps):
-                while p.active and p.i < len(p.inputs) and p.inputs[p.i][0] == t:
-                    cmd = p.inputs[p.i][1]
-                    p.i += 1
-                    if cmd == "flee":
-                        p.state, p.end_tick, p.heavy_pending = "fled", t, None
-                        break
-                    if p.allowed is not None and cmd not in p.allowed:
-                        p.ignored += 1
-                        continue
-                    self.command(idx, t, cmd)
-            if not any(p.active for p in self.ps):
-                return self._pack_result(t, "none")
-            for p in self.ps:
-                if p.active and p.heavy_pending and p.heavy_pending[0] == t:
-                    e = self.es[p.heavy_pending[2]]
-                    if not e.alive:
-                        e = self.es[self._first_alive()] if self._first_alive() is not None else e
-                    e.hp -= p.heavy_pending[1]
-                    p.threat += p.heavy_pending[1]
-                    p.count("heavy_hit")
-                    p.heavy_pending = None
-            self._burn(t)
-            if not any(e.alive for e in self.es):
-                return self._pack_result(t + 1, "victory")
-            self.opponents(t)
-            for p in self.ps:
-                if p.active and p.hp <= 0:
-                    p.state, p.end_tick, p.heavy_pending = "down", t + 1, None
-            if not any(p.active for p in self.ps):
-                return self._pack_result(t + 1, "none")
-            for p in self.ps:
-                if p.active:
-                    p.stam = min(cfg["player"]["stamina_max"], p.stam + cfg["player"]["stamina_regen_per_tick"] + p.fx_get("stamina_regen_bonus"))
-        return self._pack_result(cfg["max_ticks"], "timeout")
+        for idx, p in enumerate(self.ps):
+            while p.active and p.i < len(p.inputs) and p.inputs[p.i][0] == t:
+                cmd = p.inputs[p.i][1]
+                p.i += 1
+                if cmd == "flee":
+                    p.state, p.end_tick, p.heavy_pending = "fled", t, None
+                    break
+                if p.allowed is not None and cmd not in p.allowed:
+                    p.ignored += 1
+                    continue
+                self.command(idx, t, cmd)
+        if not any(p.active for p in self.ps):
+            return self._pack_result(t, "none")
+        for p in self.ps:
+            if p.active and p.heavy_pending and p.heavy_pending[0] == t:
+                e = self.es[p.heavy_pending[2]]
+                if not e.alive:
+                    e = self.es[self._first_alive()] if self._first_alive() is not None else e
+                e.hp -= p.heavy_pending[1]
+                p.threat += p.heavy_pending[1]
+                p.count("heavy_hit")
+                p.heavy_pending = None
+        self._burn(t)
+        if not any(e.alive for e in self.es):
+            return self._pack_result(t + 1, "victory")
+        self.opponents(t)
+        for p in self.ps:
+            if p.active and p.hp <= 0:
+                p.state, p.end_tick, p.heavy_pending = "down", t + 1, None
+        if not any(p.active for p in self.ps):
+            return self._pack_result(t + 1, "none")
+        for p in self.ps:
+            if p.active:
+                p.stam = min(cfg["player"]["stamina_max"], p.stam + cfg["player"]["stamina_regen_per_tick"] + p.fx_get("stamina_regen_bonus"))
+        return None
+
+    def run(self) -> PackResult:  # type: ignore[override]
+        for t in range(self.cfg["max_ticks"]):
+            res = self.tick(t)
+            if res is not None:
+                return res
+        return self._pack_result(self.cfg["max_ticks"], "timeout")
 
     def _pack_result(self, ticks: int, how: str) -> PackResult:
         self.opp_hp = sum(e.hp for e in self.es)

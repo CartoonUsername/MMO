@@ -1,0 +1,36 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER für den Vertical Slice: Größen, Geschwindigkeiten, Orte, Beute und Zeiten sind Vorschläge, KEINE beschlossenen Spielinhalte. Ganzzahlen; Längen in Zentimetern; 1 Tick = 100 ms.",
+  "cee_rules": "rules_v9.json",
+  "sim_rules": "sim_rules_v5.json",
+  "zone": {"width": 6000, "height": 6000, "spawn": [500, 500], "town_radius": 700},
+  "speed_cm_per_tick": 35,
+  "aggro_radius": 700,
+  "pack_radius": 600,
+  "join_radius": 1500,
+  "view_radius": 3500,
+  "state_every_ticks": 2,
+  "fight_every_ticks": 2,
+  "aggro_immunity_ticks": 60,
+  "respawn_ticks": 400,
+  "ticks_per_day": 6000,
+  "start_coins": 200,
+  "game_commands_per_burst": 40,
+  "enemies": [
+    {"type": "wolf", "at": [2200, 1800]}, {"type": "wolf", "at": [2350, 1900]},
+    {"type": "wolf", "at": [3800, 3600]}, {"type": "wolf", "at": [3950, 3700]}, {"type": "bear", "at": [3875, 3800]},
+    {"type": "wolf", "at": [1500, 4200]}
+  ],
+  "nodes": [
+    {"id": "ore1", "item": "iron_ore@standard", "at": [1100, 700], "qty": 3},
+    {"id": "ore2", "item": "iron_ore@standard", "at": [1300, 1000], "qty": 3},
+    {"id": "herb1", "item": "healing_herb@standard", "at": [300, 1300], "qty": 2},
+    {"id": "water1", "item": "clean_water@standard", "at": [800, 300], "qty": 2}
+  ],
+  "node_cooldown_ticks": 150,
+  "gather_reach": 250,
+  "drops": {
+    "wolf": {"coin@gold": 6, "healing_herb@standard": 1},
+    "bear": {"coin@gold": 20}
+  }
+}

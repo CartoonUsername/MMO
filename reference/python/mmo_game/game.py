@@ -1,0 +1,381 @@
+"""Serverautoritativer Spielserver ohne Netzwerk (deterministisch, tickgetrieben). Der Transport (`net.py`) ruft nur `connect`,
+`handle`, `tick`, `drain` und `disconnect` auf. Siehe ADR-0028.
+
+Der Client sendet ausschließlich Absichten: Bewegungsrichtung, Sammeln, Kampfbefehle und die bekannten Weltbefehle
+(`mmo_server`). Positionen, Gegner, Kampf, Beute und Zeit entstehen allein hier; der Kampf nutzt dieselbe Simulation wie die
+Referenz (`mmo_sim.pack`), die Berichte laufen durch die CEE.
+"""
+from __future__ import annotations
+
+import json
+from importlib import resources
+from typing import Any
+
+from mmo_cee.errors import RuleViolation
+from mmo_server import Gateway, Sessions
+from mmo_server.gateway import ID_RE, _fail
+from mmo_sim import EncounterServer, SimError
+from mmo_sim.live import LiveEncounter
+from mmo_sim.rules import load_sim_rules
+from mmo_world import WorldError
+from mmo_world.world import World
+
+COIN = "coin@gold"
+MAX_LINE = 4096
+
+
+def load_game_rules(name: str = "game_rules_v1.json") -> dict[str, Any]:
+    return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
+
+
+def _dist2(a: tuple[int, int], b: tuple[int, int]) -> int:
+    return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+
+
+def _ok(req_id: Any, result: Any) -> dict[str, Any]:
+    return {"v": 1, "id": req_id if isinstance(req_id, str) else None, "ok": True, "result": result}
+
+
+class _Err(Exception):
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code, self.message = code, message
+
+
+class GameServer:
+    def __init__(self, rules: dict[str, Any] | None = None) -> None:
+        self.R = rules or load_game_rules()
+        self.world = World(self.R["cee_rules"])
+        self.sim = load_sim_rules(self.R["sim_rules"])
+        self.tick_no = 0
+        self.sessions = Sessions()
+        self.gateway = Gateway(self.world, self.sessions, lambda: self.tick_no)
+        self.encounters = EncounterServer(self.sim, self.world.svc, lambda: self.world.day[0])
+        self.players: dict[str, dict[str, Any]] = {}     # Figur -> Zustand im Raum
+        self.sess_of: dict[str, str] = {}                # Figur -> Sitzung
+        self.queues: dict[str, list[dict[str, Any]]] = {}
+        self.fights: dict[str, dict[str, Any]] = {}
+        self.fight_of: dict[str, str] = {}               # Figur -> Kampf
+        self.enemies = [{"id": f"e{i + 1}", "type": e["type"], "pos": tuple(e["at"]), "home": tuple(e["at"]), "alive": True,
+                         "respawn_at": 0, "fight": None} for i, e in enumerate(self.R["enemies"])]
+        self.nodes = [{**n, "pos": tuple(n["at"]), "ready_at": 0} for n in self.R["nodes"]]
+        self._fight_counter = 0
+        self._bucket: dict[str, int] = {}
+        self.log: list[str] = []
+
+    # ---------------------------------------------------------------- Verbindung ----
+    def connect(self, account: str) -> tuple[str, list[str]]:
+        """Entwicklungs-Anmeldung: Konto = Figurenname (keine Passwörter; echte Anmeldung kommt später). Neue Figur: Mensch, Startmünzen."""
+        if not isinstance(account, str) or not ID_RE.fullmatch(account):
+            raise ValueError("Ungültiger Kontoname")
+        if any(self.sessions.get(s) and self.sessions.get(s)["account"] == account for s in list(self.queues)):
+            raise ValueError("Konto ist schon verbunden")
+        if not self.world.svc.log.has(account):
+            self.world.svc.create(account, "player")
+            self.world.inv.deposit(account, COIN, self.R["start_coins"])
+        sid = self.sessions.open(account, [account])
+        self.queues[sid] = []
+        self.gateway.on_push(sid, lambda char, item, sid=sid: self._emit(sid, {"ev": "notify", "char": char, "item": item}))
+        return sid, [account]
+
+    def disconnect(self, sid: str) -> None:
+        sess = self.sessions.get(sid)
+        if sess is not None:
+            for c in sess["characters"]:
+                self._leave(c)
+        self.sessions.close(sid)
+        self.queues.pop(sid, None)
+
+    def drain(self, sid: str) -> list[dict[str, Any]]:
+        q = self.queues.get(sid, [])
+        self.queues[sid] = []
+        return q
+
+    def _emit(self, sid: str | None, ev: dict[str, Any]) -> None:
+        if sid in self.queues:
+            self.queues[sid].append(ev)
+
+    def _emit_to(self, char: str, ev: dict[str, Any]) -> None:
+        self._emit(self.sess_of.get(char), ev)
+
+    # ---------------------------------------------------------------- Eingang ----
+    def handle(self, sid: str, raw: str | bytes | dict[str, Any]) -> dict[str, Any]:
+        sess = self.sessions.get(sid)
+        if sess is None:
+            return _fail(None, "unknown_session", "Unbekannte Sitzung")
+        req = raw
+        if isinstance(raw, (str, bytes)):
+            if len(raw) > MAX_LINE:
+                return _fail(None, "bad_request", "Nachricht zu groß")
+            try:
+                req = json.loads(raw)
+            except ValueError:
+                return _fail(None, "bad_request", "Kein gültiges JSON")
+        if not isinstance(req, dict) or not isinstance(req.get("cmd"), str):
+            return _fail(None, "bad_request", "cmd fehlt")
+        if not req["cmd"].startswith("game."):
+            return self.gateway.handle(sid, req)           # Weltbefehle: Handel, Markt, Gruppen, Herstellen ...
+        rid = req.get("id")
+        args = req.get("args", {})
+        try:
+            if not isinstance(args, dict):
+                raise _Err("bad_request", "args muss ein Objekt sein")
+            char = args.get("char")
+            if char not in sess["characters"]:
+                raise _Err("forbidden", "Figur gehört nicht zu dieser Sitzung")
+            if not self._take_token(char):
+                raise _Err("rate_limited", "Zu viele Befehle")
+            handler = getattr(self, "_cmd_" + req["cmd"][5:], None)
+            if handler is None or not req["cmd"][5:].isidentifier():
+                raise _Err("unknown_command", "Unbekannter Befehl")
+            return _ok(rid, handler(sid, char, args))
+        except _Err as e:
+            return _fail(rid, e.code, e.message)
+
+    def _take_token(self, char: str) -> bool:
+        cap = self.R["game_commands_per_burst"]
+        n = self._bucket.get(char, cap)
+        if n <= 0:
+            return False
+        self._bucket[char] = n - 1
+        return True
+
+    # ---------------------------------------------------------------- Befehle ----
+    def _cmd_join(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        if char not in self.players:
+            sp = tuple(self.R["zone"]["spawn"])
+            self.players[char] = {"pos": sp, "dir": (0, 0), "immune_until": 0}
+            self.sess_of[char] = sid
+        return self._snapshot_for(char)
+
+    def _cmd_move(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        self._need_joined(char)
+        dx, dy = a.get("dx"), a.get("dy")
+        if any(not isinstance(v, int) or isinstance(v, bool) or not -1 <= v <= 1 for v in (dx, dy)):
+            raise _Err("bad_request", "dx und dy müssen -1, 0 oder 1 sein")
+        self.players[char]["dir"] = (dx, dy)
+        return {"dir": [dx, dy]}
+
+    def _cmd_gather(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        self._need_joined(char)
+        if char in self.fight_of:
+            raise _Err("rejected", "Im Kampf nicht möglich")
+        node = next((n for n in self.nodes if n["id"] == a.get("node")), None)
+        if node is None:
+            raise _Err("rejected", "Unbekannter Sammelpunkt")
+        if _dist2(self.players[char]["pos"], node["pos"]) > self.R["gather_reach"] ** 2:
+            raise _Err("rejected", "Zu weit entfernt")
+        if self.tick_no < node["ready_at"]:
+            raise _Err("rejected", "Sammelpunkt erschöpft")
+        node["ready_at"] = self.tick_no + self.R["node_cooldown_ticks"]
+        self.world.inv.deposit(char, node["item"], node["qty"])
+        return {"item": node["item"], "qty": node["qty"]}
+
+    def _cmd_fight(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        fid = self.fight_of.get(char)
+        if fid is None:
+            raise _Err("rejected", "Nicht im Kampf")
+        f = self.fights[fid]
+        if not isinstance(a.get("input"), str) or not f["live"].submit(f["chars"].index(char), a["input"]):
+            raise _Err("rejected", "Befehl nicht angenommen")
+        return {"tick": f["live"].t}
+
+    def _cmd_state(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        self._need_joined(char)
+        return self._snapshot_for(char)
+
+    def _need_joined(self, char: str) -> None:
+        if char not in self.players:
+            raise _Err("rejected", "Erst game.join")
+
+    # ---------------------------------------------------------------- Zeit ----
+    def tick(self) -> None:
+        self.tick_no += 1
+        for c in self._bucket:                              # Befehlsbudget füllt sich ein Befehl je Tick
+            self._bucket[c] = min(self.R["game_commands_per_burst"], self._bucket[c] + 1)
+        if self.tick_no % self.R["ticks_per_day"] == 0:
+            self._new_day(self.world.day[0] + 1)
+        self._move_players()
+        self._respawn()
+        self._aggro()
+        self._advance_fights()
+        if self.tick_no % self.R["state_every_ticks"] == 0:
+            for c in list(self.players):
+                self._emit_to(c, {"ev": "state", **self._snapshot_for(c)})
+
+    def _new_day(self, day: int) -> None:
+        w = self.world
+        w.day[0] = day
+        w.company.advance_day(day)
+        w.exchange.expire(day)
+        w.offers.expire(day)
+        w.parties.expire(day)
+        if w.pricing is not None:
+            w.pricing.advance(day)
+
+    def _move_players(self) -> None:
+        z, speed = self.R["zone"], self.R["speed_cm_per_tick"]
+        for c, p in self.players.items():
+            if c in self.fight_of or p["dir"] == (0, 0):
+                continue
+            dx, dy = p["dir"]
+            if dx and dy:                                   # Diagonale: ganzzahlig auf ca. 0,7 begrenzt (Betrag ≤ speed)
+                step = speed * 707 // 1000
+                nx, ny = p["pos"][0] + dx * step, p["pos"][1] + dy * step
+            else:
+                nx, ny = p["pos"][0] + dx * speed, p["pos"][1] + dy * speed
+            p["pos"] = (min(max(0, nx), z["width"]), min(max(0, ny), z["height"]))
+
+    def _respawn(self) -> None:
+        for e in self.enemies:
+            if not e["alive"] and self.tick_no >= e["respawn_at"]:
+                e["alive"] = True
+                e["pos"] = e["home"]
+
+    # ---------------------------------------------------------------- Kampfbeginn ----
+    def _aggro(self) -> None:
+        R = self.R
+        for c in list(self.players):
+            p = self.players[c]
+            if c in self.fight_of or self.tick_no < p["immune_until"]:
+                continue
+            trigger = next((e for e in self.enemies if e["alive"] and e["fight"] is None
+                            and _dist2(p["pos"], e["pos"]) <= R["aggro_radius"] ** 2), None)
+            if trigger is None:
+                continue
+            maxo = self.sim["multi"]["max_opponents"]
+            pack = [e for e in self.enemies if e["alive"] and e["fight"] is None
+                    and _dist2(trigger["pos"], e["pos"]) <= R["pack_radius"] ** 2][:maxo]
+            self._start_fight(c, pack)
+
+    def _start_fight(self, trigger_char: str, pack: list[dict[str, Any]]) -> None:
+        R = self.R
+        chars = [trigger_char]
+        view = self.world.parties.view(trigger_char)
+        if view is not None:
+            for m in view["members"]:
+                mp = self.players.get(m)
+                if (m != trigger_char and mp is not None and m not in self.fight_of
+                        and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
+                    chars.append(m)
+        chars = chars[: self.sim["group"]["max_party"]]
+        specs = self.encounters.pack_specs(chars, {})
+        types = [e["type"] for e in pack]
+        live = LiveEncounter(self.sim, types, specs)
+        self._fight_counter += 1
+        fid = f"fight-{self._fight_counter:06d}"
+        self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "started": self.tick_no}
+        for e in pack:
+            e["fight"] = fid
+        for c in chars:
+            self.fight_of[c] = fid
+            self.players[c]["dir"] = (0, 0)
+            self._emit_to(c, {"ev": "fight_start", "fight": fid, "opponents": types, "party": chars, "you": chars.index(c)})
+
+    def _advance_fights(self) -> None:
+        for fid in list(self.fights):
+            f = self.fights[fid]
+            live = f["live"]
+            # Spieler, die geflohen oder ausgefallen sind, verlassen den Kampf sofort
+            res = live.advance()
+            for i, c in enumerate(f["chars"]):
+                st = live._sim.ps[i].state
+                if st != "active" and self.fight_of.get(c) == fid:
+                    self._leave_fight(c, fid, st)
+            if res is not None:
+                self._end_fight(fid)
+            elif live.t % self.R["fight_every_ticks"] == 0:
+                for c in f["chars"]:
+                    if self.fight_of.get(c) == fid:
+                        self._emit_to(c, {"ev": "fight", "fight": fid, **live.view()})
+
+    def _leave_fight(self, char: str, fid: str, state: str) -> None:
+        del self.fight_of[char]
+        p = self.players.get(char)
+        if p is None:                                        # Verbindung schon getrennt
+            return
+        p["immune_until"] = self.tick_no + self.R["aggro_immunity_ticks"]
+        if state == "down":                                  # Niederlage: zurück zum Startpunkt
+            p["pos"] = tuple(self.R["zone"]["spawn"])
+        else:                                                # Flucht: ein Stück vom Gegner weg
+            p["pos"] = (max(0, p["pos"][0] - self.R["aggro_radius"]), max(0, p["pos"][1] - self.R["aggro_radius"]))
+        self._emit_to(char, {"ev": "fight_left", "fight": fid, "reason": "defeat" if state == "down" else "fled"})
+
+    def _end_fight(self, fid: str) -> None:
+        f = self.fights.pop(fid)
+        live, chars = f["live"], f["chars"]
+        result = live.result
+        assert result is not None
+        # Bericht und Entwicklung: aus dem Eingabeprotokoll, durch dieselbe Simulation (muss mit dem Live-Ergebnis übereinstimmen)
+        inputs = {c: live.inputs_of(i) for i, c in enumerate(chars)}
+        report: dict[str, Any] = {}
+        try:
+            eid = self.encounters.start_pack(chars, f["types"])
+            fin = self.encounters.finish_pack(eid, inputs)
+            if fin.result != result:
+                self.log.append(f"{fid}: Live-Ergebnis weicht von der Neuberechnung ab")
+            report = {c: (ev.payload if ev is not None else None) for c, ev in fin.events.items()}
+        except (SimError, RuleViolation, WorldError) as e:
+            self.log.append(f"{fid}: Bericht abgelehnt: {e}")
+        for c in chars:
+            self.fight_of.pop(c, None)
+        killed = [e for e in self.enemies if e["id"] in f["enemies"]]
+        for e in killed:
+            e["fight"] = None
+            if result.outcome == "victory":
+                e["alive"], e["respawn_at"] = False, self.tick_no + self.R["respawn_ticks"]
+        loot = self._loot(chars, result, f["types"]) if result.outcome == "victory" else {}
+        for i, c in enumerate(chars):
+            if c in self.players:
+                pr = result.players[i]
+                self._emit_to(c, {"ev": "fight_end", "fight": fid, "outcome": pr.outcome, "ticks": result.ticks,
+                                  "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {})})
+
+    def _loot(self, chars: list[str], result: Any, types: list[str]) -> dict[str, dict[str, int]]:
+        eligible = [c for i, c in enumerate(chars) if result.players[i].outcome == "victory" and result.players[i].actions]
+        totals: dict[str, int] = {}
+        for t in types:
+            for key, qty in self.R["drops"].get(t, {}).items():
+                totals[key] = totals.get(key, 0) + qty
+        out: dict[str, dict[str, int]] = {}
+        if not eligible:
+            return out
+        view = self.world.parties.view(eligible[0]) if len(chars) > 1 else None
+        for key, qty in sorted(totals.items()):
+            if key == COIN:                                 # Münzen: gleichmäßig an alle mit Beitrag, Rest der Reihe nach
+                share, rest = divmod(qty, len(eligible))
+                alloc = {c: share + (1 if i < rest else 0) for i, c in enumerate(eligible)}
+                for c, n in alloc.items():
+                    if n:
+                        self.world.inv.deposit(c, COIN, n)
+                alloc = {c: n for c, n in alloc.items() if n}
+            elif view is not None:                          # Gruppe: Beuteverteilung nach Modus, nur Teilnehmer mit Beitrag
+                alloc = self.world.parties.distribute_loot(view["id"], key, qty, eligible, finder=eligible[0])
+            else:
+                self.world.inv.deposit(eligible[0], key, qty)
+                alloc = {eligible[0]: qty}
+            for c, n in alloc.items():
+                out.setdefault(c, {})[key] = n
+        return out
+
+    def _leave(self, char: str) -> None:
+        fid = self.fight_of.get(char)
+        if fid is not None:                                 # Verbindungsabbruch im Kampf = Flucht
+            f = self.fights[fid]
+            f["live"].submit(f["chars"].index(char), "flee")
+        self.players.pop(char, None)
+        self.sess_of.pop(char, None)
+
+    # ---------------------------------------------------------------- Ansicht ----
+    def _snapshot_for(self, char: str) -> dict[str, Any]:
+        me = self.players[char]
+        r2 = self.R["view_radius"] ** 2
+        others = [{"char": c, "pos": list(p["pos"]), "fight": c in self.fight_of} for c, p in sorted(self.players.items())
+                  if c != char and _dist2(p["pos"], me["pos"]) <= r2]
+        enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None}
+                   for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]
+        nodes = [{"id": n["id"], "item": n["item"], "pos": list(n["pos"]), "ready": self.tick_no >= n["ready_at"]}
+                 for n in self.nodes if _dist2(n["pos"], me["pos"]) <= r2]
+        return {"tick": self.tick_no, "day": self.world.day[0], "you": {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char)},
+                "players": others, "enemies": enemies, "nodes": nodes,
+                "zone": {"w": self.R["zone"]["width"], "h": self.R["zone"]["height"]}}

@@ -149,6 +149,22 @@ class EncounterServer:
         """Eigene Fähigkeitsbefehle (ADR-0027): nur die der ausgerüsteten Fähigkeiten."""
         return {name for name, sk in skills(self.cfg).items() if sk["ability"] in (equipped or [])}
 
+    def pack_specs(self, party: Any, inputs_by_character: Any) -> list[dict[str, Any]]:
+        """Spielerangaben (Stufe, Eingaben, freigegebene Befehle, Ausrüstung) für die Mehrgegnersimulation – für Abschluss und Live-Kampf gleich."""
+        specs = []
+        for c in party:
+            equipped = self.service.equipped_abilities(c)
+            allowed = self.service.allowed_commands(c)
+            if allowed is not None:
+                allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS) | self._skill_command_set(equipped))
+            spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
+            if allowed is not None:
+                spec["allowed"] = allowed
+            if equipped is not None:
+                spec["equipped"] = equipped
+            specs.append(spec)
+        return specs
+
     # -- Kampf gegen mehrere Gegner (ADR-0026) ---------------------------------------------------
     def start_pack(self, character_ids: Any, opponent_types: Any) -> str:
         m = self.cfg.get("multi")
@@ -180,18 +196,7 @@ class EncounterServer:
         party, opponents, day = entry
         if not isinstance(inputs_by_character, dict) or set(inputs_by_character) - set(party):
             raise SimError("Eingaben nur von Teilnehmern der Gruppe")
-        specs = []
-        for c in party:
-            equipped = self.service.equipped_abilities(c)
-            allowed = self.service.allowed_commands(c)
-            if allowed is not None:
-                allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS) | self._skill_command_set(equipped))
-            spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
-            if allowed is not None:
-                spec["allowed"] = allowed
-            if equipped is not None:
-                spec["equipped"] = equipped
-            specs.append(spec)
+        specs = self.pack_specs(party, inputs_by_character)
         result = simulate_pack(self.cfg, list(opponents), specs)
         main = strongest(self.cfg, opponents)
         reports = {c: build_report(self.cfg, encounter_id, main, day, r) for c, r in zip(party, result.players) if r.actions}
