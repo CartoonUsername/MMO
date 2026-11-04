@@ -124,6 +124,9 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.abilities` | char:s | – | lesend | query |
 | `query.character` | char:s | char | lesend | query |
 | `character.choose_class` | char:s, base_class:s | char | schreibend | default |
+| `essence.decide` | char:s, decision:s, choice:s | char | schreibend | default |
+| `essence.trial` | char:s, form:s | char | schreibend | default |
+| `essence.adopt` | char:s, form:s, ack:s | char | schreibend | default |
 | `query.element_catalog` |  | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 

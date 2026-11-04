@@ -178,6 +178,11 @@ class CharacterService:
         from .combos import unlocked
         return unlocked(self.state(character_id), self.rules_of(character_id))
 
+    def essence_preview(self, character_id: str) -> dict:
+        """Vorschau aller Wesensformen und Entscheidungen mit Voraussetzungen und Folgen (AP 6, ADR-0045)."""
+        from .forms import essence_preview
+        return essence_preview(self.state(character_id), self.rules_of(character_id))
+
     def profession_branches(self, character_id: str) -> dict:
         """Berufszweige und Meisterstücke der Figur, aus Herstellungsberichten abgeleitet (AP 5, ADR-0044)."""
         from .branches import profession_view

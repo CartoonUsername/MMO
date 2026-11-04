@@ -10,7 +10,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Alle starten als Mensch, 3 Startklassen | vorhanden | `mmo_cee/identity`, Regeln; Klassennamen sind Arbeitsbezeichnungen |
 | Wesensmatrix aus validierter Historie, Hash-Kette, Replay | vorhanden | Character History, Golden Vectors |
 | Charakter im Spiel sichtbar (Klasse wählen, Entwicklung ansehen) | vorhanden (neu) | ADR-0038, Fenster „Charakter“ |
-| Wesensform dauerhaft, bewusste Annahme | vorhanden | `mmo_cee/essence.py` (Annahme nur einmal, Fehler „dauerhaft“); Vorschau der Folgen im Client **fehlt** |
+| Wesensform dauerhaft, bewusste Annahme | vorhanden | `mmo_cee/essence.py` (Annahme nur einmal, Fehler „dauerhaft“); Vorschau, Prüfung und bestätigte Annahme im Client seit AP 6 (ADR-0045) |
 | Drei Schichten: Lebensgeschichte / aktuelles Profil / Wesenidentität sauber getrennt | vorhanden (neu) | `mmo_cee/layers.py`, `docs/DOMAIN_MODEL.md`, ADR-0040; Meilensteine aus Erkundung/Sozialem brauchen AP 3 |
 | Wesensformen nicht nur elementar (Beruf, Forschung, Erkundung) | teilweise | 5 Platzhalterformen (`ember_kin` …), Berufs-/Forschungspfade nicht im Detail geprüft |
 | Berufe als eigene Domäne (Zweige, Techniken, Rezepte, Meisterstücke) | teilweise | Berufe, Meisterschaftsstufen, 7 Rezepte, Techniken (ADR-0010); Spezialisierungszweige und Meisterstücke seit AP 5 (ADR-0044, abgeleitet, 4 Berufe); Experimente/Respezialisierung fehlen |

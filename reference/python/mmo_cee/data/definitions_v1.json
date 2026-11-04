@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "_comment": "PLATZHALTER (AP 6, ADR-0045): Anzeigedefinitionen zu Wesensformen, Entscheidungen und Fähigkeiten (Name, Beschreibung, Tradeoff, Gegenspiel). Mechanik steht in den CEE-Regeln; hier nur redaktionelle Texte. Keine bestätigten Spielinhalte.",
+  "forms": {
+    "ember_kin": {"name": "Glutblut", "text": "Wesen aus Schmiedefeuer und Mut.", "tradeoff": "Stark gegen Feuer- und Kältelagen, verwundbar durch Wasser und leichter zu bemerken.", "counterplay": "Wasser-Gegner und Wasser-Elemente."},
+    "umbral_kin": {"name": "Schattenblut", "text": "Wesen der Dämmerung und des schnellen Schlags.", "tradeoff": "Unauffällig und flink, aber empfindlich gegen Licht und schlechter heilbar.", "counterplay": "Licht-Gegner, Flächenlicht."},
+    "stone_born": {"name": "Steingeboren", "text": "Wesen aus Fels, Geduld und Bergbau.", "tradeoff": "Sehr robust und tragfähig, aber langsam und schlecht im Ausweichen.", "counterplay": "Schnelle Gegner, Kontrolle über Zeit."},
+    "tide_walker": {"name": "Gezeitenwandler", "text": "Wesen der Wege, des Handels und des Wassers.", "tradeoff": "Schnell im Wasser und gute Heilung, aber schwach gegen Feuer und leicht gepanzert.", "counterplay": "Feuer-Gegner."},
+    "grove_warden": {"name": "Hainwächter", "text": "Wesen von Feld, Wald und Kräutern.", "tradeoff": "Regeneration und Kräuterertrag, aber schwach gegen Feuer und schlecht mit Metallrüstung.", "counterplay": "Feuer-Gegner."},
+    "twilight_kin": {"name": "Zwielichtblut", "text": "Geheimes Wesen zwischen Licht und Schatten; nur durch Entdeckung erreichbar.", "tradeoff": "Starker Licht- und Schattenschaden, aber verwundbar gegen körperliche Treffer.", "counterplay": "Physische Gegner."}
+  },
+  "modifiers": {
+    "fire_damage_permille": "Feuerschaden", "cold_resist_permille": "Kälteresistenz", "water_resist_permille": "Wasserresistenz", "stealth_permille": "Unauffälligkeit",
+    "move_speed_permille": "Lauftempo", "light_resist_permille": "Lichtresistenz", "healing_received_permille": "erhaltene Heilung", "physical_resist_permille": "körperliche Resistenz",
+    "carry_capacity_permille": "Tragkraft", "dodge_window_permille": "Ausweichfenster", "swim_speed_permille": "Schwimmtempo", "healing_done_permille": "gewirkte Heilung",
+    "fire_resist_permille": "Feuerresistenz", "armor_permille": "Rüstung", "regeneration_permille": "Regeneration", "herb_yield_permille": "Kräuterertrag",
+    "metal_armor_permille": "Metallrüstung", "light_damage_permille": "Lichtschaden", "shadow_damage_permille": "Schattenschaden"
+  },
+  "decisions": {
+    "ember_vow": {"name": "Schwur der Glut", "text": "Du kannst dich dem Schmiedefeuer verschreiben.", "options": {"accept": "Schwören", "refuse": "Ablehnen"}},
+    "shadow_pact": {"name": "Pakt der Schatten", "text": "Die Dämmerung bietet dir einen Pakt.", "options": {"accept": "Annehmen", "refuse": "Ablehnen"}},
+    "mountain_oath": {"name": "Eid des Berges", "text": "Der Berg verlangt Beständigkeit.", "options": {"accept": "Schwören", "refuse": "Ablehnen"}},
+    "grove_rite": {"name": "Ritus des Hains", "text": "Der Hain lädt dich zu seinem Ritus.", "options": {"accept": "Teilnehmen", "refuse": "Ablehnen"}}
+  },
+  "abilities": {
+    "power_strike": {"name": "Kraftschlag", "text": "Schwerer Schlag.", "tradeoff": "Lange Sperrzeit, viel Ausdauer.", "counterplay": "Ausweichen."},
+    "disrupting_blow": {"name": "Störender Hieb", "text": "Betäubt kurz und unterbricht Zauber.", "tradeoff": "Geringer Schaden.", "counterplay": "Widerstandsfähige Gegner."},
+    "hindering_mark": {"name": "Hemmendes Zeichen", "text": "Verlangsamt den Gegner.", "tradeoff": "Kein direkter Schaden.", "counterplay": "Immune Gegner."},
+    "shield_wall": {"name": "Schildwall", "text": "Verteidigungshaltung.", "tradeoff": "Bindet die Figur.", "counterplay": "Schildbrecher."},
+    "riposte": {"name": "Riposte", "text": "Konterschlag nach Parade.", "tradeoff": "Zeitfenster knapp.", "counterplay": "Täuschende Gegner."},
+    "ally_mend": {"name": "Verbündeten heilen", "text": "Heilt einen Gefährten.", "tradeoff": "Kostet Ausdauer.", "counterplay": "Heilungsreduktion."},
+    "ally_ward": {"name": "Verbündeten schützen", "text": "Schützt einen Gefährten.", "tradeoff": "Kurze Dauer.", "counterplay": "Durchdringender Schaden."},
+    "flowing_step": {"name": "Fließender Schritt", "text": "Weicht kurz aus.", "tradeoff": "Nur sehr kurzes Fenster.", "counterplay": "Flächenangriffe."},
+    "ember_strike": {"name": "Glutschlag", "text": "Feuerschlag mit Brandschaden über Zeit.", "tradeoff": "Schwächer gegen Feuerwesen.", "counterplay": "Wasser, Feuerresistenz."},
+    "veteran_focus": {"name": "Veteranenfokus", "text": "Stellt Ausdauer wieder her.", "tradeoff": "Lange Abklingzeit.", "counterplay": "-"},
+    "twilight_veil": {"name": "Zwielichtschleier", "text": "Mindert eingehenden Schaden.", "tradeoff": "Kurze Dauer.", "counterplay": "Lichtangriffe."}
+  }
+}

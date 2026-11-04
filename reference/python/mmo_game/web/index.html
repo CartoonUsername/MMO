@@ -262,9 +262,8 @@ async function refreshChar(){
   if(!dirs.length)box.appendChild(el("div","Noch keine Kampferfahrung – kämpfe gegen Gegner.","hint"));
   for(const [k,v] of dirs.sort((a,b)=>b[1]-a[1]))kv(box,DIR_NAME[k]||k,v);
   const ab=Object.entries(c.combat.abilities||{});if(ab.length){sect(box,"Fähigkeiten (Plätze: "+c.combat.loadout_slots+")");
-    for(const [k,v] of ab)kv(box,k,(v.missing&&v.missing.length)?"gesperrt ("+v.missing.length+" offen)":(v.equipped?"ausgerüstet":"freigeschaltet"))}
-  sect(box,"Wesenspfad");const el2=c.essence.eligible||[];
-  box.appendChild(el("div",el2.length?"Prüfung möglich für: "+el2.map(f=>FORM_NAME[f]||f).join(", "):"Noch keine Wesensform erreichbar – sie entsteht aus deiner Spielgeschichte.","hint"));
+    for(const [k,v] of ab)kv(box,((c.ability_defs||{})[k]||{}).name||k,(v.missing&&v.missing.length)?"gesperrt ("+v.missing.length+" offen)":(v.equipped?"ausgerüstet":"freigeschaltet"))}
+  renderEssence(box,c);
   const dl=Object.entries(c.discoveries||{});if(dl.length){sect(box,"Entdeckungen");for(const [id,pr] of dl){
     const row=el("div","","k");row.append(el("span",DISC_NAME[id]||id),el("b",pr.known?"entdeckt":pr.evidence.length+"/"+pr.evidence_needed+" Hinweise"));box.appendChild(row);
     if(pr.ready&&!pr.known){const b=el("button","Abschließen: "+(DISC_NAME[id]||id));b.onclick=async()=>{await act("charMsg","discovery.complete",{discovery:id},"Entdeckt!");refreshChar()};box.appendChild(b)}}}
@@ -272,6 +271,22 @@ async function refreshChar(){
   renderStory(box,c);
   sect(box,"Wissen");kv(box,"Rezepte",c.knowledge.recipes.length);kv(box,"Entdeckungen",c.knowledge.discoveries.length);kv(box,"Techniken",c.knowledge.techniques.length);
   const ec=c.economy||{};if(ec.trades||ec.companies_open)kv(box,"Handel / Firmen",(ec.trades||0)+" / "+(ec.companies_open||0));
+}
+function renderEssence(box,c){
+  const pv=c.essence_preview||{};sect(box,"Wesenspfad");
+  if(!pv.forms){box.appendChild(el("div","Wesenspfad nicht verfügbar.","hint"));return}
+  box.appendChild(el("div",pv.warning,"hint"));
+  for(const d of pv.decisions||[]){const row=el("div","","k");row.append(el("span",d.name),el("b",d.chosen?(d.options[d.chosen]||d.chosen):(d.available?"offen":"ab Stufe "+d.min_level)));box.appendChild(row);
+    if(!d.chosen&&d.available){box.appendChild(el("div",d.text,"hint"));for(const [o,lab] of Object.entries(d.options)){const b=el("button",lab);
+      b.onclick=async()=>{if(!confirm("„"+d.name+"“: "+lab+"? Diese Entscheidung ist endgültig."))return;await act("charMsg","essence.decide",{decision:d.id,choice:o},"Entscheidung getroffen");refreshChar()};box.appendChild(b)}}}
+  for(const f of pv.forms){if(f.status==="secret")continue;
+    const row=el("div","","k");row.append(el("span",f.name),el("b",({adopted:"angenommen",trial_passed:"Prüfung bestanden",eligible:"Prüfung möglich",locked_in:"–",progress:f.score+"/"+f.threshold})[f.status]||f.status));box.appendChild(row);
+    if(f.status==="locked_in")continue;
+    box.appendChild(el("div",f.text+" Vorteile: "+Object.entries(f.advantages).map(([k,v])=>k+" +"+v/10+"%").join(", ")+". Nachteile: "+Object.entries(f.disadvantages).map(([k,v])=>k+" −"+v/10+"%").join(", ")+". "+f.tradeoff+(f.min_level>1&&!f.level_ok?" Benötigt Stufe "+f.min_level+".":""),"hint"));
+    if(f.status==="eligible"){const b=el("button","Prüfung ablegen: "+f.name);b.onclick=async()=>{await act("charMsg","essence.trial",{form:f.id},"Prüfung bestanden");refreshChar()};box.appendChild(b)}
+    if(f.status==="trial_passed"){const b=el("button","Dauerhaft annehmen: "+f.name);b.onclick=async()=>{
+      if(!confirm("Wesensform „"+f.name+"“ DAUERHAFT annehmen?\nVorteile: "+Object.entries(f.advantages).map(([k,v])=>k+" +"+v/10+"%").join(", ")+"\nNachteile: "+Object.entries(f.disadvantages).map(([k,v])=>k+" −"+v/10+"%").join(", ")+"\nDas kann nicht rückgängig gemacht werden."))return;
+      await act("charMsg","essence.adopt",{form:f.id,ack:"adopt:"+f.id},"Wesensform angenommen");refreshChar()};box.appendChild(b)}}
 }
 function showGains(g){if(!g||!(g.xp||Object.keys(g.elements||{}).length))return;const parts=[];if(g.xp)parts.push("+"+g.xp+" EP");
   for(const [k,v] of Object.entries(g.elements||{}))parts.push("+"+v+" "+(ELEM_NAME[k]||k));log("Entwicklung: "+parts.join(" · ")+(g.level?" · STUFE "+g.level+"!":""),"g");

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from mmo_world.world import World
+from mmo_world.errors import WorldError
 
 
 @dataclass(frozen=True)
@@ -70,11 +71,20 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
         "economy": safe(lambda: svc.economic_profile(char), {}),
         "appearance": safe(lambda: svc.appearance(char), {}),
         "layers": safe(lambda: svc.layers(char), {}),
+        "essence_preview": safe(lambda: svc.essence_preview(char), {}),
+        "ability_defs": safe(lambda: __import__("mmo_cee.forms", fromlist=["x"]).ability_definitions(svc.state(char), svc.rules_of(char), svc.abilities(char)), {}),
         "combinations": safe(lambda: svc.element_combinations(char), []),
         "profession_detail": safe(lambda: svc.profession_branches(char), {}),
         "discoveries": safe(lambda: {d: pr for d in svc.rules_of(char)["discovery"]["discoveries"]
                                      for pr in [svc.discovery_progress(char, d)] if pr["known"] or pr["evidence"]}, {}),
     }
+
+
+def _adopt(w: World, a: dict[str, Any]) -> Any:
+    """Dauerhafte Annahme nur mit ausdrücklicher Bestätigung: `ack` muss `adopt:<form>` lauten (ADR-0045)."""
+    if a["ack"] != "adopt:" + a["form"]:
+        raise WorldError("Annahme braucht ausdrückliche Bestätigung (ack = adopt:<Form>)")
+    return _res(w.svc.record(a["char"], "essence.adopted", {"form": a["form"]}))
 
 
 def _c(name: str, args: str, actor: str | None, call: Callable[[World, dict[str, Any]], Any], mutating: bool = True,
@@ -163,6 +173,10 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.character", "char:s", "char", lambda w, a: _character_view(w, a["char"]), mutating=False),
     _c("character.choose_class", "char:s base_class:s", "char", lambda w, a: _res(w.svc.record(a["char"], "identity.class_chosen", {"base_class": a["base_class"]}))),
+    _c("essence.decide", "char:s decision:s choice:s", "char",
+       lambda w, a: _res(w.svc.record(a["char"], "essence.decision_made", {"decision_id": a["decision"], "choice": a["choice"]}))),
+    _c("essence.trial", "char:s form:s", "char", lambda w, a: _res(w.svc.record(a["char"], "essence.trial_passed", {"form": a["form"]}))),
+    _c("essence.adopt", "char:s form:s ack:s", "char", lambda w, a: _adopt(w, a)),
     _c("query.element_catalog", "", None, lambda w, a: _element_catalog(w), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}

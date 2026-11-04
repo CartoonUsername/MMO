@@ -234,6 +234,9 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         await c.msg()
         await self._call(c, 0, "game.join", char="anna")
         v = (await self._call(c, 1, "query.character", char="anna"))["result"]
+        self.assertEqual(v["essence_preview"]["form"], "human")
+        self.assertIn("ember_kin", [f["id"] for f in v["essence_preview"]["forms"]])
+        self.assertEqual(v["ability_defs"]["power_strike"]["name"], "Kraftschlag")
         self.assertEqual((v["identity"]["base_class"], v["essence"]["form"], v["identity"]["level"]), (None, "human", 1))
         self.assertEqual(sorted(v["classes"]), ["archer", "shaman_alchemist", "warrior"])
         self.assertEqual(set(v["elements"]["affinity"]), {"fire", "water", "shadow", "light", "wind", "earth", "electric", "ice", "nature"})
@@ -252,7 +255,7 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         import re
         from mmo_server.protocol import COMMANDS
         html = (Path(__file__).parent.parent / "mmo_game" / "web" / "index.html").read_text(encoding="utf-8")
-        for marker in ("onCanvasClick", "profession_detail", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
+        for marker in ("onCanvasClick", "profession_detail", "renderEssence", "findPath", 'id="bGather"'):          # Klick-Bewegung mit Wegfindung und Sammeln-Knopf
             self.assertIn(marker, html)
         for fid in ("wChar", "wParty", "wTrade", "wCraft"):
             self.assertIn(f'id="{fid}"', html)
