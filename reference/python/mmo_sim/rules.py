@@ -156,6 +156,9 @@ def validate_sim_rules(cfg: dict[str, Any]) -> None:
         validate_multi_rules(cfg)
     if "skills" in cfg:
         validate_skill_rules(cfg)
+    if "enemy_abilities" in cfg:
+        from .enemies import validate_enemy_rules
+        validate_enemy_rules(cfg)
     for name, eff in ability_effects(cfg).items():
         if not isinstance(eff, dict) or not eff or set(eff) - set(EFFECT_KEYS):
             raise SimError(f"ability_effects.{name}: unbekannte oder fehlende Wirkung")
