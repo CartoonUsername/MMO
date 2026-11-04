@@ -1,6 +1,6 @@
 # Codex als zweiter Entwickler (Claude Code bleibt Lead)
 
-Quelle: offizielle Anleitung des Plugins <https://github.com/openai/codex-plugin-cc> (Stand der Prüfung: heute; vor Ausführung die Seite noch einmal ansehen). **Status: nicht installiert** – die Einrichtung muss auf dem Zielrechner (Hostinger-VPS, `/root/MMO`) von dir mit deinem ChatGPT-Konto bestätigt werden; die Cloud-Sitzung, in der dieses Dokument entstand, hat weder den VPS noch dein ChatGPT-Login.
+Quelle: offizielle Anleitung des Plugins <https://github.com/openai/codex-plugin-cc> (Stand der Prüfung: heute; vor Ausführung die Seite noch einmal ansehen). **Status: nicht installiert und vorerst nicht geplant (Entscheidung des Nutzers: ohne Codex weiterarbeiten)** – die Einrichtung muss auf dem Zielrechner (Hostinger-VPS, `/root/MMO`) von dir mit deinem ChatGPT-Konto bestätigt werden; die Cloud-Sitzung, in der dieses Dokument entstand, hat weder den VPS noch dein ChatGPT-Login.
 
 ## Voraussetzungen prüfen (auf dem VPS)
 ```bash
