@@ -88,6 +88,36 @@ def skill_commands(cfg: dict[str, Any]) -> tuple[str, ...]:
     return tuple(sorted(skills(cfg)))
 
 
+def element_permille(cfg: dict[str, Any], attacker: str | None, defender: str | None) -> int:
+    """Schadensfaktor (Promille) eines Elements gegen ein Element; 1000 ohne `elements`-Tabelle oder ohne Angabe."""
+    el = cfg.get("elements")
+    if not el or not attacker or not defender:
+        return 1000
+    if attacker == defender:
+        return el["same_permille"]
+    if defender in el["strong"].get(attacker, ()):
+        return el["strong_permille"]
+    if attacker in el["strong"].get(defender, ()):
+        return el["weak_permille"]
+    return 1000
+
+
+def validate_element_rules(cfg: dict[str, Any]) -> None:
+    el = cfg["elements"]
+    for k in ("strong_permille", "weak_permille", "same_permille"):
+        if not isinstance(el.get(k), int) or isinstance(el.get(k), bool) or not 1 <= el[k] <= 3000:
+            raise SimError(f"elements.{k} ungültig")
+    if el["weak_permille"] > 1000 or el["strong_permille"] < 1000:
+        raise SimError("elements: strong >= 1000 >= weak nötig")
+    names = set(el["strong"]) | {x for v in el["strong"].values() for x in v}
+    for a, ds in el["strong"].items():
+        if not isinstance(ds, list) or a in ds:
+            raise SimError(f"elements.strong.{a} ungültig")
+    for name, s in skills(cfg).items():
+        if "element" in s and s["element"] not in names:
+            raise SimError(f"skills.{name}: unbekanntes Element")
+
+
 def validate_skill_rules(cfg: dict[str, Any]) -> None:
     if "multi" not in cfg:
         raise SimError("skills brauchen multi")
@@ -156,6 +186,8 @@ def validate_sim_rules(cfg: dict[str, Any]) -> None:
         validate_multi_rules(cfg)
     if "skills" in cfg:
         validate_skill_rules(cfg)
+    if "elements" in cfg:
+        validate_element_rules(cfg)
     if "enemy_abilities" in cfg:
         from .enemies import validate_enemy_rules
         validate_enemy_rules(cfg)

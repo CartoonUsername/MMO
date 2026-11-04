@@ -28,6 +28,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Persönliche Meisterschaft getrennt vom Objekt | fehlt | – |
 | 9 Elemente, Paare, Dreifach-Endgame | teilweise | `elements`: alle 9, max. 2 regulär + 1 Endgame-Element ab Stufe 40; **Interaktionen/Klassenabhängigkeit nur als 4 Beispiele** (ADR-0027) |
 | Kombinationskatalog 36/84, klassenabhängige Umsetzung, Gegenspiel, Anzeige im Spiel | vorhanden (neu) | ADR-0042; nur beschreibend, Kampfwirkung = AP 4b |
+| Elementschaden im Kampf (Stärke/Schwäche/gleich, Sofort- und Zeitschaden) | vorhanden (neu) | `sim_rules_v8` `elements`, ADR-0043; bisher nur `cast_ember` (Feuer); weitere Elementskills offen |
 | Aktives Elementmanagement im Kampf | fehlt | offen (Frage 6) |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
 | Action-Kampf, Telegraphen, Zustände | teilweise | 1:1-, Gruppen-, Mehrgegner-Kampf, Gegnerfähigkeiten (sim_rules_v7); **Raumkampf/Trefferzonen/PvP fehlen** |

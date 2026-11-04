@@ -27,7 +27,7 @@ from .errors import SimError
 from .fight import EncounterResult
 from .group import _Group, _P, _validated
 from .enemies import abilities_at, effective_interval, extra_commands
-from .rules import COMMANDS, GROUP_COMMANDS, MULTI_COMMANDS, skill_commands, skills
+from .rules import COMMANDS, element_permille, GROUP_COMMANDS, MULTI_COMMANDS, skill_commands, skills
 
 
 @dataclass(frozen=True)
@@ -197,10 +197,12 @@ class _Pack(_Group):
         """Eigene Fähigkeitsbefehle (ADR-0027)."""
         p, kind = self.ps[idx], a["kind"]
         if kind == "burst_dot":
-            self._hurt(e, a["damage"], t, "skill")
-            p.threat += a["damage"]
+            f = element_permille(self.cfg, a.get("element"), e.spec.get("element"))
+            dmg = a["damage"] * f // 1000
+            self._hurt(e, dmg, t, "skill")
+            p.threat += dmg
             d = a["dot"]
-            e.burn = [t + d["ticks"], t + d["interval"], d["damage"], d["interval"], idx]  # neuer Einsatz ersetzt den alten
+            e.burn = [t + d["ticks"], t + d["interval"], d["damage"] * f // 1000, d["interval"], idx]  # neuer Einsatz ersetzt den alten
         elif kind == "evade":
             p.evade_until = t + a["ticks"]
         elif kind == "mitigate":
