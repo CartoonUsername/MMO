@@ -228,6 +228,16 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         for c in cs.values():
             c.w.close()
 
+    async def test_kampfecho_ueber_das_gateway(self):
+        c, _, _ = await WsClient.open(self.port)
+        await c.send({"cmd": "register", "account": "emma", "password": "passwort123"})
+        await c.msg()
+        await self._call(c, 0, "game.join", char="emma")
+        v = (await self._call(c, 1, "query.echoes", char="emma"))["result"]
+        self.assertEqual((v["echoes"], v["max_resonance"]), ([], 30))
+        r = await self._call(c, 2, "echo.upgrade", char="emma", echo="echo-00000001", protect=False, request_id="x")
+        self.assertFalse(r["ok"])                                          # unbekanntes Echo: abgelehnt, nichts passiert
+
     async def test_charakter_sicht_und_klassenwahl(self):
         c, _, _ = await WsClient.open(self.port)
         await c.send({"cmd": "register", "account": "anna", "password": "passwort123"})

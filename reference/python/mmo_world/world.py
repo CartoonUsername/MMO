@@ -16,6 +16,7 @@ from mmo_cee.service import CharacterService
 from .company import CompanyRegistry, load_company_rules
 from .company_service import CompanyService
 from .crafting import CraftingService
+from .echo import EchoService, load_echo_rules
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
 from .notifications import Outbox
@@ -34,6 +35,7 @@ PRODUCTION_RULES = "production_rules_v1.json"
 PRICING_RULES = "pricing_rules_v1.json"
 TRADE_RULES = "trade_rules_v1.json"
 PARTY_RULES = "party_rules_v1.json"
+ECHO_RULES = "echo_rules_v1.json"
 
 
 class World:
@@ -81,7 +83,12 @@ class World:
             if oldq is not None:
                 self.pricing.factors, self.pricing.shocks = oldq.factors, oldq.shocks
                 self.pricing.maker_used, self.pricing.last_day = oldq.maker_used, oldq.last_day
-        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties):
+        olde = getattr(self, "echo", None)
+        self.echo = EchoService(self.svc, self.inv, self.trading.coin, load_echo_rules(ECHO_RULES), clock, olde.seed if olde else None)
+        if olde is not None:
+            for a in ("_counter", "_listing_counter", "echoes", "listings", "equipped", "mastery", "mastery_day", "awards"):
+                setattr(self.echo, a, getattr(olde, a))
+        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties, self.echo):
             svc.notify = self.outbox.emit  # Benachrichtigungen (abgeleitet, nicht Teil des Weltzustands/der Vektor-Hashes)
 
     def snapshot(self) -> dict[str, Any]:
@@ -94,6 +101,8 @@ class World:
             snap["trade_offers"] = json.loads(self.offers.to_json())
         if self.production.active:
             snap["production"] = json.loads(self.production.to_json())
+        if self.echo.active:
+            snap["echoes"] = json.loads(self.echo.to_json())
         if self.pricing is not None and self.pricing.active:
             snap["pricing"] = json.loads(self.pricing.to_json())
         return snap

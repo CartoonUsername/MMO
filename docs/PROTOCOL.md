@@ -127,6 +127,15 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `essence.decide` | char:s, decision:s, choice:s | char | schreibend | default |
 | `essence.trial` | char:s, form:s | char | schreibend | default |
 | `essence.adopt` | char:s, form:s, ack:s | char | schreibend | default |
+| `echo.activate` | char:s, echo:s | char | schreibend | default |
+| `echo.release` | char:s, echo:s | char | schreibend | default |
+| `echo.equip` | char:s, echo:s, role:s | char | schreibend | default |
+| `echo.unequip` | char:s, echo:s | char | schreibend | default |
+| `echo.upgrade` | char:s, echo:s, protect?:b, request_id?:s | char | schreibend | default |
+| `echo.list` | char:s, echo:s, price:i | char | schreibend | default |
+| `echo.cancel` | char:s, listing:s | char | schreibend | default |
+| `echo.buy` | char:s, listing:s | char | schreibend | default |
+| `query.echoes` | char:s | char | lesend | query |
 | `query.element_catalog` |  | – | lesend | query |
 | `query.appearance` | char:s | – | lesend | query |
 

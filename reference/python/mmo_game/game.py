@@ -33,7 +33,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v4.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v5.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -328,8 +328,29 @@ class GameServer:
             after = self.world.svc.state(c).parts["identity"]["level"]
             if after > before:
                 g["level"] = after
+            eg = self._echo_gains(c, types)
+            if eg:
+                g["echo"] = eg
             gains[c] = g
         return gains
+
+    def _echo_gains(self, c: str, types: list[str]) -> dict[str, Any]:
+        """Kampfechos (AP 7): einmaliges Echo beim ersten Sieg über bestimmte Gegner, Resonanzmaterial, persönliche Meisterschaft."""
+        E = self.R.get("echo")
+        if not E:
+            return {}
+        out: dict[str, Any] = {}
+        for t in dict.fromkeys(types):
+            d = E["first_kill"].get(t)
+            if d and self.world.echo.award_once(c, d):
+                out.setdefault("echoes", []).append(d)
+            for key, qty in E["material_per_victory"].get(t, {}).items():
+                self.world.inv.deposit(c, key, qty)
+                out.setdefault("items", {})[key] = out.get("items", {}).get(key, 0) + qty
+        m = self.world.echo.grant_mastery(c, E["mastery_per_victory"])
+        if m:
+            out["mastery"] = m
+        return out
 
     def _check_pois(self) -> None:
         """Erkundung: Hinweise an festen Orten (je Figur einmalig); Entdeckungen der CEE schließt der Spieler selbst ab."""

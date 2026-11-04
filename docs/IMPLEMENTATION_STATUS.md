@@ -22,8 +22,8 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 ## Kampfecho, Resonanz, Elemente, Kampf (Teil VI–VIII)
 | Blueprint | Stand | Beleg / Lücke |
 |---|---|---|
-| Kampfecho (Haupttradition + Hybrid) | **fehlt** | keine Treffer im Code |
-| Resonanz +0..+30, Rückschritt, Schutz, Pechschutz, atomar | **fehlt** | Erfolgsraten/Kosten bewusst offen (Frage 8) → konfigurierbar bauen |
+| Kampfecho (Haupttradition + Hybrid) | vorhanden (neu) | `mmo_world/echo.py`, ADR-0046; Kampfwirkung der Echos in der Simulation fehlt noch |
+| Resonanz +0..+30, Rückschritt, Schutz, Pechschutz, atomar | vorhanden (neu), Raten/Kosten Platzhalter | Erfolgsraten/Kosten bewusst offen (Frage 8) → konfigurierbar bauen |
 | Handelbarkeit: unaktiviert handelbar, aktiviert gebunden, Freigabe | **fehlt** | direkter Handel (ADR-0023) und Markt (ADR-0015) existieren als Grundlage |
 | Persönliche Meisterschaft getrennt vom Objekt | fehlt | – |
 | 9 Elemente, Paare, Dreifach-Endgame | teilweise | `elements`: alle 9, max. 2 regulär + 1 Endgame-Element ab Stufe 40; **Interaktionen/Klassenabhängigkeit nur als 4 Beispiele** (ADR-0027) |

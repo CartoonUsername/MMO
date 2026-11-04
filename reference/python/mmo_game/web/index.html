@@ -97,6 +97,9 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
       <div class="row2"><input id="tQty" type="number" min="1" value="1" placeholder="Menge"><input id="tPrice" type="number" min="1" value="10" placeholder="Preis gesamt"></div>
       <button id="tSend" style="width:100%;margin-top:4px">Angebot senden</button>
       <div id="tradeMsg" class="msg" role="status"></div></details>
+    <details class="panel win" id="wEcho"><summary>Kampfechos</summary>
+      <div class="hint">Kampfechos tragen Kampftraditionen. Aktivieren bindet sie an dich; Resonanz +0 bis +30 kostet Material und Münzen, ein Fehlschlag zerstört nie das Echo, ab Stufe 10 kann die Stufe sinken (Schutzstein verhindert das). Zahlen sind Entwürfe.</div>
+      <div id="echoBox"></div><div id="echoMsg" class="msg" role="status"></div></details>
     <details class="panel win" id="wCraft"><summary>Herstellen</summary>
       <div class="hint">Rezepte (Platzhalter, nicht alle sofort verfügbar – manche brauchen Entdeckungen oder Berufsstufe).</div>
       <select id="cRecipe"></select><div id="cInfo" class="hint"></div>
@@ -183,7 +186,36 @@ async function refreshTrade(){
   for(const o of r.result.incoming)a.appendChild(li(offerText(o),[["Annehmen",()=>act("tradeMsg","trade.accept",{offer:o.id},"Angenommen")],["Ablehnen",()=>act("tradeMsg","trade.decline",{offer:o.id},"Abgelehnt")]]));
   for(const o of r.result.outgoing)b.appendChild(li(offerText(o),[["Zurückziehen",()=>act("tradeMsg","trade.cancel",{offer:o.id},"Zurückgezogen")]]));
 }
-function refreshWins(){if($("wChar").open)refreshChar().catch(()=>{});if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
+function newRid(){return "r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+async function refreshEcho(){
+  const r=await call("query.echoes",{});if(!r.ok){$("echoBox").textContent=errMsg(r);return}
+  const v=r.result,box=$("echoBox");box.textContent="";const inv=(await call("query.inventory",{})).result||{};
+  const have=k=>inv[k]||0;kv(box,"Resonanzstaub / Schutzsteine / Siegel",have(v.items.dust)+" / "+have(v.items.protect)+" / "+have(v.items.seal));
+  if(!v.echoes.length)box.appendChild(el("div","Noch kein Kampfecho – besiege starke Gegner (z. B. den Alpha-Wolf).","hint"));
+  const lo=v.loadout;
+  for(const e of v.echoes){sect(box,e.name+" +"+e.resonance);
+    barRow(box,e.band.name,e.resonance,v.max_resonance,"nd");
+    box.appendChild(el("div",e.text+(e.element?" ["+(ELEM_NAME[e.element]||e.element)+"]":"")+" · Klassen: "+(e.classes?e.classes.map(k=>CLASS_NAME[k]||k).join(", "):"alle")+" · "+(e.activated?(e.bound?"gebunden":"aktiviert, handelbar"):"unaktiviert, handelbar"),"hint"));
+    const slot=lo.main===e.id?"Haupttradition":lo.hybrid.includes(e.id)?"Hybrid":null;if(slot)kv(box,"Ausgerüstet",slot);
+    const row=el("div","","row2");const btn=(t,f)=>{const b=el("button",t);b.onclick=f;row.appendChild(b)};
+    if(!e.bound)btn("Aktivieren",async()=>{if(!confirm("„"+e.name+"“ aktivieren? Es wird an deinen Charakter gebunden und ist erst mit einem Resonanzsiegel wieder handelbar."))return;await act("echoMsg","echo.activate",{echo:e.id},"Aktiviert");refreshEcho()});
+    if(e.bound&&!slot){btn("Haupt",async()=>{await act("echoMsg","echo.equip",{echo:e.id,role:"main"},"Ausgerüstet");refreshEcho()});btn("Hybrid",async()=>{await act("echoMsg","echo.equip",{echo:e.id,role:"hybrid"},"Ausgerüstet");refreshEcho()})}
+    if(slot)btn("Ablegen",async()=>{await act("echoMsg","echo.unequip",{echo:e.id},"Abgelegt");refreshEcho()});
+    if(e.bound&&!slot)btn("Lösen (Siegel)",async()=>{if(!confirm("Resonanzsiegel einsetzen? Das Echo wird wieder handelbar, die Stufe bleibt."))return;await act("echoMsg","echo.release",{echo:e.id},"Handelbar");refreshEcho()});
+    box.appendChild(row);
+    if(e.bound&&e.next){box.appendChild(el("div","Nächste Stufe: Chance "+e.next.chance_permille/10+" % · Kosten "+e.next.cost.dust+" Staub + "+e.next.cost.coins+" Münzen"+(e.next.drop_risk?" · Risiko: Stufenverlust bei Fehlschlag":""),"hint"));
+      const r2=el("div","","row2"),up=el("button","Verbessern"),pr=el("button","Mit Schutzstein");
+      up.onclick=async()=>{const x=await act("echoMsg","echo.upgrade",{echo:e.id,request_id:newRid()},"");if(x&&x.ok){const q=x.result;setMsg("echoMsg",q.success?"Erfolg! Stufe +"+q.after:"Fehlschlag"+(q.after<q.before?" – Stufe sinkt auf +"+q.after:""),q.success)}refreshEcho()};
+      pr.onclick=async()=>{const x=await act("echoMsg","echo.upgrade",{echo:e.id,protect:true,request_id:newRid()},"");if(x&&x.ok){const q=x.result;setMsg("echoMsg",q.success?"Erfolg! Stufe +"+q.after:"Fehlschlag"+(q.protected?" – Schutzstein bewahrt die Stufe":""),q.success)}refreshEcho()};
+      r2.append(up,pr);box.appendChild(r2)}
+    if(e.tradable&&!e.listing){const r3=el("div","","row2"),pi=el("input");pi.type="number";pi.min="1";pi.value="1000";const b=el("button","Anbieten");
+      b.onclick=async()=>{await act("echoMsg","echo.list",{echo:e.id,price:parseInt(pi.value,10)||0},"Angeboten");refreshEcho()};r3.append(pi,b);box.appendChild(r3)}
+    if(e.listing){const b=el("button","Angebot zurückziehen");b.onclick=async()=>{await act("echoMsg","echo.cancel",{listing:e.listing},"Zurückgezogen");refreshEcho()};box.appendChild(b)}}
+  const ms=Object.entries(v.mastery);if(ms.length){sect(box,"Persönliche Meisterschaft");for(const [k,m] of ms)kv(box,k,"Stufe "+m.level+" ("+m.points+")")}
+  if(v.market.length){sect(box,"Angebote anderer");for(const m of v.market){const row=el("div","","row2");row.append(el("span",m.echo.name+" +"+m.echo.resonance+" · "+m.price+" Münzen"));
+    const b=el("button","Kaufen");b.onclick=async()=>{if(!confirm(m.echo.name+" +"+m.echo.resonance+" für "+m.price+" Münzen kaufen?"))return;await act("echoMsg","echo.buy",{listing:m.id},"Gekauft");refreshEcho()};row.appendChild(b);box.appendChild(row)}}
+}
+function refreshWins(){if($("wEcho")&&$("wEcho").open)refreshEcho().catch(()=>{});if($("wChar").open)refreshChar().catch(()=>{});if($("wParty").open)refreshParty().catch(()=>{});if($("wTrade").open)refreshTrade().catch(()=>{})}
 function buildCraft(){
   const s=$("cRecipe");for(const [id,[n]] of Object.entries(RECIPES)){const o=document.createElement("option");o.value=id;o.textContent=n;s.appendChild(o)}
   const info=()=>{const [n,inp,out]=RECIPES[s.value];$("cInfo").textContent="Zutaten je Stück: "+Object.entries(inp).map(([k,v])=>v+" × "+k).join(", ")+" → "+out+" ×"};
@@ -199,7 +231,7 @@ function wireWins(){
   $("tSend").onclick=()=>{const to=$("tTo").value.trim(),item=$("tItem").value.trim(),qty=Math.floor(+$("tQty").value),price=Math.floor(+$("tPrice").value);
     if(!to||!item||!(qty>0)||!(price>0)){setMsg("tradeMsg","Figur, Ware, Menge und Preis ausfüllen.",false);return}
     act("tradeMsg","trade.offer",{to,side:$("tSide").value,item_key:item,qty,price},"Angebot gesendet")};
-  refreshChar().catch(()=>{});initElem().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
+  refreshChar().catch(()=>{});initElem().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wEcho").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
 }
 const NOTE={"trade.offer_received":"Neues Handelsangebot","trade.offer_accepted":"Handelsangebot angenommen","trade.offer_declined":"Handelsangebot abgelehnt","trade.offer_cancelled":"Handelsangebot zurückgezogen","trade.offer_expired":"Handelsangebot abgelaufen","party.invited":"Gruppeneinladung","party.joined":"Jemand ist der Gruppe beigetreten","party.left":"Jemand hat die Gruppe verlassen"};
 function notifyText(i){const k=i&&(i.kind||i.type);return (NOTE[k]||k||"Nachricht")+(i&&i.data?" "+JSON.stringify(i.data):"")}
@@ -288,7 +320,9 @@ function renderEssence(box,c){
       if(!confirm("Wesensform „"+f.name+"“ DAUERHAFT annehmen?\nVorteile: "+Object.entries(f.advantages).map(([k,v])=>k+" +"+v/10+"%").join(", ")+"\nNachteile: "+Object.entries(f.disadvantages).map(([k,v])=>k+" −"+v/10+"%").join(", ")+"\nDas kann nicht rückgängig gemacht werden."))return;
       await act("charMsg","essence.adopt",{form:f.id,ack:"adopt:"+f.id},"Wesensform angenommen");refreshChar()};box.appendChild(b)}}
 }
-function showGains(g){if(!g||!(g.xp||Object.keys(g.elements||{}).length))return;const parts=[];if(g.xp)parts.push("+"+g.xp+" EP");
+function showGains(g){if(g&&g.echo){const e=g.echo,p=[];if((e.echoes||[]).length)p.push("NEUES KAMPFECHO: "+e.echoes.join(", ")+" (Fenster Kampfechos)");
+  if(e.items)p.push("Resonanzmaterial: "+Object.entries(e.items).map(([k,v])=>"+"+v+" "+k.split("@")[0]).join(", "));if(e.mastery)p.push("+"+e.mastery+" Meisterschaft");log("Echo: "+p.join(" · "),"g");if($("wEcho").open)refreshEcho().catch(()=>{})}
+  if(!g||!(g.xp||Object.keys(g.elements||{}).length))return;const parts=[];if(g.xp)parts.push("+"+g.xp+" EP");
   for(const [k,v] of Object.entries(g.elements||{}))parts.push("+"+v+" "+(ELEM_NAME[k]||k));log("Entwicklung: "+parts.join(" · ")+(g.level?" · STUFE "+g.level+"!":""),"g");
   const m=ents.get("me");if(m){if(g.xp)floatText(m.x,m.y,"+"+g.xp+" EP","#9fd3ff");if(g.level)floatText(m.x,m.y-60,"Stufe "+g.level+"!","#ffd166")}refreshChar().catch(()=>{})}
 function endFightUi(){fight=null;cdState={};busyUntil=0;stamNow=kitStamina;stunnedNow=false;teleNow=null;$("fightpanel").style.display="none";$("hpwrap").style.display="none"}
