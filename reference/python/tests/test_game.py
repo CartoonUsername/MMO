@@ -242,8 +242,10 @@ class CombatTests(unittest.TestCase):
         self.assertEqual((start["opponents"], start["party"], start["you"]), (["wolf", "wolf"], ["anna"], 0))
         self.assertEqual(end["outcome"], "victory")
         self.assertEqual(end["report"]["opponent_type"], "wolf")
-        self.assertEqual(end["loot"], {"coin@gold": 12, "healing_herb@standard": 2})
-        self.assertEqual(g.world.inv.balance("anna", "coin@gold"), 212)
+        drops = g.R["drops"]["wolf"]
+        self.assertEqual(end["loot"], {"coin@gold": 2 * drops["coin@gold"], "healing_herb@standard": 2 * drops["healing_herb@standard"]})         # zwei Wölfe, erster Kill des Tages
+        self.assertEqual(end["loot_factor"], {"wolf": 1000})
+        self.assertEqual(g.world.inv.balance("anna", "coin@gold"), 200 + 2 * drops["coin@gold"])
         self.assertEqual(g.log, [])                                            # Live-Ergebnis == Neuberechnung
         st = g.world.svc.state("anna")
         self.assertGreater(sum(st.parts["combat"]["points"].values()), 0)      # Entwicklung entsteht aus dem Bericht
@@ -338,8 +340,9 @@ class CombatTests(unittest.TestCase):
         fight_until_end(g, [a, b])
         ea, eb = kinds(a, "fight_end")[0], kinds(b, "fight_end")[0]
         self.assertEqual((ea["outcome"], eb["outcome"]), ("victory", "victory"))
-        self.assertEqual(sum(l.get("coin@gold", 0) for l in (ea["loot"], eb["loot"])), 12)
-        self.assertEqual(sum(l.get("healing_herb@standard", 0) for l in (ea["loot"], eb["loot"])), 2)
+        drops = g.R["drops"]["wolf"]
+        self.assertEqual(sum(l.get("coin@gold", 0) for l in (ea["loot"], eb["loot"])), 2 * drops["coin@gold"])
+        self.assertEqual(sum(l.get("healing_herb@standard", 0) for l in (ea["loot"], eb["loot"])), 2 * drops["healing_herb@standard"])
         self.assertIsNotNone(ea["report"])
         self.assertIsNotNone(eb["report"])
         self.assertEqual(g.log, [])
@@ -363,7 +366,7 @@ class CombatTests(unittest.TestCase):
         b.pull()
         eb = kinds(b, "fight_end")[0]
         self.assertEqual((eb["loot"], eb["report"]), ({}, None))
-        self.assertEqual(kinds(a, "fight_end")[0]["loot"]["coin@gold"], 12)
+        self.assertEqual(kinds(a, "fight_end")[0]["loot"]["coin@gold"], 2 * g.R["drops"]["wolf"]["coin@gold"])
 
     def test_a_third_player_cannot_join_a_running_fight(self):
         g = GameServer()
@@ -681,7 +684,7 @@ class SurvivorTests(unittest.TestCase):
         fight_until_end(g, [a])
         b.pull()
         self.assertEqual(kinds(b, "fight_left")[0]["reason"], "fled")
-        self.assertEqual(kinds(a, "fight_end")[0]["loot"]["coin@gold"], 6)         # alles an anna
+        self.assertEqual(kinds(a, "fight_end")[0]["loot"]["coin@gold"], g.R["drops"]["wolf"]["coin@gold"])         # alles an anna
         eb = kinds(b, "fight_end")[0]
         self.assertEqual((eb["outcome"], eb["loot"], eb["report"] is not None), ("fled", {}, True))      # Bericht ja, Beute nein
 

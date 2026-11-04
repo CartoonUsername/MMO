@@ -35,5 +35,5 @@ Zu viele Befehle: `rate_limited` (Budget füllt sich ein Befehl je Tick).
 - `telegraph`: `{fight, t, enemy, ability, kind, ticks, target, answers:[…]}` – **Ankündigung** einer Gegnerfähigkeit (ab `sim_rules_v7` auch jedes normalen Angriffs: `kind: basic`); sie wirkt genau `ticks` Ticks später. `answers` nennt die Antworten (`dodge`, `block`, `parry`, `interrupt`, `shield`, `break_shield`, `kill_caster`, `area`, `focus`); `target` ist der Index des Spielers (oder `null`).
 - `enemy_event`: `{fight, t, type, …}` mit `type` = `resolved` (Wirkung eingetreten; `outcome` bzw. `outcomes` je Spieler, `ally`, `summoned`), `interrupted`, `shield_broken` (`by`) oder `phase` (`phase`).
 - `fight_left`: `{fight, reason: defeat|fled}` – du bist raus.
-- `fight_end`: `{fight, outcome, ticks, actions, report, loot}` – `report` ist der CEE-Bericht (oder `null`, wenn nichts bewertbar war), `loot` die erhaltene Beute.
+- `fight_end`: `{fight, outcome, ticks, actions, report, loot, loot_factor}` – `report` ist der CEE-Bericht (oder `null`, wenn nichts bewertbar war), `loot` die erhaltene Beute, `loot_factor` der Beutefaktor in Promille je Gegnerart (sinkt ab dem vierten Kill derselben Art am selben Tag, ADR-0035).
 - `notify`: Benachrichtigung aus dem Postfach (ADR-0024), z. B. Angebot erhalten.

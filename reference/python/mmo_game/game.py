@@ -90,6 +90,7 @@ class GameServer:
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
         self.saved_pos: dict[str, tuple[int, int]] = {}
+        self.kills: dict[str, int] = {}                  # "Figur|Gegnerart" -> Kills am aktuellen Tag (Beuteabnahme, ADR-0035)
         if world is not None:                                # Neustart: Zähler und Zustand aus dem gespeicherten Spiel
             self.encounters._counter = _max_encounter_counter(world)
         if saved:
@@ -101,6 +102,8 @@ class GameServer:
             for n in self.nodes:
                 n["ready_at"] = int(saved.get("nodes", {}).get(n["id"], 0))
             self.saved_pos = {c: (int(x), int(y)) for c, (x, y) in saved.get("positions", {}).items()}
+            if saved.get("kills_day") == self.world.day[0]:
+                self.kills = {k: int(v) for k, v in saved.get("kills", {}).items()}
 
     # ---------------------------------------------------------------- Speichern ----
     def save(self, store: Store) -> int:
@@ -109,6 +112,7 @@ class GameServer:
         state = {"generation": gen, "tick": self.tick_no, "format": 1,
                  "nodes": {n["id"]: n["ready_at"] for n in self.nodes},
                  "enemies": {e["id"]: {"alive": e["alive"], "respawn_at": e["respawn_at"]} for e in self.enemies},
+                 "kills_day": self.world.day[0], "kills": dict(sorted(self.kills.items())),
                  "positions": {**{c: list(p) for c, p in self.saved_pos.items()}, **{c: list(p["pos"]) for c, p in self.players.items()}}}
         tmp = store.path / "game_state.json.tmp"
         tmp.write_text(json.dumps(state, sort_keys=True, separators=(",", ":")), encoding="utf-8")
@@ -280,6 +284,7 @@ class GameServer:
     def _new_day(self, day: int) -> None:
         w = self.world
         w.day[0] = day
+        self.kills = {}                                  # Beuteabnahme beginnt jeden Tag neu
         w.company.advance_day(day)
         w.exchange.expire(day)
         w.offers.expire(day)
@@ -468,27 +473,42 @@ class GameServer:
         for e in killed:
             e["fight"] = None
             if result.outcome == "victory":
-                e["alive"], e["respawn_at"] = False, self.tick_no + self.R["respawn_ticks"]
+                e["alive"], e["respawn_at"] = False, self.tick_no + self.R.get("respawn_ticks_by_type", {}).get(e["type"], self.R["respawn_ticks"])
             else:
                 self._begin_return(e)                           # Kampf ohne Sieg: zurück nach Hause
-        loot = self._loot(chars, result, f["types"]) if result.outcome == "victory" else {}
+        loot, factors = self._loot(chars, result, f["types"]) if result.outcome == "victory" else ({}, {})
         for i, c in enumerate(chars):
             if c in self.players:
                 pr = result.players[i]
                 self._emit_to(c, {"ev": "fight_end", "fight": fid, "outcome": pr.outcome, "ticks": result.ticks,
-                                  "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {})})
+                                  "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {}), "loot_factor": factors})
 
-    def _loot(self, chars: list[str], result: Any, types: list[str]) -> dict[str, dict[str, int]]:
+    def _decay(self, chars: list[str], t: str) -> int:
+        """Beutefaktor in Promille für das Töten der Art `t`: Mittel der Faktoren aller beteiligten Figuren (je nach ihren bisherigen Kills heute)."""
+        table = self.R["loot_decay_permille"]
+        return sum(table[min(self.kills.get(f"{c}|{t}", 0), len(table) - 1)] for c in chars) // len(chars)
+
+    def _loot(self, chars: list[str], result: Any, types: list[str]) -> tuple[dict[str, dict[str, int]], dict[str, int]]:
+        """Beute eines Sieges: Münzen gleichmäßig, Gegenstände nach Gruppenmodus; nur Teilnehmer mit Beitrag. Die Menge je Gegnerart sinkt mit den
+        bisherigen Kills der Beteiligten am selben Tag (Rückgabe: Beute je Figur, Faktor je Gegnerart)."""
         eligible = [c for i, c in enumerate(chars) if result.players[i].outcome == "victory" and result.players[i].actions]
+        out: dict[str, dict[str, int]] = {}
+        factors: dict[str, int] = {}
+        if not eligible:
+            return out, factors
         totals: dict[str, int] = {}
         for t in types:
+            f = self._decay(eligible, t)
+            factors[t] = f
             for key, qty in self.R["drops"].get(t, {}).items():
-                totals[key] = totals.get(key, 0) + qty
-        out: dict[str, dict[str, int]] = {}
-        if not eligible:
-            return out
+                totals[key] = totals.get(key, 0) + qty * f // 1000
+        for t in types:
+            for c in eligible:
+                self.kills[f"{c}|{t}"] = self.kills.get(f"{c}|{t}", 0) + 1
         view = self.world.parties.view(eligible[0]) if len(chars) > 1 else None
         for key, qty in sorted(totals.items()):
+            if qty <= 0:
+                continue
             if key == COIN:                                 # Münzen: gleichmäßig an alle mit Beitrag, Rest der Reihe nach
                 share, rest = divmod(qty, len(eligible))
                 alloc = {c: share + (1 if i < rest else 0) for i, c in enumerate(eligible)}
@@ -503,7 +523,7 @@ class GameServer:
                 alloc = {eligible[0]: qty}
             for c, n in alloc.items():
                 out.setdefault(c, {})[key] = n
-        return out
+        return out, factors
 
     def _leave(self, char: str) -> None:
         fid = self.fight_of.get(char)

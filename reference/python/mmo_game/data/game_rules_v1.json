@@ -173,40 +173,46 @@
   "gather_reach": 250,
   "drops": {
     "wolf": {
-      "coin@gold": 6,
-      "healing_herb@standard": 1
+      "coin@gold": 56,
+      "healing_herb@standard": 6
     },
     "bear": {
-      "coin@gold": 20
-    },
-    "alpha_wolf": {
-      "coin@gold": 30,
-      "healing_herb@standard": 2
+      "coin@gold": 110,
+      "iron_ore@standard": 6
     },
     "wisp_healer": {
-      "coin@gold": 8,
-      "healing_herb@standard": 2
+      "coin@gold": 38,
+      "healing_herb@standard": 8
     },
     "bog_witch": {
-      "coin@gold": 14,
-      "frost_lily@standard": 1
-    },
-    "stone_warden": {
-      "coin@gold": 25,
-      "iron_ore@standard": 3
+      "coin@gold": 90,
+      "frost_lily@standard": 2,
+      "glass_sand@standard": 6
     },
     "shadow_hunter": {
-      "coin@gold": 16,
-      "charcoal@standard": 2
+      "coin@gold": 90,
+      "charcoal@standard": 8
     },
     "totem_caller": {
-      "coin@gold": 15,
-      "timber@standard": 2
+      "coin@gold": 80,
+      "timber@standard": 8
+    },
+    "stone_warden": {
+      "coin@gold": 120,
+      "iron_ore@standard": 8,
+      "iron_ingot@standard": 1
+    },
+    "alpha_wolf": {
+      "coin@gold": 220,
+      "healing_herb@standard": 10,
+      "iron_ingot@standard": 6
     },
     "stone_heart_colossus": {
-      "coin@gold": 120,
-      "iron_ingot@standard": 4,
-      "glass_sand@standard": 3
+      "coin@gold": 800,
+      "iron_ingot@standard": 25,
+      "glass_sand@standard": 30,
+      "frost_lily@standard": 8,
+      "iron_blade@fine": 2
     }
   },
   "terrain": {
@@ -359,5 +365,20 @@
       "stone_heart_colossus": 24,
       "wolf_pup": 36
     }
+  },
+  "loot_decay_permille": [
+    1000,
+    1000,
+    1000,
+    750,
+    500,
+    250,
+    100
+  ],
+  "_loot_comment": "PLATZHALTER: Beute je Gegnerart. Der Wert (Münzen + Gegenstände zum Referenzwert) richtet sich nach Dauer und Risiko des Kampfes laut Balancing-Bericht (ADR-0035). `loot_decay_permille`: je Figur, Gegnerart und Tag mindert sich die Beute ab dem vierten Kill (Index = bisherige Kills).",
+  "respawn_ticks_by_type": {
+    "alpha_wolf": 1800,
+    "stone_warden": 1200,
+    "stone_heart_colossus": 6000
   }
 }
