@@ -123,7 +123,7 @@ class WsClient:
 class ServerTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.srv = NetServer(tick_seconds=0.02, auth=AccountStore(Path(self.tmp.name) / "a.json"))
+        self.srv = NetServer(port=0, tick_seconds=0.02, auth=AccountStore(Path(self.tmp.name) / "a.json"))
         self.port = await self.srv.start()
 
     async def asyncTearDown(self):
@@ -245,7 +245,7 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
 class ProxyTests(unittest.IsolatedAsyncioTestCase):
     async def _two(self, trust):
         with tempfile.TemporaryDirectory() as tmp:
-            srv = NetServer(tick_seconds=0.05, auth=AccountStore(Path(tmp) / "a.json"), max_per_ip=1, trust_proxy=trust)
+            srv = NetServer(port=0, tick_seconds=0.05, auth=AccountStore(Path(tmp) / "a.json"), max_per_ip=1, trust_proxy=trust)
             port = await srv.start()
             res = []
             cs = []
@@ -284,7 +284,7 @@ class BrowserSmoke(unittest.IsolatedAsyncioTestCase):
     @unittest.skipUnless(_have_browser(), "node/playwright nicht verfügbar")
     async def test_zwei_browser_spieler(self):
         with tempfile.TemporaryDirectory() as tmp:
-            srv = NetServer(tick_seconds=0.1, auth=AccountStore(Path(tmp) / "a.json"), max_per_ip=8)
+            srv = NetServer(port=0, tick_seconds=0.1, auth=AccountStore(Path(tmp) / "a.json"), max_per_ip=8)
             port = await srv.start()
             npm_root = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True).stdout.strip()
             proc = await asyncio.create_subprocess_exec("node", str(HERE / "browser" / "smoke.js"), str(port),
