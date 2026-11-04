@@ -244,5 +244,19 @@
         "kind": "rock"
       }
     ]
+  },
+  "enemy_ai": {
+    "_comment": "PLATZHALTER: Gegner bemerken Spieler im Alarmradius (aggro_radius, freie Strecke), verfolgen sie, kämpfen ab dem Kampfradius und kehren zurück, wenn sie das Ziel verlieren oder zu weit von zu Hause sind.",
+    "engage_radius": 150,
+    "leash_radius": 2200,
+    "home_radius": 60,
+    "repath_ticks": 10,
+    "stuck_limit": 6,
+    "grid_cm": 100,
+    "speed_cm_per_tick": {
+      "wolf": 40,
+      "bear": 28,
+      "default": 30
+    }
   }
 }

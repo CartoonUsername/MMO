@@ -23,6 +23,7 @@ from mmo_sim.rules import load_sim_rules
 from mmo_world import WorldError
 from mmo_world.persistence import PersistenceError, Store
 
+from .navigation import Navigator
 from .terrain import Terrain, TerrainError
 from mmo_world.world import World
 
@@ -76,9 +77,11 @@ class GameServer:
         self.fights: dict[str, dict[str, Any]] = {}
         self.fight_of: dict[str, str] = {}               # Figur -> Kampf
         self.enemies = [{"id": f"e{i + 1}", "type": e["type"], "pos": tuple(e["at"]), "home": tuple(e["at"]), "alive": True,
-                         "respawn_at": 0, "fight": None} for i, e in enumerate(self.R["enemies"])]
+                         "respawn_at": 0, "fight": None, "state": "idle", "target": None, "path": [], "repath_at": 0, "stuck": 0}
+                        for i, e in enumerate(self.R["enemies"])]
         self.nodes = [{**n, "pos": tuple(n["at"]), "ready_at": 0} for n in self.R["nodes"]]
         self.terrain = Terrain(self.R["terrain"], self.R["zone"], self.R["speed_cm_per_tick"])
+        self.nav = Navigator(self.terrain, self.R["enemy_ai"]["grid_cm"])
         for what, pos in [("Startpunkt", tuple(self.R["zone"]["spawn"]))] + [(f"Gegner {e['id']}", e["pos"]) for e in self.enemies] + [(f"Sammelpunkt {n['id']}", n["pos"]) for n in self.nodes]:
             if self.terrain.blocked(*pos):
                 raise TerrainError(f"{what} liegt im Blockierten: {pos}")
@@ -266,7 +269,8 @@ class GameServer:
             self._new_day(self.world.day[0] + 1)
         self._move_players()
         self._respawn()
-        self._aggro()
+        self._alert()
+        self._enemies_act()
         self._advance_fights()
         if self.tick_no % self.R["state_every_ticks"] == 0:
             for c in list(self.players):
@@ -292,26 +296,93 @@ class GameServer:
     def _respawn(self) -> None:
         for e in self.enemies:
             if not e["alive"] and self.tick_no >= e["respawn_at"]:
-                e["alive"] = True
-                e["pos"] = e["home"]
+                e.update(alive=True, pos=e["home"], state="idle", target=None, path=[], stuck=0)
 
-    # ---------------------------------------------------------------- Kampfbeginn ----
-    def _aggro(self) -> None:
+    # ---------------------------------------------------------------- Gegner-KI (ADR-0031) ----
+    def _speed_of(self, e: dict[str, Any]) -> int:
+        sp = self.R["enemy_ai"]["speed_cm_per_tick"]
+        return sp.get(e["type"], sp["default"])
+
+    def _alert(self) -> None:
+        """Ruhende Gegner bemerken Spieler im Alarmradius (freie Strecke) und beginnen die Verfolgung; ihr Rudel schließt sich an."""
         R = self.R
         for c in list(self.players):
             p = self.players[c]
             if c in self.fight_of or self.tick_no < p["immune_until"]:
                 continue
-            trigger = next((e for e in self.enemies if e["alive"] and e["fight"] is None
-                            and _dist2(p["pos"], e["pos"]) <= R["aggro_radius"] ** 2
-                            and self.terrain.clear_line(p["pos"], e["pos"])), None)
-            if trigger is None:
-                continue
-            maxo = self.sim["multi"]["max_opponents"]
-            pack = [e for e in self.enemies if e["alive"] and e["fight"] is None
-                    and _dist2(trigger["pos"], e["pos"]) <= R["pack_radius"] ** 2][:maxo]
-            self._start_fight(c, pack)
+            for e in self.enemies:
+                if (e["alive"] and e["fight"] is None and e["state"] == "idle"
+                        and _dist2(p["pos"], e["pos"]) <= R["aggro_radius"] ** 2 and self.terrain.clear_line(p["pos"], e["pos"])):
+                    self._begin_chase(e, c)
+                    for o in self.enemies:
+                        if (o is not e and o["alive"] and o["fight"] is None and o["state"] == "idle"
+                                and _dist2(e["pos"], o["pos"]) <= R["pack_radius"] ** 2):
+                            self._begin_chase(o, c)
 
+    def _begin_chase(self, e: dict[str, Any], char: str) -> None:
+        e.update(state="chase", target=char, path=[], repath_at=0, stuck=0)
+
+    def _begin_return(self, e: dict[str, Any]) -> None:
+        e.update(state="return", target=None, path=[], repath_at=0, stuck=0)
+
+    def _enemies_act(self) -> None:
+        ai = self.R["enemy_ai"]
+        for e in self.enemies:
+            if not e["alive"] or e["fight"] is not None:
+                continue
+            if e["state"] == "chase":
+                c = e["target"]
+                p = self.players.get(c)
+                if (p is None or c in self.fight_of or self.tick_no < p["immune_until"]
+                        or _dist2(e["pos"], e["home"]) > ai["leash_radius"] ** 2):
+                    self._begin_return(e)                       # Ziel verloren oder zu weit von zu Hause
+                elif _dist2(e["pos"], p["pos"]) <= ai["engage_radius"] ** 2 and self.terrain.clear_line(e["pos"], p["pos"]):
+                    maxo = self.sim["multi"]["max_opponents"]
+                    pack = [e] + [o for o in self.enemies if o is not e and o["alive"] and o["fight"] is None and o["state"] in ("idle", "chase")
+                                  and _dist2(e["pos"], o["pos"]) <= self.R["pack_radius"] ** 2]
+                    self._start_fight(c, pack[:maxo])
+                    continue
+                else:
+                    self._walk(e, p["pos"])
+            if e["state"] == "return":
+                if _dist2(e["pos"], e["home"]) <= ai["home_radius"] ** 2:
+                    e.update(state="idle", pos=e["home"], path=[], stuck=0)
+                else:
+                    self._walk(e, e["home"])
+
+    def _walk(self, e: dict[str, Any], goal: tuple[int, int]) -> None:
+        """Ein Schritt entlang des Weges zum Ziel; der Weg wird regelmäßig oder bei Hängenbleiben neu berechnet und geglättet."""
+        ai = self.R["enemy_ai"]
+        if not e["path"] or self.tick_no >= e["repath_at"] or e["stuck"] >= ai["stuck_limit"]:
+            path = self.nav.find_path(e["pos"], goal)
+            e["repath_at"], e["stuck"] = self.tick_no + ai["repath_ticks"], 0
+            if path is None:
+                if e["state"] == "chase":
+                    self._begin_return(e)                       # kein Weg zum Spieler (z. B. Insel)
+                return
+            e["path"] = path
+            self._smooth(e)
+        speed = self._speed_of(e)
+        while e["path"]:
+            wp = e["path"][0]
+            if len(e["path"]) > 1 and _dist2(e["pos"], wp) <= speed * speed:
+                e["path"].pop(0)                                # Wegpunkt erreicht
+                self._smooth(e)
+                continue
+            new = self.terrain.move_toward(e["pos"], wp, speed)
+            e["stuck"] = e["stuck"] + 1 if new == e["pos"] else 0
+            e["pos"] = new
+            if new == wp and len(e["path"]) > 1:
+                e["path"].pop(0)
+            return
+
+    def _smooth(self, e: dict[str, Any]) -> None:
+        """Überspringt Wegpunkte, wenn der übernächste in freier Strecke liegt (kürzere, geradere Wege)."""
+        path = e["path"]
+        while len(path) > 1 and self.terrain.clear_line(e["pos"], path[1]):
+            path.pop(0)
+
+    # ---------------------------------------------------------------- Kampfbeginn ----
     def _start_fight(self, trigger_char: str, pack: list[dict[str, Any]]) -> None:
         R = self.R
         chars = [trigger_char]
@@ -331,6 +402,7 @@ class GameServer:
         self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "started": self.tick_no}
         for e in pack:
             e["fight"] = fid
+            e["state"], e["target"], e["path"] = "fight", None, []
         for c in chars:
             self.fight_of[c] = fid
             self.players[c]["dir"] = (0, 0)
@@ -389,6 +461,8 @@ class GameServer:
             e["fight"] = None
             if result.outcome == "victory":
                 e["alive"], e["respawn_at"] = False, self.tick_no + self.R["respawn_ticks"]
+            else:
+                self._begin_return(e)                           # Kampf ohne Sieg: zurück nach Hause
         loot = self._loot(chars, result, f["types"]) if result.outcome == "victory" else {}
         for i, c in enumerate(chars):
             if c in self.players:
@@ -439,7 +513,7 @@ class GameServer:
         r2 = self.R["view_radius"] ** 2
         others = [{"char": c, "pos": list(p["pos"]), "fight": c in self.fight_of} for c, p in sorted(self.players.items())
                   if c != char and _dist2(p["pos"], me["pos"]) <= r2]
-        enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None}
+        enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None, "state": e["state"]}
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]
         nodes = [{"id": n["id"], "item": n["item"], "pos": list(n["pos"]), "ready": self.tick_no >= n["ready_at"]}
                  for n in self.nodes if _dist2(n["pos"], me["pos"]) <= r2]

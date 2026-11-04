@@ -27,7 +27,7 @@ Hülle wie `docs/PROTOCOL.md`: `{"v":1,"id":"<1-64 Zeichen>","cmd":"…","args":
 Zu viele Befehle: `rate_limited` (Budget füllt sich ein Befehl je Tick).
 
 ## Ereignisse (Server → Client, ohne `id`)
-- `state` (alle 2 Ticks): `{tick, day, you:{char,pos,fight,ground} (`ground` = Geländeart unter der Figur), players:[{char,pos,fight}], enemies:[{id,type,pos,alive,fight}], nodes:[{id,item,pos,ready}], zone}`; Positionen in Zentimetern.
+- `state` (alle 2 Ticks): `{tick, day, you:{char,pos,fight,ground} (`ground` = Geländeart unter der Figur), players:[{char,pos,fight}], enemies:[{id,type,pos,alive,fight,state}] (`state`: idle|chase|return|fight), nodes:[{id,item,pos,ready}], zone}`; Positionen in Zentimetern.
 - `fight_start`: `{fight, opponents:[Typ], party:[Figur], you:<Index>}`.
 - `fight` (alle 2 Ticks): `{tick, opponents:[{type,hp,alive}], players:[{hp,max_hp,stamina,state,cooldowns,busy,focus}], stagger:[bool]}` – keine Bedrohung/Zielwahl.
 - `fight_left`: `{fight, reason: defeat|fled}` – du bist raus.

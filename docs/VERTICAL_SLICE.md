@@ -16,6 +16,7 @@
 | 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON, Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
 | 4 | Unity-Client (`client/unity`): Verbindung, Bewegung/Kamera, Kampfeingaben + Anzeige, Inventar/Herstellung/Handel-Oberfläche | **Quellcode vorhanden, nicht in Unity geprüft** (Unity läuft in dieser Umgebung nicht) |
 | 4b | Gelände und Kollision (`mmo_game.terrain`): Geländearten mit Tempo, Fluss mit Brücke, Fels, Wasser, Zonenrand; Gleiten an Hindernissen; Aggro nur mit freier Strecke | **fertig** (ADR-0030) |
+| 4c | Gegnerbewegung (`mmo_game.navigation`, KI in `mmo_game.game`): Aufmerksamkeit, Verfolgung über die Brücke (A*), Kampf ab Kampfradius, Leine, Heimkehr | **fertig** (ADR-0031) |
 | 5 | Persistenz: Welt (CEE, Inventar, Märkte, Gruppen) als Generationen im `Store`, Spielzustand (Tick, Gegner, Sammelpunkte, Positionen) daneben; Autosave und Speichern beim Beenden | **fertig** |
 | 6 | Anmeldung: Konten mit PBKDF2-Hash, Sperren, Sitzungs-Token, TLS-Option | **fertig** (ADR-0029); offen: E-Mail/Passwort-Zurücksetzen, Kontoverwaltung |
 
@@ -23,7 +24,7 @@
 1. Beide Spieler verbinden sich (`hello`), treten bei (`game.join`) und erscheinen am Startpunkt.
 2. Sie laufen (`game.move`), sammeln Erz/Kräuter/Wasser (`game.gather`), stellen mit `craft` Barren/Salbe her.
 3. Sie handeln untereinander (`trade.offer`/`trade.accept`) oder über das Orderbuch (`market.*`).
-4. Sie bilden eine Gruppe (`party.*`) und laufen zu den Wölfen; Annäherung löst den Kampf aus (Rudel bis 3 Gegner, Gruppenmitglieder in Reichweite kämpfen mit).
+4. Sie bilden eine Gruppe (`party.*`) und laufen zu den Wölfen; die Tiere bemerken sie, laufen auf sie zu (über die Brücke) und der Kampf beginnt, wenn sie nahe genug sind (Rudel bis 3 Gegner, Gruppenmitglieder in Reichweite kämpfen mit).
 5. Im Kampf senden sie Befehle (`game.fight`: `light`, `heavy`, `dodge`, `block`, `stun`, `slow`, `sweep`, `target_n`, `heal`, `shield`, Fähigkeiten, `flee`); der Server schickt den Live-Zustand.
 6. Sieg: Bericht an die CEE (Entwicklung), Beute (Münzen, Kräuter) nach Gruppenregeln. Niederlage: zurück zum Startpunkt. Flucht: kurze Schonfrist.
 

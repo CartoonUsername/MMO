@@ -10,6 +10,7 @@ Alle Zahlen sind Platzhalter.
 """
 from __future__ import annotations
 
+from math import isqrt
 from typing import Any
 
 from mmo_sim.errors import SimError
@@ -87,11 +88,28 @@ class Terrain:
         return True
 
     # -- Bewegung ----------------------------------------------------------------------
-    def step(self, pos: tuple[int, int], dx: int, dy: int) -> tuple[int, int]:
-        s = self.speed * self.speed_permille(*pos) // 1000
+    def step(self, pos: tuple[int, int], dx: int, dy: int, speed: int | None = None) -> tuple[int, int]:
+        s = (self.speed if speed is None else speed) * self.speed_permille(*pos) // 1000
         if dx and dy:
             s = s * 707 // 1000
         for cand in ((pos[0] + dx * s, pos[1] + dy * s), (pos[0] + dx * s, pos[1]), (pos[0], pos[1] + dy * s)):
+            if cand != pos and not self.blocked(*cand):
+                return cand
+        return pos
+
+    def move_toward(self, pos: tuple[int, int], target: tuple[int, int], speed: int) -> tuple[int, int]:
+        """Ein Schritt in gerader Linie zum Ziel (Länge = Tempo mal Geländefaktor, ganzzahlig); bei Kollision Gleiten entlang einer Achse."""
+        s = speed * self.speed_permille(*pos) // 1000
+        vx, vy = target[0] - pos[0], target[1] - pos[1]
+        dist = isqrt(vx * vx + vy * vy)
+        if dist == 0 or s <= 0:
+            return pos
+        if dist <= s:
+            cands = [target]
+        else:
+            nx, ny = pos[0] + vx * s // dist, pos[1] + vy * s // dist
+            cands = [(nx, ny), (nx, pos[1]), (pos[0], ny)]
+        for cand in cands:
             if cand != pos and not self.blocked(*cand):
                 return cand
         return pos

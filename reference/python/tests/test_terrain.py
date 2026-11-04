@@ -93,6 +93,112 @@ class BoundaryTests(unittest.TestCase):
         self.assertEqual(T.nearest_walkable((2500, 1000)), (2500, 1000))
 
 
+class MoveTowardTests(unittest.TestCase):
+    def test_straight_diagonal_and_exact_arrival(self):
+        self.assertEqual(T.move_toward((3000, 1000), (3000, 1600), 40), (3000, 1040))
+        self.assertEqual(T.move_toward((3000, 1000), (3300, 1400), 40), (3000 + 300 * 40 // 500, 1000 + 400 * 40 // 500))      # (3024, 1032)
+        self.assertEqual(T.move_toward((3000, 1000), (3030, 1000), 40), (3030, 1000))                 # näher als ein Schritt: genau am Ziel
+        self.assertEqual(T.move_toward((3000, 1000), (3040, 1000), 40), (3040, 1000))                 # genau ein Schritt
+        self.assertEqual(T.move_toward((3000, 1000), (3041, 1000), 40), (3040, 1000))                 # einen mehr: nur ein Schritt
+        self.assertEqual(T.move_toward((3000, 1000), (3000, 1000), 40), (3000, 1000))
+        self.assertEqual(T.move_toward((3000, 1000), (3100, 1000), 0), (3000, 1000))
+
+    def test_terrain_factor(self):
+        self.assertEqual(T.move_toward((3900, 3700), (3900, 4200), 40), (3900, 3724))                 # Matsch 60 %
+        self.assertEqual(T.move_toward((500, 500), (900, 500), 40), (552, 500))                       # Straße 130 %
+
+    def test_blocked_steps_slide_along_either_axis_or_stay(self):
+        self.assertEqual(T.move_toward((2900, 2250), (3100, 2400), 35), (2900 + 200 * 35 // 250, 2250))    # See im Süden: nach Osten gleiten
+        x, y = T.move_toward((1650, 1000), (1850, 1100), 35)
+        self.assertEqual((x, y > 1000), (1650, True))                                                  # Fluss im Osten: nach Süden gleiten
+        self.assertEqual(T.move_toward((1650, 1000), (1700, 1000), 35), (1650, 1000))                  # frontal gegen das Wasser: stehen bleiben
+
+    def test_arrival_in_blocked_ground_is_refused(self):
+        self.assertEqual(T.move_toward((1650, 1000), (1660, 1000), 35), (1650, 1000))                  # Ziel zählt als blockiert (40 vor dem Wasser: 1660)
+
+
+class NavigationOptimalityTests(unittest.TestCase):
+    @staticmethod
+    def dijkstra(nav, start, goal):
+        import heapq
+        best = {start: 0}
+        heap = [(0, start)]
+        while heap:
+            d, c = heapq.heappop(heap)
+            if c == goal:
+                return d
+            if d > best.get(c, 1 << 60):
+                continue
+            for dx, dy, base in ((1, 0, 10), (-1, 0, 10), (0, 1, 10), (0, -1, 10), (1, 1, 14), (1, -1, 14), (-1, 1, 14), (-1, -1, 14)):
+                n = (c[0] + dx, c[1] + dy)
+                if not nav.passable(n):
+                    continue
+                if dx and dy and not (nav.passable((c[0] + dx, c[1])) and nav.passable((c[0], c[1] + dy))):
+                    continue
+                nd = d + base * (nav.cost[c[1] * nav.cols + c[0]] + nav.cost[n[1] * nav.cols + n[0]])
+                if nd < best.get(n, 1 << 60):
+                    best[n] = nd
+                    heapq.heappush(heap, (nd, n))
+        return None
+
+    @staticmethod
+    def path_cost(nav, start_cell, cells):
+        total, cur = 0, start_cell
+        for c in cells:
+            if c == cur:
+                continue
+            dx, dy = c[0] - cur[0], c[1] - cur[1]
+            assert max(abs(dx), abs(dy)) == 1, (cur, c)
+            base = 14 if dx and dy else 10
+            if dx and dy:
+                assert nav.passable((cur[0] + dx, cur[1])) and nav.passable((cur[0], cur[1] + dy)), ("Ecke geschnitten", cur, c)
+            total += base * (nav.cost[cur[1] * nav.cols + cur[0]] + nav.cost[c[1] * nav.cols + c[0]])
+            cur = c
+        return total
+
+    def test_paths_are_optimal_and_never_cut_corners_on_random_maps(self):
+        import random
+        from mmo_game.navigation import Navigator
+        rng = random.Random(11)
+        for trial in range(12):
+            regions = []
+            for _ in range(rng.randint(2, 6)):
+                x1, y1 = rng.randrange(0, 5000, 100), rng.randrange(0, 5000, 100)
+                regions.append({"kind": rng.choice(["mud", "road", "water", "water"]), "rect": [x1, y1, x1 + rng.randrange(200, 1200, 100), y1 + rng.randrange(200, 1200, 100)]})
+            t = Terrain({**R["terrain"], "regions": regions, "obstacles": []}, R["zone"], 35)
+            nav = Navigator(t, 100)
+            for _ in range(5):
+                a = (rng.randrange(100, 5900, 100) + 50, rng.randrange(100, 5900, 100) + 50)
+                b = (rng.randrange(100, 5900, 100) + 50, rng.randrange(100, 5900, 100) + 50)
+                s, g = nav.nearest_passable(nav.cell_of(a)), nav.nearest_passable(nav.cell_of(b))
+                if s is None or g is None:
+                    continue
+                path = nav.find_path(a, b)
+                best = self.dijkstra(nav, s, g)
+                if best is None:
+                    self.assertIsNone(path)
+                    continue
+                self.assertIsNotNone(path)
+                cells = [nav.cell_of(p) for p in path]
+                if s != g:
+                    cells[-1] = g                                         # letzter Punkt ist das Ziel selbst (kann in einer blockierten Zelle liegen)
+                self.assertEqual(self.path_cost(nav, s, cells), best, (trial, a, b))
+
+    def test_the_first_waypoint_is_not_the_start_cell(self):
+        from mmo_game.navigation import Navigator
+        nav = Navigator(T, 100)
+        path = nav.find_path((1020, 520), (1420, 520))
+        self.assertNotEqual(path[0], nav.center(nav.cell_of((1020, 520))))
+        self.assertEqual(path[0], (1150, 550))
+
+    def test_blocked_cells_include_rocks_and_the_nearest_free_cell_is_chosen_exactly(self):
+        from mmo_game.navigation import Navigator
+        nav = Navigator(T, 100)
+        self.assertIsNone(nav.cost[9 * 60 + 9])                                    # Zelle um (950, 950): Fels bei (900, 900) r 90 + Figur 40
+        self.assertEqual(nav.nearest_passable((18, 10)), (19, 10))                 # Fluss: Nachbar im Osten (Mitte 1950 liegt über 1940)
+        self.assertEqual(nav.nearest_passable((17, 10)), (16, 10))
+
+
 class QueryTests(unittest.TestCase):
     def test_later_regions_cover_earlier_ones(self):
         self.assertEqual(T.kind_at(1800, 1000), "water")                                # Fluss
@@ -237,7 +343,10 @@ class GameTests(unittest.TestCase):
             g.tick()
         self.assertNotIn("anna", g.fight_of)
         g.players["anna"]["pos"] = (1800, 1800)                                         # auf der Brücke: freie Strecke
-        g.tick()
+        for _ in range(60):
+            g.tick()
+            if "anna" in g.fight_of:
+                break
         self.assertIn("anna", g.fight_of)
 
     def test_slower_ground_slows_the_player_and_roads_speed_up(self):
@@ -259,7 +368,10 @@ class GameTests(unittest.TestCase):
         a = Bot(g, "anna")
         a.call("game.join")
         g.players["anna"]["pos"] = (2300, 1800)
-        g.tick()
+        for _ in range(60):
+            g.tick()
+            if "anna" in g.fight_of:
+                break
         self.assertIn("anna", g.fight_of)
         a.call("game.fight", input="flee")
         g.tick()
@@ -271,7 +383,10 @@ class GameTests(unittest.TestCase):
         a = Bot(g, "anna")
         a.call("game.join")
         g.players["anna"]["pos"] = (2500, 1800)                                         # 700 zurück liegt der Fluss
-        g.tick()
+        for _ in range(60):
+            g.tick()
+            if "anna" in g.fight_of:
+                break
         self.assertIn("anna", g.fight_of)
         a.call("game.fight", input="flee")
         g.tick()

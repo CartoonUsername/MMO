@@ -585,19 +585,20 @@ class SurvivorTests(unittest.TestCase):
                 break
         self.assertIsNotNone(entered)
         self.assertGreaterEqual(entered - left_at, g.R["aggro_immunity_ticks"] - 1)    # frühestens nach der Schonfrist
-        self.assertLessEqual(entered - left_at, g.R["aggro_immunity_ticks"] + 40)
+        self.assertLessEqual(entered - left_at, g.R["aggro_immunity_ticks"] + 200)     # danach müssen Gegner heimkehren und neu aufmerksam werden
 
     def test_no_second_fight_while_fighting(self):
-        R = rules_with(enemies=[{"type": "wolf", "at": [2000, 1800]}, {"type": "wolf", "at": [2000, 1850]}, {"type": "wolf", "at": [2000, 2500]}])
+        R = rules_with(enemies=[{"type": "wolf", "at": [2000, 1800]}, {"type": "wolf", "at": [2000, 1850]}, {"type": "wolf", "at": [2000, 2800]}])
         g = GameServer(R)
         a = Bot(g, "anna")
         a.call("game.join")
-        g.players["anna"]["pos"] = (2000, 2150)                                  # beide Rudel in Aggro-Reichweite, das dritte Tier außerhalb des Rudelradius
-        for _ in range(5):
+        g.players["anna"]["pos"] = (2000, 2150)                                  # alle drei bemerken sie; das dritte Tier (650 entfernt) ist nicht im Rudelradius
+        for _ in range(120):
             g.tick()
         self.assertEqual(len(g.fights), 1)
         self.assertEqual(g.fights[g.fight_of["anna"]]["types"], ["wolf", "wolf"])
         self.assertIsNone(g.enemies[2]["fight"])
+        self.assertIn(g.enemies[2]["state"], ("return", "idle"))                 # sein Ziel kämpft schon: es gibt auf und geht heim
 
     def test_party_members_far_away_or_busy_do_not_join(self):
         R = rules_with(join_radius=1000, enemies=[{"type": "wolf", "at": [2000, 1800]}])
@@ -609,7 +610,8 @@ class SurvivorTests(unittest.TestCase):
         b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
         g.players["ben"]["pos"] = (2000 + 1001, 1800)                           # knapp außerhalb des Beitrittsradius
         g.players["anna"]["pos"] = (2000, 1800)
-        g.tick()
+        for _ in range(40):
+            g.tick()
         self.assertEqual(g.fights[g.fight_of["anna"]]["chars"], ["anna"])
         self.assertNotIn("ben", g.fight_of)
 
