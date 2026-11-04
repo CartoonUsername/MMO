@@ -242,6 +242,34 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         await cl.close()
 
 
+class ProxyTests(unittest.IsolatedAsyncioTestCase):
+    async def _two(self, trust):
+        with tempfile.TemporaryDirectory() as tmp:
+            srv = NetServer(tick_seconds=0.05, auth=AccountStore(Path(tmp) / "a.json"), max_per_ip=1, trust_proxy=trust)
+            port = await srv.start()
+            res = []
+            cs = []
+            for i, name in enumerate(("anna", "ben")):
+                try:
+                    c, _, _ = await WsClient.open(port, extra=f"X-Forwarded-For: 10.0.0.{i + 1}\r\n")
+                except (ConnectionError, asyncio.IncompleteReadError):          # Grenze je Adresse: Verbindung wird abgelehnt
+                    res.append("error")
+                    continue
+                await c.send({"cmd": "register", "account": name, "password": "passwort123"})
+                res.append((await c.msg()).get("ev"))
+                cs.append(c)
+            for c in cs:
+                c.w.close()
+            await srv.stop()
+            return res
+
+    async def test_hinter_proxy_zaehlt_echte_adresse(self):
+        self.assertEqual(await self._two(True), ["welcome", "welcome"])
+
+    async def test_ohne_vertrauen_wird_header_ignoriert(self):
+        self.assertEqual(await self._two(False), ["welcome", "error"])      # beide gelten als 127.0.0.1, Grenze 1
+
+
 def _have_browser() -> bool:
     if not shutil.which("node"):
         return False

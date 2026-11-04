@@ -85,11 +85,12 @@ class WsConn:
 class NetServer:
     def __init__(self, game: GameServer | None = None, host: str = "127.0.0.1", port: int = 7777, tick_seconds: float = TICK_SECONDS,
                  store: Store | None = None, autosave_ticks: int = 600, auth: AccountStore | None = None,
-                 ssl_context: ssl.SSLContext | None = None, max_per_ip: int = MAX_PER_IP) -> None:
+                 ssl_context: ssl.SSLContext | None = None, max_per_ip: int = MAX_PER_IP, trust_proxy: bool = False) -> None:
         self.game, self.host, self.port, self.tick_seconds = game or GameServer(), host, port, tick_seconds
         self.store, self.autosave_ticks, self.auth, self.ssl, self.max_per_ip = store, autosave_ticks, auth, ssl_context, max_per_ip
         if host not in LOOPBACK and (auth is None or ssl_context is None):
             raise ValueError("Nicht-lokale Adressen verlangen Konten (auth) und TLS (ssl_context)")
+        self.trust_proxy = trust_proxy                         # hinter Caddy/nginx auf derselben Maschine: Client-Adresse aus X-Forwarded-For
         self._ips: dict[str, int] = {}
         self._writers: dict[str, LineConn | WsConn] = {}
         self._server: asyncio.AbstractServer | None = None
@@ -152,9 +153,15 @@ class NetServer:
             counted = True
             first = await asyncio.wait_for(reader.readline(), timeout=10)
             if first.startswith(b"GET "):
-                upgraded = await self._http(reader, writer, first)
+                headers: dict[str, str] = {}
+                upgraded = await self._http(reader, writer, first, headers)
                 if not upgraded:
                     return
+                if self.trust_proxy and ip in LOOPBACK and headers.get("x-forwarded-for"):
+                    real = headers["x-forwarded-for"].split(",")[-1].strip()[:64]      # letzter Eintrag stammt vom eigenen Proxy
+                    self._ips[ip] = max(0, self._ips.get(ip, 1) - 1)
+                    ip = real
+                    self._ips[ip] = self._ips.get(ip, 0) + 1
                 conn = WsConn(reader, writer)
                 first = None
             sid = await self._session(conn, ip, first)
@@ -205,9 +212,8 @@ class NetServer:
         await conn.send(welcome)
         return sid
 
-    async def _http(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, request_line: bytes) -> bool:
+    async def _http(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, request_line: bytes, headers: dict[str, str]) -> bool:
         """Beantwortet eine HTTP-Anfrage; True, wenn zu WebSocket gewechselt wurde."""
-        headers: dict[str, str] = {}
         size = len(request_line)
         while True:
             try:
@@ -267,7 +273,7 @@ class NetServer:
 
 
 async def serve(host: str = "127.0.0.1", port: int = 7777, data: str | None = None, insecure_dev: bool = False,
-                cert: str | None = None, key: str | None = None) -> None:
+                cert: str | None = None, key: str | None = None, trust_proxy: bool = False) -> None:
     store = Store(data) if data else None
     game = GameServer.load(store) if store is not None and store.current() is not None else GameServer()
     auth = None if insecure_dev else AccountStore(Path(data) / "accounts.json" if data else None)
@@ -276,7 +282,7 @@ async def serve(host: str = "127.0.0.1", port: int = 7777, data: str | None = No
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.minimum_version = ssl.TLSVersion.TLSv1_2
         ctx.load_cert_chain(cert, key)
-    srv = NetServer(game, host=host, port=port, store=store, auth=auth, ssl_context=ctx)
+    srv = NetServer(game, host=host, port=port, store=store, auth=auth, ssl_context=ctx, trust_proxy=trust_proxy)
     p = await srv.start()
     mode = ("ohne Konten (nur Entwicklung)" if auth is None else "mit Konten") + (", TLS" if ctx else ", ohne TLS")
     print(f"Spielserver läuft auf {host}:{p} ({mode})" + (f", Speicher: {data}" if data else ", ohne Speicherung"), flush=True)
@@ -303,6 +309,6 @@ if __name__ == "__main__":
     port = int(args[0]) if args and args[0].isdigit() else 7777
     try:
         asyncio.run(serve(_arg(args, "--host") or "127.0.0.1", port, _arg(args, "--data"), "--insecure-dev" in args,
-                          _arg(args, "--cert"), _arg(args, "--key")))
+                          _arg(args, "--cert"), _arg(args, "--key"), "--behind-proxy" in args))
     except KeyboardInterrupt:
         pass
