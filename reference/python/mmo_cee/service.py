@@ -173,6 +173,11 @@ class CharacterService:
         from .layers import layers
         return layers(self.log.events(character_id), self.state(character_id), self.rules_of(character_id))
 
+    def element_combinations(self, character_id: str) -> list[dict]:
+        """Freigeschaltete Elementkombinationen der Figur mit klassenabhängiger Umsetzung (AP 4a, ADR-0042)."""
+        from .combos import unlocked
+        return unlocked(self.state(character_id), self.rules_of(character_id))
+
     def economic_profile(self, character_id: str) -> dict:
         """Laufbahn, Unternehmen, Netzwerkgröße, Anzahl Handel."""
         return economic_profile(self.state(character_id), self.rules_of(character_id))

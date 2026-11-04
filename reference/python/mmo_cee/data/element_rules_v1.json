@@ -1,0 +1,61 @@
+{
+  "version": "1",
+  "_comment": "PLATZHALTER (AP 4, ADR-0042): Elementmotive, Wirkbereiche und klassenabhängige Umsetzung. Ideen laut Blueprint §24, KEINE endgültigen Mechanikwerte und keine bestätigten Inhalte. Kombinationen sind frei (kein fester Pfad), aber begrenzt: je Kombination höchstens ein Wirkbereich zweimal, Dreifachkombinationen nur mit drei geprägten Elementen.",
+  "elements": {
+    "fire":     {"name": "Feuer",    "domains": ["burst", "dot"]},
+    "water":    {"name": "Wasser",   "domains": ["support", "control"]},
+    "shadow":   {"name": "Schatten", "domains": ["summon", "mobility"]},
+    "light":    {"name": "Licht",    "domains": ["defense", "support"]},
+    "wind":     {"name": "Wind",     "domains": ["mobility", "control"]},
+    "earth":    {"name": "Erde",     "domains": ["defense", "environment"]},
+    "electric": {"name": "Elektro",  "domains": ["burst", "control"]},
+    "ice":      {"name": "Eis",      "domains": ["control", "defense"]},
+    "nature":   {"name": "Natur",    "domains": ["summon", "support"]}
+  },
+  "domains": {
+    "burst":       {"name": "Entladung",    "counterplay": "Ausweichen im Wirkfenster, Schilde"},
+    "dot":         {"name": "Zerrung",      "counterplay": "Heilung, Abstand, Reinigung"},
+    "control":     {"name": "Kontrolle",    "counterplay": "Unterbrechen, Widerstandsfenster"},
+    "mobility":    {"name": "Bewegung",     "counterplay": "Flächeneffekte, Kontrolle"},
+    "defense":     {"name": "Schutz",       "counterplay": "Durchdringung, Schildbruch"},
+    "support":     {"name": "Beistand",     "counterplay": "Fokus auf Heiler, Unterbrechen"},
+    "summon":      {"name": "Beschwörung",  "counterplay": "Flächenschaden, Beschwörer ausschalten"},
+    "environment": {"name": "Umgebung",     "counterplay": "Positionswechsel, Ausweichen"}
+  },
+  "delivery": {
+    "warrior": {
+      "burst": "Nahkampfschlag mit Druckwelle",
+      "dot": "Waffe, die den Gegner brennen oder zehren lässt",
+      "control": "Rammstoß, der Gegner betäubt oder zurückwirft",
+      "mobility": "Vorstoß oder Sprung durch die Linie",
+      "defense": "Rüstungsaura, die Schaden mindert",
+      "support": "Kampfruf, der Verbündete stärkt",
+      "summon": "Schlachtgeist an der Seite",
+      "environment": "Aufschlag, der den Boden verändert"
+    },
+    "shaman_alchemist": {
+      "burst": "gewirkter Zauber mit Flächenentladung",
+      "dot": "Gebräu oder Fluch mit Wirkung über Zeit",
+      "control": "Bannzauber, der Gegner verlangsamt oder fesselt",
+      "mobility": "geistgetragener Schritt oder Schwebe",
+      "defense": "Schutzgeist oder Schutzfeld für die Gruppe",
+      "support": "Elixier oder Segen für Verbündete",
+      "summon": "gerufener Geist oder Kleinwesen",
+      "environment": "Zone auf dem Boden mit eigener Wirkung"
+    },
+    "archer": {
+      "burst": "Spezialpfeil mit Entladung beim Aufprall",
+      "dot": "Pfeil mit anhaltender Wirkung am Ziel",
+      "control": "Pfeil oder Falle, die Gegner festsetzt",
+      "mobility": "schneller Positionswechsel oder Rückwärtssprung",
+      "defense": "Tarn- oder Ausweichschleier",
+      "support": "Signalpfeil, der Verbündete stärkt",
+      "summon": "Begleiter oder Projektilschwarm",
+      "environment": "Falle oder Hindernis im Gelände"
+    }
+  },
+  "limits": {
+    "max_same_domain_per_combination": 2,
+    "triple_requires_attuned": 3
+  }
+}

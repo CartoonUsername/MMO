@@ -37,6 +37,11 @@ def _res(x: Any) -> Any:
     return x
 
 
+def _element_catalog(w: Any) -> dict[str, Any]:
+    from mmo_cee.combos import catalog
+    return catalog(w.svc.rules)
+
+
 def _character_view(w: Any, char: str) -> dict[str, Any]:
     """Lesende Gesamtsicht auf die Charakterentwicklung (Identität, Elemente, Berufe, Wesen, Kampf, Wissen). Reine Ableitung aus dem Zustand."""
     svc = w.svc
@@ -65,6 +70,7 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
         "economy": safe(lambda: svc.economic_profile(char), {}),
         "appearance": safe(lambda: svc.appearance(char), {}),
         "layers": safe(lambda: svc.layers(char), {}),
+        "combinations": safe(lambda: svc.element_combinations(char), []),
         "discoveries": safe(lambda: {d: pr for d in svc.rules_of(char)["discovery"]["discoveries"]
                                      for pr in [svc.discovery_progress(char, d)] if pr["known"] or pr["evidence"]}, {}),
     }
@@ -156,6 +162,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.abilities", "char:s", None, lambda w, a: w.svc.abilities(a["char"]), mutating=False),
     _c("query.character", "char:s", "char", lambda w, a: _character_view(w, a["char"]), mutating=False),
     _c("character.choose_class", "char:s base_class:s", "char", lambda w, a: _res(w.svc.record(a["char"], "identity.class_chosen", {"base_class": a["base_class"]}))),
+    _c("query.element_catalog", "", None, lambda w, a: _element_catalog(w), mutating=False),
     _c("query.appearance", "char:s", None, lambda w, a: w.svc.appearance(a["char"]), mutating=False),
 ]}
 

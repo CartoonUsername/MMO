@@ -80,6 +80,10 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
       <div id="chClass" class="row2"></div><div id="charMsg" class="msg" role="status"></div></details>
     <div class="panel" id="fightpanel" style="display:none"><h2>Kampf</h2><div id="opps"></div><div id="tele"></div></div>
     <div class="panel"><h2>Inventar</h2><table id="inv"></table><div class="hint">Verkaufen an den Händler: Klick auf „verkaufen“.</div></div>
+    <details class="panel win" id="wElem"><summary>Elemente</summary>
+      <div class="hint">Jedes Element lässt sich frei mit jedem anderen kombinieren (36 Paare, 84 Dreier). Was eine Kombination bedeutet, hängt von deiner Klasse ab. Beschreibungen sind Entwürfe.</div>
+      <div class="row2"><select id="eA"></select><select id="eB"></select><select id="eC"></select></div>
+      <div id="eOut" class="hint" style="margin-top:6px"></div></details>
     <details class="panel win" id="wParty"><summary>Gruppe</summary>
       <div id="partyView" class="hint">Keine Gruppe.</div><ul id="partyInv"></ul>
       <div class="row2"><button id="pForm">Gründen</button><button id="pLeave">Verlassen</button><button id="pDisband">Auflösen</button></div>
@@ -111,6 +115,7 @@ const COLORS={grass:"#27422b",road:"#5b4f3a",mud:"#4a3a2a",water:"#1f4a73",rock:
 
 function log(t,c){const d=$("log"),e=document.createElement("div");if(c)e.className=c;e.textContent=t;d.appendChild(e);while(d.childNodes.length>200)d.removeChild(d.firstChild);d.scrollTop=d.scrollHeight}
 function send(o){if(ws&&ws.readyState===1)ws.send(JSON.stringify(o))}
+function callNoChar(cmd){return new Promise((res,rej)=>{const id="c"+(++seq);pending.set(id,res);send({v:1,id,cmd,args:{}});setTimeout(()=>{if(pending.delete(id))rej(new Error("Zeitüberschreitung"))},8000)})}
 function call(cmd,args){return new Promise((res,rej)=>{const id="c"+(++seq);pending.set(id,res);send({v:1,id,cmd,args:{char:me,...args}});setTimeout(()=>{if(pending.delete(id))rej(new Error("Zeitüberschreitung"))},8000)})}
 
 function connect(register){
@@ -194,7 +199,7 @@ function wireWins(){
   $("tSend").onclick=()=>{const to=$("tTo").value.trim(),item=$("tItem").value.trim(),qty=Math.floor(+$("tQty").value),price=Math.floor(+$("tPrice").value);
     if(!to||!item||!(qty>0)||!(price>0)){setMsg("tradeMsg","Figur, Ware, Menge und Preis ausfüllen.",false);return}
     act("tradeMsg","trade.offer",{to,side:$("tSide").value,item_key:item,qty,price},"Angebot gesendet")};
-  refreshChar().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
+  refreshChar().catch(()=>{});initElem().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
 }
 const NOTE={"trade.offer_received":"Neues Handelsangebot","trade.offer_accepted":"Handelsangebot angenommen","trade.offer_declined":"Handelsangebot abgelehnt","trade.offer_cancelled":"Handelsangebot zurückgezogen","trade.offer_expired":"Handelsangebot abgelaufen","party.invited":"Gruppeneinladung","party.joined":"Jemand ist der Gruppe beigetreten","party.left":"Jemand hat die Gruppe verlassen"};
 function notifyText(i){const k=i&&(i.kind||i.type);return (NOTE[k]||k||"Nachricht")+(i&&i.data?" "+JSON.stringify(i.data):"")}
@@ -219,6 +224,24 @@ function renderStory(box,c){const L=c.layers&&c.layers.life_story;if(!L)return;s
   const list=L.milestones.slice(-10).reverse();for(const m of list){const d=el("div",mileText(m),"hint");d.title="Ereignis #"+m.seq;box.appendChild(d)}
   if(L.milestones.length>10)box.appendChild(el("div","… und "+(L.milestones.length-10)+" frühere","hint"));
   const n=L.counts;box.appendChild(el("div","Kämpfe "+n.encounters+" · Herstellungen "+n.crafts+" · Handel "+n.trades+" · Beweise "+n.evidence,"hint"))}
+
+// ---------- Element-Katalog (AP 4a): Kombinationen und klassenabhängige Umsetzung ----------
+let elCat=null;
+function comboHtml(c,cls,box){const t=el("div","","");t.appendChild(el("b",c.names.join(" + ")));box.appendChild(t);
+  for(const d of c.domains)box.appendChild(el("div","• "+d.name+(d.weight>1?" ×"+d.weight:"")+" – Gegenspiel: "+d.counterplay));
+  for(const [k,v] of Object.entries(c.variants)){const w=el("div","","");w.appendChild(el("b",(CLASS_NAME[k]||k)+": "));w.appendChild(document.createTextNode(v.join("; ")));if(k===cls)w.style.color="var(--ok)";box.appendChild(w)}}
+async function initElem(){
+  const r=await callNoChar("query.element_catalog");if(!r.ok)return;elCat=r.result;
+  for(const id of ["eA","eB","eC"]){const sel=$(id);sel.textContent="";const o0=el("option",id==="eC"?"(drittes Element, selten)":"– Element –");o0.value="";sel.appendChild(o0);
+    for(const [k,v] of Object.entries(elCat.elements)){const o=el("option",v.name);o.value=k;sel.appendChild(o)};sel.onchange=showElem}
+}
+async function showElem(){
+  const sel=["eA","eB","eC"].map(i=>$(i).value).filter(Boolean),box=$("eOut");box.textContent="";if(!elCat)return;
+  if(sel.length<2){box.textContent="Wähle zwei Elemente.";return}
+  if(new Set(sel).size!==sel.length){box.textContent="Jedes Element nur einmal.";return}
+  const key=[...sel].sort().join("+"),list=sel.length===2?elCat.pairs:elCat.triples,c=list.find(x=>x.key===key);if(!c)return;
+  const ch=await call("query.character",{});comboHtml(c,ch.ok?ch.result.identity.base_class:null,box);
+  if(sel.length===3)box.appendChild(el("div","Dreifachkombinationen sind seltene Endgame-Entwicklung (drei geprägte Elemente, hohe Stufe).","hint"))}
 async function refreshChar(){
   const r=await call("query.character",{});if(!r.ok){$("chv").textContent=errMsg(r);return}
   const c=r.result,box=$("chv");box.textContent="";const id=c.identity;
@@ -242,6 +265,7 @@ async function refreshChar(){
   const dl=Object.entries(c.discoveries||{});if(dl.length){sect(box,"Entdeckungen");for(const [id,pr] of dl){
     const row=el("div","","k");row.append(el("span",DISC_NAME[id]||id),el("b",pr.known?"entdeckt":pr.evidence.length+"/"+pr.evidence_needed+" Hinweise"));box.appendChild(row);
     if(pr.ready&&!pr.known){const b=el("button","Abschließen: "+(DISC_NAME[id]||id));b.onclick=async()=>{await act("charMsg","discovery.complete",{discovery:id},"Entdeckt!");refreshChar()};box.appendChild(b)}}}
+  if((c.combinations||[]).length){sect(box,"Deine Kombinationen");for(const k of c.combinations)comboHtml(k,c.identity.base_class,box)}
   renderStory(box,c);
   sect(box,"Wissen");kv(box,"Rezepte",c.knowledge.recipes.length);kv(box,"Entdeckungen",c.knowledge.discoveries.length);kv(box,"Techniken",c.knowledge.techniques.length);
   const ec=c.economy||{};if(ec.trades||ec.companies_open)kv(box,"Handel / Firmen",(ec.trades||0)+" / "+(ec.companies_open||0));
