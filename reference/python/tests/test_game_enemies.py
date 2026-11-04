@@ -204,7 +204,7 @@ class EndToEndTests(unittest.TestCase):
         a.pull()
         self.assertEqual(g.log, [])
         self.assertTrue(all(e["fight"] is None for e in g.enemies))
-        self.assertEqual(len(g.enemies), 15)                                     # Beschworene sind keine Welt-Gegner
+        self.assertEqual(len(g.enemies), len(g.R["enemies"]))                                     # Beschworene sind keine Welt-Gegner
 
     def test_a_loadout_change_during_a_fight_does_not_change_the_replayed_result(self):
         g = GameServer()

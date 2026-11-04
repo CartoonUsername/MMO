@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v6.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v7.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -88,6 +88,13 @@ class GameServer:
         for what, pos in [("Startpunkt", tuple(self.R["zone"]["spawn"]))] + [(f"Gegner {e['id']}", e["pos"]) for e in self.enemies] + [(f"Sammelpunkt {n['id']}", n["pos"]) for n in self.nodes]:
             if self.terrain.blocked(*pos):
                 raise TerrainError(f"{what} liegt im Blockierten: {pos}")
+        self.regions: list[dict[str, Any]] = list(self.R.get("regions", {}).get("list", []))
+        self.dungeons: dict[str, dict[str, Any]] = {}     # laufende Dungeon-Durchläufe (nur im Speicher)
+        self.dungeon_of: dict[str, str] = {}              # Figur -> Durchlauf
+        self._dungeon_counter = 0
+        self._region_of: dict[str, str | None] = {}
+        self._blocked_notice: dict[str, int] = {}
+        self._check_world_rules()
         self._fight_counter = 0
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
@@ -300,7 +307,7 @@ class GameServer:
             self.log.append(f"Progression abgelehnt ({char}, {type}): {e}")
             return False
 
-    def _progress_fight(self, chars: list[str], result: Any, types: list[str], inputs: dict[str, list]) -> dict[str, dict[str, Any]]:
+    def _progress_fight(self, chars: list[str], result: Any, types: list[str], inputs: dict[str, list], bonus: int = 1000) -> dict[str, dict[str, Any]]:
         """Erfahrung und Elementexposition eines Sieges je Teilnehmer mit Beitrag (vor der Beuteabnahme berechnet)."""
         P = self.R.get("progression")
         gains: dict[str, dict[str, Any]] = {}
@@ -311,7 +318,7 @@ class GameServer:
             if pr.outcome != "victory" or not pr.actions:
                 continue
             factors = {t: self._decay([c], t) for t in types}
-            xp = progression.fight_xp(P, self.sim, types, factors)
+            xp = progression.fight_xp(P, self.sim, types, factors) * bonus // 1000      # Gefahrenbonus (Region)
             elements = progression.element_exposure(P, self.sim, types, factors)
             used = [cmd for _, cmd in inputs.get(c, [])]
             key = f"{c}|skillexp"
@@ -421,6 +428,7 @@ class GameServer:
         self._alert()
         self._enemies_act()
         self._advance_fights()
+        self._dungeon_tick()
         if self.tick_no % 5 == 0:
             self._check_pois()
         if self.tick_no % self.R["state_every_ticks"] == 0:
@@ -439,17 +447,203 @@ class GameServer:
         if w.pricing is not None:
             w.pricing.advance(day)
 
+    # ---------------------------------------------------------------- Welt (AP 9, ADR-0048) ----
+    def _check_world_rules(self) -> None:
+        W, H = self.R["zone"]["width"], self.R["zone"]["height"]
+        ids = set()
+        for r in self.regions:
+            a, b, c, d = r["rect"]
+            if r["id"] in ids or not (0 <= a < c <= W and 0 <= b < d <= H) or not 1 <= r["danger"] <= len(self.R["regions"]["danger_bonus_permille"]):
+                raise TerrainError(f"Region ungültig: {r['id']}")
+            ids.add(r["id"])
+        for did, dg in self.R.get("dungeons", {}).items():
+            if did.startswith("_"):
+                continue
+            if dg["region"] not in ids or self.terrain.blocked(*dg["entrance"]):
+                raise TerrainError(f"Dungeon {did}: Region/Eingang ungültig")
+            for st in dg["stages"]:
+                if not 1 <= len(st["enemies"]) <= self.sim["multi"]["max_opponents"]:
+                    raise TerrainError(f"Dungeon {did}: Etappe ungültig")
+        self.boss_rules = {b: v for b, v in self.R.get("world_bosses", {}).items() if not b.startswith("_") and b in self.sim["opponents"]}
+        # Dungeons mit Gegnern, die die gewählte Simulation nicht kennt (ältere Regeln), sind nicht verfügbar
+        self.dungeon_rules = {d: g for d, g in self.R.get("dungeons", {}).items() if not d.startswith("_")
+                              and all(x in self.sim["opponents"] for st in g["stages"] for x in st["enemies"])}
+
+    def _region_at(self, pos: tuple[int, int]) -> dict[str, Any] | None:
+        found = None
+        for r in self.regions:                                  # spätere überdecken frühere
+            a, b, c, d = r["rect"]
+            if a <= pos[0] <= c and b <= pos[1] <= d:
+                found = r
+        return found
+
+    def _access(self, char: str, region: dict[str, Any] | None) -> str | None:
+        """None = Zutritt erlaubt, sonst der Grund. Normale Regionen sind nie durch Stufen gesperrt (nur besondere mit `requires`)."""
+        req = (region or {}).get("requires")
+        if not req:
+            return None
+        if "discovery" in req and req["discovery"] not in self.world.svc.state(char).parts["discovery"]["known"]:
+            return region.get("hint") or "Dir fehlt das nötige Wissen."
+        if "min_level" in req and self.world.svc.state(char).parts["identity"]["level"] < req["min_level"]:
+            return f"Benötigt Stufe {req['min_level']}."
+        return None
+
+    def _danger_bonus(self, pos_list: list[tuple[int, int]]) -> int:
+        table = self.R.get("regions", {}).get("danger_bonus_permille")
+        if not table or not self.regions:
+            return 1000
+        return max(table[(self._region_at(p) or {"danger": 1})["danger"] - 1] for p in pos_list)
+
     def _move_players(self) -> None:
         for c, p in self.players.items():
             if c in self.fight_of or p["dir"] == (0, 0):
+                self._note_region(c, p)
                 continue
             dx, dy = p["dir"]
-            p["pos"] = self.terrain.step(p["pos"], dx, dy, self.R["speed_cm_per_tick"] * self.world.equipment.move_permille(c) // 1000)
+            new = self.terrain.step(p["pos"], dx, dy, self.R["speed_cm_per_tick"] * self.world.equipment.move_permille(c) // 1000)
+            reg = self._region_at(new)
+            why = self._access(c, reg) if reg is not (self._region_at(p["pos"])) else None
+            if why:                                              # besondere Region ohne Zutritt: Schritt entfällt
+                if self.tick_no >= self._blocked_notice.get(c, 0):
+                    self._blocked_notice[c] = self.tick_no + 30
+                    self._emit_to(c, {"ev": "region_blocked", "region": reg["id"], "name": reg["name"], "reason": why})
+                continue
+            p["pos"] = new
+            self._note_region(c, p)
+
+    def _note_region(self, c: str, p: dict[str, Any]) -> None:
+        reg = self._region_at(p["pos"])
+        rid = reg["id"] if reg else None
+        if self._region_of.get(c, "") != rid:
+            self._region_of[c] = rid
+            if reg:
+                self._emit_to(c, {"ev": "region", "region": rid, "name": reg["name"], "danger": reg["danger"], "level": reg["level"],
+                                  "warning": reg["danger"] >= 4})
 
     def _respawn(self) -> None:
         for e in self.enemies:
             if not e["alive"] and self.tick_no >= e["respawn_at"]:
                 e.update(alive=True, pos=e["home"], state="idle", target=None, path=[], stuck=0)
+                if e["type"] in self.boss_rules:
+                    self._broadcast({"ev": "world_boss", "boss": e["type"], "name": self.boss_rules[e["type"]]["name"], "state": "spawned",
+                                     "region": (self._region_at(e["home"]) or {}).get("name")})
+
+    def _broadcast(self, ev: dict[str, Any]) -> None:
+        for c in list(self.players):
+            self._emit_to(c, ev)
+
+    def _boss_defeated(self, chars: list[str], result: Any, types: list[str]) -> None:
+        """Weltboss besiegt: serverweite Meldung, Teilnehmerkiste für alle mit Beitrag."""
+        for t in dict.fromkeys(types):
+            wb = self.boss_rules.get(t)
+            if not wb:
+                continue
+            part = [c for i, c in enumerate(chars) if result.players[i].outcome == "victory" and result.players[i].actions]
+            for c in part:
+                for key, qty in wb["chest"].items():
+                    self.world.inv.deposit(c, key, qty)
+                self._emit_to(c, {"ev": "world_boss_chest", "boss": t, "items": dict(wb["chest"])})
+            self._broadcast({"ev": "world_boss", "boss": t, "name": wb["name"], "state": "defeated", "by": part})
+
+    # ---------------------------------------------------------------- Dungeon (AP 9) ----
+    def _cmd_world(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        R = self.R
+        return {"regions": [{k: v for k, v in r.items() if k != "hint"} for r in self.regions],
+                "dungeons": {d: {"name": g["name"], "entrance": g["entrance"], "radius": g["radius"], "stages": len(g["stages"]), "region": g["region"]}
+                             for d, g in self.dungeon_rules.items()},
+                "world_bosses": {b: {"name": v["name"]} for b, v in self.boss_rules.items()}}
+
+    def _cmd_dungeon_enter(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        self._need_joined(char)
+        did = a.get("dungeon")
+        dg = self.dungeon_rules.get(did) if isinstance(did, str) else None
+        if dg is None:
+            raise _Err("bad_request", "Unbekannter Dungeon")
+        me = self.players[char]
+        if char in self.fight_of or char in self.dungeon_of:
+            raise _Err("rejected", "Du bist bereits im Kampf oder in einem Dungeon")
+        if _dist2(me["pos"], tuple(dg["entrance"])) > dg["radius"] ** 2:
+            raise _Err("rejected", "Du bist nicht am Eingang")
+        group = [char]
+        view = self.world.parties.view(char)
+        if view is not None:
+            group += [m for m in view["members"] if m != char and m in self.players and m not in self.fight_of and m not in self.dungeon_of
+                      and _dist2(self.players[m]["pos"], tuple(dg["entrance"])) <= dg["radius"] ** 2]
+        group = group[: self.sim["group"]["max_party"]]
+        for m in group:
+            why = self._access(m, self._region_at(tuple(dg["entrance"])))
+            if why:
+                raise _Err("rejected", f"{m}: {why}")
+            if self.daily.get(f"{m}|dungeon:{did}", 0) >= dg["daily_entries"]:
+                raise _Err("rejected", f"{m} hat heute keine Dungeon-Zutritte mehr")
+        for m in group:
+            self.daily[f"{m}|dungeon:{did}"] = self.daily.get(f"{m}|dungeon:{did}", 0) + 1
+        self._dungeon_counter += 1
+        rid = f"dng-{self._dungeon_counter:05d}"
+        self.dungeons[rid] = {"id": rid, "dungeon": did, "name": dg["name"], "chars": group, "stage": -1, "stages_total": len(dg["stages"]), "next_at": self.tick_no + 5}
+        for m in group:
+            self.dungeon_of[m] = rid
+            self.players[m]["immune_until"] = self.tick_no + 10 ** 6       # Karten-Gegner lassen Durchläufe in Ruhe
+            self._emit_to(m, {"ev": "dungeon", "state": "entered", "dungeon": did, "name": dg["name"], "party": group, "stages": len(dg["stages"])})
+        return {"run": rid, "party": group}
+
+    def _dungeon_tick(self) -> None:
+        for rid, run in list(self.dungeons.items()):
+            alive = [c for c in run["chars"] if c in self.players and self.dungeon_of.get(c) == rid]
+            if not alive:
+                self._dungeon_end(rid, "empty")
+                continue
+            if run.get("fight") or self.tick_no < run["next_at"] or any(c in self.fight_of for c in alive):
+                continue
+            dg = self.R["dungeons"][run["dungeon"]]
+            run["stage"] += 1
+            st = dg["stages"][run["stage"]]
+            ent = tuple(dg["entrance"])
+            pack = [{"id": f"{rid}-{run['stage']}-{i}", "type": t, "pos": ent, "home": ent, "fight": None, "state": "idle", "target": None, "path": []}
+                    for i, t in enumerate(st["enemies"])]
+            for c in alive:
+                self.players[c]["pos"] = ent
+                self._emit_to(c, {"ev": "dungeon", "state": "stage", "name": dg["name"], "stage": run["stage"] + 1, "stages": run["stages_total"], "title": st["name"]})
+            run["fight"] = True
+            self._start_fight(alive[0], pack, alive, rid)
+
+    def _dungeon_after(self, f: dict[str, Any], result: Any) -> None:
+        rid = f["dungeon"]
+        run = self.dungeons.get(rid)
+        if run is None:
+            return
+        run["fight"] = False
+        dg = self.R["dungeons"][run["dungeon"]]
+        if result.outcome != "victory":
+            self._dungeon_end(rid, "failed")
+            return
+        run["next_at"] = self.tick_no + dg["stage_delay_ticks"]
+        if run["stage"] + 1 >= run["stages_total"]:
+            for i, c in enumerate(f["chars"]):
+                if c in self.players and result.players[i].outcome == "victory" and result.players[i].actions:
+                    key = f"{c}|chest:{run['dungeon']}"
+                    if self.daily.get(key, 0) == 0:                       # Abschlusstruhe einmal pro Tag
+                        self.daily[key] = 1
+                        for k, q in dg["chest"].items():
+                            self.world.inv.deposit(c, k, q)
+                        self._emit_to(c, {"ev": "dungeon", "state": "chest", "items": dict(dg["chest"])})
+            self._dungeon_end(rid, "cleared")
+
+    def _dungeon_end(self, rid: str, why: str) -> None:
+        run = self.dungeons.pop(rid, None)
+        if run is None:
+            return
+        dg = self.R["dungeons"][run["dungeon"]]
+        for c in run["chars"]:
+            if self.dungeon_of.get(c) == rid:
+                del self.dungeon_of[c]
+                p = self.players.get(c)
+                if p is not None:
+                    p["immune_until"] = self.tick_no + self.R["aggro_immunity_ticks"]
+                    if why == "cleared":
+                        p["pos"] = self.terrain.nearest_walkable((dg["entrance"][0] + 100, dg["entrance"][1]))
+                    self._emit_to(c, {"ev": "dungeon", "state": why, "name": dg["name"]})
+
 
     # ---------------------------------------------------------------- Gegner-KI (ADR-0031) ----
     def _speed_of(self, e: dict[str, Any]) -> int:
@@ -536,16 +730,23 @@ class GameServer:
             path.pop(0)
 
     # ---------------------------------------------------------------- Kampfbeginn ----
-    def _start_fight(self, trigger_char: str, pack: list[dict[str, Any]]) -> None:
+    def _start_fight(self, trigger_char: str, pack: list[dict[str, Any]], chars: list[str] | None = None, dungeon: str | None = None) -> None:
         R = self.R
-        chars = [trigger_char]
-        view = self.world.parties.view(trigger_char)
-        if view is not None:
-            for m in view["members"]:
-                mp = self.players.get(m)
-                if (m != trigger_char and mp is not None and m not in self.fight_of
-                        and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
-                    chars.append(m)
+        boss = any(e["type"] in self.boss_rules for e in pack)
+        if chars is None:
+            chars = [trigger_char]
+            view = self.world.parties.view(trigger_char)
+            if view is not None:
+                for m in view["members"]:
+                    mp = self.players.get(m)
+                    if (m != trigger_char and mp is not None and m not in self.fight_of
+                            and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
+                        chars.append(m)
+            if boss:                                             # Weltboss: auch Spieler im Umkreis außerhalb der Gruppe kämpfen mit
+                for m, mp in sorted(self.players.items()):
+                    if (m not in chars and m not in self.fight_of and m not in self.dungeon_of
+                            and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
+                        chars.append(m)
         chars = chars[: self.sim["group"]["max_party"]]
         specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars}, {c: self.world.equipment.sim_gear(c) for c in chars})
         types = [e["type"] for e in pack]
@@ -554,7 +755,8 @@ class GameServer:
         live = LiveEncounter(self.sim, types, specs, abilities)
         self._fight_counter += 1
         fid = f"fight-{self._fight_counter:06d}"
-        self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "abilities": abilities, "specs": specs, "started": self.tick_no}
+        self.fights[fid] = {"id": fid, "live": live, "chars": chars, "enemies": [e["id"] for e in pack], "types": types, "abilities": abilities, "specs": specs, "started": self.tick_no, "dungeon": dungeon,
+                           "danger": self._danger_bonus([tuple(e["home"]) if "home" in e else tuple(e["pos"]) for e in pack])}
         for e in pack:
             e["fight"] = fid
             e["state"], e["target"], e["path"] = "fight", None, []
@@ -623,20 +825,24 @@ class GameServer:
                 e["alive"], e["respawn_at"] = False, self.tick_no + self.R.get("respawn_ticks_by_type", {}).get(e["type"], self.R["respawn_ticks"])
             else:
                 self._begin_return(e)                           # Kampf ohne Sieg: zurück nach Hause
-        gains = self._progress_fight(chars, result, f["types"], inputs)
-        loot, factors = self._loot(chars, result, f["types"]) if result.outcome == "victory" else ({}, {})
+        gains = self._progress_fight(chars, result, f["types"], inputs, f.get("danger", 1000))
+        loot, factors = self._loot(chars, result, f["types"], f.get("danger", 1000)) if result.outcome == "victory" else ({}, {})
         for i, c in enumerate(chars):
             if c in self.players:
                 pr = result.players[i]
                 self._emit_to(c, {"ev": "fight_end", "fight": fid, "outcome": pr.outcome, "ticks": result.ticks,
                                   "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {}), "loot_factor": factors, "gains": gains.get(c, {})})
+        if result.outcome == "victory":
+            self._boss_defeated(chars, result, f["types"])
+        if f.get("dungeon"):
+            self._dungeon_after(f, result)
 
     def _decay(self, chars: list[str], t: str) -> int:
         """Beutefaktor in Promille für das Töten der Art `t`: Mittel der Faktoren aller beteiligten Figuren (je nach ihren bisherigen Kills heute)."""
         table = self.R["loot_decay_permille"]
         return sum(table[min(self.kills.get(f"{c}|{t}", 0), len(table) - 1)] for c in chars) // len(chars)
 
-    def _loot(self, chars: list[str], result: Any, types: list[str]) -> tuple[dict[str, dict[str, int]], dict[str, int]]:
+    def _loot(self, chars: list[str], result: Any, types: list[str], bonus: int = 1000) -> tuple[dict[str, dict[str, int]], dict[str, int]]:
         """Beute eines Sieges: Münzen gleichmäßig, Gegenstände nach Gruppenmodus; nur Teilnehmer mit Beitrag. Die Menge je Gegnerart sinkt mit den
         bisherigen Kills der Beteiligten am selben Tag (Rückgabe: Beute je Figur, Faktor je Gegnerart)."""
         eligible = [c for i, c in enumerate(chars) if result.players[i].outcome == "victory" and result.players[i].actions]
@@ -649,7 +855,7 @@ class GameServer:
             f = self._decay(eligible, t)
             factors[t] = f
             for key, qty in self.R["drops"].get(t, {}).items():
-                totals[key] = totals.get(key, 0) + qty * f // 1000
+                totals[key] = totals.get(key, 0) + qty * f * bonus // 1_000_000
         for t in types:
             for c in eligible:
                 self.kills[f"{c}|{t}"] = self.kills.get(f"{c}|{t}", 0) + 1
@@ -678,6 +884,7 @@ class GameServer:
         if fid is not None:                                 # Verbindungsabbruch im Kampf = Flucht
             f = self.fights[fid]
             f["live"].submit(f["chars"].index(char), "flee")
+        self.dungeon_of.pop(char, None)                     # Verbindungsabbruch beendet die Teilnahme am Dungeon
         gone = self.players.pop(char, None)
         if gone is not None:
             self.saved_pos[char] = gone["pos"]
@@ -693,6 +900,12 @@ class GameServer:
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]
         nodes = [{"id": n["id"], "item": n["item"], "pos": list(n["pos"]), "ready": self.tick_no >= n["ready_at"]}
                  for n in self.nodes if _dist2(n["pos"], me["pos"]) <= r2]
-        return {"tick": self.tick_no, "day": self.world.day[0], "you": {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char), "ground": self.terrain.kind_at(*me["pos"])},
+        reg = self._region_at(me["pos"])
+        you = {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char), "ground": self.terrain.kind_at(*me["pos"]),
+               "region": {"id": reg["id"], "name": reg["name"], "danger": reg["danger"], "level": reg["level"]} if reg else None}
+        run = self.dungeons.get(self.dungeon_of.get(char, ""))
+        if run:
+            you["dungeon"] = {"id": run["dungeon"], "name": run["name"], "stage": run["stage"] + 1, "stages": run["stages_total"]}
+        return {"tick": self.tick_no, "day": self.world.day[0], "you": you,
                 "players": others, "enemies": enemies, "nodes": nodes,
                 "zone": {"w": self.R["zone"]["width"], "h": self.R["zone"]["height"]}}

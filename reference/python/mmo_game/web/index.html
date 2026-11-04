@@ -70,7 +70,7 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
     <div class="panel"><div id="cvwrap"><canvas id="cv"></canvas>
       <div id="hud"><div class="lbl"><span id="hudName"></span><span id="hudHp"></span></div><div class="bar"><i id="hudHpBar" style="background:var(--ok)"></i></div><div class="lbl"><span>Ausdauer</span><span id="hudSt"></span></div><div class="bar st"><i id="hudStBar"></i></div></div>
       <div id="skillbar"></div></div>
-      <div class="row"><button id="bGather">Sammeln (E)</button></div>
+      <div class="row"><button id="bGather">Sammeln (E)</button><button id="bDungeon" style="display:none">Dungeon betreten</button></div>
       <div class="hint">Kampf: Skills mit Tasten 1–9/0 oder Klick auf die Leiste · Leertaste = Ausweichen · Gegner im Kampf anklicken = Ziel wählen · Bewegen: Mausklick auf den Boden (oder WASD/Pfeile) · Sammelpunkt anklicken = hinlaufen und sammeln · Gegner anklicken = hinlaufen und kämpfen · Sammeln: E · Kampf: Tasten 1–9 oder Knöpfe · Gegner in der Nähe starten den Kampf von selbst.</div></div>
   </div>
   <div id="right">
@@ -155,6 +155,11 @@ function onMessage(m){
     case"enemy_event":log("· "+m.type+(m.ability?" "+m.ability:"")+(m.outcome?" → "+m.outcome:""));if(m.type!=="phase")teleNow=null,tele();break;
     case"fight_left":log("Kampf verlassen ("+(m.reason==="defeat"?"besiegt":"geflohen")+")","e");endFightUi();refreshInv();break;
     case"fight_end":log("Kampfende: "+m.outcome+" ("+m.ticks+" Ticks)"+(m.loot?" · Beute: "+JSON.stringify(m.loot):"")+(m.loot_factor?" · Faktor "+JSON.stringify(m.loot_factor):""),m.outcome==="victory"?"g":"e");showGains(m.gains);endFightUi();refreshInv();break;
+    case"region":log((m.warning?"⚠ ":"")+"Region: "+m.name+" – Gefahr "+m.danger+"/5, empfohlen ab Stufe "+m.level+(m.warning?" (sehr gefährlich, aber begehbar)":""),m.warning?"e":"g");break;
+    case"region_blocked":log("🔒 "+m.name+": "+m.reason,"e");break;
+    case"world_boss":log("🌍 Weltboss "+m.name+(m.state==="spawned"?" ist erschienen"+(m.region?" in "+m.region:"")+"!":" wurde besiegt"+((m.by||[]).length?" von "+m.by.join(", "):"")+"!"),"g");beep(m.state==="spawned"?330:660,.2,"sawtooth");break;
+    case"world_boss_chest":log("🎁 Weltboss-Kiste: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "),"g");refreshInv();break;
+    case"dungeon":log(m.state==="entered"?"🕳 Dungeon "+m.name+" betreten ("+m.stages+" Etappen, Gruppe: "+m.party.join(", ")+")":m.state==="stage"?"🕳 Etappe "+m.stage+"/"+m.stages+": "+m.title:m.state==="chest"?"🎁 Dungeon-Kiste: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "):m.state==="cleared"?"✅ Dungeon abgeschlossen: "+m.name:"❌ Dungeon beendet ("+m.state+")",m.state==="failed"?"e":"g");if(m.state==="chest")refreshInv();break;
     case"poi":log("🔎 Hinweis gefunden: "+m.name,"g");floatText((ents.get("me")||{x:0}).x,(ents.get("me")||{y:0}).y,"🔎 "+m.name,"#ffd166");refreshWins();beep(880,.1,"triangle");break;
     case"notify":log("Nachricht: "+notifyText(m.item));refreshWins();refreshInv();break;
     case"error":log("Fehler: "+(m.message||m.code),"e");break;
@@ -252,7 +257,7 @@ function wireWins(){
   $("tSend").onclick=()=>{const to=$("tTo").value.trim(),item=$("tItem").value.trim(),qty=Math.floor(+$("tQty").value),price=Math.floor(+$("tPrice").value);
     if(!to||!item||!(qty>0)||!(price>0)){setMsg("tradeMsg","Figur, Ware, Menge und Preis ausfüllen.",false);return}
     act("tradeMsg","trade.offer",{to,side:$("tSide").value,item_key:item,qty,price},"Angebot gesendet")};
-  refreshChar().catch(()=>{});initElem().catch(()=>{});$("wChar").ontoggle=refreshWins;$("wEcho").ontoggle=refreshWins;$("wGear").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
+  refreshChar().catch(()=>{});initElem().catch(()=>{});loadWorld().catch(()=>{});$("bDungeon").onclick=async()=>{const id=nearDungeon();if(!id)return;const r=await call("game.dungeon_enter",{dungeon:id});if(!r.ok)log("Dungeon: "+errMsg(r),"e")};$("wChar").ontoggle=refreshWins;$("wEcho").ontoggle=refreshWins;$("wGear").ontoggle=refreshWins;$("wParty").ontoggle=refreshWins;$("wTrade").ontoggle=refreshWins;setInterval(refreshWins,6000);
 }
 const NOTE={"trade.offer_received":"Neues Handelsangebot","trade.offer_accepted":"Handelsangebot angenommen","trade.offer_declined":"Handelsangebot abgelehnt","trade.offer_cancelled":"Handelsangebot zurückgezogen","trade.offer_expired":"Handelsangebot abgelaufen","party.invited":"Gruppeneinladung","party.joined":"Jemand ist der Gruppe beigetreten","party.left":"Jemand hat die Gruppe verlassen"};
 function notifyText(i){const k=i&&(i.kind||i.type);return (NOTE[k]||k||"Nachricht")+(i&&i.data?" "+JSON.stringify(i.data):"")}
@@ -347,7 +352,11 @@ function showGains(g){if(g&&g.gear&&Object.keys(g.gear).length)log("Fund: "+Obje
   for(const [k,v] of Object.entries(g.elements||{}))parts.push("+"+v+" "+(ELEM_NAME[k]||k));log("Entwicklung: "+parts.join(" · ")+(g.level?" · STUFE "+g.level+"!":""),"g");
   const m=ents.get("me");if(m){if(g.xp)floatText(m.x,m.y,"+"+g.xp+" EP","#9fd3ff");if(g.level)floatText(m.x,m.y-60,"Stufe "+g.level+"!","#ffd166")}refreshChar().catch(()=>{})}
 function endFightUi(){fight=null;cdState={};busyUntil=0;stamNow=kitStamina;stunnedNow=false;teleNow=null;$("fightpanel").style.display="none";$("hpwrap").style.display="none"}
-function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" · Tag "+state.day+" · Tick "+state.tick+" · Gelände: "+y.ground+" · Pos "+Math.round(y.pos[0]/100)+","+Math.round(y.pos[1]/100)+" m"}
+function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" · Tag "+state.day+" · Tick "+state.tick+" · Gelände: "+y.ground+" · Pos "+Math.round(y.pos[0]/100)+","+Math.round(y.pos[1]/100)+" m"+(y.region?" · "+y.region.name+" (Gefahr "+y.region.danger+"/5, empf. Stufe "+y.region.level+")":"")+(y.dungeon?" · Dungeon "+y.dungeon.name+" "+y.dungeon.stage+"/"+y.dungeon.stages:"");dungeonBtn()}
+let worldInfo=null;
+async function loadWorld(){const r=await call("game.world",{});if(r.ok)worldInfo=r.result}
+function nearDungeon(){if(!worldInfo||!state||state.you.fight||state.you.dungeon)return null;for(const[id,d]of Object.entries(worldInfo.dungeons)){if(Math.hypot(d.entrance[0]-state.you.pos[0],d.entrance[1]-state.you.pos[1])<=d.radius)return id}return null}
+function dungeonBtn(){const id=nearDungeon(),b=$("bDungeon");b.style.display=id?"":"none";if(id)b.textContent="Dungeon betreten: "+worldInfo.dungeons[id].name}
 function tele(){const t=teleNow;$("tele").textContent=t?"⚠ "+t.ability+" – wirkt in "+t.ticks+" Ticks. Antwort: "+(t.answers||[]).join(", "):""}
 function fightUi(){
   const v=fight.view,o=$("opps");o.textContent="";

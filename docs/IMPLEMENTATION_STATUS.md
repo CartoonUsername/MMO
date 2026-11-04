@@ -33,14 +33,14 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Aktives Elementmanagement im Kampf | fehlt | offen (Frage 6) |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
 | Action-Kampf, Telegraphen, Zustände | teilweise | 1:1-, Gruppen-, Mehrgegner-Kampf, Gegnerfähigkeiten (sim_rules_v7); **Raumkampf/Trefferzonen/PvP fehlen** |
-| Dungeons, Weltbosse, Raids | fehlt | ein Boss-Typ (Steinherz-Koloss) als Gegnervorlage |
+| Dungeons, Weltbosse, Raids | teilweise (neu) | 1 Dungeon (3 Etappen), Weltboss mit Mitkämpfern/Kiste, ADR-0048; Raids und echte Instanzen fehlen |
 
 ## Welt, Wirtschaft, Gesellschaft (Teil IX–XIII)
 | Blueprint | Stand | Beleg / Lücke |
 |---|---|---|
 | Gemeinsame Welt, serverautoritativ | vorhanden (Referenz) | Spielserver `mmo_game`, ein Prozess; Mehrregion-Betrieb **fehlt** |
 | Gelände, Kollision, Wegfindung | vorhanden | ADR-0030/0031; eine Zone 6000×6000 cm |
-| Regionen, Gefahrenstufen, Fortbewegung/Epochen | fehlt | – |
+| Regionen, Gefahrenstufen, Fortbewegung/Epochen | teilweise (neu) | 7 Regionen mit Gefahr 1–5, Zugangsbedingung, Bonus (ADR-0048); Fortbewegungsstufen/Epochen fehlen |
 | Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017); NPC-Händler minimal, keine NPC-Lebensprofile |
 | Spielerunternehmen: Gründung, Personal, Beteiligungen, Produktion | vorhanden (Referenz) | ADR-0012/0016, `company.*`, `production.*` |
 | Filialen, Töchter, Offline-Betrieb mit Deckel | fehlt | Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
