@@ -58,7 +58,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Persistenz, Migration, Backup | vorhanden | ADR-0014/0018/0037, geprüftes Backup + Restore |
 | Konten, TLS, Rate-Limits | vorhanden | ADR-0029 |
 | Regelversionierung, Golden Vectors | vorhanden | v1–v9 (CEE), sim_rules bis v7 |
-| Engine | **Konflikt** | Blueprint: Unreal „bevorzugte Kandidatin“ (VORSCHLAG, Frage 23 offen). Repo: Unity 6 Client (`client/unity`, in Unity ungetestet) + Browser-Testclient. Entscheidung beim Nutzer |
+| Engine | Unity 6 (bestätigt) | Client mit WebSocket, Kit-Leiste, 12 datengetriebenen Fenstern (ADR-0054); in Unity ungetestet, Übersetzung gegen Nachbildung geprüft |
 | Phase-1-Prototyp (Third-Person, Boss, Dedicated Server) | teilweise | Server ja; Third-Person-Client nur Browser (Top-down, Klick-Bewegung) |
 
 ## Vorschlag für die Reihenfolge (nach Blueprint §80: kleinster vertikaler Fortschritt zuerst)
@@ -70,4 +70,4 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 6. Danach Welt-/Wirtschaftsausbau (Grundstücke, Stadt, Filialen, Gilden) – je eigene Etappe mit ADR.
 
 ## Offene Entscheidungen (Blueprint §57), die vor Bau geklärt sein müssen
-Engine (Unreal oder Unity) · Anzahl gleichzeitig ausrüstbarer Echos (Frage 7) · Resonanz-Raten/Kosten (8) · welche Echos serverexklusiv sind (9) · Berufswechsel (10) · Währung/Gebühren (17) · Grundstücksgrößen (18).
+Anzahl gleichzeitig ausrüstbarer Echos (Frage 7) · Resonanz-Raten/Kosten (8) · welche Echos serverexklusiv sind (9) · Berufswechsel (10) · Währung/Gebühren (17) · Grundstücksgrößen (18).
