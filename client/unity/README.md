@@ -2,12 +2,10 @@
 
 **Stand:** Quellcode vorhanden, **in dieser Entwicklungsumgebung nicht kompiliert oder in Unity getestet** (Unity läuft hier nicht). Der Server und das Protokoll sind getestet (`reference/python/tests/test_game.py`, inkl. zwei TCP-Clients); der Client hält sich an `docs/VERTICAL_SLICE_PROTOCOL.md`.
 
-## Einrichten (Unity 6, 3D (URP), kostenlos in der Personal-Lizenz)
-1. Neues Projekt „3D (URP)“ anlegen.
-2. Package Manager → „Add package by name“ → `com.unity.nuget.newtonsoft-json` (für JSON).
-3. Den Ordner `Assets/Scripts` aus diesem Verzeichnis in das Projekt kopieren.
-4. Leere Szene öffnen, ein leeres GameObject anlegen, `GameController` anhängen, dort `account` und `password` setzen (z. B. `spieler1` bzw. `spieler2` im zweiten Editor/Build, Passwort mindestens 8 Zeichen). Beim allerersten Start `register` anhaken, danach wieder abhaken.
-5. Server starten: `cd reference/python && python -m mmo_game.net 7777 --data ./spielstand` (mit Konten, lokal), dann in Unity Play drücken. Ohne Konten nur zum Testen: `--insecure-dev`. `useTls` nur mit einem Serverzertifikat, dem das System vertraut (ein selbst signiertes Zertifikat muss erst im System als vertrauenswürdig eingetragen werden).
+## Einrichten (Unity 6, kostenlos in der Personal-Lizenz)
+1. Unity Hub → „Add“ → „Add project from disk“ → diesen Ordner (`client/unity`) wählen; bei Versionsabfrage die installierte Unity-6-Version nehmen (Hub bietet es an). Das Projekt nutzt die eingebaute Render-Pipeline (kein URP nötig) und holt das JSON-Paket selbst.
+2. Beliebige (auch leere) Szene öffnen und Play drücken: der Controller legt sich selbst an und zeigt eine Anmeldemaske (Adresse, Port, Konto, Passwort; „Konto anlegen“ beim ersten Mal).
+3. Server: lokal `cd reference/python && python -m mmo_game.net 7777 --data ./spielstand` (Adresse `127.0.0.1`), oder die Adresse eines gehosteten Servers eintragen (öffentliche Server verlangen TLS, siehe `docs/VERTICAL_SLICE.md`).
 
 ## Steuerung
 WASD laufen · E sammeln · im Kampf: Linksklick leicht, Rechtsklick schwer, Leertaste ausweichen, Q blocken, 1 betäuben, 2 verlangsamen, 3 Rundumschlag, 4 heilen, 5 Schild, Tab zweites Ziel, F fliehen, R/C/V Fähigkeiten (nur mit Ausrüstung). Seitenleiste: Gruppe, Herstellen, Handel.

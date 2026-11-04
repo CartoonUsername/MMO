@@ -37,10 +37,37 @@ namespace Mmo
             var g = GameObject.CreatePrimitive(PrimitiveType.Plane);
             g.name = "Boden"; g.transform.localScale = new Vector3(6f, 1f, 6f); g.transform.position = new Vector3(30f, 0f, 30f);
             ground = g.transform;
-            net = new NetClient();
-            net.OnEvent += OnServerEvent;
-            net.Connect(host, port, account, password.Length > 0 ? password : null, register, useTls);
+            if (autoConnect) StartConnect();
+        }
+
+        public bool autoConnect = false;                   // false: zuerst Anmeldemaske (kein Inspector nötig)
+
+        void StartConnect()
+        {
+            try
+            {
+                net = new NetClient();
+                net.OnEvent += OnServerEvent;
+                net.Connect(host, port, account, password.Length > 0 ? password : null, register, useTls);
+            }
+            catch (System.Exception e) { info = "Verbindung fehlgeschlagen: " + e.Message; net = null; return; }
             net.Send("game.join", new JObject(), r => net.Send("game.map", new JObject(), BuildMap));
+        }
+
+        void LoginGui()
+        {
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - 160, Screen.height / 2 - 130, 320, 260), GUI.skin.box);
+            GUILayout.Label("MMO Testclient – Anmeldung");
+            GUILayout.Label("Server (Adresse)"); host = GUILayout.TextField(host);
+            GUILayout.Label("Port"); int.TryParse(GUILayout.TextField(port.ToString()), out port);
+            GUILayout.Label("Konto"); account = GUILayout.TextField(account);
+            GUILayout.Label("Passwort (mind. 8 Zeichen)"); password = GUILayout.PasswordField(password, '*');
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Anmelden")) { register = false; StartConnect(); }
+            if (GUILayout.Button("Konto anlegen")) { register = true; StartConnect(); }
+            GUILayout.EndHorizontal();
+            if (info.Length > 0) GUILayout.Label(info);
+            GUILayout.EndArea();
         }
 
         // Statische Karte (Darstellung): Gebiete als flache Quader, Hindernisse als Zylinder. Begehbarkeit entscheidet allein der Server.
@@ -112,6 +139,7 @@ namespace Mmo
 
         void Update()
         {
+            if (net == null) return;
             net.Pump();
             if (state == null) return;
             SyncViews();
@@ -199,6 +227,7 @@ namespace Mmo
 
         void OnGUI()
         {
+            if (net == null) { LoginGui(); return; }
             var sb = new StringBuilder();
             sb.AppendLine("Konto: " + account + (net != null && net.Connected ? "  (verbunden)" : "  (getrennt)"));
             if (state != null) sb.AppendLine("Tick " + state["tick"] + "  Tag " + state["day"] + "  Position " + state["you"]["pos"]);
