@@ -237,8 +237,12 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((v["identity"]["base_class"], v["essence"]["form"], v["identity"]["level"]), (None, "human", 1))
         self.assertEqual(sorted(v["classes"]), ["archer", "shaman_alchemist", "warrior"])
         self.assertEqual(set(v["elements"]["affinity"]), {"fire", "water", "shadow", "light", "wind", "earth", "electric", "ice", "nature"})
+        self.assertEqual([m["type"] for m in v["layers"]["life_story"]["milestones"]], ["identity.created"])
         self.assertTrue((await self._call(c, 2, "character.choose_class", char="anna", base_class="warrior"))["ok"])
         self.assertEqual((await self._call(c, 3, "query.character", char="anna"))["result"]["identity"]["base_class"], "warrior")
+        v2 = (await self._call(c, 3, "query.character", char="anna"))["result"]["layers"]
+        self.assertEqual([m["type"] for m in v2["life_story"]["milestones"]], ["identity.created", "identity.class_chosen"])
+        self.assertEqual(v2["essence_identity"]["base_class"], "warrior")
         again = await self._call(c, 4, "character.choose_class", char="anna", base_class="archer")      # dauerhaft
         self.assertFalse(again["ok"])
         self.assertFalse((await self._call(c, 5, "character.choose_class", char="anna", base_class="paladin"))["ok"])

@@ -168,6 +168,11 @@ class CharacterService:
         """Handelsrichtungen -> Stufe (mehrere gleichzeitig möglich)."""
         return economic_directions(self.state(character_id), self.rules_of(character_id))
 
+    def layers(self, character_id: str) -> dict:
+        """Drei Schichten: Lebensgeschichte, aktuelles Profil, Wesenidentität (reine Ableitung, ADR-0040)."""
+        from .layers import layers
+        return layers(self.log.events(character_id), self.state(character_id), self.rules_of(character_id))
+
     def economic_profile(self, character_id: str) -> dict:
         """Laufbahn, Unternehmen, Netzwerkgröße, Anzahl Handel."""
         return economic_profile(self.state(character_id), self.rules_of(character_id))

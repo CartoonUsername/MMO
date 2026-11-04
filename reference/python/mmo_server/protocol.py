@@ -64,6 +64,7 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
                       "techniques": safe(lambda: svc.known_techniques(char), []), "craft_profile": safe(lambda: svc.craft_profile(char), {})},
         "economy": safe(lambda: svc.economic_profile(char), {}),
         "appearance": safe(lambda: svc.appearance(char), {}),
+        "layers": safe(lambda: svc.layers(char), {}),
     }
 
 

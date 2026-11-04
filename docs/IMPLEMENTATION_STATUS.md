@@ -11,7 +11,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Wesensmatrix aus validierter Historie, Hash-Kette, Replay | vorhanden | Character History, Golden Vectors |
 | Charakter im Spiel sichtbar (Klasse wählen, Entwicklung ansehen) | vorhanden (neu) | ADR-0038, Fenster „Charakter“ |
 | Wesensform dauerhaft, bewusste Annahme | vorhanden | `mmo_cee/essence.py` (Annahme nur einmal, Fehler „dauerhaft“); Vorschau der Folgen im Client **fehlt** |
-| Drei Schichten: Lebensgeschichte / aktuelles Profil / Wesenidentität sauber getrennt | teilweise | Event-Log und Projektion getrennt; explizite Dreiteilung als Datenmodell nicht dokumentiert (`DOMAIN_MODEL.md` fehlt) |
+| Drei Schichten: Lebensgeschichte / aktuelles Profil / Wesenidentität sauber getrennt | vorhanden (neu) | `mmo_cee/layers.py`, `docs/DOMAIN_MODEL.md`, ADR-0040; Meilensteine aus Erkundung/Sozialem brauchen AP 3 |
 | Wesensformen nicht nur elementar (Beruf, Forschung, Erkundung) | teilweise | 5 Platzhalterformen (`ember_kin` …), Berufs-/Forschungspfade nicht im Detail geprüft |
 | Berufe als eigene Domäne (Zweige, Techniken, Rezepte, Meisterstücke) | teilweise | Berufe, Meisterschaftsstufen, 7 Rezepte, Techniken (ADR-0010); **Spezialisierungszweige und Meisterstücke fehlen** |
 | Entdeckungen, Pionier, Lehre | vorhanden | `mmo_cee/discovery`, `mmo_world` (ADR-0009) |
