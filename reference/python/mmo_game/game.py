@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from mmo_cee.errors import RuleViolation
+from mmo_game import progression
 from mmo_server import Gateway, Sessions
 from mmo_server.gateway import ID_RE, _fail
 from mmo_sim import EncounterServer, SimError
@@ -32,7 +33,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v2.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v3.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -90,6 +91,7 @@ class GameServer:
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
         self.saved_pos: dict[str, tuple[int, int]] = {}
+        self.daily: dict[str, int] = {}                    # Tageszähler der Progression (Sammeln, Fähigkeits-Exposition); beginnt jeden Tag neu
         self.kills: dict[str, int] = {}                  # "Figur|Gegnerart" -> Kills am aktuellen Tag (Beuteabnahme, ADR-0035)
         if world is not None:                                # Neustart: Zähler und Zustand aus dem gespeicherten Spiel
             self.encounters._counter = _max_encounter_counter(world)
@@ -104,6 +106,7 @@ class GameServer:
             self.saved_pos = {c: (int(x), int(y)) for c, (x, y) in saved.get("positions", {}).items()}
             if saved.get("kills_day") == self.world.day[0]:
                 self.kills = {k: int(v) for k, v in saved.get("kills", {}).items()}
+                self.daily = {k: int(v) for k, v in saved.get("daily", {}).items()}
 
     # ---------------------------------------------------------------- Speichern ----
     def save(self, store: Store) -> int:
@@ -112,7 +115,7 @@ class GameServer:
         state = {"generation": gen, "tick": self.tick_no, "format": 1,
                  "nodes": {n["id"]: n["ready_at"] for n in self.nodes},
                  "enemies": {e["id"]: {"alive": e["alive"], "respawn_at": e["respawn_at"]} for e in self.enemies},
-                 "kills_day": self.world.day[0], "kills": dict(sorted(self.kills.items())),
+                 "kills_day": self.world.day[0], "kills": dict(sorted(self.kills.items())), "daily": dict(sorted(self.daily.items())),
                  "positions": {**{c: list(p) for c, p in self.saved_pos.items()}, **{c: list(p["pos"]) for c, p in self.players.items()}}}
         tmp = store.path / "game_state.json.tmp"
         tmp.write_text(json.dumps(state, sort_keys=True, separators=(",", ":")), encoding="utf-8")
@@ -243,7 +246,16 @@ class GameServer:
             raise _Err("rejected", "Sammelpunkt erschöpft")
         node["ready_at"] = self.tick_no + self.R["node_cooldown_ticks"]
         self.world.inv.deposit(char, node["item"], node["qty"])
-        return {"item": node["item"], "qty": node["qty"]}
+        out: dict[str, Any] = {"item": node["item"], "qty": node["qty"]}
+        P = self.R.get("progression")
+        if P:
+            key = f"{char}|gather"
+            g = progression.gather_gain(P, node["item"], self.daily.get(key, 0))
+            self.daily[key] = self.daily.get(key, 0) + 1
+            if g is not None:
+                self._record(char, "profession.work", {"profession": g[0], "xp": g[1]})
+                out["gains"] = {"profession": g[0], "xp": g[1]}
+        return out
 
     def _cmd_fight(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         fid = self.fight_of.get(char)
@@ -277,6 +289,75 @@ class GameServer:
     def _cmd_kit(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         return {"commands": self._kit_for(char), "stamina_max": self.sim["player"]["stamina_max"]}
 
+    # ------------------------------------------------------------ Progression ----
+    def _record(self, char: str, type: str, payload: dict[str, Any]) -> bool:
+        """Zeichnet ein Entwicklungsereignis auf; Regelverstöße (z. B. Grenzen der CEE) werden nicht zum Spielfehler."""
+        try:
+            self.world.svc.record(char, type, payload)
+            return True
+        except (RuleViolation, WorldError) as e:
+            self.log.append(f"Progression abgelehnt ({char}, {type}): {e}")
+            return False
+
+    def _progress_fight(self, chars: list[str], result: Any, types: list[str], inputs: dict[str, list]) -> dict[str, dict[str, Any]]:
+        """Erfahrung und Elementexposition eines Sieges je Teilnehmer mit Beitrag (vor der Beuteabnahme berechnet)."""
+        P = self.R.get("progression")
+        gains: dict[str, dict[str, Any]] = {}
+        if not P or result.outcome != "victory":
+            return gains
+        for i, c in enumerate(chars):
+            pr = result.players[i]
+            if pr.outcome != "victory" or not pr.actions:
+                continue
+            factors = {t: self._decay([c], t) for t in types}
+            xp = progression.fight_xp(P, self.sim, types, factors)
+            elements = progression.element_exposure(P, self.sim, types, factors)
+            used = [cmd for _, cmd in inputs.get(c, [])]
+            key = f"{c}|skillexp"
+            sk = progression.skill_exposure(P, used, self.daily.get(key, 0))
+            self.daily[key] = self.daily.get(key, 0) + sum(1 for cmd in used if cmd in P["skill_exposure"])
+            for el, n in sk.items():
+                elements[el] = elements.get(el, 0) + n
+            before = self.world.svc.state(c).parts["identity"]["level"]
+            g: dict[str, Any] = {"xp": 0, "elements": {}}
+            if xp > 0 and self._record(c, "identity.xp_gained", {"amount": xp}):
+                g["xp"] = xp
+            for el, n in sorted(elements.items()):
+                if n > 0 and self._record(c, "element.exposure", {"element": el, "amount": n}):
+                    g["elements"][el] = n
+            after = self.world.svc.state(c).parts["identity"]["level"]
+            if after > before:
+                g["level"] = after
+            gains[c] = g
+        return gains
+
+    def _check_pois(self) -> None:
+        """Erkundung: Hinweise an festen Orten (je Figur einmalig); Entdeckungen der CEE schließt der Spieler selbst ab."""
+        P = self.R.get("progression")
+        if not P:
+            return
+        for c, p in self.players.items():
+            if c in self.fight_of:
+                continue
+            for poi in P["pois"]:
+                if _dist2(p["pos"], tuple(poi["at"])) > poi["radius"] ** 2:
+                    continue
+                try:
+                    self.world.discovery.gather(c, poi["discovery"], poi["evidence"])
+                except (RuleViolation, WorldError):
+                    continue                                    # schon gesammelt oder Voraussetzung fehlt
+                self._emit_to(c, {"ev": "poi", "poi": poi["id"], "name": poi["name"], "discovery": poi["discovery"]})
+
+    def _cmd_attune(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        return self._attune(char, a.get("element"))
+
+    def _attune(self, char: str, element: Any) -> dict[str, Any]:
+        try:
+            self.world.svc.record(char, "element.attuned", {"element": element})
+        except RuleViolation as e:
+            raise _Err("rejected", str(e))
+        return {"element": element}
+
     def _cmd_map(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         return self.terrain.export()
 
@@ -300,6 +381,8 @@ class GameServer:
         self._alert()
         self._enemies_act()
         self._advance_fights()
+        if self.tick_no % 5 == 0:
+            self._check_pois()
         if self.tick_no % self.R["state_every_ticks"] == 0:
             for c in list(self.players):
                 self._emit_to(c, {"ev": "state", **self._snapshot_for(c)})
@@ -308,6 +391,7 @@ class GameServer:
         w = self.world
         w.day[0] = day
         self.kills = {}                                  # Beuteabnahme beginnt jeden Tag neu
+        self.daily = {}
         w.company.advance_day(day)
         w.exchange.expire(day)
         w.offers.expire(day)
@@ -499,12 +583,13 @@ class GameServer:
                 e["alive"], e["respawn_at"] = False, self.tick_no + self.R.get("respawn_ticks_by_type", {}).get(e["type"], self.R["respawn_ticks"])
             else:
                 self._begin_return(e)                           # Kampf ohne Sieg: zurück nach Hause
+        gains = self._progress_fight(chars, result, f["types"], inputs)
         loot, factors = self._loot(chars, result, f["types"]) if result.outcome == "victory" else ({}, {})
         for i, c in enumerate(chars):
             if c in self.players:
                 pr = result.players[i]
                 self._emit_to(c, {"ev": "fight_end", "fight": fid, "outcome": pr.outcome, "ticks": result.ticks,
-                                  "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {}), "loot_factor": factors})
+                                  "actions": pr.actions, "report": report.get(c), "loot": loot.get(c, {}), "loot_factor": factors, "gains": gains.get(c, {})})
 
     def _decay(self, chars: list[str], t: str) -> int:
         """Beutefaktor in Promille für das Töten der Art `t`: Mittel der Faktoren aller beteiligten Figuren (je nach ihren bisherigen Kills heute)."""

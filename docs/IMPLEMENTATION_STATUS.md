@@ -15,7 +15,8 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Wesensformen nicht nur elementar (Beruf, Forschung, Erkundung) | teilweise | 5 Platzhalterformen (`ember_kin` …), Berufs-/Forschungspfade nicht im Detail geprüft |
 | Berufe als eigene Domäne (Zweige, Techniken, Rezepte, Meisterstücke) | teilweise | Berufe, Meisterschaftsstufen, 7 Rezepte, Techniken (ADR-0010); **Spezialisierungszweige und Meisterstücke fehlen** |
 | Entdeckungen, Pionier, Lehre | vorhanden | `mmo_cee/discovery`, `mmo_world` (ADR-0009) |
-| Anti-Farming (kein sinnloses Wiederholen) | vorhanden | Tages-/Signaldeckel in den Regeln |
+| Anti-Farming (kein sinnloses Wiederholen) | vorhanden | Tages-/Signaldeckel in den Regeln; Spielquellen mit Beutefaktor und Tageslimits (ADR-0041) |
+| Spielgeschehen speist Profile (Erfahrung, Elemente, Berufe durch Sammeln, Erkundungshinweise, Prägung) | vorhanden (neu) | ADR-0041, `game_rules_v3.json`; nur 2 Hinweisorte, weitere Quellen offen |
 | Klassenspezifische Bewegungsmechaniken, Manifestationen | fehlt | nur Parametermechanik der Visual Evolution (ADR-0008) |
 
 ## Kampfecho, Resonanz, Elemente, Kampf (Teil VI–VIII)

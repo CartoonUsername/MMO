@@ -143,7 +143,8 @@ function onMessage(m){
     case"telegraph":teleNow=m;if(m.kind!=="basic")log("⚠ "+m.ability+" ("+m.kind+") in "+m.ticks+" Ticks – Antworten: "+(m.answers||[]).join("/"));tele();break;
     case"enemy_event":log("· "+m.type+(m.ability?" "+m.ability:"")+(m.outcome?" → "+m.outcome:""));if(m.type!=="phase")teleNow=null,tele();break;
     case"fight_left":log("Kampf verlassen ("+(m.reason==="defeat"?"besiegt":"geflohen")+")","e");endFightUi();refreshInv();break;
-    case"fight_end":log("Kampfende: "+m.outcome+" ("+m.ticks+" Ticks)"+(m.loot?" · Beute: "+JSON.stringify(m.loot):"")+(m.loot_factor?" · Faktor "+JSON.stringify(m.loot_factor):""),m.outcome==="victory"?"g":"e");endFightUi();refreshInv();break;
+    case"fight_end":log("Kampfende: "+m.outcome+" ("+m.ticks+" Ticks)"+(m.loot?" · Beute: "+JSON.stringify(m.loot):"")+(m.loot_factor?" · Faktor "+JSON.stringify(m.loot_factor):""),m.outcome==="victory"?"g":"e");showGains(m.gains);endFightUi();refreshInv();break;
+    case"poi":log("🔎 Hinweis gefunden: "+m.name,"g");floatText((ents.get("me")||{x:0}).x,(ents.get("me")||{y:0}).y,"🔎 "+m.name,"#ffd166");refreshWins();beep(880,.1,"triangle");break;
     case"notify":log("Nachricht: "+notifyText(m.item));refreshWins();refreshInv();break;
     case"error":log("Fehler: "+(m.message||m.code),"e");break;
   }
@@ -208,6 +209,7 @@ function el(tag,txt,cls){const e=document.createElement(tag);if(txt!==undefined)
 function kv(box,k,v){const d=el("div","","k");d.append(el("span",k),el("b",String(v)));box.appendChild(d)}
 function barRow(box,label,val,max,cls){kv(box,label,val);const b=el("div","","bar "+(cls||""));const i=el("i");i.style.width=Math.min(100,100*val/Math.max(1,max))+"%";b.appendChild(i);box.appendChild(b)}
 function sect(box,t){box.appendChild(el("h3",t))}
+const DISC_NAME={old_shrine_map:"Karte zum alten Schrein",iron_folding:"Eisenfaltung",frostglass_recipe:"Frostglas-Rezept",windrider_glider:"Windreiter-Gleiter"};
 const MILE={"identity.created":"Als Mensch geboren","identity.class_chosen":d=>"Grundklasse: "+(CLASS_NAME[d.base_class]||d.base_class),"identity.level_reached":d=>"Stufe "+d.level+" erreicht","element.attuned":d=>"Element geprägt: "+(ELEM_NAME[d.element]||d.element),
   "essence.trial_passed":d=>"Prüfung bestanden: "+(FORM_NAME[d.form]||d.form),"essence.decision_made":"Wesensentscheidung getroffen","essence.adopted":d=>"Wesensform angenommen: "+(FORM_NAME[d.form]||d.form),
   "discovery.made":d=>"Entdeckung: "+d.discovery_id,"discovery.learned":d=>"Gelernt: "+d.discovery_id,"economy.company_founded":"Firma gegründet","economy.company_closed":"Firma geschlossen","economy.career_changed":d=>"Laufbahn: "+(d.role||""),
@@ -225,7 +227,8 @@ async function refreshChar(){
   if(!id.base_class){for(const k of c.classes){const b=el("button",CLASS_NAME[k]||k);b.onclick=async()=>{if(!confirm("Grundklasse „"+(CLASS_NAME[k]||k)+"“ wählen? Das ist dauerhaft."))return;await act("charMsg","character.choose_class",{base_class:k},"Klasse gewählt");refreshChar()};cl.appendChild(b)}}
   const aff=Object.entries(c.elements.affinity).filter(([,v])=>v>0);sect(box,"Elemente");
   if(!aff.length)box.appendChild(el("div","Noch keine Prägung – Elemente entstehen aus deinen Handlungen (Kampf, Herstellen, Entdecken).","hint"));
-  for(const [k,v] of aff.sort((a,b)=>b[1]-a[1]))barRow(box,(ELEM_NAME[k]||k)+(c.elements.attuned.includes(k)?" ✔ gebunden":""),v,100,"nd");
+  for(const [k,v] of aff.sort((a,b)=>b[1]-a[1])){barRow(box,(ELEM_NAME[k]||k)+(c.elements.attuned.includes(k)?" ✔ geprägt":""),v,100,"nd");
+    if(v>=100&&!c.elements.attuned.includes(k)){const b=el("button","Prägen: "+(ELEM_NAME[k]||k));b.onclick=async()=>{if(!confirm("Element „"+(ELEM_NAME[k]||k)+"“ dauerhaft prägen?"))return;await act("charMsg","game.attune",{element:k},"Element geprägt");refreshChar()};box.appendChild(b)}}
   const pr=Object.entries(c.professions);sect(box,"Berufe");
   if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
   for(const [k,v] of pr.sort((a,b)=>b[1]-a[1]))kv(box,PROF_NAME[k]||k,v+" EP");
@@ -236,10 +239,16 @@ async function refreshChar(){
     for(const [k,v] of ab)kv(box,k,(v.missing&&v.missing.length)?"gesperrt ("+v.missing.length+" offen)":(v.equipped?"ausgerüstet":"freigeschaltet"))}
   sect(box,"Wesenspfad");const el2=c.essence.eligible||[];
   box.appendChild(el("div",el2.length?"Prüfung möglich für: "+el2.map(f=>FORM_NAME[f]||f).join(", "):"Noch keine Wesensform erreichbar – sie entsteht aus deiner Spielgeschichte.","hint"));
+  const dl=Object.entries(c.discoveries||{});if(dl.length){sect(box,"Entdeckungen");for(const [id,pr] of dl){
+    const row=el("div","","k");row.append(el("span",DISC_NAME[id]||id),el("b",pr.known?"entdeckt":pr.evidence.length+"/"+pr.evidence_needed+" Hinweise"));box.appendChild(row);
+    if(pr.ready&&!pr.known){const b=el("button","Abschließen: "+(DISC_NAME[id]||id));b.onclick=async()=>{await act("charMsg","discovery.complete",{discovery:id},"Entdeckt!");refreshChar()};box.appendChild(b)}}}
   renderStory(box,c);
   sect(box,"Wissen");kv(box,"Rezepte",c.knowledge.recipes.length);kv(box,"Entdeckungen",c.knowledge.discoveries.length);kv(box,"Techniken",c.knowledge.techniques.length);
   const ec=c.economy||{};if(ec.trades||ec.companies_open)kv(box,"Handel / Firmen",(ec.trades||0)+" / "+(ec.companies_open||0));
 }
+function showGains(g){if(!g||!(g.xp||Object.keys(g.elements||{}).length))return;const parts=[];if(g.xp)parts.push("+"+g.xp+" EP");
+  for(const [k,v] of Object.entries(g.elements||{}))parts.push("+"+v+" "+(ELEM_NAME[k]||k));log("Entwicklung: "+parts.join(" · ")+(g.level?" · STUFE "+g.level+"!":""),"g");
+  const m=ents.get("me");if(m){if(g.xp)floatText(m.x,m.y,"+"+g.xp+" EP","#9fd3ff");if(g.level)floatText(m.x,m.y-60,"Stufe "+g.level+"!","#ffd166")}refreshChar().catch(()=>{})}
 function endFightUi(){fight=null;cdState={};busyUntil=0;stamNow=kitStamina;stunnedNow=false;teleNow=null;$("fightpanel").style.display="none";$("hpwrap").style.display="none"}
 function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" · Tag "+state.day+" · Tick "+state.tick+" · Gelände: "+y.ground+" · Pos "+Math.round(y.pos[0]/100)+","+Math.round(y.pos[1]/100)+" m"}
 function tele(){const t=teleNow;$("tele").textContent=t?"⚠ "+t.ability+" – wirkt in "+t.ticks+" Ticks. Antwort: "+(t.answers||[]).join(", "):""}
@@ -338,7 +347,7 @@ async function gather(id){
   if(!state||fight)return;const my=state.you.pos;
   const n=state.nodes.filter(n=>n.ready&&(!id||n.id===id)).sort((a,b)=>d2(a.pos,my)-d2(b.pos,my))[0];
   if(!n){log("Kein bereiter Sammelpunkt in Sicht.");return}
-  const r=await call("game.gather",{node:n.id});log(r.ok?"Gesammelt: "+r.result.item+" × "+r.result.qty:"Sammeln: "+r.error.message,r.ok?"g":"e");if(r.ok){refreshInv();beep(660,.12,"triangle");const m=ents.get("me");if(m)floatText(m.x,m.y,"+"+r.result.qty+" "+r.result.item.split("@")[0],"#ffd166")}
+  const r=await call("game.gather",{node:n.id});log(r.ok?"Gesammelt: "+r.result.item+" × "+r.result.qty+(r.result.gains?" · +"+r.result.gains.xp+" "+(PROF_NAME[r.result.gains.profession]||r.result.gains.profession):""):"Sammeln: "+r.error.message,r.ok?"g":"e");if(r.ok){refreshInv();beep(660,.12,"triangle");const m=ents.get("me");if(m)floatText(m.x,m.y,"+"+r.result.qty+" "+r.result.item.split("@")[0],"#ffd166")}
 }
 const d2=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2;
 
@@ -426,7 +435,7 @@ const ARRIVE_GROUND=100,ARRIVE_NODE=170,ARRIVE_WP=110,CELL=60;     // cm; Sammel
 // Wegfindung nur zur Darstellung/Steuerung: A* auf einem Raster über der Karte (game.map). Der Server prüft jeden Schritt trotzdem selbst.
 let grid=null;
 function terrainKind(x,y){let k=map.default;for(const r of map.regions){const[a,b,c,d]=r.rect;if(x>=a&&x<=c&&y>=b&&y<=d)k=r.kind}return k}
-function freeAt(x,y){const R=(map.player_radius||40)+12;if(x<R||y<R||x>map.w-R||y>map.h-R)return false;
+function freeAt(x,y){const R=(map.player_radius||40)+30;if(x<R||y<R||x>map.w-R||y>map.h-R)return false;
   for(const[dx,dy]of[[0,0],[R,0],[-R,0],[0,R],[0,-R]])if(!(map.kinds[terrainKind(x+dx,y+dy)]>0))return false;
   for(const o of map.obstacles){const r=o.r+R;if((o.at[0]-x)**2+(o.at[1]-y)**2<r*r)return false}return true}
 function buildGrid(){const W=Math.ceil(map.w/CELL),H=Math.ceil(map.h/CELL),ok=new Uint8Array(W*H);
@@ -468,7 +477,7 @@ function steer(){
   if(target.pi===target.path.length-1&&wd<=ARRIVE_WP&&target.kind==='ground'){stopWalk();return}
   if(wd<target.stuck.d-20){target.stuck={t:now,d:wd}}else if(now-target.stuck.t>1500){
     if(target.fails++>=1){stopWalk();log("Weg blockiert.");return}target.path=null;target.stuck={t:now,d:1e9};return}
-  const m=Math.max(Math.abs(dx),Math.abs(dy)),nd=[Math.abs(dx)>m*.4?Math.sign(dx):0,Math.abs(dy)>m*.4?Math.sign(dy):0];
+  const m=Math.max(Math.abs(dx),Math.abs(dy)),nd=[Math.abs(dx)>Math.max(25,m*.3)?Math.sign(dx):0,Math.abs(dy)>Math.max(25,m*.3)?Math.sign(dy):0];
   if(nd[0]!==lastMove[0]||nd[1]!==lastMove[1]){lastMove=nd;dir=nd;call("game.move",{dx:nd[0],dy:nd[1]}).then(r=>{if(!r.ok&&target){log("Bewegen: "+errMsg(r),"e");target=null}}).catch(()=>{})}
 }
 setInterval(steer,100);

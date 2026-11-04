@@ -199,7 +199,7 @@ class GatheringTests(unittest.TestCase):
         self.assertEqual(a.call("game.gather", node="nope")["error"]["code"], "rejected")
         walk(g, [a], [(1100, 700)], reach=200)
         r = a.call("game.gather", node="ore1")
-        self.assertEqual(r["result"], {"item": "iron_ore@standard", "qty": 3})
+        self.assertEqual(r["result"], {"item": "iron_ore@standard", "qty": 3, "gains": {"profession": "mining", "xp": 10}})
         self.assertEqual(a.call("game.gather", node="ore1")["error"]["code"], "rejected")        # erschöpft
         for _ in range(150):
             g.tick()

@@ -14,7 +14,7 @@ def cmds(bot):
 class KitTests(unittest.TestCase):
     def test_regeln_v2_kits_sind_gueltig(self):
         R = load_game_rules()
-        self.assertEqual(R["version"], "2")
+        self.assertGreaterEqual(int(R["version"]), 2)
         g = GameServer()
         cat = g.world.svc.rules["combat"]["abilities"]
         self.assertEqual(sorted(k for k in R["class_kits"] if not k.startswith("_")), ["archer", "shaman_alchemist", "warrior"])
