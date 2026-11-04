@@ -39,7 +39,45 @@ namespace Mmo
             net = new NetClient();
             net.OnEvent += OnServerEvent;
             net.Connect(host, port, account, password.Length > 0 ? password : null, register, useTls);
-            net.Send("game.join", new JObject());
+            net.Send("game.join", new JObject(), r => net.Send("game.map", new JObject(), BuildMap));
+        }
+
+        // Statische Karte (Darstellung): Gebiete als flache Quader, Hindernisse als Zylinder. Begehbarkeit entscheidet allein der Server.
+        void BuildMap(JObject r)
+        {
+            if (r["ok"] == null || !(bool)r["ok"]) { info = "Karte nicht verfügbar"; return; }
+            var m = r["result"];
+            foreach (var reg in m["regions"])
+            {
+                var rect = reg["rect"];
+                float x1 = (float)rect[0] * CmToM, y1 = (float)rect[1] * CmToM, x2 = (float)rect[2] * CmToM, y2 = (float)rect[3] * CmToM;
+                var g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                g.name = "Gelände " + reg["kind"];
+                g.transform.position = new Vector3((x1 + x2) / 2f, 0.02f, (y1 + y2) / 2f);
+                g.transform.localScale = new Vector3(x2 - x1, 0.04f, y2 - y1);
+                Destroy(g.GetComponent<Collider>());
+                g.GetComponent<Renderer>().material.color = KindColor((string)reg["kind"]);
+            }
+            foreach (var o in m["obstacles"])
+            {
+                var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                float rad = (float)o["r"] * CmToM;
+                g.name = "Hindernis";
+                g.transform.position = new Vector3((float)o["at"][0] * CmToM, 1f, (float)o["at"][1] * CmToM);
+                g.transform.localScale = new Vector3(rad * 2f, 1f, rad * 2f);
+                g.GetComponent<Renderer>().material.color = new Color(0.35f, 0.35f, 0.35f);
+            }
+        }
+
+        static Color KindColor(string kind)
+        {
+            switch (kind)
+            {
+                case "road": return new Color(0.75f, 0.65f, 0.45f);
+                case "water": return new Color(0.15f, 0.35f, 0.8f);
+                case "mud": return new Color(0.4f, 0.3f, 0.2f);
+                default: return new Color(0.3f, 0.6f, 0.3f);
+            }
         }
 
         void OnDestroy() { net?.Dispose(); }

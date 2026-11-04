@@ -15,6 +15,7 @@
 | 2 | Spielserver ohne Netzwerk (`mmo_game.game`): Raum 60 × 60 m, Bewegung mit Tempolimit, Gegner mit Aggro und Wiedererscheinen, Sammelpunkte, Kampf mit Gruppe und Beute, Tageswechsel | **fertig** |
 | 3 | Transport (`mmo_game.net`): TCP mit zeilenweisem JSON, Anmeldung per Konto-Name (nur Entwicklung), Live-Ereignisse, Testclient (`mmo_game.client`) | **fertig** |
 | 4 | Unity-Client (`client/unity`): Verbindung, Bewegung/Kamera, Kampfeingaben + Anzeige, Inventar/Herstellung/Handel-Oberfläche | **Quellcode vorhanden, nicht in Unity geprüft** (Unity läuft in dieser Umgebung nicht) |
+| 4b | Gelände und Kollision (`mmo_game.terrain`): Geländearten mit Tempo, Fluss mit Brücke, Fels, Wasser, Zonenrand; Gleiten an Hindernissen; Aggro nur mit freier Strecke | **fertig** (ADR-0030) |
 | 5 | Persistenz: Welt (CEE, Inventar, Märkte, Gruppen) als Generationen im `Store`, Spielzustand (Tick, Gegner, Sammelpunkte, Positionen) daneben; Autosave und Speichern beim Beenden | **fertig** |
 | 6 | Anmeldung: Konten mit PBKDF2-Hash, Sperren, Sitzungs-Token, TLS-Option | **fertig** (ADR-0029); offen: E-Mail/Passwort-Zurücksetzen, Kontoverwaltung |
 

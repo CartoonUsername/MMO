@@ -22,11 +22,12 @@ Hülle wie `docs/PROTOCOL.md`: `{"v":1,"id":"<1-64 Zeichen>","cmd":"…","args":
 | `game.gather` | `node` | sammelt am Sammelpunkt (Reichweite, Abklingzeit); Beute kommt ins Inventar |
 | `game.fight` | `input` | Kampfbefehl; der Server vergibt den Tick; unbekannt oder nicht im Kampf: `rejected` |
 | `game.state` | – | aktueller Zustand in Sichtweite |
+| `game.map` | – | statische Karte: `{w,h,default,kinds:{Art:Tempo‰},regions:[{kind,rect:[x1,y1,x2,y2]}],obstacles:[{at,r}],player_radius}` – nur zur Darstellung; Begehbarkeit und Tempo entscheidet der Server |
 
 Zu viele Befehle: `rate_limited` (Budget füllt sich ein Befehl je Tick).
 
 ## Ereignisse (Server → Client, ohne `id`)
-- `state` (alle 2 Ticks): `{tick, day, you:{char,pos,fight}, players:[{char,pos,fight}], enemies:[{id,type,pos,alive,fight}], nodes:[{id,item,pos,ready}], zone}`; Positionen in Zentimetern.
+- `state` (alle 2 Ticks): `{tick, day, you:{char,pos,fight,ground} (`ground` = Geländeart unter der Figur), players:[{char,pos,fight}], enemies:[{id,type,pos,alive,fight}], nodes:[{id,item,pos,ready}], zone}`; Positionen in Zentimetern.
 - `fight_start`: `{fight, opponents:[Typ], party:[Figur], you:<Index>}`.
 - `fight` (alle 2 Ticks): `{tick, opponents:[{type,hp,alive}], players:[{hp,max_hp,stamina,state,cooldowns,busy,focus}], stagger:[bool]}` – keine Bedrohung/Zielwahl.
 - `fight_left`: `{fight, reason: defeat|fled}` – du bist raus.

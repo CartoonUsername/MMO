@@ -22,6 +22,8 @@ from mmo_sim.live import LiveEncounter
 from mmo_sim.rules import load_sim_rules
 from mmo_world import WorldError
 from mmo_world.persistence import PersistenceError, Store
+
+from .terrain import Terrain, TerrainError
 from mmo_world.world import World
 
 COIN = "coin@gold"
@@ -76,6 +78,10 @@ class GameServer:
         self.enemies = [{"id": f"e{i + 1}", "type": e["type"], "pos": tuple(e["at"]), "home": tuple(e["at"]), "alive": True,
                          "respawn_at": 0, "fight": None} for i, e in enumerate(self.R["enemies"])]
         self.nodes = [{**n, "pos": tuple(n["at"]), "ready_at": 0} for n in self.R["nodes"]]
+        self.terrain = Terrain(self.R["terrain"], self.R["zone"], self.R["speed_cm_per_tick"])
+        for what, pos in [("Startpunkt", tuple(self.R["zone"]["spawn"]))] + [(f"Gegner {e['id']}", e["pos"]) for e in self.enemies] + [(f"Sammelpunkt {n['id']}", n["pos"]) for n in self.nodes]:
+            if self.terrain.blocked(*pos):
+                raise TerrainError(f"{what} liegt im Blockierten: {pos}")
         self._fight_counter = 0
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
@@ -202,6 +208,8 @@ class GameServer:
     def _cmd_join(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         if char not in self.players:
             sp = self.saved_pos.pop(char, None) or tuple(self.R["zone"]["spawn"])
+            if self.terrain.blocked(*sp):                       # z. B. nach einer Kartenänderung
+                sp = self.terrain.nearest_walkable(sp)
             self.players[char] = {"pos": sp, "dir": (0, 0), "immune_until": 0}
             self.sess_of[char] = sid
         return self._snapshot_for(char)
@@ -238,6 +246,9 @@ class GameServer:
             raise _Err("rejected", "Befehl nicht angenommen")
         return {"tick": f["live"].t}
 
+    def _cmd_map(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        return self.terrain.export()
+
     def _cmd_state(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         self._need_joined(char)
         return self._snapshot_for(char)
@@ -272,17 +283,11 @@ class GameServer:
             w.pricing.advance(day)
 
     def _move_players(self) -> None:
-        z, speed = self.R["zone"], self.R["speed_cm_per_tick"]
         for c, p in self.players.items():
             if c in self.fight_of or p["dir"] == (0, 0):
                 continue
             dx, dy = p["dir"]
-            if dx and dy:                                   # Diagonale: ganzzahlig auf ca. 0,7 begrenzt (Betrag ≤ speed)
-                step = speed * 707 // 1000
-                nx, ny = p["pos"][0] + dx * step, p["pos"][1] + dy * step
-            else:
-                nx, ny = p["pos"][0] + dx * speed, p["pos"][1] + dy * speed
-            p["pos"] = (min(max(0, nx), z["width"]), min(max(0, ny), z["height"]))
+            p["pos"] = self.terrain.step(p["pos"], dx, dy)
 
     def _respawn(self) -> None:
         for e in self.enemies:
@@ -298,7 +303,8 @@ class GameServer:
             if c in self.fight_of or self.tick_no < p["immune_until"]:
                 continue
             trigger = next((e for e in self.enemies if e["alive"] and e["fight"] is None
-                            and _dist2(p["pos"], e["pos"]) <= R["aggro_radius"] ** 2), None)
+                            and _dist2(p["pos"], e["pos"]) <= R["aggro_radius"] ** 2
+                            and self.terrain.clear_line(p["pos"], e["pos"])), None)
             if trigger is None:
                 continue
             maxo = self.sim["multi"]["max_opponents"]
@@ -356,7 +362,8 @@ class GameServer:
         if state == "down":                                  # Niederlage: zurück zum Startpunkt
             p["pos"] = tuple(self.R["zone"]["spawn"])
         else:                                                # Flucht: ein Stück vom Gegner weg
-            p["pos"] = (max(0, p["pos"][0] - self.R["aggro_radius"]), max(0, p["pos"][1] - self.R["aggro_radius"]))
+            away = (max(0, p["pos"][0] - self.R["aggro_radius"]), max(0, p["pos"][1] - self.R["aggro_radius"]))
+            p["pos"] = self.terrain.nearest_walkable(away)
         self._emit_to(char, {"ev": "fight_left", "fight": fid, "reason": "defeat" if state == "down" else "fled"})
 
     def _end_fight(self, fid: str) -> None:
@@ -436,6 +443,6 @@ class GameServer:
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]
         nodes = [{"id": n["id"], "item": n["item"], "pos": list(n["pos"]), "ready": self.tick_no >= n["ready_at"]}
                  for n in self.nodes if _dist2(n["pos"], me["pos"]) <= r2]
-        return {"tick": self.tick_no, "day": self.world.day[0], "you": {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char)},
+        return {"tick": self.tick_no, "day": self.world.day[0], "you": {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char), "ground": self.terrain.kind_at(*me["pos"])},
                 "players": others, "enemies": enemies, "nodes": nodes,
                 "zone": {"w": self.R["zone"]["width"], "h": self.R["zone"]["height"]}}

@@ -18,5 +18,5 @@
 **Absicherung:** `tests/test_live.py`, `tests/test_game.py` (Bewegung, Sammeln, Herstellen, Handel, Solo- und Gruppenkampf, Abbruch, Tageswechsel, zwei TCP-Clients), Mutationstests (siehe Statusbericht).
 
 **Offen / Grenzen**
-- Keine Kollision/Hindernisse/Höhen, keine Interpolation/Vorhersage im Client, kein Chat, Markt ortsunabhängig, eine Zone.
+- Kollision und Gelände siehe ADR-0030; keine Höhen, keine Interpolation/Vorhersage im Client, kein Chat, Markt ortsunabhängig, eine Zone.
 - Gegner-KI ist nur „stehen und kämpfen"; Tempo/Aggro sind ungetestete Platzhalter.

@@ -3,7 +3,15 @@
   "_comment": "PLATZHALTER für den Vertical Slice: Größen, Geschwindigkeiten, Orte, Beute und Zeiten sind Vorschläge, KEINE beschlossenen Spielinhalte. Ganzzahlen; Längen in Zentimetern; 1 Tick = 100 ms.",
   "cee_rules": "rules_v9.json",
   "sim_rules": "sim_rules_v5.json",
-  "zone": {"width": 6000, "height": 6000, "spawn": [500, 500], "town_radius": 700},
+  "zone": {
+    "width": 6000,
+    "height": 6000,
+    "spawn": [
+      500,
+      500
+    ],
+    "town_radius": 700
+  },
   "speed_cm_per_tick": 35,
   "aggro_radius": 700,
   "pack_radius": 600,
@@ -17,20 +25,224 @@
   "start_coins": 200,
   "game_commands_per_burst": 40,
   "enemies": [
-    {"type": "wolf", "at": [2200, 1800]}, {"type": "wolf", "at": [2350, 1900]},
-    {"type": "wolf", "at": [3800, 3600]}, {"type": "wolf", "at": [3950, 3700]}, {"type": "bear", "at": [3875, 3800]},
-    {"type": "wolf", "at": [1500, 4200]}
+    {
+      "type": "wolf",
+      "at": [
+        2200,
+        1800
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        2350,
+        1900
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        3800,
+        3600
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        3950,
+        3700
+      ]
+    },
+    {
+      "type": "bear",
+      "at": [
+        3875,
+        3800
+      ]
+    },
+    {
+      "type": "wolf",
+      "at": [
+        1500,
+        4200
+      ]
+    }
   ],
   "nodes": [
-    {"id": "ore1", "item": "iron_ore@standard", "at": [1100, 700], "qty": 3},
-    {"id": "ore2", "item": "iron_ore@standard", "at": [1300, 1000], "qty": 3},
-    {"id": "herb1", "item": "healing_herb@standard", "at": [300, 1300], "qty": 2},
-    {"id": "water1", "item": "clean_water@standard", "at": [800, 300], "qty": 2}
+    {
+      "id": "ore1",
+      "item": "iron_ore@standard",
+      "at": [
+        1100,
+        700
+      ],
+      "qty": 3
+    },
+    {
+      "id": "ore2",
+      "item": "iron_ore@standard",
+      "at": [
+        1300,
+        1000
+      ],
+      "qty": 3
+    },
+    {
+      "id": "herb1",
+      "item": "healing_herb@standard",
+      "at": [
+        300,
+        1300
+      ],
+      "qty": 2
+    },
+    {
+      "id": "water1",
+      "item": "clean_water@standard",
+      "at": [
+        800,
+        300
+      ],
+      "qty": 2
+    }
   ],
   "node_cooldown_ticks": 150,
   "gather_reach": 250,
   "drops": {
-    "wolf": {"coin@gold": 6, "healing_herb@standard": 1},
-    "bear": {"coin@gold": 20}
+    "wolf": {
+      "coin@gold": 6,
+      "healing_herb@standard": 1
+    },
+    "bear": {
+      "coin@gold": 20
+    }
+  },
+  "terrain": {
+    "_comment": "PLATZHALTER: Geländearten (Tempofaktor in Promille, 0 = nicht begehbar), Gebiete (spätere überdecken frühere) und Hindernisse (Kreise).",
+    "player_radius": 40,
+    "kinds": {
+      "grass": 1000,
+      "road": 1300,
+      "mud": 600,
+      "water": 0,
+      "rock": 0
+    },
+    "default": "grass",
+    "regions": [
+      {
+        "kind": "road",
+        "rect": [
+          400,
+          400,
+          1500,
+          600
+        ]
+      },
+      {
+        "kind": "road",
+        "rect": [
+          1400,
+          500,
+          1600,
+          1900
+        ]
+      },
+      {
+        "kind": "road",
+        "rect": [
+          1500,
+          1700,
+          2400,
+          1900
+        ]
+      },
+      {
+        "kind": "water",
+        "rect": [
+          1700,
+          0,
+          1900,
+          3600
+        ]
+      },
+      {
+        "kind": "road",
+        "rect": [
+          1700,
+          1700,
+          1900,
+          1900
+        ]
+      },
+      {
+        "kind": "water",
+        "rect": [
+          2800,
+          2300,
+          3500,
+          3000
+        ]
+      },
+      {
+        "kind": "mud",
+        "rect": [
+          3500,
+          3300,
+          4300,
+          4100
+        ]
+      },
+      {
+        "kind": "mud",
+        "rect": [
+          1300,
+          3900,
+          1800,
+          4500
+        ]
+      }
+    ],
+    "obstacles": [
+      {
+        "at": [
+          900,
+          900
+        ],
+        "r": 90,
+        "kind": "rock"
+      },
+      {
+        "at": [
+          700,
+          1500
+        ],
+        "r": 70,
+        "kind": "rock"
+      },
+      {
+        "at": [
+          2500,
+          2300
+        ],
+        "r": 100,
+        "kind": "rock"
+      },
+      {
+        "at": [
+          3000,
+          3500
+        ],
+        "r": 80,
+        "kind": "rock"
+      },
+      {
+        "at": [
+          1100,
+          2600
+        ],
+        "r": 120,
+        "kind": "rock"
+      }
+    ]
   }
 }

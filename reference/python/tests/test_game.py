@@ -30,18 +30,28 @@ class Bot:
         return self.g.players[self.name]["pos"]
 
 
+PATH_TO_WOLVES = [(1500, 500), (1500, 1800), (2300, 1800)]       # Straße, dann über die Brücke
+
+
 def walk(g, bots, targets, reach=300, max_ticks=3000):
-    """Alle Bots gehen zu ihren Zielen (stoppt, sobald jemand im Kampf ist oder alle da sind)."""
+    """Alle Bots gehen zu ihren Zielen (ein Punkt oder eine Liste von Wegpunkten); stoppt, sobald jemand im Kampf ist oder alle da sind."""
+    paths = [list(t) if isinstance(t, list) else [t] for t in targets]
+    idx = [0] * len(bots)
     for _ in range(max_ticks):
         done = True
-        for b, t in zip(bots, targets):
+        for k, (b, path) in enumerate(zip(bots, paths)):
             if b.name in g.fight_of:
                 continue
+            t = path[idx[k]]
+            last = idx[k] == len(path) - 1
             x, y = b.pos()
-            if (x - t[0]) ** 2 + (y - t[1]) ** 2 <= reach ** 2:
-                b.call("game.move", dx=0, dy=0)
-                continue
+            if (x - t[0]) ** 2 + (y - t[1]) ** 2 <= (reach if last else 60) ** 2:
+                if last:
+                    b.call("game.move", dx=0, dy=0)
+                    continue
+                idx[k] += 1
             done = False
+            t = path[idx[k]]
             dx = (t[0] > x) - (t[0] < x) if abs(t[0] - x) > 40 else 0
             dy = (t[1] > y) - (t[1] < y) if abs(t[1] - y) > 40 else 0
             b.call("game.move", dx=dx, dy=dy)
@@ -134,25 +144,29 @@ class MovementTests(unittest.TestCase):
 
     def test_speed_is_limited_by_the_server(self):
         start = self.a.pos()
+        self.assertEqual(start, (500, 500))                                              # Straße: Faktor 1,3 -> 45 je Tick
         self.assertEqual(self.a.call("game.move", dx=1, dy=0)["result"], {"dir": [1, 0]})
         for _ in range(10):
             self.g.tick()
-        self.assertEqual(self.a.pos(), (start[0] + 10 * 35, start[1]))
+        self.assertEqual(self.a.pos(), (start[0] + 10 * 45, start[1]))
         for bad in ({"dx": 2, "dy": 0}, {"dx": 1.5, "dy": 0}, {"dx": "1", "dy": 0}, {"dx": True, "dy": 0}, {"dx": 1}, {}):
             self.assertEqual(self.a.call("game.move", **bad)["error"]["code"], "bad_request", bad)
-        self.assertEqual(self.a.pos(), (start[0] + 350, start[1]))
+        self.assertEqual(self.a.pos(), (start[0] + 450, start[1]))
 
     def test_diagonal_is_not_faster_and_zone_borders_hold(self):
         self.a.call("game.move", dx=1, dy=1)
         x0, y0 = self.a.pos()
         self.g.tick()
         x1, y1 = self.a.pos()
-        self.assertTrue((x1 - x0) ** 2 + (y1 - y0) ** 2 <= 35 ** 2)
+        self.assertTrue((x1 - x0) ** 2 + (y1 - y0) ** 2 <= 45 ** 2)
         self.a.call("game.move", dx=-1, dy=-1)
         for _ in range(400):
             self.g.tick()
             self.a.call("game.move", dx=-1, dy=-1)
-        self.assertEqual(self.a.pos(), (0, 0))
+        x, y = self.a.pos()
+        r = self.g.terrain.radius
+        self.assertTrue(x >= r and y >= r)                                               # Rand mit Figurenradius
+        self.assertEqual((x < r + 45, y < r + 45), (True, True))
 
     def test_state_events_show_nearby_players_only(self):
         b = Bot(self.g, "ben")
@@ -221,7 +235,7 @@ class CombatTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES], reach=300)
+        walk(g, [a], [PATH_TO_WOLVES], reach=300)
         self.assertIn("anna", g.fight_of)
         fight_until_end(g, [a])
         start, end = kinds(a, "fight_start")[0], kinds(a, "fight_end")[0]
@@ -245,7 +259,7 @@ class CombatTests(unittest.TestCase):
         a = Bot(g, "anna")
         a.call("game.join")
         self.assertEqual(a.call("game.fight", input="light")["error"]["code"], "rejected")     # nicht im Kampf
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         for bad in ("fireball", 5, None, "cast_ember"):                         # unbekannt / Fähigkeit nicht ausgerüstet wird ignoriert
             r = a.call("game.fight", input=bad)
             if bad in ("fireball", 5, None):
@@ -257,7 +271,7 @@ class CombatTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         p = a.pos()
         a.call("game.move", dx=1, dy=0)
         for _ in range(5):
@@ -269,7 +283,7 @@ class CombatTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         a.call("game.fight", input="flee")
         g.tick()
         a.pull()
@@ -300,7 +314,7 @@ class CombatTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         fid = g.fight_of["anna"]
         g.disconnect(a.sid)
         for _ in range(3):
@@ -317,7 +331,7 @@ class CombatTests(unittest.TestCase):
         a.call("party.form")
         iid = a.call("party.invite", target="ben")["result"]
         self.assertTrue(b.call("party.accept", invite=iid)["ok"])
-        walk(g, [a, b], [WOLVES, (WOLVES[0] + 100, WOLVES[1])])
+        walk(g, [a, b], [PATH_TO_WOLVES, PATH_TO_WOLVES])
         for _ in range(20):
             g.tick()
         self.assertEqual(g.fight_of.get("anna"), g.fight_of.get("ben"))
@@ -337,7 +351,7 @@ class CombatTests(unittest.TestCase):
         b.call("game.join")
         a.call("party.form")
         b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
-        walk(g, [a, b], [WOLVES, (WOLVES[0] + 100, WOLVES[1])])
+        walk(g, [a, b], [PATH_TO_WOLVES, PATH_TO_WOLVES])
         for i in range(3000):
             if "anna" in g.fight_of and i % 8 == 0:
                 a.call("game.fight", input="light")                              # nur anna kämpft
@@ -355,7 +369,7 @@ class CombatTests(unittest.TestCase):
         a, c = Bot(g, "anna"), Bot(g, "cara")
         a.call("game.join")
         c.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         g.players["cara"]["pos"] = (WOLVES[0] + 50, WOLVES[1])
         for _ in range(5):
             g.tick()
@@ -366,7 +380,7 @@ class CombatTests(unittest.TestCase):
             g = GameServer()
             a = Bot(g, "anna")
             a.call("game.join")
-            walk(g, [a], [WOLVES])
+            walk(g, [a], [PATH_TO_WOLVES])
             fight_until_end(g, [a], spam=("light", "dodge"))
             return json.dumps(g.world.snapshot(), sort_keys=True), json.dumps(a.events, sort_keys=True)
         self.assertEqual(run(), run())
@@ -507,7 +521,7 @@ class SurvivorTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         g.players["anna"]["pos"] = (1100, 700)                                  # neben ore1, aber im Kampf
         r = a.call("game.gather", node="ore1")
         self.assertEqual((r["error"]["code"], r["error"]["message"]), ("rejected", "Im Kampf nicht möglich"))
@@ -555,7 +569,7 @@ class SurvivorTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         before = a.pos()
         a.call("game.fight", input="flee")
         g.tick()
@@ -673,7 +687,7 @@ class SurvivorTests(unittest.TestCase):
         g = GameServer()
         a = Bot(g, "anna")
         a.call("game.join")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         real = g.encounters.finish_pack
 
         def tampered(eid, inputs):
@@ -732,7 +746,7 @@ class PersistenceTests(unittest.TestCase):
         a.call("game.join")
         walk(g, [a], [(1100, 700)], reach=200)
         a.call("game.gather", node="ore1")
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         fight_until_end(g, [a])
         return g, a
 
@@ -762,7 +776,7 @@ class PersistenceTests(unittest.TestCase):
         b.call("game.join")
         for _ in range(h.R["respawn_ticks"] + 5):
             h.tick()
-        walk(h, [b], [WOLVES])
+        walk(h, [b], [PATH_TO_WOLVES])
         fight_until_end(h, [b])
         self.assertEqual(h.log, [])                              # CEE hat den Bericht mit neuer ID angenommen
         self.assertEqual(kinds(b, "fight_end")[0]["outcome"], "victory")
@@ -774,12 +788,12 @@ class PersistenceTests(unittest.TestCase):
         a, b = Bot(g, "anna"), Bot(g, "ben")                    # anna ist vor ben angelegt, kämpft aber später (höhere ID)
         for x in (a, b):
             x.call("game.join")
-        walk(g, [b], [WOLVES])
+        walk(g, [b], [PATH_TO_WOLVES])
         fight_until_end(g, [b])
         g.players["ben"]["pos"] = (5000, 5000)
         for _ in range(g.R["respawn_ticks"] + 5):
             g.tick()
-        walk(g, [a], [WOLVES])
+        walk(g, [a], [PATH_TO_WOLVES])
         fight_until_end(g, [a])
         g.save(self.store)
         self.assertEqual(GS.load(self.store).encounters._counter, 2)
