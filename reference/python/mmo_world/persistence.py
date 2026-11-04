@@ -317,7 +317,8 @@ class Store:
             envelope = json.loads(snap_bytes)
             logs: Logs = {}
             for f in sorted((d / "logs").glob("*.jsonl")):
-                logs[unquote(f.stem)] = [json.loads(line) for line in f.read_text(encoding="utf-8").splitlines() if line]
+                # nicht f.stem: ab Python 3.14 hat z. B. "...jsonl" (Figur "..") keine Endung mehr
+                logs[unquote(f.name[:-len(".jsonl")])] = [json.loads(line) for line in f.read_text(encoding="utf-8").splitlines() if line]
         except ValueError as e:
             raise PersistenceError(f"Speicherpunkt nicht lesbar: {e}") from e
         return import_world(envelope, logs)

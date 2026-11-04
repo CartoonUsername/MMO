@@ -19,7 +19,15 @@ fi
 # Spielserver: eigener Benutzer, Code unter /opt/mmo, Spielstand unter /var/lib/mmo
 id mmo >/dev/null 2>&1 || useradd --system --home /var/lib/mmo --shell /usr/sbin/nologin mmo
 mkdir -p /opt/mmo /var/lib/mmo /var/backups/mmo
-rm -rf /opt/mmo/python && cp -r "$REPO_DIR/reference/python" /opt/mmo/python
+# Rollback-Stand: bisherige Laufzeit (und Skripte/DEPLOY_INFO) als *.prev aufheben, neue erst in Temp kopieren, dann tauschen
+if [ -d /opt/mmo/python ]; then
+  rm -rf /opt/mmo/python.prev && cp -a /opt/mmo/python /opt/mmo/python.prev
+  [ -d /opt/mmo/scripts ] && { rm -rf /opt/mmo/scripts.prev; cp -a /opt/mmo/scripts /opt/mmo/scripts.prev; }
+  [ -f /opt/mmo/DEPLOY_INFO ] && cp -a /opt/mmo/DEPLOY_INFO /opt/mmo/DEPLOY_INFO.prev
+fi
+rm -rf /opt/mmo/python.new && cp -r "$REPO_DIR/reference/python" /opt/mmo/python.new
+find /opt/mmo/python.new -name __pycache__ -type d -prune -exec rm -rf {} +
+rm -rf /opt/mmo/python && mv /opt/mmo/python.new /opt/mmo/python
 chown -R mmo:mmo /var/lib/mmo
 
 cat > /etc/systemd/system/mmo.service <<'U'

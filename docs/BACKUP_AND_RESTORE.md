@@ -27,6 +27,15 @@ Prüft Prüfsumme, Manifest und lädt den Stand mit dem echten Lader in ein Temp
 4. `systemctl start mmo`, Seite öffnen, einloggen, Figur prüfen.
 Rückgängig machen: Dienst stoppen, `/var/lib/mmo` wegschieben, `…before-restore-…` zurückbenennen, Dienst starten.
 
+## Rollback eines Deployments (Programmstand, nicht Spielstand)
+`deploy/setup.sh` hebt vor dem Austausch die bisherige Laufzeit als `/opt/mmo/python.prev` auf (ebenso `scripts.prev`, `DEPLOY_INFO.prev`). Zurück auf den alten Stand:
+```bash
+systemctl stop mmo
+mv /opt/mmo/python /opt/mmo/python.failed && mv /opt/mmo/python.prev /opt/mmo/python
+systemctl start mmo && systemctl is-active mmo
+```
+Achtung: Hat die neue Version den Spielstand schon mit einer neueren Regelversion gespeichert, lädt die alte ihn nicht (ADR-0014) – dann zusätzlich die vor dem Deployment erstellte Sicherung mit `restore_mmo.sh live` zurückspielen.
+
 ## Grenzen
 - Gleiche Platte = kein Schutz bei Serververlust/Löschung des VPS: Archive regelmäßig extern ablegen (z. B. `scp` auf den eigenen PC) und Hostinger-Snapshots/Backups prüfen. Hostinger bietet laut Preisseite „kostenlose wöchentliche Datensicherungen“ für KVM-Pläne; Umfang, Wiederherstellungsweg und Aufpreis für tägliche Backups bitte im hPanel nachsehen (nicht geprüft, nichts gebucht).
 - Spieler, die zwischen letzter Speicherung und Sicherung gespielt haben, verlieren höchstens die Spielzeit seit der letzten automatischen Speicherung (alle 600 Ticks = 60 s).
