@@ -160,12 +160,17 @@ class EncounterServer:
         """Eigene Fähigkeitsbefehle (ADR-0027): nur die der ausgerüsteten Fähigkeiten."""
         return {name for name, sk in skills(self.cfg).items() if sk["ability"] in (equipped or [])}
 
-    def pack_specs(self, party: Any, inputs_by_character: Any) -> list[dict[str, Any]]:
+    def pack_specs(self, party: Any, inputs_by_character: Any, extra_equipped: Any = None) -> list[dict[str, Any]]:
         """Spielerangaben (Stufe, Eingaben, freigegebene Befehle, Ausrüstung) für die Mehrgegnersimulation – für Abschluss und Live-Kampf gleich."""
         specs = []
         for c in party:
             equipped = self.service.equipped_abilities(c)
             allowed = self.service.allowed_commands(c)
+            extra = [a for a in (extra_equipped or {}).get(c, []) if equipped is not None and a not in equipped]
+            if extra:                                                      # Klassen-Kit (Spielschicht): wirkt wie ausgerüstet, ohne die CEE-Ausrüstung zu ändern
+                cat = self.service.abilities(c)
+                allowed = sorted(set(allowed or []) | {cat[a]["command"] for a in extra if a in cat and cat[a]["command"]})
+                equipped = equipped + extra
             if allowed is not None:
                 allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS) | self._skill_command_set(equipped))
             spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
