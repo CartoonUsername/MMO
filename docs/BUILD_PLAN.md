@@ -4,7 +4,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 
 | AP | Inhalt | Blueprint | Phase | Status |
 |---|---|---|---|---|
-| 1 | **Kampfsystem spielbar**: Skill-Leiste mit Tasten, Klassen-Kits, Abklingzeiten/Ausdauer sichtbar, Lebens-/Zielanzeige, Effekte, Zielwahl per Klick | §27–29, §60 | 1 | **in Arbeit** |
+| 1 | **Kampfsystem spielbar**: Skill-Leiste mit Tasten, Klassen-Kits, Abklingzeiten/Ausdauer sichtbar, Lebens-/Zielanzeige, Effekte, Zielwahl per Klick | §27–29, §60 | 1 | fertig, wartet auf Bereitstellung (ADR-0039) |
 | 2 | Datenmodell Charakter: Lebensgeschichte / aktuelles Profil / Wesenidentität (`docs/DOMAIN_MODEL.md`, Tests) | §12, §70.1–2 | 0/1 | offen |
 | 3 | Spielgeschehen füttert die Profile (Sammeln→Beruf, Erkundung, Elemente), Anti-Farming bleibt | §9, §10, §70.3 | 1/2 | offen |
 | 4 | Elementarsystem: 36 Paare / 84 Dreier, Interaktionen, klassenabhängige Wirkung, Elementmanagement im Kampf | §22–26, §74 | 2/3 | offen |

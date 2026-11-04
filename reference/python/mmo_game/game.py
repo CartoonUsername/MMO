@@ -32,7 +32,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v1.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v2.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -254,6 +254,29 @@ class GameServer:
             raise _Err("rejected", "Befehl nicht angenommen")
         return {"tick": f["live"].t}
 
+    # ------------------------------------------------------------- Kampf-Kit ----
+    def _kit_abilities(self, char: str) -> list[str]:
+        """Fähigkeiten, die die Grundklasse der Figur im Kampf von Anfang an nutzt (Spielregeln v2, Platzhalter)."""
+        cls = self.world.svc.state(char).parts["identity"]["base_class"]
+        return list(self.R.get("class_kits", {}).get(cls, [])) if cls else []
+
+    def _cmd_info(self, cmd: str) -> dict[str, Any]:
+        """Kosten und Zeiten eines Kampfbefehls aus den Simulationsregeln (reine Anzeige)."""
+        sim = self.sim
+        a = sim["actions"].get(cmd) or sim.get("skills", {}).get(cmd) or sim.get("group", {}).get(cmd) \
+            or (sim.get("multi", {}).get("sweep") if cmd == "sweep" else None) or {}
+        kind = a.get("kind") or ("attack" if a.get("damage") else "defense" if cmd in ("dodge", "block") else "control" if cmd in ("stun", "slow") else "support")
+        return {"cmd": cmd, "cost": a.get("cost", 0), "busy": a.get("busy", 0), "cooldown": a.get("cooldown", 0), "kind": kind}
+
+    def _kit_for(self, char: str) -> list[dict[str, Any]]:
+        spec = self.encounters.pack_specs([char], {}, {char: self._kit_abilities(char)})[0]
+        order = ["light", "heavy", "stun", "slow", "cast_ember", "heal", "shield", "dash", "veil", "focus_surge", "sweep", "dodge", "block", "flee"]
+        cmds = set(spec.get("allowed") or order) - {"target_1", "target_2", "target_3", "target_4", "target_5", "target_6"}
+        return [self._cmd_info(c) for c in order if c in cmds] + [self._cmd_info(c) for c in sorted(cmds - set(order))]
+
+    def _cmd_kit(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        return {"commands": self._kit_for(char), "stamina_max": self.sim["player"]["stamina_max"]}
+
     def _cmd_map(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         return self.terrain.export()
 
@@ -400,7 +423,7 @@ class GameServer:
                         and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
                     chars.append(m)
         chars = chars[: self.sim["group"]["max_party"]]
-        specs = self.encounters.pack_specs(chars, {})
+        specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars})
         types = [e["type"] for e in pack]
         # Fähigkeiten: feste der Vorlage plus Baukasten je Spawn-Punkt und Tag (reproduzierbar, ADR-0032/0033)
         abilities = [roll_abilities(self.sim, e["type"], e["id"], self.world.day[0]) for e in pack] if "enemy_abilities" in self.sim else None
@@ -414,7 +437,7 @@ class GameServer:
         for c in chars:
             self.fight_of[c] = fid
             self.players[c]["dir"] = (0, 0)
-            self._emit_to(c, {"ev": "fight_start", "fight": fid, "opponents": types, "abilities": abilities, "party": chars, "you": chars.index(c)})
+            self._emit_to(c, {"ev": "fight_start", "fight": fid, "opponents": types, "abilities": abilities, "party": chars, "you": chars.index(c), "kit": self._kit_for(c), "enemy_ids": [e["id"] for e in pack]})
 
     def _advance_fights(self) -> None:
         for fid in list(self.fights):
