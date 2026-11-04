@@ -84,7 +84,7 @@ class RulesTests(unittest.TestCase):
         R = load_game_rules()
         g = GameServer()
         self.assertEqual(g.world.svc.rules.version, "9")
-        self.assertEqual(g.sim["version"], "6")
+        self.assertEqual(g.sim["version"], "7")
         self.assertTrue(R["speed_cm_per_tick"] > 0 and R["aggro_radius"] > 0)
         # Beute nur aus bekannten Gegnern und handelbaren Gegenständen
         for t, items in R["drops"].items():
@@ -351,6 +351,7 @@ class CombatTests(unittest.TestCase):
         b.call("game.join")
         a.call("party.form")
         b.call("party.accept", invite=a.call("party.invite", target="ben")["result"])
+        g.world.svc.record("anna", "identity.xp_gained", {"amount": 200000})            # starke Kämpferin (die Wölfe sind seit dem Balancing zäher)
         walk(g, [a, b], [PATH_TO_WOLVES, PATH_TO_WOLVES])
         for i in range(3000):
             if "anna" in g.fight_of and i % 8 == 0:

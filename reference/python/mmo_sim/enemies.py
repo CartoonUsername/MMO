@@ -45,6 +45,8 @@ def validate_enemy_rules(cfg: dict[str, Any]) -> None:
     for name, o in cfg["opponents"].items():
         if o["attack_interval"] > 0 and o["attack_interval"] + o["windup"] < mc:
             raise SimError(f"Gegner {name}: Angriffstakt + Vorwarnzeit unter dem Boden min_attack_cycle")
+    if "telegraph_basic" in ea and not isinstance(ea["telegraph_basic"], bool):
+        raise SimError("enemy_abilities.telegraph_basic muss true/false sein")
     for key, lo, hi in (("player_slow_permille", 1000, 5000), ("heal_threshold_permille", 1, 999), ("max_enemies", 2, 12)):
         if not _is_int(ea.get(key)) or not lo <= ea[key] <= hi:
             raise SimError(f"enemy_abilities.{key} muss {lo}..{hi} sein")

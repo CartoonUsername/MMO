@@ -18,6 +18,7 @@
 | 4b | Gelände und Kollision (`mmo_game.terrain`): Geländearten mit Tempo, Fluss mit Brücke, Fels, Wasser, Zonenrand; Gleiten an Hindernissen; Aggro nur mit freier Strecke | **fertig** (ADR-0030) |
 | 4c | Gegnerbewegung (`mmo_game.navigation`, KI in `mmo_game.game`): Aufmerksamkeit, Verfolgung über die Brücke (A*), Kampf ab Kampfradius, Leine, Heimkehr | **fertig** (ADR-0031) |
 | 4d | Gegnerfähigkeiten im Spielserver: Baukasten je Spawn-Punkt und Tag, Ankündigungen (`telegraph`), Zustände auf Spielern, Schilde, Heilen, Beschwören, Phasen, Boss (`mmo_sim.pack`, ADR-0033) | **fertig** |
+| 4e | Balancing: deterministische Testspieler, Bericht `docs/BALANCE_REPORT.md`, `sim_rules_v7` (ADR-0034) | **erster Stand fertig** (Werte sind Platzhalter) |
 | 5 | Persistenz: Welt (CEE, Inventar, Märkte, Gruppen) als Generationen im `Store`, Spielzustand (Tick, Gegner, Sammelpunkte, Positionen) daneben; Autosave und Speichern beim Beenden | **fertig** |
 | 6 | Anmeldung: Konten mit PBKDF2-Hash, Sperren, Sitzungs-Token, TLS-Option | **fertig** (ADR-0029); offen: E-Mail/Passwort-Zurücksetzen, Kontoverwaltung |
 

@@ -2,7 +2,7 @@
   "version": "1",
   "_comment": "PLATZHALTER für den Vertical Slice: Größen, Geschwindigkeiten, Orte, Beute und Zeiten sind Vorschläge, KEINE beschlossenen Spielinhalte. Ganzzahlen; Längen in Zentimetern; 1 Tick = 100 ms.",
   "cee_rules": "rules_v9.json",
-  "sim_rules": "sim_rules_v6.json",
+  "sim_rules": "sim_rules_v7.json",
   "zone": {
     "width": 6000,
     "height": 6000,
@@ -119,8 +119,8 @@
     {
       "type": "stone_warden",
       "at": [
-        4800,
-        4800
+        4500,
+        4300
       ]
     },
     {
@@ -356,7 +356,8 @@
       "shadow_hunter": 38,
       "totem_caller": 26,
       "stone_imp": 34,
-      "stone_heart_colossus": 24
+      "stone_heart_colossus": 24,
+      "wolf_pup": 36
     }
   }
 }

@@ -67,7 +67,7 @@ Jede Familie bekommt ein **Element** als Charakter (z. B. Moorhexe Natur/Schatte
 
 ## 6. Umsetzungsplan (Vorschlag)
 
-*Stand:* Alle Schritte sind umgesetzt: Regeln und Baukasten (ADR-0032), Wirkung in der Simulation, Berichte, Spielserver mit Ankündigungen und Beute, Golden Vectors (ADR-0033). Offen bleiben Balancing, weitere Familien und Fähigkeiten sowie Gegner mit Historie.
+*Stand:* Alle Schritte sind umgesetzt: Regeln und Baukasten (ADR-0032), Wirkung in der Simulation, Berichte, Spielserver mit Ankündigungen und Beute, Golden Vectors (ADR-0033). Ein erstes Balancing mit Testspielern steht (`docs/BALANCE_REPORT.md`, ADR-0034); offen bleiben echte Spieltests, weitere Familien und Fähigkeiten sowie Gegner mit Historie.
 
 1. **Regeln `sim_rules_v6`:** Abschnitt `enemy_abilities` (Kosten entfallen; Vorwarnung, Dauer, Ziel, Wirkung, Unterbrechbarkeit) und je Gegnerart `pattern` und `phases`; Prüfung beim Laden; neue Regelversion, alte Vektoren bleiben byteidentisch.
 2. **Simulation (`mmo_sim.pack`):** Gegnerfähigkeiten, Zustände auf Spielern, Gegnerschild, Heilen/Beschwören, Phasenwechsel; weiterhin deterministisch und mit Eingabeprotokoll nachspielbar.

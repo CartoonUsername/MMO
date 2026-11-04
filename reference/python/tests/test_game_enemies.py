@@ -167,7 +167,7 @@ class EndToEndTests(unittest.TestCase):
             if bots[0].name in g.fight_of:
                 break
         self.assertIn("anna", g.fight_of)
-        self.assertIn("stone_heart_colossus", g.fights[g.fight_of["anna"]]["types"])          # der Wächter in 566 cm Entfernung kämpft mit
+        self.assertEqual(g.fights[g.fight_of["anna"]]["types"], ["stone_heart_colossus"])
         for i in range(2500):
             for b in bots:
                 if b.name in g.fight_of:
@@ -185,8 +185,9 @@ class EndToEndTests(unittest.TestCase):
             b.pull()
             self.assertTrue(b.of("fight_end") or b.of("fight_left"))
         tel = [e["ability"] for e in bots[0].of("telegraph")]
-        self.assertIn("heavy_slam", tel)
-        self.assertIn("ground_pound", tel)
+        self.assertIn("colossus_slam", tel)
+        self.assertIn("colossus_quake", tel)
+        self.assertIn("basic_attack", tel)                                        # auch normale Angriffe werden angekündigt (sim_rules_v7)
 
     def test_summons_vanish_after_the_fight_and_do_not_drop_loot(self):
         g = GameServer()

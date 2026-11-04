@@ -242,6 +242,9 @@ class _Pack(_Group):
                 elif not (self.EA and self._start_ability(e, t)):
                     e.hit_tick = t + e.spec["windup"]
                     e.hit_target = self._target()
+                    if self.EA and self.EA.get("telegraph_basic"):             # auch normale Angriffe ankündigen (Anzeige, Abwehr)
+                        self.events.append({"t": t, "type": "telegraph", "enemy": self.es.index(e), "ability": "basic_attack", "kind": "basic",
+                                            "ticks": e.spec["windup"], "target": e.hit_target, "answers": ["dodge", "block", "parry"]})
             if e.hit_tick == t:
                 self._resolve_hit_of(e, t)
 

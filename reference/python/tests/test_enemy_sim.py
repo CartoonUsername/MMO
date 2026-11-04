@@ -504,6 +504,32 @@ class SurvivorTests(unittest.TestCase):
             self.assertEqual(payload["actions"][n], cc["actions"][n]["max_per_minute"] * payload["duration_s"] // 60 + cc["encounter"]["burst_allowance"])
 
 
+class BasicTelegraphTests(unittest.TestCase):
+    def test_normal_attacks_are_announced_only_when_the_rules_say_so(self):
+        plain = run(["dummy"], [P([[100, "flee"]])], [[]])
+        self.assertEqual(ev(plain, "telegraph"), [])                                       # v6: keine Ankündigung normaler Angriffe
+        c = copy.deepcopy(C)
+        c["enemy_abilities"]["telegraph_basic"] = True
+        r = run(["dummy"], [P([[100, "flee"]])], [[]], c)
+        tel = ev(r, "telegraph")
+        self.assertEqual([(t["t"], t["ability"], t["kind"], t["ticks"], t["target"], t["answers"]) for t in tel],
+                         [(40, "basic_attack", "basic", 5, 0, ["dodge", "block", "parry"]), (85, "basic_attack", "basic", 5, 0, ["dodge", "block", "parry"])])
+        self.assertEqual(r.players[0].damage_ticks, plain.players[0].damage_ticks)           # nur Anzeige, keine Wirkung auf den Kampf
+
+    def test_the_flag_must_be_a_boolean(self):
+        from mmo_sim.rules import validate_sim_rules
+        c = copy.deepcopy(C)
+        c["enemy_abilities"]["telegraph_basic"] = 1
+        with self.assertRaises(SimError):
+            validate_sim_rules(c)
+
+    def test_v7_announces_basic_attacks_with_the_windup_of_the_enemy(self):
+        c7 = load_sim_rules("sim_rules_v7.json")
+        r = simulate_pack(c7, ["wolf"], [P([[100, "flee"]], 10)])
+        tel = [e for e in r.events if e["type"] == "telegraph"]
+        self.assertEqual((tel[0]["kind"], tel[0]["ticks"], tel[0]["t"]), ("basic", c7["opponents"]["wolf"]["windup"], c7["opponents"]["wolf"]["attack_interval"]))
+
+
 class LiveSurvivorTests(unittest.TestCase):
     def test_target_commands_beyond_three_and_the_shield_display(self):
         e = LiveEncounter(C, ["dummy"], [P([])], [["stone_skin"]])
