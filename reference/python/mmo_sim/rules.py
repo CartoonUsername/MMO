@@ -77,6 +77,51 @@ def validate_group_rules(cfg: dict[str, Any]) -> None:
         raise SimError("group.ability_commands: nur heal/shield, je Befehl höchstens eine Fähigkeit")
 
 
+SKILL_KINDS = ("burst_dot", "evade", "mitigate", "restore_stamina")  # Arten eigener Fähigkeitsbefehle (ADR-0027)
+
+
+def skills(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {k: v for k, v in cfg.get("skills", {}).items() if not k.startswith("_")}
+
+
+def skill_commands(cfg: dict[str, Any]) -> tuple[str, ...]:
+    return tuple(sorted(skills(cfg)))
+
+
+def validate_skill_rules(cfg: dict[str, Any]) -> None:
+    if "multi" not in cfg:
+        raise SimError("skills brauchen multi")
+
+    def ok(v: Any, lo: int = 1) -> bool:
+        return isinstance(v, int) and not isinstance(v, bool) and v >= lo
+
+    taken = set(COMMANDS + GROUP_COMMANDS + MULTI_COMMANDS)
+    seen: set[str] = set()
+    for name, s in skills(cfg).items():
+        if name in taken or not name.isidentifier():
+            raise SimError(f"skills.{name}: Name ungültig oder schon als Befehl vergeben")
+        if not isinstance(s.get("ability"), str) or not s["ability"] or s["ability"] in seen:
+            raise SimError(f"skills.{name}: ability fehlt oder ist schon vergeben")
+        seen.add(s["ability"])
+        if s.get("kind") not in SKILL_KINDS or not (ok(s.get("cost"), 0) and ok(s.get("busy")) and ok(s.get("cooldown"), 0)):
+            raise SimError(f"skills.{name}: kind/cost/busy/cooldown ungültig")
+        if s.get("counts_as") not in (None, "heavy_hit"):
+            raise SimError(f"skills.{name}: counts_as nur heavy_hit oder null")
+        kind = s["kind"]
+        if kind == "burst_dot":
+            d = s.get("dot")
+            if not ok(s.get("damage")) or not isinstance(d, dict) or not (ok(d.get("interval")) and ok(d.get("damage")) and ok(d.get("ticks"))):
+                raise SimError(f"skills.{name}: damage/dot ungültig")
+        elif kind == "evade":
+            if not ok(s.get("ticks")):
+                raise SimError(f"skills.{name}: ticks ungültig")
+        elif kind == "mitigate":
+            if not ok(s.get("ticks")) or not ok(s.get("damage_permille"), 0) or s["damage_permille"] > 1000:
+                raise SimError(f"skills.{name}: ticks/damage_permille ungültig")
+        elif not ok(s.get("amount")):
+            raise SimError(f"skills.{name}: amount ungültig")
+
+
 def validate_multi_rules(cfg: dict[str, Any]) -> None:
     if "group" not in cfg:
         raise SimError("multi braucht group")
@@ -109,6 +154,8 @@ def validate_sim_rules(cfg: dict[str, Any]) -> None:
         validate_group_rules(cfg)
     if "multi" in cfg:
         validate_multi_rules(cfg)
+    if "skills" in cfg:
+        validate_skill_rules(cfg)
     for name, eff in ability_effects(cfg).items():
         if not isinstance(eff, dict) or not eff or set(eff) - set(EFFECT_KEYS):
             raise SimError(f"ability_effects.{name}: unbekannte oder fehlende Wirkung")
@@ -152,7 +199,11 @@ def max_actions_per_minute(cfg: dict[str, Any]) -> dict[str, int]:
         g = cfg["group"]
         group = {"ally_heal": _per_minute(cfg, max(g["heal"]["busy"], g["heal"]["cooldown"], 1)),
                  "ally_shield": _per_minute(cfg, max(g["shield"]["busy"], g["shield"]["cooldown"], 1))}
-    return {
+    extra = {}
+    for sk in skills(cfg).values():  # Einsätze eigener Befehle zählen als CEE-Aktion
+        if sk["counts_as"]:
+            extra[sk["counts_as"]] = extra.get(sk["counts_as"], 0) + _per_minute(cfg, max(sk["busy"], sk["cooldown"], 1))
+    out = {
         **group,
         "light_hit": _per_minute(cfg, period("light")),
         "precise_hit": _per_minute(cfg, period("precise")),
@@ -164,6 +215,9 @@ def max_actions_per_minute(cfg: dict[str, Any]) -> dict[str, int]:
         "stun_applied": _per_minute(cfg, period("stun")),
         "slow_applied": _per_minute(cfg, period("slow")),
     }
+    for k, v in extra.items():
+        out[k] += v
+    return out
 
 
 def check_compatibility(cfg: dict[str, Any], cee_rules: Any) -> list[str]:
@@ -175,6 +229,10 @@ def check_compatibility(cfg: dict[str, Any], cee_rules: Any) -> list[str]:
         if rate > limit:
             problems.append(f"{action}: Simulation erlaubt bis {rate}/min, CEE-Limit {limit}/min")
     effects = ability_effects(cfg)
+    cat_skills = {k for k in cee_rules["combat"].get("abilities", {}) if not k.startswith("_")}
+    for name, sk in sorted(skills(cfg).items()):
+        if sk["ability"] not in cat_skills:
+            problems.append(f"skills.{name}: Fähigkeit {sk['ability']} existiert in den CEE-Regeln nicht")
     for name in sorted(set(cfg.get("group", {}).get("ability_commands", {})) - {k for k in cee_rules["combat"].get("abilities", {}) if not k.startswith("_")}):
         problems.append(f"group.ability_commands.{name}: Fähigkeit existiert in den CEE-Regeln nicht")
     catalog = {k for k in cee_rules["combat"].get("abilities", {}) if not k.startswith("_")}

@@ -21,7 +21,7 @@ from typing import Any
 from .errors import SimError
 from .fight import EncounterResult
 from .group import _Group, _P, _validated
-from .rules import COMMANDS, GROUP_COMMANDS, MULTI_COMMANDS
+from .rules import COMMANDS, GROUP_COMMANDS, MULTI_COMMANDS, skill_commands, skills
 
 
 @dataclass(frozen=True)
@@ -43,6 +43,7 @@ class _E:
         self.next_start: int | None = interval if interval > 0 else None
         self.hit_tick: int | None = None
         self.hit_target: int | None = None
+        self.burn: list[int] | None = None  # [Ende, nächster Tick, Schaden, Abstand, Verursacher]
 
     @property
     def alive(self) -> bool:
@@ -61,9 +62,14 @@ class _Pack(_Group):
                 raise SimError(f"unbekannter Gegner: {t!r}")
         self.cfg, self.A, self.G, self.M = cfg, cfg["actions"], cfg["group"], m
         self.ps = [_P(cfg, lvl, spec, inputs) for spec, lvl, inputs in specs]
+        self.SK = skills(cfg)
         for p in self.ps:
             p.cd["sweep"] = 0
             p.focus = 0
+            p.evade_until = p.mit_until = -1
+            p.mit_permille = 1000
+            for name in self.SK:
+                p.cd[name] = 0
         scale = 1000 + self.G["opponent_hp_per_extra_member_permille"] * (len(self.ps) - 1)
         self.es = [_E(cfg["opponents"][t]["hp"] * scale // 1000, cfg["opponents"][t]) for t in opponent_types]
 
@@ -97,7 +103,7 @@ class _Pack(_Group):
             else:
                 p.ignored += 1
             return
-        a = self.M["sweep"] if cmd == "sweep" else self.A[cmd]
+        a = self.M["sweep"] if cmd == "sweep" else self.SK[cmd] if cmd in self.SK else self.A[cmd]
         cost = max(0, a["cost"] + (p.fx_get("dodge_cost_delta") if cmd == "dodge" else 0))
         cooldown = max(0, a["cooldown"] + (p.fx_get("dodge_cooldown_delta") if cmd == "dodge" else 0))
         if t < p.busy_until or p.stam < cost or (cmd in p.cd and t < p.cd[cmd]):
@@ -119,6 +125,8 @@ class _Pack(_Group):
                     x.hp -= a["damage"]
                     p.threat += a["damage"]
             p.count("light_hit")
+        elif cmd in self.SK:
+            self._skill(idx, e, cmd, a, t)
         elif cmd == "heavy":
             p.heavy_pending = (t + a["windup"], p.scaled(a["damage"], "heavy_damage_permille"), self.es.index(e))
         elif cmd == "dodge":
@@ -138,6 +146,38 @@ class _Pack(_Group):
         p.busy_until = t + a["busy"]
         if cmd in p.cd:
             p.cd[cmd] = t + cooldown
+
+    def _skill(self, idx: int, e: _E, cmd: str, a: dict[str, Any], t: int) -> None:
+        """Eigene Fähigkeitsbefehle (ADR-0027)."""
+        p, kind = self.ps[idx], a["kind"]
+        if kind == "burst_dot":
+            e.hp -= a["damage"]
+            p.threat += a["damage"]
+            d = a["dot"]
+            e.burn = [t + d["ticks"], t + d["interval"], d["damage"], d["interval"], idx]  # neuer Einsatz ersetzt den alten
+        elif kind == "evade":
+            p.evade_until = t + a["ticks"]
+        elif kind == "mitigate":
+            p.mit_until, p.mit_permille = t + a["ticks"], a["damage_permille"]
+        else:
+            p.stam = min(self.cfg["player"]["stamina_max"], p.stam + a["amount"])
+        if a["counts_as"]:
+            p.count(a["counts_as"])
+
+    def _burn(self, t: int) -> None:
+        for e in self.es:
+            b = e.burn
+            if b is None or not e.alive:
+                continue
+            if t >= b[1]:
+                e.hp -= b[2]
+                self.ps[b[4]].threat += b[2]
+                b[1] += b[3]
+                if b[1] > b[0]:
+                    e.burn = None
+
+    def _taken_by(self, p: Any, amount: int, t: int) -> int:
+        return amount * p.mit_permille // 1000 if t < p.mit_until else amount
 
     # -- Gegner --------------------------------------------------------------------
     def opponents(self, t: int) -> None:
@@ -160,7 +200,9 @@ class _Pack(_Group):
             tgt = self._target()
         if tgt is not None:
             p = self.ps[tgt]
-            if p.dodge_start <= t < p.dodge_until:
+            if t < p.evade_until:
+                pass
+            elif p.dodge_start <= t < p.dodge_until:
                 p.count("perfect_dodge" if t - p.dodge_start < a["dodge"]["perfect_window"] else "dodge")
             elif p.block_start <= t < p.block_until:
                 if t - p.block_start < a["block"]["parry_window"]:
@@ -169,10 +211,10 @@ class _Pack(_Group):
                     e.stagger_until = t + extra
                 else:
                     p.count("block")
-                    self._damage_to(p, p.scaled(e.spec["damage"] * min(a["block"]["damage_permille"], p.fx.get("block_damage_permille", 1000)) // 1000,
-                                                "damage_taken_permille"), t)
+                    self._damage_to(p, self._taken_by(p, p.scaled(e.spec["damage"] * min(a["block"]["damage_permille"], p.fx.get("block_damage_permille", 1000)) // 1000,
+                                                                  "damage_taken_permille"), t), t)
             else:
-                self._damage_to(p, p.scaled(e.spec["damage"], "damage_taken_permille"), t)
+                self._damage_to(p, self._taken_by(p, p.scaled(e.spec["damage"], "damage_taken_permille"), t), t)
         e.hit_tick = None
         e.hit_target = None
         e.next_start = t + self._interval_of(e, t) + extra
@@ -203,6 +245,7 @@ class _Pack(_Group):
                     p.threat += p.heavy_pending[1]
                     p.count("heavy_hit")
                     p.heavy_pending = None
+            self._burn(t)
             if not any(e.alive for e in self.es):
                 return self._pack_result(t + 1, "victory")
             self.opponents(t)
@@ -224,7 +267,7 @@ class _Pack(_Group):
 
 def simulate_pack(cfg: dict[str, Any], opponent_types: Any, players: Any) -> PackResult:
     """`opponent_types`: Liste von 1..max_opponents Gegnertypen; `players` wie bei `simulate_group`. Fehler -> SimError."""
-    return _Pack(cfg, opponent_types, _validated(cfg, players, MULTI_COMMANDS)).run()
+    return _Pack(cfg, opponent_types, _validated(cfg, players, MULTI_COMMANDS + skill_commands(cfg))).run()
 
 
 def strongest(cfg: dict[str, Any], opponent_types: Any) -> str:

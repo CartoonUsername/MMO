@@ -16,7 +16,7 @@ from .errors import SimError
 from .fight import EncounterResult, simulate
 from .group import GroupResult, simulate_group
 from .pack import PackResult, simulate_pack, strongest
-from .rules import MULTI_COMMANDS
+from .rules import MULTI_COMMANDS, skills
 
 
 @dataclass(frozen=True)
@@ -145,6 +145,10 @@ class EncounterServer:
         events = {c: (self.service.record(c, "combat.encounter_resolved", reports[c]) if c in reports else None) for c in party}
         return GroupFinish(result, events)
 
+    def _skill_command_set(self, equipped: list[str] | None) -> set[str]:
+        """Eigene Fähigkeitsbefehle (ADR-0027): nur die der ausgerüsteten Fähigkeiten."""
+        return {name for name, sk in skills(self.cfg).items() if sk["ability"] in (equipped or [])}
+
     # -- Kampf gegen mehrere Gegner (ADR-0026) ---------------------------------------------------
     def start_pack(self, character_ids: Any, opponent_types: Any) -> str:
         m = self.cfg.get("multi")
@@ -181,7 +185,7 @@ class EncounterServer:
             equipped = self.service.equipped_abilities(c)
             allowed = self.service.allowed_commands(c)
             if allowed is not None:
-                allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS))
+                allowed = sorted(set(allowed) | self._group_command_map(equipped) | set(MULTI_COMMANDS) | self._skill_command_set(equipped))
             spec: dict[str, Any] = {"level": self.service.state(c).parts["identity"]["level"], "inputs": inputs_by_character.get(c, [])}
             if allowed is not None:
                 spec["allowed"] = allowed

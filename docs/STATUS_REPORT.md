@@ -11,7 +11,7 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 | Referenzimplementierung | `reference/python/mmo_cee/` – **vorhanden**, nur Standardbibliothek |
 | Implementierte Engines | Identity, Element, Profession, Essence, Combat Development, Visual Evolution, Discovery, Crafting, **Economic Profile** + Character History (Event-Log, Hash-Kette, Replay) |
 | Regeln | `rules_v1.json` (ohne Kampf), `rules_v2.json` (v1 + `combat`), `rules_v3.json` (v2 + Wesensform mit Kampfrichtungs-Voraussetzung), `rules_v4.json` (v3 + Wesensbewertung mit Entscheidungen, ADR-0007), `rules_v5.json` (v4 + Entdeckungen, geheime Wesensform, ADR-0009), `rules_v6.json` (v5 + Handwerk: Rezepte, Techniken, ADR-0010), `rules_v7.json` (v6 + Wirtschaft: Handel, Laufbahn, Gründung, ADR-0011); v1–v6 unverändert, Standard ist v7 |
-| Tests | **887** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
+| Tests | **913** `unittest`-Tests, alle grün (`cd reference/python && python -m unittest discover -s . -t . -v`) |
 | Weltzustand | `reference/python/mmo_world/` – `DiscoveryRegistry` (Pionier, Lehrfenster), `DiscoveryService` (transaktional mit der CEE), `Inventory` (atomar), `CraftingService` (Herstellung, ADR-0010) `TradeService` (Handel, ADR-0011) sowie `CompanyRegistry`/`CompanyService` (Firmensimulation, ADR-0012; Regeln `company_rules_v1.json`) |
 | Kampfsimulation | `reference/python/mmo_sim/` – deterministischer 1:1-Kampfkern, `EncounterServer` (ADR-0006), `sim_rules_v1.json` (vorläufige Werte) |
 | Golden Test Vectors | `reference/golden/` (CEE, 24 Szenarien, `mmo_cee.golden`) `reference/golden_sim/` (Simulation, 96 Fälle, `mmo_sim.golden`) `reference/golden_group/` (Gruppenkampf, 57 Fälle, `mmo_sim.golden_group`), `reference/golden_pack/` (Mehrgegnerkampf, `mmo_sim.golden_pack`), `reference/golden_visual/` (Visual Evolution, 21 Fälle, `mmo_cee.golden_visual`) und `reference/golden_world/` (Weltseite, 17 Szenarien mit Welt-Hash je Schritt, `mmo_world.golden`, ADR-0013); Format: `reference/golden/README.md` |
@@ -20,7 +20,7 @@ Stand: 2026-11-03 · Arbeitsbranch `claude/awesome-dirac-9k6p3n` · `main` unver
 
 ## Noch nicht implementiert
 
-Eigene Fähigkeitsbefehle (Kosten/Abklingzeit/Zustände), Fähigkeitsstufen, Raumkampf (Gruppenkampf ohne Raum ist da, ADR-0022; mehrere Gegner ohne Raum, ADR-0026), Produktion/Offline-Produktion/Aufträge der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft, Werkzeuge/Werkstätten/Materialgewinnung, Wirkung der Entdeckungen auf Wirtschaft/Städte, Persistenz von Registry und Inventar, echte Optik/Assets zur Visual Evolution (nur Parametermechanik), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
+Weitere Arten eigener Fähigkeitsbefehle und Elementwirkungen (vier Beispiele gibt es, ADR-0027), Fähigkeitsstufen, Raumkampf (Gruppenkampf ohne Raum ist da, ADR-0022; mehrere Gegner ohne Raum, ADR-0026), Produktion/Offline-Produktion/Aufträge der Firmen, Filialen/Töchter, Dividenden, Märkte/Preisbildung/NPC-Wirtschaft, Werkzeuge/Werkstätten/Materialgewinnung, Wirkung der Entdeckungen auf Wirtschaft/Städte, Persistenz von Registry und Inventar, echte Optik/Assets zur Visual Evolution (nur Parametermechanik), Persistenz/Snapshots, Server-Protokoll, C++-Portierung (Vektoren liegen bereit).
 
 ## Nicht bestätigte Inhalte (Vorschläge)
 
@@ -63,6 +63,7 @@ Python 3.13, kein pytest; Tests mit `unittest`. Keine externen Abhängigkeiten.
 26. `3fc1cdf` Direkter Zwei-Parteien-Handel (`mmo_world.direct_trade`, ADR-0023), 784 Tests.
 27. `1029797` Push-Ereignisse: Postfach mit Abruf, Quittung, Stummschaltung (`mmo_world.notifications`, ADR-0024), 813 Tests.
 28. `65049c1` Gruppenbildung: Gruppen, Einladungen, Anführer, Beuteverteilung (`mmo_world.party`, ADR-0025; Stufenabstand nur Platzhalter, Boosting-Regeln offen), 845 Tests.
-29. (dieser Stand) Kampf gegen mehrere Gegner mit Fokus und Flächenangriff (`mmo_sim.pack`, `sim_rules_v4`, ADR-0026), 887 Tests.
+29. `42f52fb` Kampf gegen mehrere Gegner mit Fokus und Flächenangriff (`mmo_sim.pack`, `sim_rules_v4`, ADR-0026), 887 Tests.
+30. (dieser Stand) Eigene Fähigkeitsbefehle: Kosten, Abklingzeit, Brand/Ausweichen/Schleier/Ausdauer (`skills`, `sim_rules_v5`, ADR-0027), 913 Tests.
 
 Plan: `docs/ROADMAP.md`.

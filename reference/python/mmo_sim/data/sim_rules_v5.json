@@ -1,0 +1,208 @@
+{
+  "version": "5",
+  "_comment": "VORLÄUFIGE technische Referenzwerte (Proof of Pipeline), KEINE beschlossenen Spielinhalte. Wie v4, zusätzlich `skills` (eigene Fähigkeitsbefehle, ADR-0027). Alles Ganzzahlen; 1 Tick = 100 ms.",
+  "ticks_per_second": 10,
+  "max_ticks": 6000,
+  "max_inputs": 5000,
+  "report": {
+    "min_duration_s": 5
+  },
+  "player": {
+    "base_hp": 1000,
+    "hp_per_level": 20,
+    "stamina_max": 100,
+    "stamina_regen_per_tick": 1
+  },
+  "actions": {
+    "light": {
+      "cost": 8,
+      "busy": 8,
+      "cooldown": 0,
+      "damage": 40
+    },
+    "precise": {
+      "cost": 8,
+      "busy": 15,
+      "cooldown": 0,
+      "damage": 90
+    },
+    "heavy": {
+      "cost": 25,
+      "busy": 20,
+      "cooldown": 20,
+      "damage": 130,
+      "windup": 6
+    },
+    "dodge": {
+      "cost": 20,
+      "busy": 4,
+      "cooldown": 20,
+      "active": 4,
+      "perfect_window": 2
+    },
+    "block": {
+      "cost": 10,
+      "busy": 8,
+      "cooldown": 15,
+      "active": 8,
+      "parry_window": 2,
+      "damage_permille": 250
+    },
+    "stun": {
+      "cost": 20,
+      "busy": 6,
+      "cooldown": 60,
+      "ticks": 15
+    },
+    "slow": {
+      "cost": 15,
+      "busy": 6,
+      "cooldown": 30,
+      "ticks": 40,
+      "interval_permille": 1500
+    }
+  },
+  "opponents": {
+    "training_dummy": {
+      "level": 1,
+      "hp": 500,
+      "attack_interval": 0,
+      "windup": 0,
+      "damage": 0,
+      "stagger": 0
+    },
+    "wolf": {
+      "level": 5,
+      "hp": 300,
+      "attack_interval": 35,
+      "windup": 5,
+      "damage": 60,
+      "stagger": 10
+    },
+    "bear": {
+      "level": 12,
+      "hp": 900,
+      "attack_interval": 45,
+      "windup": 8,
+      "damage": 120,
+      "stagger": 8
+    },
+    "stone_golem": {
+      "level": 20,
+      "hp": 2000,
+      "attack_interval": 50,
+      "windup": 12,
+      "damage": 200,
+      "stagger": 6
+    }
+  },
+  "ability_effects": {
+    "_comment": "Zusammensetzung mehrerer ausgerüsteter Fähigkeiten: *_permille multiplizieren (Fähigkeiten in alphabetischer Reihenfolge, je Schritt abgerundet), block_damage_permille nimmt das Minimum, *_bonus/*_delta addieren sich.",
+    "power_strike": {
+      "heavy_damage_permille": 1250
+    },
+    "disrupting_blow": {
+      "stun_ticks_bonus": 5
+    },
+    "hindering_mark": {
+      "slow_ticks_bonus": 10
+    },
+    "shield_wall": {
+      "block_damage_permille": 150
+    },
+    "riposte": {
+      "parry_stagger_bonus": 6
+    },
+    "flowing_step": {
+      "dodge_cost_delta": -8,
+      "dodge_cooldown_delta": -8
+    },
+    "ember_strike": {
+      "light_damage_permille": 1400
+    },
+    "veteran_focus": {
+      "stamina_regen_bonus": 1
+    },
+    "twilight_veil": {
+      "damage_taken_permille": 900
+    }
+  },
+  "group": {
+    "max_party": 4,
+    "opponent_hp_per_extra_member_permille": 600,
+    "heal": {
+      "amount": 200,
+      "cost": 20,
+      "busy": 8,
+      "cooldown": 40
+    },
+    "shield": {
+      "absorb": 150,
+      "ticks": 40,
+      "cost": 15,
+      "busy": 8,
+      "cooldown": 50
+    },
+    "ability_commands": {
+      "ally_mend": "heal",
+      "ally_ward": "shield"
+    },
+    "threat": {
+      "heal_permille": 1000
+    }
+  },
+  "multi": {
+    "max_opponents": 3,
+    "sweep": {
+      "cost": 30,
+      "busy": 14,
+      "cooldown": 50,
+      "damage": 50
+    }
+  },
+  "skills": {
+    "_comment": "Eigene Befehle einzelner Fähigkeiten (nur in der Mehrgegner-Simulation `mmo_sim.pack`). `ability` muss ausgerüstet sein, wenn die Figur Befehle über Fähigkeiten freigeschaltet bekommt. `counts_as`: CEE-Aktion, die ein Einsatz zählt (null = keine Entwicklungspunkte).",
+    "cast_ember": {
+      "ability": "ember_strike",
+      "kind": "burst_dot",
+      "cost": 30,
+      "busy": 12,
+      "cooldown": 80,
+      "damage": 180,
+      "dot": {
+        "interval": 10,
+        "damage": 20,
+        "ticks": 40
+      },
+      "counts_as": "heavy_hit"
+    },
+    "dash": {
+      "ability": "flowing_step",
+      "kind": "evade",
+      "cost": 15,
+      "busy": 4,
+      "cooldown": 60,
+      "ticks": 6,
+      "counts_as": null
+    },
+    "veil": {
+      "ability": "twilight_veil",
+      "kind": "mitigate",
+      "cost": 25,
+      "busy": 6,
+      "cooldown": 120,
+      "ticks": 30,
+      "damage_permille": 500,
+      "counts_as": null
+    },
+    "focus_surge": {
+      "ability": "veteran_focus",
+      "kind": "restore_stamina",
+      "cost": 0,
+      "busy": 6,
+      "cooldown": 300,
+      "amount": 50,
+      "counts_as": null
+    }
+  }
+}

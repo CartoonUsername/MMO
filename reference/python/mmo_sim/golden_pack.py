@@ -19,7 +19,7 @@ from .rules import load_sim_rules
 from .server import build_report
 
 FORMAT_VERSION = 1
-RULES_FILE = "sim_rules_v4.json"
+RULES_FILE = "sim_rules_v5.json"
 NAME = "sim_packs"
 
 
@@ -66,12 +66,30 @@ def cases() -> list[dict[str, Any]]:
     add("pack_defeat", ["bear", "bear", "bear"], [_p([]), _p([])])
     add("pack_timeout", ["training_dummy", "training_dummy", "training_dummy"], [_p([])])
     add("equipment_in_a_pack", [W, W, W], [_p([[0, "sweep"]] + lights(20, 8, 20), 5, equipped=["ember_strike", "shield_wall"]), _p(lights(10), 5)])
+    add("skill_ember_burns", ["bear"], [_p([[0, "cast_ember"], [100, "flee"]], 20)])
+    add("skill_ember_burn_finishes_the_kill", [W], [_p([[0, "cast_ember"], [12, "light"], [60, "flee"]])])
+    add("skill_ember_refresh_replaces_the_burn", [W, "bear"], [_p([[0, "cast_ember"], [80, "cast_ember"], [140, "flee"]], 20)])
+    add("skill_ember_burn_stops_when_the_target_falls", [W, W], [_p([[0, "cast_ember"], [12, "sweep"], [40, "sweep"], [90, "flee"]], 20)])
+    add("skill_ember_hits_the_focus", [W, "bear"], [_p([[0, "target_2"], [1, "cast_ember"], [100, "flee"]], 20)])
+    add("skill_ember_counts_as_heavy_hit", [W], [_p([[0, "cast_ember"], [100, "flee"]])])
+    add("skill_ember_threat_draws_the_opponent", [W], [_p([[100, "flee"]]), _p([[0, "cast_ember"], [100, "flee"]])])
+    add("skill_ember_cooldown_busy_and_cost", [W, W, W], [_p([[0, "cast_ember"], [5, "cast_ember"], [12, "cast_ember"], [80, "cast_ember"], [100, "flee"]])])
+    add("skill_dash_avoids_the_hit", [W], [_p([[36, "dash"], [100, "flee"]])])
+    add("skill_dash_window_expires", [W], [_p([[20, "dash"], [100, "flee"]])])
+    add("skill_dash_cooldown", [W], [_p([[36, "dash"], [40, "dash"], [100, "dash"], [150, "flee"]])])
+    add("skill_veil_halves_damage", [W], [_p([[30, "veil"], [100, "flee"]])])
+    add("skill_veil_stacks_with_block", [W], [_p([[30, "veil"], [38, "block"], [100, "flee"]])])
+    add("skill_veil_ends", [W], [_p([[0, "veil"], [150, "flee"]])])
+    add("skill_focus_surge_is_capped", [W], [_p([[0, "focus_surge"], [100, "flee"]])])
+    add("skills_need_the_ability", [W], [_p([[0, "cast_ember"], [12, "dash"], [100, "flee"]], allowed=["light", "dash", "flee"])])
+    add("skills_in_the_group", [W, W], [_p([[0, "cast_ember"], [100, "flee"]], 20), _p([[10, "veil"], [100, "flee"]], 20)])
     for seed in range(1, 9):
         opps = [("wolf", "bear", "stone_golem", "training_dummy")[(seed + k) % 4] for k in range(1 + seed % 3)]
         n = 1 + seed % 4
         specs = []
         for i in range(n):
-            extra = [[3 + i, "target_2"], [30 + i, "sweep"], [70 + i, "target_1"], [120 + i, "sweep"]]
+            extra = [[3 + i, "target_2"], [30 + i, "sweep"], [70 + i, "target_1"], [120 + i, "sweep"],
+                     [15 + i, "cast_ember"], [60 + i, "dash"], [100 + i, "veil"], [150 + i, "focus_surge"]]
             if i % 2:
                 extra += [[5 + i, "heal"], [40 + i, "shield"]]
             ins = sorted(pseudo_random_inputs(seed * 10 + i, 160, 2500) + extra, key=lambda x: x[0])
@@ -84,6 +102,7 @@ def cases() -> list[dict[str, Any]]:
         "invalid_empty_party": ([W], []), "invalid_too_many_players": ([W], [ok] * 5),
         "invalid_unknown_command": ([W], [_p([[0, "target_4"]])]), "invalid_allowed_unknown": ([W], [_p([], 1, allowed=["target_9"])]),
         "invalid_unsorted": ([W], [_p([[5, "sweep"], [4, "light"]])]),
+        "invalid_unknown_skill": ([W], [_p([[0, "cast_nova"]])]), "invalid_allowed_unknown_skill": ([W], [_p([], 1, allowed=["cast_nova"])]),
     }
     for name, (opps, players) in bad.items():
         add(name, opps, players)
