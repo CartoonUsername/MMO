@@ -53,7 +53,8 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
 <div id="game">
   <div id="left">
     <div class="panel"><canvas id="cv"></canvas>
-      <div class="hint">Bewegen: WASD/Pfeile · Sammeln: E (am Sammelpunkt) · Kampf: Tasten 1–9 oder Knöpfe · Gegner in der Nähe starten den Kampf von selbst.</div></div>
+      <div class="row"><button id="bGather">Sammeln (E)</button></div>
+      <div class="hint">Bewegen: Mausklick auf den Boden (oder WASD/Pfeile) · Sammelpunkt anklicken = hinlaufen und sammeln · Gegner anklicken = hinlaufen und kämpfen · Sammeln: E · Kampf: Tasten 1–9 oder Knöpfe · Gegner in der Nähe starten den Kampf von selbst.</div></div>
   </div>
   <div id="right">
     <div class="panel"><h2>Figur</h2><div id="me"></div>
@@ -201,9 +202,9 @@ async function refreshInv(){
     if(!k.startsWith("coin@")){const s=document.createElement("button");s.textContent="verkaufen";s.onclick=async()=>{const x=await call("maker.sell",{item_key:k,qty:n});log(x.ok?"Verkauft: "+k+" × "+n+" → "+JSON.stringify(x.result):"Verkauf: "+x.error.message,x.ok?"g":"e");refreshInv()};b.appendChild(s)}
     tr.append(a,b);t.appendChild(tr)}
 }
-async function gather(){
+async function gather(id){
   if(!state||fight)return;const my=state.you.pos;
-  const n=state.nodes.filter(n=>n.ready).sort((a,b)=>d2(a.pos,my)-d2(b.pos,my))[0];
+  const n=state.nodes.filter(n=>n.ready&&(!id||n.id===id)).sort((a,b)=>d2(a.pos,my)-d2(b.pos,my))[0];
   if(!n){log("Kein bereiter Sammelpunkt in Sicht.");return}
   const r=await call("game.gather",{node:n.id});log(r.ok?"Gesammelt: "+r.result.item+" × "+r.result.qty:"Sammeln: "+r.error.message,r.ok?"g":"e");if(r.ok){refreshInv();beep(660,.12,"triangle");const m=ents.get("me");if(m)floatText(m.x,m.y,"+"+r.result.qty+" "+r.result.item.split("@")[0],"#ffd166")}
 }
@@ -275,6 +276,7 @@ function frame(t){
   const phase=((state.tick%TICKS_PER_DAY)/TICKS_PER_DAY),dark=Math.max(0,.5-.5*Math.cos(phase*2*Math.PI)-.25)*.7;if(dark>0){g.fillStyle="rgba(8,12,40,"+dark.toFixed(3)+")";g.fillRect(0,0,W,H)}
   if(flash>0){g.fillStyle="rgba(255,60,60,"+(flash*.35)+")";g.fillRect(0,0,W,H);flash=Math.max(0,flash-dt*3)}
   if(teleNow&&fight){g.fillStyle="rgba(20,10,0,.75)";g.fillRect(W/2-250,10,500,38);g.fillStyle="#ffc857";g.font="bold 15px system-ui";g.textAlign="center";g.fillText("⚠ "+teleNow.ability+" – Antwort: "+(teleNow.answers||[]).join(" / "),W/2,34)}
+  if(target&&!fight){const X=sx(target.x),Y=sy(target.y);g.strokeStyle="rgba(255,255,255,"+(.5+.4*Math.sin(ph*6))+")";g.lineWidth=2;g.beginPath();g.ellipse(X,Y,14,7,0,0,7);g.stroke()}
   // Minikarte
   const MW=130,MH=130*map.h/map.w,mx=W-MW-10,my=H-MH-10,mk=MW/map.w;g.fillStyle="rgba(10,14,20,.8)";g.fillRect(mx-2,my-2,MW+4,MH+4);g.fillStyle=COLORS[map.default]||"#27422b";g.fillRect(mx,my,MW,MH);
   for(const r of map.regions){g.fillStyle=COLORS[r.kind]||"#444";const[a,b,c,d]=r.rect;g.fillRect(mx+a*mk,my+b*mk,(c-a)*mk,(d-b)*mk)}
@@ -283,15 +285,79 @@ function frame(t){
 function terrainAt(x,y){let k=map.default;for(const r of map.regions){const[a,b,c,d]=r.rect;if(x>=a&&x<=c&&y>=b&&y<=d)k=r.kind}return k}
 function draw(){}
 requestAnimationFrame(frame);
+
+// ---------- Klick-Bewegung (wie in vielen Online-Spielen): Boden, Sammelpunkt oder Gegner anklicken ----------
+// Der Client schickt nur Richtungen; Tempo, Hindernisse und Reichweiten entscheidet weiter der Server.
+let target=null,lastMove=[0,0];
+const ARRIVE_GROUND=100,ARRIVE_NODE=170,ARRIVE_WP=110,CELL=60;     // cm; Sammelreichweite des Servers ist größer (Platzhalter 250)
+// Wegfindung nur zur Darstellung/Steuerung: A* auf einem Raster über der Karte (game.map). Der Server prüft jeden Schritt trotzdem selbst.
+let grid=null;
+function terrainKind(x,y){let k=map.default;for(const r of map.regions){const[a,b,c,d]=r.rect;if(x>=a&&x<=c&&y>=b&&y<=d)k=r.kind}return k}
+function freeAt(x,y){const R=(map.player_radius||40)+12;if(x<R||y<R||x>map.w-R||y>map.h-R)return false;
+  for(const[dx,dy]of[[0,0],[R,0],[-R,0],[0,R],[0,-R]])if(!(map.kinds[terrainKind(x+dx,y+dy)]>0))return false;
+  for(const o of map.obstacles){const r=o.r+R;if((o.at[0]-x)**2+(o.at[1]-y)**2<r*r)return false}return true}
+function buildGrid(){const W=Math.ceil(map.w/CELL),H=Math.ceil(map.h/CELL),ok=new Uint8Array(W*H);
+  for(let j=0;j<H;j++)for(let i=0;i<W;i++)ok[j*W+i]=freeAt(i*CELL+CELL/2,j*CELL+CELL/2)?1:0;grid={W,H,ok}}
+function lineFree(a,b){const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/25);for(let i=1;i<=n;i++){if(!freeAt(a[0]+(b[0]-a[0])*i/n,a[1]+(b[1]-a[1])*i/n))return false}return true}
+function findPath(from,to){
+  if(!grid)buildGrid();const{W,H,ok}=grid,ci=(x)=>Math.max(0,Math.min(W-1,Math.floor(x/CELL))),cj=(y)=>Math.max(0,Math.min(H-1,Math.floor(y/CELL)));
+  const near=(x,y)=>{let i=ci(x),j=cj(y);if(ok[j*W+i])return j*W+i;for(let r=1;r<8;r++)for(let dj=-r;dj<=r;dj++)for(let di=-r;di<=r;di++){const a=i+di,b=j+dj;if(a>=0&&b>=0&&a<W&&b<H&&ok[b*W+a])return b*W+a}return -1};
+  const s0=near(from[0],from[1]),g0=near(to[0],to[1]);if(s0<0||g0<0)return null;
+  if(lineFree(from,to))return[to];
+  const gi=g0%W,gj=(g0-gi)/W,h=(n)=>{const i=n%W,j=(n-i)/W;return Math.hypot(i-gi,j-gj)};
+  const gsc=new Float32Array(W*H).fill(1e9),par=new Int32Array(W*H).fill(-1),closed=new Uint8Array(W*H),heap=[[h(s0),s0]];gsc[s0]=0;
+  const push=(it)=>{heap.push(it);let c=heap.length-1;while(c>0){const q=(c-1)>>1;if(heap[q][0]<=heap[c][0])break;[heap[q],heap[c]]=[heap[c],heap[q]];c=q}};
+  const pop=()=>{const t=heap[0],l=heap.pop();if(heap.length){heap[0]=l;let c=0;for(;;){let m=c,a=2*c+1,b=a+1;if(a<heap.length&&heap[a][0]<heap[m][0])m=a;if(b<heap.length&&heap[b][0]<heap[m][0])m=b;if(m===c)break;[heap[m],heap[c]]=[heap[c],heap[m]];c=m}}return t};
+  let found=false;
+  while(heap.length){const[,n]=pop();if(closed[n])continue;closed[n]=1;if(n===g0){found=true;break}const i=n%W,j=(n-i)/W;
+    for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){if(!di&&!dj)continue;const a=i+di,b=j+dj;if(a<0||b<0||a>=W||b>=H)continue;const m=b*W+a;if(!ok[m]||closed[m])continue;
+      if(di&&dj&&(!ok[j*W+a]||!ok[b*W+i]))continue;const g=gsc[n]+(di&&dj?1.414:1);if(g<gsc[m]){gsc[m]=g;par[m]=n;push([g+h(m),m])}}}
+  if(!found)return null;
+  const cells=[];for(let n=g0;n!==-1;n=par[n])cells.push(n);cells.reverse();
+  const pts=cells.map(n=>{const i=n%W;return[i*CELL+CELL/2,(n-i)/W*CELL+CELL/2]});pts.push(to);
+  const out=[];let anchor=from,k=0;                                  // Sichtlinien-Glättung: nur die nötigen Eckpunkte behalten
+  while(k<pts.length){let far=k;for(let t=pts.length-1;t>k;t--){if(lineFree(anchor,pts[t])){far=t;break}}out.push(pts[far]);anchor=pts[far];k=far+1}
+  return out}
+function setTarget(t){target=t;t.path=null;t.pi=0;t.stuck={t:performance.now(),d:1e9};t.repath=0;t.fails=0}
+function stopWalk(){target=null;if(lastMove[0]||lastMove[1]){lastMove=[0,0];dir=[0,0];if(joined)call("game.move",{dx:0,dy:0}).catch(()=>{})}}
+function steer(){
+  if(!joined||!state||!target||!map)return;
+  if(fight){target=null;return}
+  const me=state.you.pos,now=performance.now();let tx=target.x,ty=target.y;
+  if(target.kind==="enemy"){const e=state.enemies.find(x=>x.id===target.id&&x.alive);if(!e){stopWalk();return}tx=e.pos[0];ty=e.pos[1]}
+  const dist=Math.hypot(tx-me[0],ty-me[1]),arrive=target.kind==="ground"?ARRIVE_GROUND:ARRIVE_NODE;
+  if(dist<=arrive){const t=target;stopWalk();if(t.kind==="node")gather(t.id);return}
+  if(!target.path||(target.kind==="enemy"&&now>target.repath)){
+    const p=findPath(me,[tx,ty]);if(!p){stopWalk();log("Dorthin führt kein Weg.","e");return}
+    target.path=p;target.pi=0;target.repath=now+800}
+  let wp=target.path[target.pi];while(target.pi<target.path.length-1&&Math.hypot(wp[0]-me[0],wp[1]-me[1])<=ARRIVE_WP){wp=target.path[++target.pi]}
+  const dx=wp[0]-me[0],dy=wp[1]-me[1],wd=Math.hypot(dx,dy);
+  if(target.pi===target.path.length-1&&wd<=ARRIVE_WP&&target.kind==='ground'){stopWalk();return}
+  if(wd<target.stuck.d-20){target.stuck={t:now,d:wd}}else if(now-target.stuck.t>1500){
+    if(target.fails++>=1){stopWalk();log("Weg blockiert.");return}target.path=null;target.stuck={t:now,d:1e9};return}
+  const m=Math.max(Math.abs(dx),Math.abs(dy)),nd=[Math.abs(dx)>m*.4?Math.sign(dx):0,Math.abs(dy)>m*.4?Math.sign(dy):0];
+  if(nd[0]!==lastMove[0]||nd[1]!==lastMove[1]){lastMove=nd;dir=nd;call("game.move",{dx:nd[0],dy:nd[1]}).then(r=>{if(!r.ok&&target){log("Bewegen: "+errMsg(r),"e");target=null}}).catch(()=>{})}
+}
+setInterval(steer,100);
+function canvasToWorld(ev){const cv=$("cv"),r=cv.getBoundingClientRect(),k=cvH/VIEW_H;return{x:cam.x+(ev.clientX-r.left-cvW/2)/k,y:cam.y+(ev.clientY-r.top-cvH/2)/k,k}}
+function onCanvasClick(ev){
+  if(!joined||!state||!map||fight)return;const w=canvasToWorld(ev),pick=40/w.k;     // 40 Bildschirm-Pixel Klicktoleranz
+  let best=null,bd=1e18;
+  for(const e of state.enemies)if(e.alive){const d=Math.hypot(e.pos[0]-w.x,e.pos[1]-w.y);if(d<Math.max(pick,(TYPE[e.type]||{r:55}).r)&&d<bd){bd=d;best={kind:"enemy",id:e.id,x:e.pos[0],y:e.pos[1]}}}
+  if(!best)for(const n of state.nodes){const d=Math.hypot(n.pos[0]-w.x,n.pos[1]-w.y);if(d<pick&&d<bd){bd=d;best={kind:"node",id:n.id,x:n.pos[0],y:n.pos[1]}}}
+  if(!best)best={kind:"ground",x:Math.max(0,Math.min(map.w,w.x)),y:Math.max(0,Math.min(map.h,w.y))};
+  held.clear();setTarget(best);lastMove=[9,9];steer();floaters.push({x:best.x,y:best.y,t:best.kind==="ground"?"✕":best.kind==="node"?"⛏":"⚔",c:"#ffffff",age:0})
+}
 const KEYDIR={w:[0,-1],arrowup:[0,-1],s:[0,1],arrowdown:[0,1],a:[-1,0],arrowleft:[-1,0],d:[1,0],arrowright:[1,0]};
 const held=new Set();
 function recalc(){let x=0,y=0;for(const k of held){x+=KEYDIR[k][0];y+=KEYDIR[k][1]}x=Math.sign(x);y=Math.sign(y);if(x!==dir[0]||y!==dir[1]){dir=[x,y];if(joined&&!fight)call("game.move",{dx:x,dy:y}).catch(()=>{})}}
 addEventListener("keydown",e=>{if(!joined||/INPUT/.test(e.target.tagName))return;const k=e.key.toLowerCase();
-  if(KEYDIR[k]){e.preventDefault();held.add(k);recalc()}
+  if(KEYDIR[k]){e.preventDefault();if(target){target=null;lastMove=[0,0]}held.add(k);recalc()}
   else if(k==="e"&&!e.repeat)gather();
   else if(/^[1-9]$/.test(k)&&fight){const f=FIGHT_KEYS[+k-1];if(f)fightCmd(f[0])}});
 addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(held.delete(k))recalc()});
 addEventListener("blur",()=>{held.clear();recalc()});
+$("cv").addEventListener("click",onCanvasClick);$("bGather").onclick=()=>gather();$("cv").style.cursor="pointer";
 $("bLogin").onclick=()=>connect(false);$("bReg").onclick=()=>connect(true);
 $("pw").addEventListener("keydown",e=>{if(e.key==="Enter")connect(false)});
 </script>
