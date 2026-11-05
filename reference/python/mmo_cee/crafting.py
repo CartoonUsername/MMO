@@ -132,6 +132,9 @@ def quality_score(state: CharacterState, rules: Rules, recipe_id: str, technique
     score = r["base_quality"] + mastery_of(state, rules, r["profession"]) * cfg["quality"]["per_mastery"]
     if technique_id:
         score += cfg["techniques"][technique_id].get("quality_bonus", cfg["quality"]["technique_bonus"])
+    if "specialization" in rules["professions"]:                         # ab rules_v10: aktiver Berufszweig (AP 53)
+        from .branches import focus_quality
+        score += focus_quality(state, rules, r["profession"], recipe_id)
     return score + material_permille * cfg["quality"]["material_weight"] // 1000
 
 

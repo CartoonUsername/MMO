@@ -173,5 +173,32 @@ class MasterpieceChronicleTests(unittest.TestCase):                  # AP 46: er
         self.assertEqual([e for e in w.chronicle.entries if e["kind"] == "masterpiece_first"], [])
 
 
+class FocusQualityTests(unittest.TestCase):                          # AP 53: aktiver Zweig gibt Gütepunkte (ADR-0075)
+    def score(self, rules, branch, recipe="iron_ingot"):
+        from mmo_cee.crafting import quality_cap, quality_score
+        s = CharacterService(load_rules(rules))
+        s.create("p", "player")
+        s.record("p", "profession.work", {"profession": "smithing", "xp": 50})
+        if branch:
+            s.record("p", SPEC, {"profession": "smithing", "branch": branch, "day": 1})
+        return quality_score(s.state("p"), s.rules_of("p"), recipe, None, 500), quality_cap(s.state("p"), s.rules_of("p"), recipe, None)
+
+    def test_bonus_applies_only_to_recipes_of_the_active_branch(self):
+        base, _ = self.score("rules_v10.json", None)
+        self.assertEqual(self.score("rules_v10.json", "refining")[0], base + 50)
+        self.assertEqual(self.score("rules_v10.json", "heavy_arms")[0], base)             # iron_ingot gehört nicht zu heavy_arms
+        self.assertEqual(self.score("rules_v10.json", "heavy_arms", "iron_blade")[0], self.score("rules_v10.json", None, "iron_blade")[0] + 50)
+        self.assertEqual(self.score("rules_v9.json", None)[0], base)                      # ältere Regeln unverändert
+
+    def test_craft_report_validates_with_the_bonus(self):
+        from tests.test_world_crafting import World as CWorld
+        w = CWorld(rules=load_rules("rules_v10.json"))
+        w.char("p", smithing=50)
+        w.stock("p", **{"iron_ore__select": 100})
+        w.svc.record("p", SPEC, {"profession": "smithing", "branch": "refining", "day": 1})
+        r = w.cs.craft("p", "iron_ingot", 5, "select")                                   # Bericht passt zur Plausibilitätsgrenze
+        self.assertIn(r.quality, w.svc.rules.data["crafting"]["tiers"])
+
+
 if __name__ == "__main__":
     unittest.main()
