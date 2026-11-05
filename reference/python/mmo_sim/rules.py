@@ -133,6 +133,9 @@ def validate_element_rules(cfg: dict[str, Any]) -> None:
             raise SimError(f"elements.{k} ungültig")
     if el["weak_permille"] > 1000 or el["strong_permille"] < 1000:
         raise SimError("elements: strong >= 1000 >= weak nötig")
+    sw = el.get("switch_ticks", 0)
+    if not isinstance(sw, int) or isinstance(sw, bool) or not 0 <= sw <= 600:
+        raise SimError("elements.switch_ticks ungültig (0..600)")
     names = set(el["strong"]) | {x for v in el["strong"].values() for x in v}
     for a, ds in el["strong"].items():
         if not isinstance(ds, list) or a in ds:

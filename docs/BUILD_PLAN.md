@@ -19,6 +19,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 13 | Gilden, Prestige, Weltchronik (Stadtpolitik zurückgestellt) | §45, §47–49 | 3 | fertig (ADR-0052; Raids, Gildenforschung offen) |
 | 14 | Server: Regionen/Instanzen, Skalierung, Last- und Exploit-Tests | §50–55, §63 | 4 | fertig (ADR-0053; Verteilung bewusst nicht gebaut) |
 | 15 | Engine-Client (Unity 6, vom Nutzer bestätigt) | §50, §77 | 1–2 | Unity 6 gewählt; Code fertig, in Unity ungetestet (ADR-0054) |
+| 16 | Aktives Elementmanagement im Kampf | §26, §74 | 2/3 | **fertig** (Zauber je Element, Wechselzeit; ADR-0055); Dreier-/Domänenskills offen |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)
 1. **Server:** Klassen-Kits (`game_rules_v2.json`), Kampfdaten je Figur (`game.kit`: Befehl, Kosten, Abklingzeit, Sperrzeit; im `fight_start`). Tests.

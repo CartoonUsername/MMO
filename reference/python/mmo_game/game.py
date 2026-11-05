@@ -22,7 +22,7 @@ from mmo_server.gateway import ID_RE, _fail
 from mmo_sim import EncounterServer, SimError
 from mmo_sim.live import LiveEncounter
 from mmo_sim.enemies import roll_abilities
-from mmo_sim.rules import load_sim_rules
+from mmo_sim.rules import load_sim_rules, skills
 from mmo_world import WorldError
 from mmo_world.persistence import PersistenceError, Store
 
@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v9.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v10.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -280,8 +280,14 @@ class GameServer:
     # ------------------------------------------------------------- Kampf-Kit ----
     def _kit_abilities(self, char: str) -> list[str]:
         """Fähigkeiten, die die Grundklasse der Figur im Kampf von Anfang an nutzt (Spielregeln v2, Platzhalter)."""
-        cls = self.world.svc.state(char).parts["identity"]["base_class"]
-        return list(self.R.get("class_kits", {}).get(cls, [])) if cls else []
+        st = self.world.svc.state(char)
+        cls = st.parts["identity"]["base_class"]
+        out = list(self.R.get("class_kits", {}).get(cls, [])) if cls else []
+        for el in st.parts["element"]["attuned"]:                      # geprägte Elemente schalten ihren Zauber frei (AP 16)
+            ab = self.R.get("element_abilities", {}).get(el)
+            if ab and ab not in out:
+                out.append(ab)
+        return out
 
     def _cmd_info(self, cmd: str) -> dict[str, Any]:
         """Kosten und Zeiten eines Kampfbefehls aus den Simulationsregeln (reine Anzeige)."""
@@ -293,9 +299,16 @@ class GameServer:
 
     def _kit_for(self, char: str) -> list[dict[str, Any]]:
         spec = self.encounters.pack_specs([char], {}, {char: self._kit_abilities(char)})[0]
-        order = ["light", "heavy", "stun", "slow", "cast_ember", "heal", "shield", "dash", "veil", "focus_surge", "sweep", "dodge", "block", "flee"]
+        order = ["light", "heavy", "stun", "slow", "cast_ember", "cast_water", "cast_earth", "cast_nature", "cast_electric", "cast_ice", "cast_wind", "cast_light", "cast_shadow", "heal", "shield", "dash", "veil", "focus_surge", "sweep", "dodge", "block", "flee"]
         cmds = set(spec.get("allowed") or order) - {"target_1", "target_2", "target_3", "target_4", "target_5", "target_6"}
         return [self._cmd_info(c) for c in order if c in cmds] + [self._cmd_info(c) for c in sorted(cmds - set(order))]
+
+    def _cmd_elements(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        """Elementübersicht für den Kampf (AP 16): geprägte Elemente, ihre Zauberbefehle und die Wechselzeit."""
+        part = self.world.svc.state(char).parts["element"]
+        casts = {e: next((n for n, s in skills(self.sim).items() if s.get("element") == e), None) for e in part["attuned"]}
+        return {"attuned": list(part["attuned"]), "casts": casts, "switch_ticks": self.sim.get("elements", {}).get("switch_ticks", 0),
+                "affinity": dict(part["affinity"])}
 
     def _cmd_kit(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         return {"commands": self._kit_for(char), "stamina_max": self.sim["player"]["stamina_max"]}

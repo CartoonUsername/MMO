@@ -10,7 +10,7 @@ Windows-PC zuerst · Unity 6 als Engine (ADR-0054) · serverautoritativ · alle 
 |---|---|---|
 | 4 | Anzahl Wesensformen | genau eine dauerhafte Hauptform pro Figur |
 | 5 | Weitere irreversible Abzweigungen | nein; spätere Vertiefung nur innerhalb der Form |
-| 6 | Elementmanagement im Kampf | 2 ausgerüstete Elemente + 1 Endgame-Element, Wechsel nur außerhalb des Kampfes, im Kampf per Skill-Leiste umschaltbar mit Abklingzeit |
+| 6 | Elementmanagement im Kampf | 2 ausgerüstete Elemente + 1 Endgame-Element, Wechsel nur außerhalb des Kampfes, im Kampf per Skill-Leiste umschaltbar mit Wechselzeit (umgesetzt in AP 16, ADR-0055) |
 | 7 | Gleichzeitige Echos | 3 Slots (Haupttradition + 2), Hybrid erst ab Meisterschaft |
 | 8 | Resonanz-Raten | Kurve fällt von 100 % (+0..+5) auf ca. 20 % (+25..+30), nie Zerstörung, Rückschritt nur ab +15, Pechschutz addiert pro Fehlschlag; Zahlen in Regeldatei, nie im Code |
 | 9 | Serverexklusive Echos | wenige Weltbosse; Verbreitung nach Epochenwechsel |

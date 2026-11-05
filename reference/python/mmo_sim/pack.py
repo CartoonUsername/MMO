@@ -79,6 +79,7 @@ class _Pack(_Group):
         for p in self.ps:
             p.cd["sweep"] = 0
             p.focus = 0
+            p.elem_last, p.elem_ready = None, 0
             p.evade_until = p.mit_until = -1
             p.mit_permille = 1000
             for name in self.SK:
@@ -149,6 +150,11 @@ class _Pack(_Group):
         if t < p.busy_until or p.stam < cost or (cmd in p.cd and t < p.cd[cmd]):
             p.ignored += 1
             return
+        el = a.get("element") if cmd in self.SK else None
+        sw = self.cfg.get("elements", {}).get("switch_ticks", 0)
+        if el and sw and getattr(p, "elem_last", None) not in (None, el) and t < p.elem_ready:   # Elementwechsel braucht Zeit (AP 16)
+            p.ignored += 1
+            return
         e = self._focus(p)
         if cmd == "light":
             precise = self._vulnerable_e(e, t)
@@ -190,6 +196,8 @@ class _Pack(_Group):
             busy, cooldown = busy * pm // 1000, cooldown * pm // 1000
         p.stam -= cost
         p.busy_until = t + busy
+        if el:
+            p.elem_last, p.elem_ready = el, t + sw
         if cmd in p.cd:
             p.cd[cmd] = t + cooldown
 
