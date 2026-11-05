@@ -1,9 +1,11 @@
-# Bereitstellung ausstehend (Stand nach AP 40)
+# Bereitstellung ausstehend (Stand nach AP 50)
 
-Auf dem VPS läuft Commit `ee249f9` (AP 16–21, 2026-11-05). **Nicht bereitgestellt:** AP 22–40 (Kombinationszauber, Marktplatz-Rabatt, Berufszweige u. a.; Einzelheiten in `CHANGELOG.md`). Bereitstellung nur nach ausdrücklicher Freigabe des Projektinhabers.
+Auf dem VPS läuft Commit `ee249f9` (AP 16–21, 2026-11-05). **Nicht bereitgestellt:** AP 22–50 (Kombinationszauber, Marktplatz-Rabatt, Hafen, Grundstückshandel, Berufszweige, Meisterstück-Chronik u. a.; Einzelheiten in `CHANGELOG.md`). Bereitstellung nur nach ausdrücklicher Freigabe des Projektinhabers.
 
 ## Neue Regelversionen
-`sim_rules_v11–v15`, `game_rules_v14–v19`, `settlement_rules_v2`, `rules_v10` (CEE). Alte Versionen und Golden Vectors bleiben.
+`sim_rules_v11–v15`, `game_rules_v14–v19`, `settlement_rules_v2` (Marktrabatt, Hafen, Grundstückshandel), `community_rules_v3` (Chronikart Meisterstück), `rules_v10` (CEE). Alte Versionen und Golden Vectors bleiben.
+
+**Wichtig:** `settlement_rules_*` und `community_rules_*` sind nicht an den Spielstand gebunden (anders als die CEE-Regeln); sie gelten sofort nach dem Neustart mit dem neuen Code. Neue Befehle: `profession.specialize`, `plot.sell`, `plot.cancel_sale`, `plot.accept_sale`.
 
 ## Ablauf (Vorschlag, bisher nicht auf dem Server ausgeführt)
 1. Auf dem Server als root: `bash scripts/backup_mmo.sh` (geprüfte Sicherung; Hinweis zur externen Kopie beachten).

@@ -28,6 +28,7 @@
 - AP 45: Missbrauchstests zum Grundstückshandel (falsche Argumente, Dritte, Doppelannahme, Münzbilanz, ungültig gewordene Angebote).
 - AP 46/47: Erstes Meisterstück je Rezept in der Weltchronik (community_rules_v3, ADR-0074), Browser-Chronik zeigt es; noch nicht deployt.
 - AP 48: Balancing-Rechnung zu Zweigbonus, Hafen und Grundstückshandel (docs/BALANCE_AP41_46.md), keine Regeländerung.
+- AP 49: Statusdokumente (IMPLEMENTATION_STATUS, DEPLOY_PENDING) auf den Stand AP 50 gebracht.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
