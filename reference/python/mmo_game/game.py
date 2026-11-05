@@ -35,7 +35,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v19.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v20.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -98,6 +98,10 @@ class GameServer:
         self._blocked_notice: dict[str, int] = {}
         self.economy_news: list[dict[str, Any]] = []      # aktive Wirtschaftsereignisse (AP 10); werden mit dem Spielzustand gesichert
         self._check_world_rules()
+        self.capital: dict[str, Any] | None = self.R.get("capital")        # Hauptstadt (AP 95, ADR-0081); fehlt in Regeln bis v19
+        self._in_capital: set[str] = set()
+        if self.capital:
+            self._check_capital()
         self._fight_counter = 0
         self._bucket: dict[str, int] = {}
         self.log: list[str] = []
@@ -552,6 +556,65 @@ class GameServer:
             return f"Benötigt Stufe {req['min_level']}."
         return None
 
+    def _check_capital(self) -> None:
+        """Prüft das Layout der Hauptstadt (AP 95): alles liegt im Kreis, begehbar, ohne Gegner, Tore zeigen auf echte Regionen."""
+        c = self.capital
+        cx, cy = c["center"]
+        r = c["radius"]
+        rids = {x["id"] for x in self.regions}
+        site = self.world.settlements.R["sites"].get(c["site"])
+        if site is None or not site.get("capital") or site["region"] != c["region"] or c["region"] not in rids:
+            raise TerrainError("Hauptstadt: Ort/Region passt nicht zu den Siedlungsregeln")
+        if not isinstance(r, int) or r < 1 or self.terrain.blocked(cx, cy):
+            raise TerrainError("Hauptstadt: Mittelpunkt/Radius ungültig")
+        reg = next(x for x in self.regions if x["id"] == c["region"])
+        a, b, x2, y2 = reg["rect"]
+        if not (a <= cx - r and cx + r <= x2 and b <= cy - r and cy + r <= y2):
+            raise TerrainError("Hauptstadt: Kreis liegt nicht ganz in ihrer Region")
+        inside = lambda pt: _dist2(tuple(pt), (cx, cy)) <= r * r
+        dids: set[str] = set()
+        for d in c["districts"]:
+            x0, y0, x1, y1 = d["rect"]
+            if d["id"] in dids or not (x0 < x1 and y0 < y1) or not all(inside(q) for q in ((x0, y0), (x0, y1), (x1, y0), (x1, y1))):
+                raise TerrainError(f"Hauptstadt: Viertel {d['id']} ungültig")
+            dids.add(d["id"])
+        seen: set[str] = set()
+        for kind in ("gates", "npcs"):
+            for o in c[kind]:
+                if o["id"] in seen or not inside(o["at"]) or self.terrain.blocked(*o["at"]):
+                    raise TerrainError(f"Hauptstadt: {o['id']} ungültig (außerhalb, blockiert oder doppelt)")
+                seen.add(o["id"])
+                if kind == "gates" and (o["leads_to"] not in rids or o["leads_to"] == c["region"]):
+                    raise TerrainError(f"Hauptstadt: Tor {o['id']} führt nirgendwohin")
+                if kind == "npcs" and o["district"] is not None and o["district"] not in dids:
+                    raise TerrainError(f"Hauptstadt: NPC {o['id']} in unbekanntem Viertel")
+        for e in self.enemies:
+            if inside(e["pos"]):
+                raise TerrainError(f"Hauptstadt: Gegner {e['id']} steht innerhalb")
+
+    def _capital_at(self, pos: tuple[int, int]) -> dict[str, Any] | None:
+        """None = außerhalb der Hauptstadt; sonst {'district': Viertel-ID oder None}."""
+        c = self.capital
+        if not c or _dist2(pos, tuple(c["center"])) > c["radius"] ** 2:
+            return None
+        for d in c["districts"]:
+            x0, y0, x1, y1 = d["rect"]
+            if x0 <= pos[0] <= x1 and y0 <= pos[1] <= y1:
+                return {"district": d["id"]}
+        return {"district": None}
+
+    def _safe_at(self, pos: tuple[int, int]) -> bool:
+        return bool(self.capital and self.capital.get("safe") and self._capital_at(pos) is not None)
+
+    def _cmd_capital(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
+        """Layout der Hauptstadt und wo die Figur gerade ist (reine Anzeige)."""
+        if not self.capital:
+            raise _Err("not_available", "Diese Regelversion kennt keine Hauptstadt")
+        here = None
+        if char in self.players:
+            here = self._capital_at(self.players[char]["pos"])
+        return {**self.capital, "here": here, "safe_here": bool(here and self.capital.get("safe"))}
+
     def _danger_bonus(self, pos_list: list[tuple[int, int]]) -> int:
         table = self.R.get("regions", {}).get("danger_bonus_permille")
         if not table or not self.regions:
@@ -600,6 +663,14 @@ class GameServer:
             self._note_region(c, p)
 
     def _note_region(self, c: str, p: dict[str, Any]) -> None:
+        if self.capital:
+            here = self._capital_at(p["pos"])
+            if here is not None and c not in self._in_capital:
+                self._in_capital.add(c)
+                self._emit_to(c, {"ev": "capital", "state": "enter", "name": self.capital["name"], "safe": bool(self.capital.get("safe"))})
+            elif here is None and c in self._in_capital:
+                self._in_capital.discard(c)
+                self._emit_to(c, {"ev": "capital", "state": "leave", "name": self.capital["name"], "safe": False})
         reg = self._region_at(p["pos"])
         rid = reg["id"] if reg else None
         if self._region_of.get(c, "") != rid:
@@ -786,7 +857,7 @@ class GameServer:
         R = self.R
         for c in list(self.players):
             p = self.players[c]
-            if c in self.fight_of or self.tick_no < p["immune_until"]:
+            if c in self.fight_of or self.tick_no < p["immune_until"] or self._safe_at(p["pos"]):
                 continue
             for e in self.enemies:
                 if (e["alive"] and e["fight"] is None and e["state"] == "idle"
@@ -811,7 +882,7 @@ class GameServer:
             if e["state"] == "chase":
                 c = e["target"]
                 p = self.players.get(c)
-                if (p is None or c in self.fight_of or self.tick_no < p["immune_until"]
+                if (p is None or c in self.fight_of or self.tick_no < p["immune_until"] or self._safe_at(p["pos"])
                         or _dist2(e["pos"], e["home"]) > ai["leash_radius"] ** 2):
                     self._begin_return(e)                       # Ziel verloren oder zu weit von zu Hause
                 elif _dist2(e["pos"], p["pos"]) <= ai["engage_radius"] ** 2 and self.terrain.clear_line(e["pos"], p["pos"]):
@@ -1020,6 +1091,7 @@ class GameServer:
             f = self.fights[fid]
             f["live"].submit(f["chars"].index(char), "flee")
         self.dungeon_of.pop(char, None)                     # Verbindungsabbruch beendet die Teilnahme am Dungeon
+        self._in_capital.discard(char)
         gone = self.players.pop(char, None)
         if gone is not None:
             self.saved_pos[char] = gone["pos"]
@@ -1052,6 +1124,9 @@ class GameServer:
         reg = self._region_at(me["pos"])
         you = {"char": char, "pos": list(me["pos"]), "fight": self.fight_of.get(char), "ground": self.terrain.kind_at(*me["pos"]),
                "region": {"id": reg["id"], "name": reg["name"], "danger": reg["danger"], "level": reg["level"]} if reg else None}
+        if self.capital:
+            here = self._capital_at(me["pos"])
+            you["capital"] = {"district": here["district"], "safe": bool(self.capital.get("safe"))} if here else None
         run = self.dungeons.get(self.dungeon_of.get(char, ""))
         if run:
             you["dungeon"] = {"id": run["dungeon"], "name": run["name"], "stage": run["stage"] + 1, "stages": run["stages_total"]}

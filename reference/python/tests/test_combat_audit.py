@@ -4,6 +4,7 @@ import unittest
 
 from mmo_game import GameServer
 from tests.test_game_enemies import Bot, fight, start
+from mmo_game import load_game_rules
 
 BAD_INPUTS = [None, 7, 3.5, True, [], {}, ["light"], {"a": 1}, "", " ", "LIGHT", "light ", "light\n", "x" * 5000, "target_9", "target_0", "target_-1",
               "../../etc/passwd", "flee;light", "‮flee", "cast_ember" * 3]
@@ -11,7 +12,7 @@ BAD_INPUTS = [None, 7, 3.5, True, [], {}, ["light"], {"a": 1}, "", " ", "LIGHT",
 
 class AuditTests(unittest.TestCase):
     def full_fight(self, pos, names=("anna",), cmds=("light", "dodge", "block", "heavy"), every=6):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         bots = [Bot(g, n) for n in names]
         for b in bots:
             b.call("game.join")
@@ -70,7 +71,7 @@ class AuditTests(unittest.TestCase):
         self.assertTrue(common)                                                  # beide sehen dieselben Ankündigungen
 
     def test_ungueltige_eingaben_im_kampf_werden_abgelehnt_und_veraendern_nichts(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         self.assertTrue(start(g, a, (3000, 1000)))
         live = g.fights[g.fight_of["anna"]]["live"]
@@ -85,7 +86,7 @@ class AuditTests(unittest.TestCase):
         self.assertFalse(r["ok"])
 
     def test_eingaben_ausserhalb_des_kampfs_und_fremde_figuren(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a, b = Bot(g, "anna"), Bot(g, "ben")
         a.call("game.join")
         self.assertFalse(a.call("game.fight", input="light")["ok"])             # nicht im Kampf
@@ -98,7 +99,7 @@ class AuditTests(unittest.TestCase):
         self.assertFalse(a.call("game.gather", node="gibt_es_nicht")["ok"])
 
     def test_gesendete_befehle_werden_nur_einmal_gezaehlt(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         self.assertTrue(start(g, a, (3000, 1000)))
         live = g.fights[g.fight_of["anna"]]["live"]

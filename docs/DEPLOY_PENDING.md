@@ -22,3 +22,6 @@ Auf dem VPS läuft Commit `ee249f9` (AP 16–21, 2026-11-05). **Nicht bereitgest
 
 ## Browser-Rauchtest (AP 90–92)
 Vor einem Deployment: `scripts/browser_smoke.sh` ausführen (braucht Node ≥ 22 und Chromium; Port per `PORT`). Prüft Fenster, Gildenchat, Titelwahl und Grundstücksangebot im echten Browser gegen einen Wegwerf-Server.
+
+## Nachtrag AP 95 (nach dem Deployment von AP 94 am 2026-11-05)
+Auf dem VPS läuft `eaf4d33` (AP 22–94, Spielstand auf CEE v10). **Nicht bereitgestellt:** AP 95 (`game_rules_v20`, Hauptstadt mit Schutzzone). Der Start prüft das Layout und bricht bei einem Fehler ab; vor dem Deployment `scripts/browser_smoke.sh` ausführen. Rückweg wie oben (`python.prev`, Sicherung).

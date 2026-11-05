@@ -3,6 +3,7 @@ import unittest
 
 from mmo_sim import SimError, simulate_pack
 from mmo_sim.rules import load_sim_rules
+from mmo_game import load_game_rules
 
 V12 = load_sim_rules("sim_rules_v12.json")
 V13 = load_sim_rules("sim_rules_v13.json")
@@ -66,7 +67,7 @@ class GameLayer(unittest.TestCase):
         def spy(sim, types, specs, abilities=None):
             seen.extend(specs)
             return real(sim, types, specs, abilities)
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         g.world.svc.record("anna", "identity.class_chosen", {"base_class": "warrior"})
         with mock.patch.object(gm, "LiveEncounter", spy):

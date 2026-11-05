@@ -56,6 +56,7 @@
 - AP 90–92: Browser-Rauchtest `scripts/browser_smoke.sh` (headless Chromium über CDP, Wegwerf-Server): Registrierung, alle Fenster ohne `undefined`/`NaN`, Gilde/Chat, Siedlung, Titelwahl, Grundstücksangebot setzen und zurückziehen per echtem Klick. Damit sind diese Anzeigen im echten Browser geprüft.
 - AP 93: Rauchtest um Marktauftrag per Klick (Platzieren, Listenanzeige, Zurückziehen) erweitert.
 - AP 94: Statusabgleich auf Stand AP 93 (IMPLEMENTATION_STATUS, BUILD_PLAN).
+- AP 95: Hauptstadt als Ort im Spiel (game_rules_v20, ADR-0081): Viertel, Tore, NPC-Markierungen, Schutzzone vor Gegnern, Abfrage `game.capital`, Ereignis `capital`, `you.capital` im Zustand; 14 neue Tests, vier Testdateien auf v19 gepinnt. Noch nicht deployt, noch keine Client-Anzeige.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

@@ -83,6 +83,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 90–92 | Browser-Rauchtest im echten Chromium (`scripts/browser_smoke.sh`) | – | – | **fertig** |
 | 93 | Rauchtest: Marktauftrag per Klick | – | – | **fertig** |
 | 94 | Statusabgleich auf Stand AP 93 | – | – | **fertig** (nur Doku) |
+| 95 | Hauptstadt als Ort: Layout (Viertel, Tore, NPC-Markierungen), Schutzzone, `game.capital`, Ereignis `capital` (game_rules_v20) | §36 | 2/3 | **fertig** (ADR-0081); Client-Anzeige, Dienstbindung, Startpunkt offen; noch nicht deployt |
 | 79 | Lastmessung 60 Bots | §50–55 | 4 | **fertig**: p95 5,46 ms je Tick |
 | 80 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck) | – | – | **fertig**, ohne Befund |
 | 81 | Upgrade-Werkzeug: Probelauf und Konsistenzsperre | §50–55 | 4 | **fertig** (Test mit Wegwerf-Spielstand) |

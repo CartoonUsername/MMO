@@ -5,7 +5,7 @@ from mmo_game import GameServer, load_game_rules
 from mmo_game.navigation import Navigator
 from mmo_game.terrain import Terrain
 
-R0 = load_game_rules()
+R0 = load_game_rules("game_rules_v19.json")
 TERR = Terrain(R0["terrain"], R0["zone"], R0["speed_cm_per_tick"])
 NAV = Navigator(TERR, 100)
 

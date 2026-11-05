@@ -2,6 +2,7 @@ import unittest
 
 from mmo_game import GameServer
 from mmo_sim.enemies import roll_abilities
+from mmo_game import load_game_rules
 
 
 class Bot:
@@ -48,7 +49,7 @@ def fight(g, bots, cmds=("light",), every=8, max_ticks=4000):
 
 class AbilityRollTests(unittest.TestCase):
     def test_fight_start_announces_the_abilities_rolled_for_spawn_and_day(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         self.assertTrue(start(g, a, (3000, 1000)))
         st = a.of("fight_start")[0]
@@ -64,12 +65,12 @@ class AbilityRollTests(unittest.TestCase):
     def test_same_spawn_same_day_same_abilities_but_a_new_day_may_differ(self):
         seen = {}
         for day in range(1, 8):
-            g = GameServer()
+            g = GameServer(load_game_rules("game_rules_v19.json"))
             g.world.day[0] = day
             a = Bot(g, "anna")
             self.assertTrue(start(g, a, (3000, 1000)))
             seen[day] = tuple(map(tuple, a.of("fight_start")[0]["abilities"]))
-            g2 = GameServer()
+            g2 = GameServer(load_game_rules("game_rules_v19.json"))
             g2.world.day[0] = day
             b = Bot(g2, "ben")
             start(g2, b, (3000, 1000))
@@ -79,7 +80,7 @@ class AbilityRollTests(unittest.TestCase):
     def test_old_sim_rules_send_no_abilities(self):
         import copy
         from mmo_game import load_game_rules
-        r = copy.deepcopy(load_game_rules())
+        r = copy.deepcopy(load_game_rules("game_rules_v19.json"))
         r["sim_rules"] = "sim_rules_v5.json"
         r["enemies"] = [{"type": "wolf", "at": [2000, 1800]}]
         g = GameServer(r)
@@ -90,7 +91,7 @@ class AbilityRollTests(unittest.TestCase):
 
 class TelegraphTests(unittest.TestCase):
     def test_telegraphs_and_results_reach_the_participants_in_order(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         self.assertTrue(start(g, a, (3000, 1000)))
         res = []
@@ -108,7 +109,7 @@ class TelegraphTests(unittest.TestCase):
         self.assertTrue(res and res[0]["t"] == first["t"] + first["ticks"])       # Ergebnis genau nach der Vorwarnzeit
 
     def test_view_events_include_casting_and_player_states(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         start(g, a, (3000, 1000))
         saw_cast = False
@@ -124,7 +125,7 @@ class TelegraphTests(unittest.TestCase):
         self.assertIn("stunned", a.of("fight")[-1]["players"][0])
 
     def test_non_participants_get_no_telegraphs(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a, b = Bot(g, "anna"), Bot(g, "ben")
         b.call("game.join")
         g.players["ben"]["pos"] = (400, 400)
@@ -137,7 +138,7 @@ class TelegraphTests(unittest.TestCase):
 
 class EndToEndTests(unittest.TestCase):
     def test_healer_and_witch_fight_ends_with_an_accepted_report_and_matching_replay(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         g.world.svc.record("anna", "identity.xp_gained", {"amount": 100000})
         start(g, a, (3000, 1000))
@@ -151,7 +152,7 @@ class EndToEndTests(unittest.TestCase):
             self.assertIsNotNone(end[0]["report"])
 
     def test_the_boss_fight_runs_and_never_breaks_the_report_rules(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         bots = [Bot(g, n) for n in ("anna", "ben", "cara")]
         for b in bots:
             b.call("game.join")
@@ -190,7 +191,7 @@ class EndToEndTests(unittest.TestCase):
         self.assertIn("basic_attack", tel)                                        # auch normale Angriffe werden angekündigt (sim_rules_v7)
 
     def test_summons_vanish_after_the_fight_and_do_not_drop_loot(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         a.call("game.join")
         g.world.svc.record("anna", "identity.xp_gained", {"amount": 100000})
@@ -207,7 +208,7 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(len(g.enemies), len(g.R["enemies"]))                                     # Beschworene sind keine Welt-Gegner
 
     def test_a_loadout_change_during_a_fight_does_not_change_the_replayed_result(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         a.call("game.join")
         g.world.svc.record("anna", "identity.xp_gained", {"amount": 50000})
@@ -217,7 +218,7 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(g.log, [])
 
     def test_the_world_snapshot_shows_new_enemy_types_with_states(self):
-        g = GameServer()
+        g = GameServer(load_game_rules("game_rules_v19.json"))
         a = Bot(g, "anna")
         a.call("game.join")
         g.players["anna"]["pos"] = (5000, 4900)

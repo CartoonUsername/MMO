@@ -1,0 +1,872 @@
+{
+ "version": 20,
+ "_comment": "PLATZHALTER für den Vertical Slice: Größen, Geschwindigkeiten, Orte, Beute und Zeiten sind Vorschläge, KEINE beschlossenen Spielinhalte. Ganzzahlen; Längen in Zentimetern; 1 Tick = 100 ms. v2 (Vorversion): Klassen-Kits (class_kits) – Platzhalter-Zuordnung, welche Fähigkeiten eine Grundklasse im Kampf von Anfang an nutzt. v3: Progression (progression) – welche Spielhandlungen die Charakterentwicklung speisen; alle Zahlen Platzhalter.",
+ "cee_rules": "rules_v10.json",
+ "sim_rules": "sim_rules_v15.json",
+ "zone": {
+  "width": 6000,
+  "height": 6000,
+  "spawn": [
+   500,
+   500
+  ],
+  "town_radius": 700
+ },
+ "speed_cm_per_tick": 35,
+ "aggro_radius": 700,
+ "pack_radius": 600,
+ "join_radius": 1500,
+ "view_radius": 3500,
+ "state_every_ticks": 2,
+ "fight_every_ticks": 2,
+ "aggro_immunity_ticks": 60,
+ "respawn_ticks": 400,
+ "ticks_per_day": 6000,
+ "start_coins": 200,
+ "game_commands_per_burst": 40,
+ "enemies": [
+  {
+   "type": "wolf",
+   "at": [
+    2200,
+    1800
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    2350,
+    1900
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    3800,
+    3600
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    3950,
+    3700
+   ]
+  },
+  {
+   "type": "bear",
+   "at": [
+    3875,
+    3800
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    1500,
+    4200
+   ]
+  },
+  {
+   "type": "wisp_healer",
+   "at": [
+    3000,
+    700
+   ]
+  },
+  {
+   "type": "bog_witch",
+   "at": [
+    3250,
+    800
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    4700,
+    1300
+   ]
+  },
+  {
+   "type": "wolf",
+   "at": [
+    4900,
+    1250
+   ]
+  },
+  {
+   "type": "alpha_wolf",
+   "at": [
+    4800,
+    1150
+   ]
+  },
+  {
+   "type": "shadow_hunter",
+   "at": [
+    5200,
+    3000
+   ]
+  },
+  {
+   "type": "totem_caller",
+   "at": [
+    800,
+    3300
+   ]
+  },
+  {
+   "type": "stone_warden",
+   "at": [
+    4500,
+    4300
+   ]
+  },
+  {
+   "type": "stone_heart_colossus",
+   "at": [
+    5200,
+    5200
+   ]
+  },
+  {
+   "type": "stone_golem",
+   "at": [
+    3700,
+    2950
+   ]
+  },
+  {
+   "type": "stone_golem",
+   "at": [
+    4200,
+    3400
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "ore1",
+   "item": "iron_ore@standard",
+   "at": [
+    1100,
+    700
+   ],
+   "qty": 3
+  },
+  {
+   "id": "ore2",
+   "item": "iron_ore@standard",
+   "at": [
+    1300,
+    1000
+   ],
+   "qty": 3
+  },
+  {
+   "id": "herb1",
+   "item": "healing_herb@standard",
+   "at": [
+    300,
+    1300
+   ],
+   "qty": 2
+  },
+  {
+   "id": "water1",
+   "item": "clean_water@standard",
+   "at": [
+    800,
+    300
+   ],
+   "qty": 2
+  }
+ ],
+ "node_cooldown_ticks": 150,
+ "gather_reach": 250,
+ "drops": {
+  "wolf": {
+   "coin@gold": 56,
+   "healing_herb@standard": 6
+  },
+  "bear": {
+   "coin@gold": 110,
+   "iron_ore@standard": 6
+  },
+  "wisp_healer": {
+   "coin@gold": 38,
+   "healing_herb@standard": 8
+  },
+  "bog_witch": {
+   "coin@gold": 90,
+   "frost_lily@standard": 2,
+   "glass_sand@standard": 6
+  },
+  "shadow_hunter": {
+   "coin@gold": 90,
+   "charcoal@standard": 8
+  },
+  "totem_caller": {
+   "coin@gold": 80,
+   "timber@standard": 8
+  },
+  "stone_warden": {
+   "coin@gold": 120,
+   "iron_ore@standard": 8,
+   "iron_ingot@standard": 1
+  },
+  "alpha_wolf": {
+   "coin@gold": 220,
+   "healing_herb@standard": 10,
+   "iron_ingot@standard": 6
+  },
+  "stone_heart_colossus": {
+   "coin@gold": 800,
+   "iron_ingot@standard": 25,
+   "glass_sand@standard": 30,
+   "frost_lily@standard": 8,
+   "iron_blade@fine": 2
+  },
+  "stone_golem": {
+   "coin@gold": 150,
+   "iron_ore@standard": 8,
+   "charcoal@standard": 4
+  }
+ },
+ "terrain": {
+  "_comment": "PLATZHALTER: Geländearten (Tempofaktor in Promille, 0 = nicht begehbar), Gebiete (spätere überdecken frühere) und Hindernisse (Kreise).",
+  "player_radius": 40,
+  "kinds": {
+   "grass": 1000,
+   "road": 1300,
+   "mud": 600,
+   "water": 0,
+   "rock": 0
+  },
+  "default": "grass",
+  "regions": [
+   {
+    "kind": "road",
+    "rect": [
+     400,
+     400,
+     1500,
+     600
+    ]
+   },
+   {
+    "kind": "road",
+    "rect": [
+     1400,
+     500,
+     1600,
+     1900
+    ]
+   },
+   {
+    "kind": "road",
+    "rect": [
+     1500,
+     1700,
+     2400,
+     1900
+    ]
+   },
+   {
+    "kind": "water",
+    "rect": [
+     1700,
+     0,
+     1900,
+     3600
+    ]
+   },
+   {
+    "kind": "road",
+    "rect": [
+     1700,
+     1700,
+     1900,
+     1900
+    ]
+   },
+   {
+    "kind": "water",
+    "rect": [
+     2800,
+     2300,
+     3500,
+     3000
+    ]
+   },
+   {
+    "kind": "mud",
+    "rect": [
+     3500,
+     3300,
+     4300,
+     4100
+    ]
+   },
+   {
+    "kind": "mud",
+    "rect": [
+     1300,
+     3900,
+     1800,
+     4500
+    ]
+   }
+  ],
+  "obstacles": [
+   {
+    "at": [
+     900,
+     900
+    ],
+    "r": 90,
+    "kind": "rock"
+   },
+   {
+    "at": [
+     700,
+     1500
+    ],
+    "r": 70,
+    "kind": "rock"
+   },
+   {
+    "at": [
+     2500,
+     2300
+    ],
+    "r": 100,
+    "kind": "rock"
+   },
+   {
+    "at": [
+     3000,
+     3500
+    ],
+    "r": 80,
+    "kind": "rock"
+   },
+   {
+    "at": [
+     1100,
+     2600
+    ],
+    "r": 120,
+    "kind": "rock"
+   }
+  ]
+ },
+ "enemy_ai": {
+  "_comment": "PLATZHALTER: Gegner bemerken Spieler im Alarmradius (aggro_radius, freie Strecke), verfolgen sie, kämpfen ab dem Kampfradius und kehren zurück, wenn sie das Ziel verlieren oder zu weit von zu Hause sind.",
+  "engage_radius": 150,
+  "leash_radius": 2200,
+  "home_radius": 60,
+  "repath_ticks": 10,
+  "stuck_limit": 6,
+  "grid_cm": 100,
+  "speed_cm_per_tick": {
+   "wolf": 40,
+   "bear": 28,
+   "default": 30,
+   "alpha_wolf": 42,
+   "wisp_healer": 30,
+   "bog_witch": 28,
+   "stone_warden": 22,
+   "shadow_hunter": 38,
+   "totem_caller": 26,
+   "stone_imp": 34,
+   "stone_heart_colossus": 24,
+   "wolf_pup": 36
+  }
+ },
+ "loot_decay_permille": [
+  1000,
+  1000,
+  1000,
+  750,
+  500,
+  250,
+  100
+ ],
+ "_loot_comment": "PLATZHALTER: Beute je Gegnerart. Der Wert (Münzen + Gegenstände zum Referenzwert) richtet sich nach Dauer und Risiko des Kampfes laut Balancing-Bericht (ADR-0035). `loot_decay_permille`: je Figur, Gegnerart und Tag mindert sich die Beute ab dem vierten Kill (Index = bisherige Kills).",
+ "respawn_ticks_by_type": {
+  "alpha_wolf": 1800,
+  "stone_warden": 1200,
+  "stone_heart_colossus": 6000,
+  "stone_golem": 1500
+ },
+ "class_kits": {
+  "_comment": "PLATZHALTER: Fähigkeiten, die eine Grundklasse ohne Freischaltung im Kampf ausgerüstet hat. Werden nur im Kampf wirksam (Befehle und Fähigkeitseffekte der Simulation); die CEE-Ausrüstung bleibt unberührt.",
+  "warrior": [
+   "power_strike",
+   "disrupting_blow"
+  ],
+  "archer": [
+   "power_strike",
+   "flowing_step",
+   "hindering_mark"
+  ],
+  "shaman_alchemist": [
+   "ember_strike",
+   "ally_mend",
+   "ally_ward",
+   "hindering_mark"
+  ]
+ },
+ "progression": {
+  "_comment": "PLATZHALTER (AP 3): Jede Quelle hat einen Grund und eine Grenze. Kämpfe: Erfahrung nach Gegnerstufe, abnehmend mit dem Beutefaktor (loot_decay_permille: gleiche Art am selben Tag bringt weniger). Elemente: Exposition durch besiegte Elementargegner und durch Fähigkeiten. Sammeln: Berufserfahrung mit Tageslimit. Erkundung: Hinweise an festen Orten (je Figur einmalig, Entdeckungen der CEE).",
+  "fight_xp_per_level": 6,
+  "fight_element_exposure": 8,
+  "skill_exposure": {
+   "cast_ember": [
+    "fire",
+    6
+   ],
+   "cast_water": [
+    "water",
+    6
+   ],
+   "cast_earth": [
+    "earth",
+    6
+   ],
+   "cast_nature": [
+    "nature",
+    6
+   ],
+   "cast_electric": [
+    "electric",
+    6
+   ],
+   "cast_ice": [
+    "ice",
+    6
+   ],
+   "cast_wind": [
+    "wind",
+    6
+   ],
+   "cast_light": [
+    "light",
+    6
+   ],
+   "cast_shadow": [
+    "shadow",
+    6
+   ]
+  },
+  "skill_exposure_max_per_fight": 10,
+  "skill_exposure_daily_cap": 60,
+  "gather": {
+   "iron_ore": [
+    "mining",
+    10
+   ],
+   "healing_herb": [
+    "farming",
+    10
+   ],
+   "clean_water": [
+    "alchemy",
+    6
+   ]
+  },
+  "gather_daily_full": 20,
+  "gather_reduced_permille": 250,
+  "pois": [
+   {
+    "id": "shrine_mural",
+    "name": "Altes Wandbild",
+    "at": [
+     400,
+     2300
+    ],
+    "radius": 300,
+    "discovery": "old_shrine_map",
+    "evidence": "shrine_mural"
+   },
+   {
+    "id": "hermit_story",
+    "name": "Einsiedler",
+    "at": [
+     3700,
+     1600
+    ],
+    "radius": 300,
+    "discovery": "old_shrine_map",
+    "evidence": "hermit_story"
+   }
+  ]
+ },
+ "echo": {
+  "_comment": "Platzhalter (AP 7): Bezugsquellen für Kampfechos und Resonanzmaterial. first_kill: erstes Besiegen schenkt einmalig ein unaktiviertes Echo; dust/protect: Material je Sieg mit Beitrag; mastery_per_victory: persönliche Meisterschaft der ausgerüsteten Haupttradition.",
+  "first_kill": {
+   "alpha_wolf": "wolf_tradition",
+   "shadow_hunter": "ember_tradition",
+   "stone_heart_colossus": "stone_tradition"
+  },
+  "material_per_victory": {
+   "wolf": {
+    "resonance_dust@standard": 1
+   },
+   "bear": {
+    "resonance_dust@standard": 2
+   },
+   "alpha_wolf": {
+    "resonance_dust@standard": 6
+   },
+   "stone_warden": {
+    "resonance_dust@standard": 3
+   },
+   "stone_heart_colossus": {
+    "resonance_dust@standard": 20,
+    "ward_stone@standard": 1,
+    "resonance_seal@standard": 1
+   }
+  },
+  "mastery_per_victory": 10
+ },
+ "gear": {
+  "_comment": "Platzhalter (AP 8): Ausrüstungsfunde. Je Sieg mit Beitrag Gegenstände aus dieser Tabelle (zusätzlich zu drops).",
+  "per_victory": {
+   "wolf": {
+    "leather_jerkin@common": 1
+   },
+   "bear": {
+    "wooden_buckler@common": 1,
+    "traveler_boots@common": 1
+   },
+   "stone_warden": {
+    "iron_cuirass@common": 1
+   },
+   "shadow_hunter": {
+    "hunter_bow@common": 1
+   },
+   "totem_caller": {
+    "ember_staff@common": 1
+   },
+   "alpha_wolf": {
+    "iron_blade@common": 1
+   }
+  },
+  "chance_permille": 150
+ },
+ "regions": {
+  "_comment": "Platzhalter (AP 9): Regionen mit Gefahrenstufe 1..5 und empfohlener Stufe. Normale Regionen sind NICHT durch Stufen gesperrt (nur Warnung); besondere Regionen dürfen Voraussetzungen verlangen (`requires`). Spätere Einträge überdecken frühere. danger_bonus_permille: Beute- und Erfahrungsbonus je Gefahrenstufe (Mut wird belohnt).",
+  "danger_bonus_permille": [
+   1000,
+   1000,
+   1100,
+   1250,
+   1500
+  ],
+  "list": [
+   {
+    "id": "sunmeadow",
+    "name": "Sonnenwiese",
+    "rect": [
+     0,
+     0,
+     1700,
+     2600
+    ],
+    "danger": 1,
+    "level": 1
+   },
+   {
+    "id": "crossing",
+    "name": "Kreuzweg-Ebene",
+    "rect": [
+     1700,
+     0,
+     3900,
+     2600
+    ],
+    "danger": 2,
+    "level": 3
+   },
+   {
+    "id": "fangvale",
+    "name": "Fangtal",
+    "rect": [
+     3900,
+     0,
+     6000,
+     2200
+    ],
+    "danger": 3,
+    "level": 6
+   },
+   {
+    "id": "moor",
+    "name": "Moorland",
+    "rect": [
+     0,
+     2600,
+     3200,
+     6000
+    ],
+    "danger": 2,
+    "level": 3
+   },
+   {
+    "id": "shadowheights",
+    "name": "Schattenhöhen",
+    "rect": [
+     3200,
+     2600,
+     6000,
+     4600
+    ],
+    "danger": 4,
+    "level": 10
+   },
+   {
+    "id": "stonewaste",
+    "name": "Steinherz-Ödland",
+    "rect": [
+     3200,
+     4600,
+     6000,
+     6000
+    ],
+    "danger": 5,
+    "level": 15
+   },
+   {
+    "id": "hiddenvale",
+    "name": "Verborgenes Tal",
+    "rect": [
+     0,
+     4800,
+     1300,
+     6000
+    ],
+    "danger": 3,
+    "level": 8,
+    "requires": {
+     "discovery": "old_shrine_map"
+    },
+    "hint": "Ein altes Wandbild und die Erzählung eines Einsiedlers weisen den Weg."
+   }
+  ]
+ },
+ "dungeons": {
+  "_comment": "Platzhalter (AP 9): Instanzierter Ablauf für Gruppen. Etappen sind Kämpfe gegen feste Gegnergruppen; Abschlusstruhe einmal pro Tag und Figur.",
+  "alte_mine": {
+   "name": "Alte Mine",
+   "entrance": [
+    700,
+    5400
+   ],
+   "radius": 300,
+   "region": "hiddenvale",
+   "daily_entries": 3,
+   "stage_delay_ticks": 30,
+   "stages": [
+    {
+     "name": "Vorkammer",
+     "enemies": [
+      "stone_imp",
+      "stone_imp"
+     ]
+    },
+    {
+     "name": "Stollen",
+     "enemies": [
+      "stone_warden"
+     ]
+    },
+    {
+     "name": "Wächter der Mine",
+     "enemies": [
+      "stone_warden",
+      "stone_imp",
+      "stone_imp"
+     ]
+    }
+   ],
+   "chest": {
+    "coin@gold": 300,
+    "resonance_dust@standard": 15,
+    "iron_cuirass@fine": 1
+   }
+  },
+  "steinherz_krypta": {
+   "name": "Steinherz-Krypta (Gildenraid)",
+   "entrance": [
+    1100,
+    5400
+   ],
+   "radius": 300,
+   "region": "hiddenvale",
+   "daily_entries": 1,
+   "stage_delay_ticks": 30,
+   "guild_raid": {
+    "min_members": 4,
+    "daily_entries_per_guild": 1,
+    "treasury_chest": {
+     "coin@gold": 1200,
+     "resonance_dust@standard": 40
+    },
+    "max_members": 8
+   },
+   "stages": [
+    {
+     "name": "Wächterhalle",
+     "enemies": [
+      "stone_warden",
+      "stone_imp",
+      "stone_imp"
+     ]
+    },
+    {
+     "name": "Kammer der Splitter",
+     "enemies": [
+      "stone_warden",
+      "stone_warden"
+     ]
+    },
+    {
+     "name": "Splitterwache",
+     "enemies": [
+      "stone_warden",
+      "stone_warden",
+      "stone_imp"
+     ],
+     "min_party": 6
+    },
+    {
+     "name": "Das Steinherz",
+     "enemies": [
+      "stone_heart_colossus",
+      "stone_imp"
+     ]
+    }
+   ],
+   "chest": {
+    "coin@gold": 150,
+    "resonance_dust@standard": 25,
+    "ward_stone@standard": 1
+   }
+  }
+ },
+ "world_bosses": {
+  "_comment": "Platzhalter (AP 9): Weltboss: alle Spieler im Umkreis kämpfen mit (bis zur Gruppengrenze); serverweite Ankündigungen; Teilnehmerkiste.",
+  "stone_heart_colossus": {
+   "name": "Steinherz-Koloss",
+   "chest": {
+    "resonance_dust@standard": 30,
+    "ward_stone@standard": 2
+   }
+  }
+ },
+ "economy_events": {
+  "_comment": "Platzhalter (AP 10): Die NPC-Weltwirtschaft reagiert auf Ereignisse. Täglich mit chance_permille ein Ereignis (deterministisch aus Tag und Seed-Text); es verschiebt Referenzpreise (Schock) für bestimmte Waren für einige Tage. Begrenzt durch die Schockgrenzen der Preisregeln – keine unbegrenzten Quellen.",
+  "chance_permille": 350,
+  "list": [
+   {
+    "id": "bad_harvest",
+    "headline": "Schlechte Ernte im Moorland – Lebensmittel sind gefragt",
+    "region": "moor",
+    "days": 5,
+    "shocks": {
+     "flour@standard": 1250,
+     "healing_herb@standard": 1150
+    }
+   },
+   {
+    "id": "border_war",
+    "headline": "Grenzkonflikt – Metall und Waffen werden knapp",
+    "region": "fangvale",
+    "days": 6,
+    "shocks": {
+     "iron_ore@standard": 1200,
+     "charcoal@standard": 1150
+    }
+   },
+   {
+    "id": "new_mine",
+    "headline": "Eine neue Mine in der Kreuzweg-Ebene drückt den Erzpreis",
+    "region": "crossing",
+    "days": 6,
+    "shocks": {
+     "iron_ore@standard": 800
+    }
+   },
+   {
+    "id": "new_harbor",
+    "headline": "Ein neuer Hafen bringt Glassand in den Handel",
+    "region": "sunmeadow",
+    "days": 7,
+    "shocks": {
+     "glass_sand@standard": 820
+    }
+   },
+   {
+    "id": "monster_raid",
+    "headline": "Monsterangriffe auf Karawanen verteuern Holz",
+    "region": "shadowheights",
+    "days": 4,
+    "shocks": {
+     "timber@standard": 1250
+    }
+   }
+  ]
+ },
+ "interest": {
+  "max_visible_players": 60
+ },
+ "_interest_comment": "AP 14 (ADR-0053): Interessenverwaltung. Höchstens so viele nächste Mitspieler werden je Zustandsmeldung gesendet; schützt Server und Netz bei Menschenaufläufen. Platzhalterzahl.",
+ "element_abilities": {
+  "fire": "ember_strike",
+  "water": "elem_water",
+  "earth": "elem_earth",
+  "nature": "elem_nature",
+  "electric": "elem_electric",
+  "ice": "elem_ice",
+  "wind": "elem_wind",
+  "light": "elem_light",
+  "shadow": "elem_shadow"
+ },
+ "_element_comment": "AP 16 (ADR-0055, Platzhalter): Jedes geprägte Element schaltet im Kampf den zugehörigen Zauber frei (max. 2 reguläre + 1 Endgame-Element laut CEE). Wechsel im Kampf kostet Zeit (sim_rules elements.switch_ticks).",
+ "_raid_comment": "AP 18 (ADR-0057, Platzhalter): Gildenraid = Dungeon mit `guild_raid`. Nur Mitglieder derselben Gilde (mind. min_members am Eingang, höchstens max_members (AP 19: 8, sim_rules_v10)), Zutritt je Gilde und Tag begrenzt (Gildenforschung erhöht ihn), Abschluss: persönliche Truhe wie im Dungeon plus Zahlung in die Gildenkasse. AP 21 (ADR-0060): Messung mit den Balancing-Bots: den Boss schaffen gute Spieler ab 4, durchschnittliche ab 6; deshalb mind. 4 Mitglieder. Etappen mit `min_party` kommen nur bei entsprechend großer Gruppe dazu (Splitterwache ab 6).",
+ "_combo_comment": "AP 22 (ADR-0061, Platzhalter): Wer zwei geprägte Elemente trägt, nutzt im Kampf deren Paarzauber; mit drei Prägungen (Endgame) zusätzlich den Dreierzauber. Befehle `combo_<a>_<b>[_<c>]` (alphabetisch).",
+ "combo_abilities": true,
+ "_specialization_comment": "AP 34 (ADR-0069): ab CEE-Regeln v10 ist die Berufs-Zweigwahl im Spiel aktiv (Befehl profession.specialize, Kosten/Abklingzeit in rules_v10).",
+ "_capital_comment": "AP 95 (ADR-0081, Vorschlag Claude, autorisiert): Hauptstadt als Ort im Spiel. PLATZHALTER-Layout (Zentimeter). Kreis um `center`; innerhalb sind Spieler vor Gegnern sicher (kein Alarm, Verfolger geben auf). Viertel nennen die Fenster/Dienste, die dort gedacht sind; es gibt KEINE Ortsbindung der Dienste (offen). Tore zeigen auf Regionen. NPCs sind Markierungen ohne Dialog.",
+ "capital": {
+  "site": "hauptstadt",
+  "name": "Hauptstadt",
+  "region": "crossing",
+  "center": [2900, 1300],
+  "radius": 550,
+  "safe": true,
+  "districts": [
+   {"id": "marktplatz", "name": "Marktplatz", "rect": [2750, 1150, 3050, 1450], "services": ["Markt", "Handel"]},
+   {"id": "handwerksviertel", "name": "Handwerksviertel", "rect": [2500, 1250, 2750, 1550], "services": ["Herstellen", "Ausrüstung"]},
+   {"id": "gildenhalle", "name": "Gildenhalle", "rect": [3050, 1000, 3300, 1250], "services": ["Gilde", "Gruppe"]},
+   {"id": "rathaus", "name": "Rathaus", "rect": [2750, 900, 3050, 1150], "services": ["Siedlung", "Chronik", "Forschung"]},
+   {"id": "kontor", "name": "Handelskontor", "rect": [3050, 1250, 3300, 1500], "services": ["Firma", "Echos"]}
+  ],
+  "gates": [
+   {"id": "westtor", "name": "Westtor", "at": [2470, 1640], "leads_to": "sunmeadow"},
+   {"id": "osttor", "name": "Osttor", "at": [3400, 1300], "leads_to": "fangvale"},
+   {"id": "suedtor", "name": "Südtor", "at": [2900, 1800], "leads_to": "moor"}
+  ],
+  "npcs": [
+   {"id": "marktmeisterin", "name": "Marktmeisterin Lenka", "role": "Markt", "at": [2900, 1300], "district": "marktplatz"},
+   {"id": "schmied", "name": "Schmied Borin", "role": "Handwerk", "at": [2620, 1400], "district": "handwerksviertel"},
+   {"id": "gildenmeister", "name": "Gildenmeister Aldrik", "role": "Gilde", "at": [3170, 1120], "district": "gildenhalle"},
+   {"id": "schreiberin", "name": "Stadtschreiberin Mara", "role": "Chronik", "at": [2900, 1020], "district": "rathaus"},
+   {"id": "kontorist", "name": "Kontorist Veit", "role": "Handel", "at": [3170, 1380], "district": "kontor"},
+   {"id": "torwache", "name": "Torwache Hanna", "role": "Auskunft", "at": [2520, 1640], "district": null}
+  ]
+ }
+}
