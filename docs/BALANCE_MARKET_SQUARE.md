@@ -19,3 +19,9 @@ Zum Vergleich: Eine Order über 10 Eisenbarren bei Referenzpreis 20 sind 200 Mü
 - Empfehlung: Option 1 plus Messung per Bot, bevor weiter gedreht wird. Gebühren bleiben eine Münzsenke, daher kein Risiko für die Wirtschaft.
 
 Status: Option 1 umgesetzt als settlement_rules_v2 (ADR-0067); keine Bot-Messung.
+
+## Obergrenze aus den Münzquellen (v2, 250/500 ‰)
+- Münzen kommen im Spiel bisher aus Gegner-Beute (Größenordnung 40–120 Münzen je Kill, `game_rules_v1.json`), Startkapital 200.
+- Neuer Break-even (nur Münzen): Stufe 1 = 800 / 0,5 % = 160 000 Umsatz, Stufe 2 = 2 800 / 1 % = 280 000 kumuliert.
+- Bei ~100 Münzen je Kill heißt das: rund 1 600 bzw. 2 800 verkaufte Kills Beute-Gegenwert. Für einen aktiven Dauerspieler über Wochen erreichbar, für Gelegenheitsspieler nicht. Das passt zu einem Projekt, das sich vor allem für Händler lohnt.
+- Eine Bot-Messung würde hier nur Annahmen über das Spielerverhalten abbilden und wurde bewusst nicht gebaut. Aussagekräftig wird sie erst mit echten Spieldaten (Handelsumsatz je Figur und Tag).
