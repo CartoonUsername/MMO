@@ -138,6 +138,22 @@ class SettlementTests(unittest.TestCase):
         self.assertEqual(s.sales, {})
         self.assertEqual(check_consistency(w), [])
 
+    def test_plot_sale_notifications(self):                          # AP 51
+        s, w = self.s, self.w
+        kinds = lambda who: [i["kind"] for i in w.outbox.fetch(who)["items"] if i["kind"].startswith("plot.")]
+        s.buy_plot("anna", "hauptstadt", 1)
+        s.sell_plot("anna", "hauptstadt", 1, "ben", 100)
+        self.assertEqual((kinds("ben"), kinds("anna")), (["plot.sale_offered"], []))
+        s.cancel_sale("anna", "hauptstadt", 1)
+        s.sell_plot("anna", "hauptstadt", 1, "ben", 100)
+        s.accept_sale("ben", "hauptstadt", 1)
+        self.assertEqual(kinds("anna"), ["plot.sold"])
+        self.assertEqual(kinds("ben"), ["plot.sale_offered", "plot.sale_cancelled", "plot.sale_offered"])
+        s.sell_plot("ben", "hauptstadt", 1, "anna", 100)
+        s.advance(9)
+        self.assertEqual(kinds("anna")[-1], "plot.sale_expired")
+        self.assertEqual(kinds("ben")[-1], "plot.sale_expired")
+
     def test_plot_sale_cancel_expiry_and_invalid_offers(self):       # AP 43
         s, w = self.s, self.w
         s.buy_plot("anna", "hauptstadt", 1)

@@ -24,6 +24,7 @@ KINDS = (
     "production.job_done", "discovery.taught",
     "party.invited", "party.invite_declined", "party.joined", "party.left", "party.kicked", "party.leader_changed",
     "party.disbanded", "party.loot",
+    "plot.sale_offered", "plot.sold", "plot.sale_cancelled", "plot.sale_expired",
 )
 MAILBOX_LIMIT = 200
 FETCH_DEFAULT, FETCH_MAX = 50, 100

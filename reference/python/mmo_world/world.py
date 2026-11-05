@@ -154,7 +154,7 @@ class World:
         self.equipment = EquipmentService(self.svc, self.inv, load_equipment_rules(EQUIPMENT_RULES))
         if oldq2 is not None:
             self.equipment.worn, self.equipment.look, self.equipment.wardrobe = oldq2.worn, oldq2.look, oldq2.wardrobe
-        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties, self.echo):
+        for svc in (self.discovery, self.company, self.exchange, self.offers, self.production, self.parties, self.echo, self.settlements):
             svc.notify = self.outbox.emit  # Benachrichtigungen (abgeleitet, nicht Teil des Weltzustands/der Vektor-Hashes)
 
     def snapshot(self) -> dict[str, Any]:

@@ -52,6 +52,8 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 48 | Balancing-Rechnung AP 36/41/43 | – | – | **fertig** (nur Doku, nicht per Bot gemessen) |
 | 49 | Statusabgleich und Bereitstellungsplan aktualisiert | – | – | **fertig** (nur Doku) |
 | 50 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck, Lasttest) | – | – | **fertig**, ohne Befund |
+| 51 | Benachrichtigungen beim Grundstückshandel (Server) | Siedlungen | 2/3 | **fertig** (Test in test_settlements) |
+| 52 | Browser: lesbare Texte dafür | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

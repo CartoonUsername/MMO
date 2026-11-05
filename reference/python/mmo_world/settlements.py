@@ -60,6 +60,7 @@ class SettlementService:
         self.contrib: dict[str, dict[str, int]] = {}      # Figur -> {Ort: Wert}
         self.sales: dict[str, dict[str, Any]] = {}        # "ort:nr" -> {seller, buyer, price, day}: Verkaufsangebot (AP 43)
         self.last_day = 0
+        self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None   # Postausgang (AP 51)
         self.record: Callable[..., Any] = lambda *a, **k: None                    # Chronik (AP 13)
         self.tech_known: Callable[[str, str], bool] = lambda site, tech: True      # von ResearchService überschrieben (AP 12)
 
@@ -210,12 +211,14 @@ class SettlementService:
             raise WorldError("Das Lager muss vor dem Verkauf leer sein")
         offer = {"seller": char, "buyer": buyer, "price": price, "day": self.day()}
         self.sales[f"{site}:{n}"] = offer
+        self.notify(buyer, "plot.sale_offered", {"plot": f"{site}:{n}", "seller": char, "price": price})
         return dict(offer, site=site, n=n)
 
     def cancel_sale(self, char: str, site: str, n: int) -> None:
         o = self.sales.get(f"{site}:{n}") if _is_int(n) else None
         if o is None or o["seller"] != char:
             raise WorldError("Kein eigenes Verkaufsangebot für dieses Grundstück")
+        self.notify(o["buyer"], "plot.sale_cancelled", {"plot": f"{site}:{n}", "seller": char})
         del self.sales[f"{site}:{n}"]
 
     def accept_sale(self, char: str, site: str, n: int) -> dict[str, Any]:
@@ -236,6 +239,7 @@ class SettlementService:
             self.inv.apply_many([(char, {self.coin: o["price"]}, {}), (o["seller"], {}, {self.coin: o["price"] - fee})])   # Gebühr verschwindet (Senke)
         p["owner"] = char
         del self.sales[f"{site}:{n}"]
+        self.notify(o["seller"], "plot.sold", {"plot": f"{site}:{n}", "buyer": char, "price": o["price"], "fee": fee})
         return {"site": site, "n": n, "seller": o["seller"], "price": o["price"], "fee": fee}
 
     def build(self, char: str, site: str, n: int, building: str) -> int:
@@ -347,7 +351,9 @@ class SettlementService:
                         self._release(p)
         days = self.R.get("sale_days", 0)
         for key in [k for k, o in sorted(self.sales.items()) if day - o["day"] > days]:
-            del self.sales[key]                                         # Angebot verfallen
+            o = self.sales.pop(key)                                     # Angebot verfallen
+            for who in (o["seller"], o["buyer"]):
+                self.notify(who, "plot.sale_expired", {"plot": key})
         self.last_day = day
         return out
 

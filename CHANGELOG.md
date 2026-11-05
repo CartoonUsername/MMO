@@ -30,6 +30,7 @@
 - AP 48: Balancing-Rechnung zu Zweigbonus, Hafen und Grundstückshandel (docs/BALANCE_AP41_46.md), keine Regeländerung.
 - AP 49: Statusdokumente (IMPLEMENTATION_STATUS, DEPLOY_PENDING) auf den Stand AP 50 gebracht.
 - AP 50: Gesamtprüfung: 1519 Tests, Golden-Vectors-Prüfung, Unity-Kerncheck (dotnet) und Lasttest mit 20 Bots (p95 0,74 ms) ohne Befund.
+- AP 51/52: Benachrichtigungen beim Grundstückshandel (`plot.sale_offered`, `plot.sold`, `plot.sale_cancelled`, `plot.sale_expired`), Browser zeigt sie lesbar; im echten Browser ungetestet.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
