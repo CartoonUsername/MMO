@@ -55,6 +55,7 @@ class Chronicle:
         self.entries: list[dict[str, Any]] = []
         self.firsts: dict[str, int] = {}                      # Schlüssel -> Eintragsnummer
         self.titles: dict[str, list[dict[str, Any]]] = {}
+        self.chosen: dict[str, str] = {}                       # Figur -> gewählte Anzeigetitel-ID (AP 73)
 
     @property
     def active(self) -> bool:
@@ -95,14 +96,30 @@ class Chronicle:
         for e in self.entries:
             if char in e["chars"]:
                 pts += self.R["kinds"][e["kind"]]["prestige"]
-        return {"points": pts, "titles": list(self.titles.get(char, []))}
+        cid = self.chosen.get(char)
+        shown = next((t["name"] for t in self.titles.get(char, []) if t["id"] == cid), None)
+        return {"points": pts, "titles": list(self.titles.get(char, [])), "chosen": cid if shown else None, "display": shown}
+
+    def choose_title(self, char: str, title_id: str | None) -> dict[str, Any]:
+        """Wählt einen verdienten Titel als Anzeigetitel (AP 73, ADR-0080); None entfernt ihn."""
+        if title_id is None:
+            self.chosen.pop(char, None)
+        elif not isinstance(title_id, str) or not any(t["id"] == title_id for t in self.titles.get(char, [])):
+            raise WorldError("Diesen Titel hast du nicht verdient")
+        else:
+            self.chosen[char] = title_id
+        return self.prestige(char)
 
     def to_json(self) -> str:
-        return json.dumps({"entries": self.entries, "firsts": self.firsts, "titles": self.titles}, sort_keys=True, separators=(",", ":"))
+        d: dict[str, Any] = {"entries": self.entries, "firsts": self.firsts, "titles": self.titles}
+        if self.chosen:                                        # nur bei Bedarf: unveränderte Welten behalten ihren Zustand
+            d["chosen"] = self.chosen
+        return json.dumps(d, sort_keys=True, separators=(",", ":"))
 
     def load(self, text: str) -> None:
         d = json.loads(text)
         self.entries, self.firsts, self.titles = d["entries"], d["firsts"], d["titles"]
+        self.chosen = d.get("chosen", {})
 
     def check(self) -> list[str]:
         errs = [f"Eintrag {i + 1}: Nummer {e['n']}" for i, e in enumerate(self.entries) if e["n"] != i + 1]

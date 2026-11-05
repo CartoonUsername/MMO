@@ -108,6 +108,7 @@ namespace Mmo
             new Cmd("guild.contribute", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("coins", 'i', true), new Arg("item_key", 's', true), new Arg("qty", 'i', true) }),
             new Cmd("query.chronicle", false, "", new Arg[] { new Arg("offset", 'i', true), new Arg("limit", 'i', true), new Arg("kind", 's', true) }),
             new Cmd("query.prestige", false, "char", new Arg[] { new Arg("char", 's', false) }),
+            new Cmd("title.choose", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("title", 's', true) }),
             new Cmd("query.echoes", false, "char", new Arg[] { new Arg("char", 's', false) }),
             new Cmd("profession.specialize", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("profession", 's', false), new Arg("branch", 's', false) }),
             new Cmd("plot.sell", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("site", 's', false), new Arg("n", 'i', false), new Arg("buyer", 's', true), new Arg("price", 'i', false) }),

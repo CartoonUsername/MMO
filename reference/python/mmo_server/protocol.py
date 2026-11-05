@@ -261,6 +261,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.chronicle", "offset:i? limit:i? kind:s?", None, lambda w, a: w.chronicle.page(a.get("offset", 0), a.get("limit", 20), a.get("kind")), mutating=False),
     _c("query.prestige", "char:s", "char", lambda w, a: dict(w.chronicle.prestige(a["char"]),
        research_titles=w.research.titles.get(a["char"], [])), mutating=False),
+    _c("title.choose", "char:s title:s?", "char", lambda w, a: w.chronicle.choose_title(a["char"], a.get("title"))),
     _c("query.echoes", "char:s", "char", lambda w, a: w.echo.view(a["char"]), mutating=False),
     _c("profession.specialize", "char:s profession:s branch:s", "char", lambda w, a: w.specialize(a["char"], a["profession"], a["branch"])),
     _c("plot.sell", "char:s site:s n:i buyer:s? price:i", "char", lambda w, a: w.settlements.sell_plot(a["char"], a["site"], a["n"], a.get("buyer"), a["price"])),

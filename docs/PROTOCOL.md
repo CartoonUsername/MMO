@@ -163,6 +163,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `guild.contribute` | char:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
 | `query.chronicle` | offset?:i, limit?:i, kind?:s | – | lesend | query |
 | `query.prestige` | char:s | char | lesend | query |
+| `title.choose` | char:s, title?:s | char | schreibend | default |
 | `query.echoes` | char:s | char | lesend | query |
 | `profession.specialize` | char:s, profession:s, branch:s | char | schreibend | default |
 | `plot.sell` | char:s, site:s, n:i, buyer?:s, price:i | char | schreibend | default |

@@ -44,7 +44,7 @@ namespace Mmo
             new PanelDef("Siedlung", "query.settlements", new[] { "settlement.found", "plot.buy", "plot.build", "plot.stash_in", "plot.stash_out", "plot.abandon", "plot.sell", "plot.cancel_sale", "plot.accept_sale", "project.contribute" }),
             new PanelDef("Forschung", "query.research", new[] { "research.start", "research.contribute", "research.license" }),
             new PanelDef("Gilde", "query.guild", new[] { "guild.found", "guild.invite", "guild.accept", "guild.decline", "guild.leave", "guild.kick", "guild.role", "guild.stash", "guild.take", "guild.contribute", "guild.research", "guild.say", "guild.disband" }),
-            new PanelDef("Chronik", "query.chronicle", new[] { "query.prestige" }),
+            new PanelDef("Chronik", "query.chronicle", new[] { "query.prestige", "title.choose" }),
         };
 
         // Alle Befehle der Fenster müssen im Katalog stehen - sonst weicht der Client vom Server ab (wird im Test geprüft).

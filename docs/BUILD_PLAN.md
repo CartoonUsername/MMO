@@ -74,6 +74,9 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 70 | Forschung v2: neue Techniken, Epochen-Inhalte, Tech-Bindung höherer Projektstufen | §42–44 | 3/5 | **fertig** (ADR-0079); weitere Epochen offen |
 | 71 | Anzeige der nötigen Technik je Projekt | §42–44 | 3/5 | **fertig, im echten Browser ungetestet** |
 | 72 | Kompatibilitätstest alter Spielstand → neue Standard-Regeln | §50–55 | 4 | **fertig** (nur Test) |
+| 73 | Anzeigetitel wählen (Server, Persistenz) | §47–49 | 3 | **fertig** (ADR-0080) |
+| 74 | Browser: Titelwahl im Chronikfenster | §47–49 | 3 | **fertig, im echten Browser ungetestet** |
+| 75 | Tests Titelwahl (Missbrauch, Persistenz) | §47–49 | 3 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

@@ -119,7 +119,7 @@ details.win>summary{cursor:pointer;margin:0;font-size:13px;text-transform:upperc
       <div id="guildBox"></div><div id="guildMsg" class="msg" role="status"></div></details>
     <details class="panel win" id="wChron"><summary>Chronik und Ruhm</summary>
       <div class="hint">Die Weltchronik hält Erstleistungen fest. Titel sind Anerkennung; sie sperren keine Inhalte für andere.</div>
-      <div id="chronBox"></div></details>
+      <div id="chronBox"></div><div id="chronMsg" class="msg" role="status"></div></details>
     <details class="panel win" id="wGear"><summary>Ausrüstung</summary>
       <div class="hint">Getragene Stücke verändern Schaden, Schutz, Ausweichkosten und Lauftempo – schwere Rüstung schützt mehr, macht aber langsamer. Das Aussehen (Transmog) ist von den Werten getrennt. Zahlen sind Entwürfe.</div>
       <div id="gearBox"></div><div id="gearMsg" class="msg" role="status"></div></details>
@@ -319,7 +319,12 @@ async function refreshGuild(){
 const CHRON_TXT={masterpiece_first:e=>"fertigte als Erste ein Meisterstück: "+e.data.name,settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name,raid_cleared:e=>"bezwang als Erste den Raid "+e.data.name};
 async function refreshChron(){
   const box=$("chronBox");box.textContent="";
-  const p=await call("query.prestige",{});if(p.ok){kv(box,"Ruhmpunkte",p.result.points);const ts=p.result.titles.map(t=>t.name).concat(p.result.research_titles);box.appendChild(el("div","Titel: "+(ts.length?ts.join(", "):"noch keine"),"hint"))}
+  const p=await call("query.prestige",{});if(p.ok){kv(box,"Ruhmpunkte",p.result.points);const ts=p.result.titles.map(t=>t.name).concat(p.result.research_titles);box.appendChild(el("div","Titel: "+(ts.length?ts.join(", "):"noch keine"),"hint"));
+    if(p.result.display)kv(box,"Angezeigter Titel",p.result.display);
+    if(p.result.titles.length){const row=el("div","","hint");row.appendChild(document.createTextNode("Anzeigetitel wählen: "));
+      for(const t of p.result.titles){const bt=el("button",(t.id===p.result.chosen?"✔ ":"")+t.name);bt.onclick=async()=>{await act("chronMsg","title.choose",{title:t.id},"Titel gewählt");refreshChron()};row.appendChild(bt)}
+      if(p.result.chosen){const bt=el("button","Titel ablegen");bt.onclick=async()=>{await act("chronMsg","title.choose",{},"Titel abgelegt");refreshChron()};row.appendChild(bt)}
+      box.appendChild(row)}}
   const c=await callRaw("query.chronicle",{limit:20});if(!c.ok){box.appendChild(el("div",errMsg(c)));return}
   sect(box,"Weltchronik ("+c.result.total+")");
   for(const e of c.result.entries)box.appendChild(el("div","Tag "+e.day+": "+(e.chars.length?e.chars.join(", ")+" ":"")+(CHRON_TXT[e.kind]?CHRON_TXT[e.kind](e):e.kind),"hint"));

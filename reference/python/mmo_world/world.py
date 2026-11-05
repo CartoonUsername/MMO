@@ -128,6 +128,7 @@ class World:
         self.guilds = GuildService(self.inv, self.trading.coin, crules, clock, lambda c: c in set(self.svc.log.character_ids()))
         if oldc is not None:
             self.chronicle.entries, self.chronicle.firsts, self.chronicle.titles = oldc.entries, oldc.firsts, oldc.titles
+            self.chronicle.chosen = oldc.chosen
         if oldg2 is not None:
             self.guilds._counter, self.guilds.guilds, self.guilds.member_of, self.guilds.invites = oldg2._counter, oldg2.guilds, oldg2.member_of, oldg2.invites
         self.settlements.record = self.research.record = self.guilds.record = self.chronicle.record
