@@ -47,6 +47,8 @@
 - AP 76: Der gewählte Anzeigetitel erscheint in der Zustandsmeldung bei Mitspielern (`players[].title`) und im Browser neben dem Namen. Im echten Browser ungetestet.
 - AP 77: Fuzz-Test erreicht Erfolgspfade für Gildenchat (`guild.say`) und Titelwahl (`title.choose`); Invarianten halten.
 - AP 78: Statusdokumente (IMPLEMENTATION_STATUS, DEPLOY_PENDING) auf den Stand AP 80.
+- AP 79: Lastmessung mit 60 Bots: p50 2,48 ms, p95 5,46 ms, max 13,25 ms je Tick (Referenzserver, Platzhalter-Last), kein Befund.
+- AP 80: Gesamtprüfung: 1543 Tests, Golden-Vectors-Prüfung, Unity-Kerncheck (dotnet) ohne Befund.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
