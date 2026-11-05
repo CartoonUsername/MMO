@@ -110,7 +110,9 @@ def _market(w: World, char: str) -> dict[str, Any]:
     maker = w.pricing.pr["maker"]["items"] if w.pricing is not None else []
     return {"items": {k: v["class"] for k, v in items.items()}, "grades": sorted(w.svc.rules["economy"]["grade_permille"]),
             "maker_items": maker, "coin": w.trading.coin,
-            "orders": [dict(w.exchange.orders[o]) for o in w.exchange.open_orders(char)], "band_permille": w.exchange.mr["band_permille"]}
+            "orders": [dict(w.exchange.orders[o]) for o in w.exchange.open_orders(char)], "band_permille": w.exchange.mr["band_permille"],
+            "fee_permille": w.exchange.mr["fee_permille"], "fee_discount_permille": max(0, min(1000, w.exchange.fee_discount(char))),
+            "max_open_orders": w.exchange.mr["max_open_orders"] + max(0, w.exchange.order_bonus(char))}   # Gebühr und Grenze für diese Figur (AP 88)
 
 
 def _market_quote(w: World, item_key: str) -> dict[str, Any]:

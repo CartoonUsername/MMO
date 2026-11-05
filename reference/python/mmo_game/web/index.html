@@ -342,7 +342,9 @@ async function initMarket(){
     $("mPlace").onclick=async()=>{await act("marketMsg","market.place",{side:$("mSide").value,item_key:itemKey(),qty:parseInt($("mQty").value,10)||0,price:parseInt($("mPrice").value,10)||0},"Auftrag platziert");refreshMarket()};
     $("mMakerBuy").onclick=async()=>{await act("marketMsg","maker.buy",{item_key:itemKey(),qty:parseInt($("mQty").value,10)||0},"Gekauft");refreshMarket()};
     $("mMakerSell").onclick=async()=>{await act("marketMsg","maker.sell",{item_key:itemKey(),qty:parseInt($("mQty").value,10)||0},"Verkauft");refreshMarket()}}
-  const ul=$("mOrders");ul.textContent="";if(!m.orders.length)ul.appendChild(li("Keine offenen Aufträge",[]));
+  const ul=$("mOrders");ul.textContent="";
+  ul.appendChild(li("Gebühr beim Verkauf: "+(m.fee_permille/10)+" %"+(m.fee_discount_permille?" − "+(m.fee_discount_permille/10)+" % Rabatt (Marktplatz)":"")+" · Aufträge "+m.orders.length+"/"+m.max_open_orders,[]));
+  if(!m.orders.length)ul.appendChild(li("Keine offenen Aufträge",[]));
   for(const o of m.orders)ul.appendChild(li((o.side==="buy"?"Kauf ":"Verkauf ")+o.remaining+"× "+o.item_key+" zu "+o.price,[["Zurückziehen",async()=>{await act("marketMsg","market.cancel",{order:o.id},"Zurückgezogen");refreshMarket()}]]));
   const w=await callRaw("game.world",{char:me});const nb=$("newsBox");nb.textContent="";
   if(w.ok&&(w.result.economy_news||[]).length)for(const n of w.result.economy_news)nb.appendChild(el("div","📰 "+n.headline+" (bis Tag "+n.until+")","hint"));else nb.textContent="Keine besonderen Marktnachrichten."

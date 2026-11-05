@@ -85,6 +85,8 @@ class SettlementTests(unittest.TestCase):
         s.contribute("anna", "moorufer", "market_square", 800, {"timber@standard": 40})   # Stufe 1: 250 Promille Rabatt
         self.assertEqual(s.fee_discount_permille("anna"), 250)
         self.assertEqual(s.fee_discount_permille("ben"), 0)      # ohne Grundstück kein Rabatt
+        from mmo_server.protocol import _market
+        self.assertEqual((_market(w, "anna")["fee_discount_permille"], _market(w, "ben")["fee_discount_permille"]), (250, 0))    # AP 89
         self.assertEqual((s.view("anna")["fee_discount_permille"], s.view("ben")["fee_discount_permille"]), (250, 0))
         self.assertEqual(sell_fee(), base - base * 250 // 1000)
         w.exchange.place("ben", "sell", item, 10, 20)           # Rabatt gilt nur für den Verkäufer
@@ -102,6 +104,9 @@ class SettlementTests(unittest.TestCase):
         self.assertEqual(s.order_bonus("anna"), 0)
         s.contribute("anna", "hauptstadt", "harbor", 2500, {"wooden_beam@standard": 40, "iron_ingot@standard": 10})
         self.assertEqual((s.order_bonus("anna"), s.order_bonus("ben"), s.view("anna")["order_bonus"]), (3, 0, 3))
+        from mmo_server.protocol import _market                                                         # AP 88: Marktfenster kennt Gebühr und Grenze der Figur
+        ma, mb = _market(w, "anna"), _market(w, "ben")
+        self.assertEqual((ma["max_open_orders"], mb["max_open_orders"], ma["fee_permille"], ma["fee_discount_permille"]), (13, 10, 20, 0))
         self.assertEqual(s.view("anna")["orders_per_reach"], 3)
         for _ in range(3):
             w.exchange.place("anna", "sell", item, 1, 25)
