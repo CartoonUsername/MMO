@@ -136,6 +136,10 @@ class SettlementService:
                 name = nm
         return name
 
+    def fee_discount_permille(self, char: str) -> int:
+        """Marktgebühren-Rabatt (Promille der Gebühr) durch den Marktplatz: bester Wert unter den Orten, in denen die Figur ein Grundstück besitzt (AP 29)."""
+        return max([self.effects(p["site"])["fee_discount_permille"] for p in self.owned_by(char) if self.is_open(p["site"])] or [0])
+
     def road_permille(self, region: str | None) -> int:
         """Bewegungsbonus durch Straßen: bester Wert unter den gegründeten Orten der Region (vom Spiel je Position abgefragt)."""
         return max([self.effects(s)["move_permille"] for s, d in self.R["sites"].items() if d["region"] == region and self.is_open(s)] or [0])

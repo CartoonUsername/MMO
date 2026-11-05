@@ -69,6 +69,26 @@ class SettlementTests(unittest.TestCase):
             s.contribute("anna", "moorufer", "road", 2000)        # mehr als gebraucht
         self.assertEqual(s.view("anna")["contributed"]["moorufer"], 630)
 
+    def test_market_square_discounts_exchange_fee(self):
+        s, w = self.s, self.w
+        item = "iron_ingot@standard"
+
+        def sell_fee() -> int:
+            w.exchange.place("anna", "sell", item, 10, 20)
+            return w.exchange.place("ben", "buy", item, 10, 20).fills[0].fee
+
+        base = sell_fee()                                        # ohne Marktplatz: volle Gebühr
+        self.assertGreater(base, 0)
+        s.found("anna", "moorufer", "Moorheim")
+        s.buy_plot("anna", "moorufer", 1)
+        self.assertEqual(s.fee_discount_permille("anna"), 0)
+        s.contribute("anna", "moorufer", "market_square", 800, {"timber@standard": 40})   # Stufe 1: 100 Promille Rabatt
+        self.assertEqual(s.fee_discount_permille("anna"), 100)
+        self.assertEqual(s.fee_discount_permille("ben"), 0)      # ohne Grundstück kein Rabatt
+        self.assertEqual(sell_fee(), base - base * 100 // 1000)
+        w.exchange.place("ben", "sell", item, 10, 20)           # Rabatt gilt nur für den Verkäufer
+        self.assertEqual(w.exchange.place("anna", "buy", item, 10, 20).fills[0].fee, base)
+
     def test_plot_limit_and_roundtrip(self):
         s, w = self.s, self.w
         for n in (1, 2, 4):

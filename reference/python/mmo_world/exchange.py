@@ -76,6 +76,7 @@ class Exchange:
         self.cee, self.inv, self.trading, self.mr, self.day, self.server_id = service, inventory, trading, rules, day_provider, server_id
         self.coin = trading.coin
         self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None  # Weltdienst setzt den Postausgang
+        self.fee_discount: Callable[[str], int] = lambda char: 0     # Rabatt auf die Gebühr in Promille je Verkäufer (Marktplatz, AP 29)
         self.orders: dict[str, dict[str, Any]] = {}
         self.stats: dict[str, dict[str, Any]] = {}
         self._counter = 0
@@ -214,6 +215,7 @@ class Exchange:
                                  (ESCROW, {}, {item_key: q, self.coin: q * buy["price"]})])
             raise
         fee = total * self.mr["fee_permille"] // 1000
+        fee -= fee * max(0, min(1000, self.fee_discount(sell["char"]))) // 1000
         if fee:
             self.inv.apply(sell["char"], {self.coin: fee}, {})
             self.inv.deposit(SINK, self.coin, fee)
