@@ -33,7 +33,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Aktives Elementmanagement im Kampf | vorhanden (neu) | AP 16, ADR-0055: Zauber je geprägtem Element, Wechselzeit 40 Ticks; Platzhalterwerte, Dreier-/Domänenskills offen |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
 | Action-Kampf, Telegraphen, Zustände | teilweise | 1:1-, Gruppen-, Mehrgegner-Kampf, Gegnerfähigkeiten (sim_rules_v7); **Raumkampf/Trefferzonen/PvP fehlen** |
-| Dungeons, Weltbosse, Raids | teilweise (neu) | 1 Dungeon (3 Etappen), Weltboss mit Mitkämpfern/Kiste, ADR-0048; Raids und echte Instanzen fehlen |
+| Dungeons, Weltbosse, Raids | teilweise (neu) | 1 Dungeon (3 Etappen), 1 Gildenraid (AP 18), Weltboss mit Mitkämpfern/Kiste, ADR-0048/0057; echte Instanzen fehlen |
 
 ## Welt, Wirtschaft, Gesellschaft (Teil IX–XIII)
 | Blueprint | Stand | Beleg / Lücke |
@@ -46,7 +46,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
 | Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte, Spezialisierung, Produktionsvorsprung offen |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
-| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Raids, Gildenforschung, Chat offen |
+| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (Trupp bis 4) seit AP 18 (ADR-0057); größere Raids, Chat, Client-Fenster dafür offen |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |
 | Weltchronik, Prestige | teilweise (neu) | Chronik mit Erstleistungen, Titel, Ruhmpunkte, Fenster (ADR-0052); seltene Inhalte offen |
 | Stadtpolitik | zurückgestellt | nicht bauen |

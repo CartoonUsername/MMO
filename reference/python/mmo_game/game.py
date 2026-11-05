@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v10.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v11.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -625,7 +625,7 @@ class GameServer:
     def _cmd_world(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
         R = self.R
         return {"regions": [{k: v for k, v in r.items() if k != "hint"} for r in self.regions],
-                "dungeons": {d: {"name": g["name"], "entrance": g["entrance"], "radius": g["radius"], "stages": len(g["stages"]), "region": g["region"]}
+                "dungeons": {d: {"name": g["name"], "entrance": g["entrance"], "radius": g["radius"], "stages": len(g["stages"]), "region": g["region"], "raid": bool(g.get("guild_raid"))}
                              for d, g in self.dungeon_rules.items()},
                 "world_bosses": {b: {"name": v["name"]} for b, v in self.boss_rules.items()}, "economy_news": self.economy_news}
 
@@ -641,10 +641,24 @@ class GameServer:
         if _dist2(me["pos"], tuple(dg["entrance"])) > dg["radius"] ** 2:
             raise _Err("rejected", "Du bist nicht am Eingang")
         group = [char]
-        view = self.world.parties.view(char)
-        if view is not None:
-            group += [m for m in view["members"] if m != char and m in self.players and m not in self.fight_of and m not in self.dungeon_of
+        raid = dg.get("guild_raid")
+        gid = self.world.guilds.member_of.get(char)
+        if raid:                                                 # Gildenraid (AP 18): nur Mitglieder derselben Gilde
+            if gid is None:
+                raise _Err("rejected", "Raids sind nur mit einer Gilde möglich")
+            guild = self.world.guilds.guilds[gid]
+            group += [m for m in sorted(guild["members"]) if m != char and m in self.players and m not in self.fight_of and m not in self.dungeon_of
                       and _dist2(self.players[m]["pos"], tuple(dg["entrance"])) <= dg["radius"] ** 2]
+            if len(group) < raid["min_members"]:
+                raise _Err("rejected", f"Für diesen Raid braucht ihr mindestens {raid['min_members']} Gildenmitglieder am Eingang")
+            cap = raid["daily_entries_per_guild"] + self.world.guilds.bonus(guild, "raid_entries")
+            if self.daily.get(f"guild:{gid}|raid:{did}", 0) >= cap:
+                raise _Err("rejected", "Eure Gilde hat heute keinen Raid-Zutritt mehr")
+        else:
+            view = self.world.parties.view(char)
+            if view is not None:
+                group += [m for m in view["members"] if m != char and m in self.players and m not in self.fight_of and m not in self.dungeon_of
+                          and _dist2(self.players[m]["pos"], tuple(dg["entrance"])) <= dg["radius"] ** 2]
         group = group[: self.sim["group"]["max_party"]]
         for m in group:
             why = self._access(m, self._region_at(tuple(dg["entrance"])))
@@ -654,9 +668,12 @@ class GameServer:
                 raise _Err("rejected", f"{m} hat heute keine Dungeon-Zutritte mehr")
         for m in group:
             self.daily[f"{m}|dungeon:{did}"] = self.daily.get(f"{m}|dungeon:{did}", 0) + 1
+        if raid:
+            self.daily[f"guild:{gid}|raid:{did}"] = self.daily.get(f"guild:{gid}|raid:{did}", 0) + 1
         self._dungeon_counter += 1
         rid = f"dng-{self._dungeon_counter:05d}"
-        self.dungeons[rid] = {"id": rid, "dungeon": did, "name": dg["name"], "chars": group, "stage": -1, "stages_total": len(dg["stages"]), "next_at": self.tick_no + 5}
+        self.dungeons[rid] = {"id": rid, "dungeon": did, "name": dg["name"], "chars": group, "stage": -1, "stages_total": len(dg["stages"]), "next_at": self.tick_no + 5,
+                              "guild": gid if raid else None}
         for m in group:
             self.dungeon_of[m] = rid
             self.players[m]["immune_until"] = self.tick_no + 10 ** 6       # Karten-Gegner lassen Durchläufe in Ruhe
@@ -703,6 +720,16 @@ class GameServer:
                         for k, q in dg["chest"].items():
                             self.world.inv.deposit(c, k, q)
                         self._emit_to(c, {"ev": "dungeon", "state": "chest", "items": dict(dg["chest"])})
+            if run.get("guild") and dg.get("guild_raid"):                # Gildenraid: Zahlung in die Gildenkasse (Gildenforschung erhöht sie)
+                guild = self.world.guilds.guilds.get(run["guild"])
+                if guild is not None:
+                    pm = 1000 + self.world.guilds.bonus(guild, "raid_treasury_permille")
+                    pay = {k: q * pm // 1000 for k, q in dg["guild_raid"]["treasury_chest"].items()}
+                    for k, q in pay.items():
+                        self.world.inv.deposit(self.world.guilds.treasury(guild["id"]), k, q)
+                    self.world.guilds._log(guild, "raid_cleared", f["chars"][0], raid=dg["name"])
+                    for c in f["chars"]:
+                        self._emit_to(c, {"ev": "dungeon", "state": "guild_chest", "items": pay})
             self._dungeon_end(rid, "cleared")
 
     def _dungeon_end(self, rid: str, why: str) -> None:
@@ -711,7 +738,10 @@ class GameServer:
             return
         dg = self.R["dungeons"][run["dungeon"]]
         if why == "cleared":
-            self._chron("dungeon_cleared", list(run["chars"]), f"dungeon:{run['dungeon']}", "dungeon", name=dg["name"])
+            if dg.get("guild_raid"):
+                self._chron("raid_cleared", list(run["chars"]), f"raid:{run['dungeon']}", "raid", name=dg["name"])
+            else:
+                self._chron("dungeon_cleared", list(run["chars"]), f"dungeon:{run['dungeon']}", "dungeon", name=dg["name"])
         for c in run["chars"]:
             if self.dungeon_of.get(c) == rid:
                 del self.dungeon_of[c]

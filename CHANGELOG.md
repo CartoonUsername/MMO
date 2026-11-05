@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unveröffentlicht] – 2026-11-05
+- AP 18: Gildenforschung und Gilden-Raid (community_rules_v2, game_rules_v11, ADR-0057), Befehl `guild.research`.
 - AP 17: Kampfwirkung der Echos (echo_rules_v2, ADR-0056).
 - AP 16: Elementmanagement im Kampf (sim_rules_v9, game_rules_v10, ADR-0055), `game.elements`.
 - Teil XIX (GitHub-Übernahme): `MMORPG_MASTER_BLUEPRINT.md` im Root, `CLAUDE.md`, `CHANGELOG.md`, `docs/DECISIONS_AND_OPEN_QUESTIONS.md`.

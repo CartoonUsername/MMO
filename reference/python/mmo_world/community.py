@@ -17,7 +17,7 @@ from .errors import WorldError
 from .inventory import Inventory
 
 
-def load_community_rules(name: str = "community_rules_v1.json") -> dict[str, Any]:
+def load_community_rules(name: str = "community_rules_v2.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_world").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -34,6 +34,15 @@ def validate_community_rules(r: dict[str, Any]) -> None:
         raise WorldError("community_rules: member_cap passt nicht zu den Gildenhaus-Stufen")
     if g["roles"][0] != "leader":
         raise WorldError("community_rules: erste Rolle muss leader sein")
+    res = g.get("research")
+    if res is not None:
+        for tid, tech in res["techs"].items():
+            if not tech["cost"] or any(not _is_int(q) or q <= 0 for q in tech["cost"].values()) or not _is_int(tech["days"]) or tech["days"] < 1:
+                raise WorldError(f"community_rules.guild.research.{tid} ungültig")
+            if tech["requires"] is not None and tech["requires"] not in res["techs"]:
+                raise WorldError(f"community_rules.guild.research.{tid}: unbekannte Voraussetzung")
+            if not tech["effect"] or any(not _is_int(v) or v <= 0 for v in tech["effect"].values()):
+                raise WorldError(f"community_rules.guild.research.{tid}: Wirkung ungültig")
     for k, v in r["chronicle"]["kinds"].items():
         if not _is_int(v["prestige"]) or v["prestige"] < 0:
             raise WorldError(f"community_rules.chronicle.{k} ungültig")
@@ -133,7 +142,56 @@ class GuildService:
         return g
 
     def capacity(self, g: dict[str, Any]) -> int:
-        return self.R["house"]["member_cap"][g["house"]["level"]]
+        return self.R["house"]["member_cap"][g["house"]["level"]] + self.bonus(g, "member_cap")
+
+    # -- Gildenforschung (AP 18, ADR-0057) -----------------------------------------------
+    def _res(self, g: dict[str, Any]) -> dict[str, Any]:
+        return g.setdefault("research", {"done": [], "active": None})
+
+    def _settle(self, g: dict[str, Any]) -> None:
+        """Eine laufende Forschung gilt ab ihrem Fertigstellungstag als abgeschlossen (kein Zeitgeber nötig)."""
+        r = self._res(g)
+        a = r["active"]
+        if a and self.day() >= a["ready_day"]:
+            r["done"].append(a["tech"])
+            r["active"] = None
+            self._log(g, "research_done", a["by"], tech=a["tech"])
+
+    def bonus(self, g: dict[str, Any], key: str) -> int:
+        res = self.R.get("research")
+        if not res:
+            return 0
+        self._settle(g)
+        return sum(res["techs"][t]["effect"].get(key, 0) for t in g["research"]["done"] if t in res["techs"])
+
+    def research_start(self, char: str, tech: str) -> dict[str, Any]:
+        g = self._need_role(char, "leader", "officer")
+        res = self.R.get("research")
+        if not res or tech not in res["techs"]:
+            raise WorldError("Unbekannte Gildenforschung")
+        spec = res["techs"][tech]
+        self._settle(g)
+        r = self._res(g)
+        if tech in r["done"]:
+            raise WorldError("Schon erforscht")
+        if r["active"]:
+            raise WorldError("Es läuft schon eine Forschung")
+        if spec["requires"] and spec["requires"] not in r["done"]:
+            raise WorldError(f"Voraussetzung fehlt: {res['techs'][spec['requires']]['name']}")
+        self.inv.apply(self.treasury(g["id"]), dict(spec["cost"]), {})          # Kosten aus der Gildenkasse (Senke)
+        r["active"] = {"tech": tech, "ready_day": self.day() + spec["days"], "by": char}
+        self._log(g, "research_start", char, tech=tech)
+        return {"tech": tech, "ready_day": r["active"]["ready_day"]}
+
+    def research_view(self, g: dict[str, Any]) -> dict[str, Any] | None:
+        res = self.R.get("research")
+        if not res:
+            return None
+        self._settle(g)
+        r = self._res(g)
+        return {"techs": [{"id": tid, "name": s["name"], "cost": s["cost"], "days": s["days"], "requires": s["requires"], "effect": s["effect"],
+                           "status": "done" if tid in r["done"] else "active" if r["active"] and r["active"]["tech"] == tid else "open"}
+                          for tid, s in res["techs"].items()], "active": r["active"]}
 
     def found(self, char: str, name: str, tag: str) -> str:
         if char in self.member_of:
@@ -306,7 +364,7 @@ class GuildService:
                 nxt = {k: {"need": q, "have": h["have"].get(k, 0)} for k, q in need.items()}
             mine = {"id": gid, "name": g["name"], "tag": g["tag"], "role": g["members"][char], "founded": g["founded"], "points": g["points"],
                     "members": [{"char": m, "role": r, "contributed": g["contrib"].get(m, 0)} for m, r in sorted(g["members"].items())],
-                    "capacity": self.capacity(g), "house": {"level": h["level"], "max": len(levels), "next": nxt},
+                    "capacity": self.capacity(g), "house": {"level": h["level"], "max": len(levels), "next": nxt}, "research": self.research_view(g),
                     "treasury": self.inv.holdings(self.treasury(gid)) if g["members"][char] in ("leader", "officer") else None, "log": g["log"][-15:]}
         return {"mine": mine, "invites": [{"id": i, "name": self.guilds[i]["name"], "tag": self.guilds[i]["tag"]} for i in self.invites.get(char, []) if i in self.guilds],
                 "found_cost": self.R["found_cost"], "coins": self.inv.balance(char, self.coin),

@@ -156,6 +156,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `guild.kick` | char:s, target:s | char | schreibend | default |
 | `guild.role` | char:s, target:s, role:s | char | schreibend | default |
 | `guild.disband` | char:s | char | schreibend | default |
+| `guild.research` | char:s, tech:s | char | schreibend | default |
 | `guild.stash` | char:s, item_key:s, qty:i | char | schreibend | default |
 | `guild.take` | char:s, item_key:s, qty:i | char | schreibend | default |
 | `guild.contribute` | char:s, coins?:i, item_key?:s, qty?:i | char | schreibend | default |
