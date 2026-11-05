@@ -187,7 +187,7 @@ function onMessage(m){
     case"region_blocked":log("🔒 "+m.name+": "+m.reason,"e");break;
     case"world_boss":log("🌍 Weltboss "+m.name+(m.state==="spawned"?" ist erschienen"+(m.region?" in "+m.region:"")+"!":" wurde besiegt"+((m.by||[]).length?" von "+m.by.join(", "):"")+"!"),"g");beep(m.state==="spawned"?330:660,.2,"sawtooth");break;
     case"world_boss_chest":log("🎁 Weltboss-Kiste: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "),"g");refreshInv();break;
-    case"dungeon":log(m.state==="entered"?"🕳 Dungeon "+m.name+" betreten ("+m.stages+" Etappen, Gruppe: "+m.party.join(", ")+")":m.state==="stage"?"🕳 Etappe "+m.stage+"/"+m.stages+": "+m.title:m.state==="chest"?"🎁 Dungeon-Kiste: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "):m.state==="cleared"?"✅ Dungeon abgeschlossen: "+m.name:"❌ Dungeon beendet ("+m.state+")",m.state==="failed"?"e":"g");if(m.state==="chest")refreshInv();break;
+    case"dungeon":log(m.state==="entered"?"🕳 Dungeon "+m.name+" betreten ("+m.stages+" Etappen, Gruppe: "+m.party.join(", ")+")":m.state==="stage"?"🕳 Etappe "+m.stage+"/"+m.stages+": "+m.title:m.state==="chest"?"🎁 Dungeon-Kiste: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "):m.state==="guild_chest"?"🏰 Gildenkasse: "+Object.entries(m.items).map(([k,v])=>v+"× "+k.split("@")[0]).join(", "):m.state==="cleared"?"✅ Dungeon abgeschlossen: "+m.name:"❌ Dungeon beendet ("+m.state+")",m.state==="failed"?"e":"g");if(m.state==="chest")refreshInv();break;
     case"poi":log("🔎 Hinweis gefunden: "+m.name,"g");floatText((ents.get("me")||{x:0}).x,(ents.get("me")||{y:0}).y,"🔎 "+m.name,"#ffd166");refreshWins();beep(880,.1,"triangle");break;
     case"notify":log("Nachricht: "+notifyText(m.item));refreshWins();refreshInv();break;
     case"error":log("Fehler: "+(m.message||m.code),"e");break;
@@ -295,12 +295,17 @@ async function refreshGuild(){
   if(off){const a=el("div","","row2"),n=textInput("Figur einladen"),b=el("button","Einladen");b.onclick=()=>done("guild.invite",{target:n.value.trim()},"Eingeladen");a.append(n,b);box.appendChild(a)}
   sect(box,"Gildenhaus Stufe "+g.house.level+"/"+g.house.max);
   if(g.house.next){box.appendChild(li(Object.entries(g.house.next).map(([k,x])=>k.split("@")[0]+" "+x.have+"/"+x.need).join(", "),[["Beitragen",()=>{const k=prompt("Was? Münzen: coin@gold, sonst z. B. timber@standard",Object.keys(g.house.next)[0]);const q=parseInt(prompt("Menge"),10);if(k&&q)done("guild.contribute",k==="coin@gold"?{coins:q}:{item_key:k,qty:q},"Beigetragen")}]]))}
+  if(g.research){sect(box,"Gildenforschung");const act=g.research.active;
+    for(const tc of g.research.techs){const eff=Object.entries(tc.effect).map(([k,x])=>({raid_entries:"+"+x+" Raid-Zutritt/Tag",member_cap:"+"+x+" Mitglieder",raid_treasury_permille:"+"+(x/10)+" % Raid-Kasse"})[k]||k).join(", "),cost=Object.entries(tc.cost).map(([k,x])=>x+" "+k.split("@")[0]).join(", ");
+      const st=tc.status==="done"?"erforscht":tc.status==="active"?"läuft bis Tag "+act.ready_day:"offen";
+      const btns=(off&&tc.status==="open"&&!act)?[["Erforschen",()=>{if(confirm(tc.name+" aus der Gildenkasse erforschen? Kosten: "+cost))done("guild.research",{tech:tc.id},"Forschung gestartet")}]]:[];
+      box.appendChild(li(tc.name+" ("+eff+") · "+cost+" · "+tc.days+" Tage · "+st,btns))}}
   if(g.treasury){sect(box,"Kasse");for(const [k,q] of Object.entries(g.treasury))kv(box,k,q)}
   const d=el("div","","row2"),ik=textInput("Ware, z. B. coin@gold"),iq=numInput("Menge",100),bd=el("button","Einzahlen");bd.onclick=()=>done("guild.stash",{item_key:ik.value.trim(),qty:parseInt(iq.value,10)||0},"Eingezahlt");d.append(ik,iq,bd);box.appendChild(d);
   if(off){const w=el("button","Auszahlen");w.onclick=()=>done("guild.take",{item_key:ik.value.trim(),qty:parseInt(iq.value,10)||0},"Ausgezahlt");box.appendChild(w)}
   const lv=el("button",lead?"Gilde auflösen":"Gilde verlassen");lv.onclick=()=>{if(confirm(lead?"Gilde auflösen? Die Kasse geht an dich.":"Gilde verlassen?"))done(lead?"guild.disband":"guild.leave",{},"Erledigt")};box.appendChild(lv)
 }
-const CHRON_TXT={settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name};
+const CHRON_TXT={settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name,raid_cleared:e=>"bezwang als Erste den Raid "+e.data.name};
 async function refreshChron(){
   const box=$("chronBox");box.textContent="";
   const p=await call("query.prestige",{});if(p.ok){kv(box,"Ruhmpunkte",p.result.points);const ts=p.result.titles.map(t=>t.name).concat(p.result.research_titles);box.appendChild(el("div","Titel: "+(ts.length?ts.join(", "):"noch keine"),"hint"))}
@@ -372,6 +377,9 @@ async function refreshEcho(){
   const r=await call("query.echoes",{});if(!r.ok){$("echoBox").textContent=errMsg(r);return}
   const v=r.result,box=$("echoBox");box.textContent="";const inv=(await call("query.inventory",{})).result||{};
   const have=k=>inv[k]||0;kv(box,"Resonanzstaub / Schutzsteine / Siegel",have(v.items.dust)+" / "+have(v.items.protect)+" / "+have(v.items.seal));
+  const cb=v.combat;if(cb){const FX={heavy_damage_permille:"Wuchtschlag",light_damage_permille:"Hieb",damage_taken_permille:"erlittener Schaden",block_damage_permille:"Blockschaden",dodge_cost_delta:"Ausweichkosten"};
+    const parts=Object.entries(cb.effects).map(([k,x])=>k.endsWith("permille")?(FX[k]||k)+" "+(x>=1000?"+":"")+((x-1000)/10).toFixed(1).replace(".",",")+" %":(FX[k]||k)+" "+x);
+    sect(box,"Wirkung im Kampf");box.appendChild(el("div",parts.length?parts.join(" · "):"Keine ausgerüstete Tradition mit Resonanz.","hint"));if(cb.abilities.length)kv(box,"Freigeschaltete Fähigkeiten",cb.abilities.join(", "))}
   if(!v.echoes.length)box.appendChild(el("div","Noch kein Kampfecho – besiege starke Gegner (z. B. den Alpha-Wolf).","hint"));
   const lo=v.loadout;
   for(const e of v.echoes){sect(box,e.name+" +"+e.resonance);
@@ -465,6 +473,8 @@ async function refreshChar(){
   if(!aff.length)box.appendChild(el("div","Noch keine Prägung – Elemente entstehen aus deinen Handlungen (Kampf, Herstellen, Entdecken).","hint"));
   for(const [k,v] of aff.sort((a,b)=>b[1]-a[1])){barRow(box,(ELEM_NAME[k]||k)+(c.elements.attuned.includes(k)?" ✔ geprägt":""),v,100,"nd");
     if(v>=100&&!c.elements.attuned.includes(k)){const b=el("button","Prägen: "+(ELEM_NAME[k]||k));b.onclick=async()=>{if(!confirm("Element „"+(ELEM_NAME[k]||k)+"“ dauerhaft prägen?"))return;await act("charMsg","game.attune",{element:k},"Element geprägt");refreshChar()};box.appendChild(b)}}
+  const em=await call("game.elements",{});if(em.ok&&em.result.attuned.length){sect(box,"Kampfzauber (Elementmanagement)");for(const k of em.result.attuned)kv(box,ELEM_NAME[k]||k,(SKILL[em.result.casts[k]]||[em.result.casts[k]])[0]);
+    box.appendChild(el("div","Im Kampf kostet der Wechsel zu einem anderen Element "+(em.result.switch_ticks/10).toFixed(1)+" s; derselbe Zauber geht sofort wieder (nach Abklingzeit).","hint"));refreshKit().catch(()=>{})}
   const pr=Object.entries(c.professions);sect(box,"Berufe");
   if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
   for(const [k,v] of pr.sort((a,b)=>b[1]-a[1])){kv(box,PROF_NAME[k]||k,v+" EP");const pd=(c.profession_detail||{})[k];
@@ -511,7 +521,7 @@ function hud(){if(!state)return;const y=state.you;$("me").textContent=y.char+" �
 let worldInfo=null;
 async function loadWorld(){const r=await call("game.world",{});if(r.ok)worldInfo=r.result}
 function nearDungeon(){if(!worldInfo||!state||state.you.fight||state.you.dungeon)return null;for(const[id,d]of Object.entries(worldInfo.dungeons)){if(Math.hypot(d.entrance[0]-state.you.pos[0],d.entrance[1]-state.you.pos[1])<=d.radius)return id}return null}
-function dungeonBtn(){const id=nearDungeon(),b=$("bDungeon");b.style.display=id?"":"none";if(id)b.textContent="Dungeon betreten: "+worldInfo.dungeons[id].name}
+function dungeonBtn(){const id=nearDungeon(),b=$("bDungeon");b.style.display=id?"":"none";if(id)b.textContent=(worldInfo.dungeons[id].raid?"Gildenraid betreten: ":"Dungeon betreten: ")+worldInfo.dungeons[id].name}
 function tele(){const t=teleNow;$("tele").textContent=t?"⚠ "+t.ability+" – wirkt in "+t.ticks+" Ticks. Antwort: "+(t.answers||[]).join(", "):""}
 function fightUi(){
   const v=fight.view,o=$("opps");o.textContent="";
@@ -524,7 +534,9 @@ function fightUi(){
 // ---------- Skill-Leiste (AP 1): Tasten, Abklingzeiten, Ausdauer, Effekte. Der Server entscheidet; der Client zeigt und sendet Absichten ----------
 const SKILL={light:["Hieb","⚔"],heavy:["Wuchtschlag","🔨"],stun:["Betäuben","💫"],slow:["Verlangsamen","❄"],cast_ember:["Glutstoß","🔥"],heal:["Heilen","✚"],shield:["Schutz","🛡"],
   dash:["Satz","💨"],veil:["Schleier","🌑"],focus_surge:["Fokus","✨"],sweep:["Rundumschlag","⟳"],dodge:["Ausweichen","↯"],block:["Blocken","◧"],flee:["Fliehen","🏃"]};
-const SLOT_KEYS=["1","2","3","4","5","6","7","8","9","0","q"];
+Object.assign(SKILL,{cast_water:["Wasserschwall","💧"],cast_earth:["Felsbrocken","🪨"],cast_nature:["Dornenranke","🌿"],cast_electric:["Blitzschlag","⚡"],cast_ice:["Eissplitter","🧊"],cast_wind:["Windstoß","🌪"],cast_light:["Lichtlanze","☀"],cast_shadow:["Schattenpfeil","☾"]});
+const ELEM_COLOR={ember:"#ff7a2f",water:"#4aa8ff",earth:"#a07850",nature:"#5fd68a",electric:"#ffe14a",ice:"#9fe8ff",wind:"#cfe8e0",light:"#fff3b0",shadow:"#8a5fd6"};
+const SLOT_KEYS=["1","2","3","4","5","6","7","8","9","0","q","r","f","g","z","x","c","v"];
 let kit=[],kitStamina=100,cdState={},busyUntil=0,stamNow=100,stunnedNow=false,fx=[];
 async function refreshKit(){const r=await call("game.kit",{});if(r.ok){kit=r.result.commands;kitStamina=r.result.stamina_max;buildBar()}}
 function buildBar(){
@@ -569,13 +581,14 @@ function drawFx(g,sx,sy,k,dt){
   const K=k*1.8;
   for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.age+=dt;if(f.age>f.dur){fx.splice(i,1);continue}const u=f.age/f.dur,X=sx(f.x),Y=sy(f.y),TX=sx(f.tx),TY=sy(f.ty),a=1-u;g.save();g.globalAlpha=a;g.lineWidth=4;
     const ang=Math.atan2(TY-Y,TX-X);
-    switch(f.cmd){
+    const ec=f.cmd.startsWith("cast_")&&f.cmd!=="cast_ember"?ELEM_COLOR[f.cmd.slice(5)]:null;switch(ec?"cast_elem":f.cmd){
       case"light":g.strokeStyle="#fff";g.beginPath();g.arc(X,Y,70*K,ang-.9+u*1.8,ang-.3+u*1.8);g.stroke();break;
       case"heavy":g.strokeStyle="#ffb347";g.lineWidth=8;g.beginPath();g.arc(X,Y,95*K,ang-1.2+u*2.4,ang-.4+u*2.4);g.stroke();break;
       case"sweep":g.strokeStyle="#ffd166";g.lineWidth=6;g.beginPath();g.arc(X,Y,(60+u*140)*K,0,7);g.stroke();break;
       case"stun":g.fillStyle="#d9b8ff";g.font="bold 26px system-ui";g.textAlign="center";g.fillText("✦",TX,TY-40*K-u*20);g.strokeStyle="#c79bff";g.beginPath();g.arc(TX,TY,(30+u*60)*K,0,7);g.stroke();break;
       case"slow":g.strokeStyle="#7fd6ff";g.beginPath();g.arc(TX,TY,(30+u*70)*K,0,7);g.stroke();break;
       case"cast_ember":{const px=X+(TX-X)*Math.min(1,u*1.6),py=Y+(TY-Y)*Math.min(1,u*1.6);g.fillStyle="#ff7a2f";g.beginPath();g.arc(px,py,14*K+4,0,7);g.fill();g.fillStyle="#ffd166";g.beginPath();g.arc(px,py,6*K+2,0,7);g.fill();break}
+      case"cast_elem":{const px=X+(TX-X)*Math.min(1,u*1.6),py=Y+(TY-Y)*Math.min(1,u*1.6);g.fillStyle=ec;g.beginPath();g.arc(px,py,14*K+4,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(px,py,8*K+2,0,7);g.stroke();break}
       case"heal":g.strokeStyle="#5fd68a";g.beginPath();g.arc(X,Y,(40+u*50)*K,0,7);g.stroke();g.fillStyle="#5fd68a";g.font="bold 22px system-ui";g.textAlign="center";g.fillText("+",X,Y-50*K-u*30);break;
       case"shield":g.strokeStyle="#6ab7ff";g.lineWidth=5;g.beginPath();g.arc(X,Y,55*K,0,7);g.stroke();break;
       case"block":g.strokeStyle="#9fb4cc";g.lineWidth=7;g.beginPath();g.arc(X,Y,50*K,ang-.8,ang+.8);g.stroke();break;

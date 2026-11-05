@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unveröffentlicht] – 2026-11-05
+- AP 20: Client-Fenster für Elementzauber, Echo-Wirkung, Gildenforschung und Raid (ADR-0059).
 - AP 19: Kampfgruppen bis 8 für Raids und Weltbosse (sim_rules_v10, game_rules_v12, ADR-0058).
 - AP 18: Gildenforschung und Gilden-Raid (community_rules_v2, game_rules_v11, ADR-0057), Befehl `guild.research`.
 - AP 17: Kampfwirkung der Echos (echo_rules_v2, ADR-0056).
