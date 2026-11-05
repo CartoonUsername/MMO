@@ -48,3 +48,23 @@ class WebClient(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ComboLabels(unittest.TestCase):
+    """AP 27: Kombinationszauber haben lesbare Namen in der Skill-Leiste und im Elementfenster."""
+    def test_combo_labels_wired(self):
+        for needle in ("function skillOf(", 'cmd.startsWith("combo_")', "skillOf(c.cmd)", "em.result.combos"):
+            self.assertIn(needle, HTML, needle)
+        self.assertNotIn('SKILL[c.cmd]||[c.cmd,"•"]', HTML)
+
+    def test_label_logic_in_node(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node nicht installiert")
+        m = re.search(r"function skillOf\(.*?\}\n", HTML, re.S)
+        self.assertIsNotNone(m)
+        js = ('const SKILL={light:["Hieb","x"]};const ELEM_NAME={earth:"Erde",water:"Wasser",fire:"Feuer"};' + m.group(0)
+              + 'console.log(JSON.stringify([skillOf("light"),skillOf("combo_earth_water"),skillOf("combo_earth_fire_water"),skillOf("zz")]))')
+        r = subprocess.run([node, "-e", js], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout.strip(), '[["Hieb","x"],["Erde+Wasser","✦"],["Erde+Feuer+Wasser","✹"],["zz","•"]]')

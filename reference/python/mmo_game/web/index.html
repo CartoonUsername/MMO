@@ -473,7 +473,7 @@ async function refreshChar(){
   if(!aff.length)box.appendChild(el("div","Noch keine Prägung – Elemente entstehen aus deinen Handlungen (Kampf, Herstellen, Entdecken).","hint"));
   for(const [k,v] of aff.sort((a,b)=>b[1]-a[1])){barRow(box,(ELEM_NAME[k]||k)+(c.elements.attuned.includes(k)?" ✔ geprägt":""),v,100,"nd");
     if(v>=100&&!c.elements.attuned.includes(k)){const b=el("button","Prägen: "+(ELEM_NAME[k]||k));b.onclick=async()=>{if(!confirm("Element „"+(ELEM_NAME[k]||k)+"“ dauerhaft prägen?"))return;await act("charMsg","game.attune",{element:k},"Element geprägt");refreshChar()};box.appendChild(b)}}
-  const em=await call("game.elements",{});if(em.ok&&em.result.attuned.length){sect(box,"Kampfzauber (Elementmanagement)");for(const k of em.result.attuned)kv(box,ELEM_NAME[k]||k,(SKILL[em.result.casts[k]]||[em.result.casts[k]])[0]);
+  const em=await call("game.elements",{});if(em.ok&&em.result.attuned.length){sect(box,"Kampfzauber (Elementmanagement)");for(const k of em.result.attuned)kv(box,ELEM_NAME[k]||k,(SKILL[em.result.casts[k]]||[em.result.casts[k]])[0]);for(const [cmd,els] of Object.entries(em.result.combos||{}))kv(box,els.map(e=>ELEM_NAME[e]||e).join(" + "),skillOf(cmd)[0]+" ("+(els.length===3?"Dreier":"Paar")+")");
     box.appendChild(el("div","Im Kampf kostet der Wechsel zu einem anderen Element "+(em.result.switch_ticks/10).toFixed(1)+" s; derselbe Zauber geht sofort wieder (nach Abklingzeit).","hint"));refreshKit().catch(()=>{})}
   const pr=Object.entries(c.professions);sect(box,"Berufe");
   if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
@@ -535,13 +535,14 @@ function fightUi(){
 const SKILL={light:["Hieb","⚔"],heavy:["Wuchtschlag","🔨"],stun:["Betäuben","💫"],slow:["Verlangsamen","❄"],cast_ember:["Glutstoß","🔥"],heal:["Heilen","✚"],shield:["Schutz","🛡"],
   dash:["Satz","💨"],veil:["Schleier","🌑"],focus_surge:["Fokus","✨"],sweep:["Rundumschlag","⟳"],dodge:["Ausweichen","↯"],block:["Blocken","◧"],flee:["Fliehen","🏃"]};
 Object.assign(SKILL,{cast_water:["Wasserschwall","💧"],cast_earth:["Felsbrocken","🪨"],cast_nature:["Dornenranke","🌿"],cast_electric:["Blitzschlag","⚡"],cast_ice:["Eissplitter","🧊"],cast_wind:["Windstoß","🌪"],cast_light:["Lichtlanze","☀"],cast_shadow:["Schattenpfeil","☾"]});
+function skillOf(cmd){if(SKILL[cmd])return SKILL[cmd];if(cmd.startsWith("combo_")){const p=cmd.slice(6).split("_");return[p.map(e=>ELEM_NAME[e]||e).join("+"),p.length===3?"✹":"✦"]}return[cmd,"•"]}
 const ELEM_COLOR={ember:"#ff7a2f",water:"#4aa8ff",earth:"#a07850",nature:"#5fd68a",electric:"#ffe14a",ice:"#9fe8ff",wind:"#cfe8e0",light:"#fff3b0",shadow:"#8a5fd6"};
 const SLOT_KEYS=["1","2","3","4","5","6","7","8","9","0","q","r","f","g","z","x","c","v"];
 let kit=[],kitStamina=100,cdState={},busyUntil=0,stamNow=100,stunnedNow=false,fx=[];
 async function refreshKit(){const r=await call("game.kit",{});if(r.ok){kit=r.result.commands;kitStamina=r.result.stamina_max;buildBar()}}
 function buildBar(){
   const w=$("skillbar");w.textContent="";
-  kit.forEach((c,i)=>{const [n,ic]=SKILL[c.cmd]||[c.cmd,"•"],b=document.createElement("button");b.className="slot "+c.kind;b.id="slot-"+c.cmd;
+  kit.forEach((c,i)=>{const [n,ic]=skillOf(c.cmd),b=document.createElement("button");b.className="slot "+c.kind;b.id="slot-"+c.cmd;
     b.title=n+" · Ausdauer "+c.cost+" · Abklingzeit "+(c.cooldown/10).toFixed(1)+" s · Sperre "+(c.busy/10).toFixed(1)+" s";
     b.innerHTML='<span class="k"></span><span class="co"></span><span class="ic"></span><span class="nm"></span><span class="cd"></span><span class="cdt"></span>';
     b.querySelector(".k").textContent=SLOT_KEYS[i]||"";b.querySelector(".co").textContent=c.cost?String(c.cost):"";b.querySelector(".ic").textContent=ic;b.querySelector(".nm").textContent=n;
