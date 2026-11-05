@@ -43,7 +43,7 @@ PARTY_RULES = "party_rules_v1.json"
 ECHO_RULES = "echo_rules_v2.json"
 EQUIPMENT_RULES = "equipment_rules_v1.json"
 BRANCH_RULES = "branch_rules_v1.json"
-SETTLEMENT_RULES = "settlement_rules_v1.json"
+SETTLEMENT_RULES = "settlement_rules_v2.json"      # v2: Marktplatz-Rabatt 250/500 ‰ (ADR-0067); v1 bleibt erhalten
 RESEARCH_RULES = "research_rules_v1.json"
 COMMUNITY_RULES = "community_rules_v2.json"
 

@@ -11,6 +11,7 @@
 - AP 29: Marktplatz senkt die Börsengebühr des Verkäufers (ADR-0066); noch nicht deployt.
 - AP 30: Siedlungsabfrage liefert den eigenen Marktrabatt (`fee_discount_permille`); Browser-Client zeigt ihn und lesbare Ortswirkungen. Unity zeigt die Abfrage generisch; noch nicht deployt.
 - Balancing-Rechnung zum Marktplatz-Rabatt (docs/BALANCE_MARKET_SQUARE.md): Wirkung vermutlich zu schwach, keine Regeländerung.
+- AP 31: settlement_rules_v2, Marktplatz-Rabatt 250/500 ‰ (ADR-0067); noch nicht deployt.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

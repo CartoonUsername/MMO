@@ -18,4 +18,4 @@ Zum Vergleich: Eine Order über 10 Eisenbarren bei Referenzpreis 20 sind 200 Mü
   3. Stattdessen mehr offene Orders (`max_open_orders` +2 je Stufe), was für Händler spürbarer ist.
 - Empfehlung: Option 1 plus Messung per Bot, bevor weiter gedreht wird. Gebühren bleiben eine Münzsenke, daher kein Risiko für die Wirtschaft.
 
-Status: **offen**, keine Regeländerung vorgenommen.
+Status: Option 1 umgesetzt als settlement_rules_v2 (ADR-0067); keine Bot-Messung.
