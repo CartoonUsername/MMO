@@ -35,7 +35,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v15.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v16.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -870,6 +870,10 @@ class GameServer:
                         chars.append(m)
         chars = chars[: self.sim["group"]["max_party"]]
         specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars}, {c: self._sim_gear(c) for c in chars})
+        for c, sp in zip(chars, specs):                               # Klassenwirkung der Kombinationen (AP 24)
+            cls = self.world.svc.state(c).parts["identity"]["base_class"]
+            if cls in self.sim.get("combo_classes", {}):
+                sp["class"] = cls
         types = [e["type"] for e in pack]
         # Fähigkeiten: feste der Vorlage plus Baukasten je Spawn-Punkt und Tag (reproduzierbar, ADR-0032/0033)
         abilities = [roll_abilities(self.sim, e["type"], e["id"], self.world.day[0]) for e in pack] if "enemy_abilities" in self.sim else None

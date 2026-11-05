@@ -33,6 +33,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Aktives Elementmanagement im Kampf | vorhanden (neu) | AP 16, ADR-0055: Zauber je geprägtem Element, Wechselzeit 40 Ticks; Platzhalterwerte, Dreier-/Domänenskills offen |
 | Kombinationszauber (Paar, Dreier) im Kampf | vorhanden (neu) | AP 22, ADR-0061: 36 Paar- und 84 Dreierzauber, bester Elementfaktor, keine Wechselzeit; Domänen-/Klassenwirkung offen, Client ungeprüft |
 | Bereichswirkung der Kombinationen | vorhanden (neu) | AP 23, ADR-0062: Kontrolle verlangsamt, Schutz mindert Schaden, Beistand gibt Ausdauer; Klassenumsetzung offen |
+| Klassenwirkung der Kombinationen | vorhanden (neu) | AP 24, ADR-0063: Krieger stärkerer Schutz, Bogenschütze längere Verlangsamung, Schamane mehr Ausdauer |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
 | Action-Kampf, Telegraphen, Zustände | teilweise | 1:1-, Gruppen-, Mehrgegner-Kampf, Gegnerfähigkeiten (sim_rules_v7); **Raumkampf/Trefferzonen/PvP fehlen** |
 | Dungeons, Weltbosse, Raids | teilweise (neu) | 1 Dungeon (3 Etappen), 1 Gildenraid (AP 18, bis 8 Spieler seit AP 19), Weltboss mit Mitkämpfern/Kiste, ADR-0048/0057/0058; echte Instanzen fehlen |

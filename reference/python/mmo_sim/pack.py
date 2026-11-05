@@ -220,11 +220,11 @@ class _Pack(_Group):
         r = a.get("riders")                                         # Bereichswirkung von Kombinationszaubern (AP 23)
         if r:
             if "slow_ticks" in r:
-                e.slow_until = max(e.slow_until, t + r["slow_ticks"])
+                e.slow_until = max(e.slow_until, t + r["slow_ticks"] * p.cls.get("slow_permille", 1000) // 1000)
             if "mitigate" in r and not t < p.mit_until:
-                p.mit_until, p.mit_permille = t + r["mitigate"]["ticks"], r["mitigate"]["damage_permille"]
+                p.mit_until, p.mit_permille = t + r["mitigate"]["ticks"], min(r["mitigate"]["damage_permille"], p.cls.get("mitigate_damage_permille", 1000))
             if "stamina" in r:
-                p.stam = min(self.cfg["player"]["stamina_max"], p.stam + r["stamina"])
+                p.stam = min(self.cfg["player"]["stamina_max"], p.stam + r["stamina"] * p.cls.get("stamina_permille", 1000) // 1000)
         if a["counts_as"]:
             p.count(a["counts_as"])
 

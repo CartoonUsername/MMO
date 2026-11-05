@@ -27,6 +27,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 21 | Raid-Balancing nach Gruppengröße (Mindestgröße 4, Etappen nach Größe) | §45, §55 | 3/4 | **fertig** (game_rules_v13, ADR-0060); Richtwerte aus Bots, echte Spieltests offen |
 | 22 | Kombinationszauber im Kampf (Paare, Dreier ab Endgame) | §22–26, §74 | 2/3 | **fertig** (sim_rules_v11, game_rules_v14, ADR-0061); Klassen-/Bereichswirkung, Client-Prüfung offen |
 | 23 | Bereichswirkung der Kombinationen (Kontrolle, Schutz, Beistand) | §22–26, §74 | 2/3 | **fertig** (sim_rules_v12, game_rules_v15, ADR-0062); Klassenumsetzung, Bewegung/Beschwörung/Umgebung offen |
+| 24 | Klassenwirkung der Kombinationen (Krieger/Bogenschütze/Schamane) | §24 | 2/3 | **fertig** (sim_rules_v13, game_rules_v16, ADR-0063); Bewegung/Beschwörung/Umgebung, Balancing offen |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)
 1. **Server:** Klassen-Kits (`game_rules_v2.json`), Kampfdaten je Figur (`game.kit`: Befehl, Kosten, Abklingzeit, Sperrzeit; im `fight_start`). Tests.

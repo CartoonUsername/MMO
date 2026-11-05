@@ -41,6 +41,7 @@ class _P:
         self.max_hp = p["base_hp"] + p["hp_per_level"] * level
         self.hp, self.stam = self.max_hp, p["stamina_max"]
         self.fx = merge_gear(cfg, combine_effects(cfg, spec.get("equipped")), spec.get("gear"))
+        self.cls = (cfg.get("combo_classes") or {}).get(spec.get("class"), {})        # Klassenwirkung der Kombinationen (AP 24)
         allowed = spec.get("allowed")
         self.allowed = None if allowed is None else frozenset(allowed)
         self.inputs, self.i = inputs, 0
@@ -79,11 +80,13 @@ def _validated(cfg: dict[str, Any], players: Any, extra_commands: tuple[str, ...
         raise SimError(f"Die Gruppe muss aus 1..{g['max_party']} Spielern bestehen")
     out = []
     for spec in players:
-        if not isinstance(spec, dict) or set(spec) - {"level", "inputs", "allowed", "equipped", "gear"} or not {"level", "inputs"} <= set(spec):
-            raise SimError("Spieler: level und inputs erforderlich, optional allowed/equipped/gear")
+        if not isinstance(spec, dict) or set(spec) - {"level", "inputs", "allowed", "equipped", "gear", "class"} or not {"level", "inputs"} <= set(spec):
+            raise SimError("Spieler: level und inputs erforderlich, optional allowed/equipped/gear/class")
         level = spec["level"]
         if not isinstance(level, int) or isinstance(level, bool) or level < 1:
             raise SimError("level muss eine positive ganze Zahl sein")
+        if "class" in spec and (not isinstance(spec["class"], str) or spec["class"] not in cfg.get("combo_classes", {})):
+            raise SimError("class: unbekannte Klasse")
         allowed = spec.get("allowed")
         if allowed is not None and (not isinstance(allowed, (list, tuple, set, frozenset))
                                     or any(c not in COMMANDS + GROUP_COMMANDS + extra_commands for c in allowed)):
