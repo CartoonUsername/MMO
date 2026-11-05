@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unveröffentlicht] – 2026-11-05
+- Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
 - AP 20: Client-Fenster für Elementzauber, Echo-Wirkung, Gildenforschung und Raid (ADR-0059).
 - AP 19: Kampfgruppen bis 8 für Raids und Weltbosse (sim_rules_v10, game_rules_v12, ADR-0058).
