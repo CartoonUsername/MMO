@@ -42,6 +42,7 @@
 - AP 66–69: Gildenchat (`guild.say`, 64 Zeichen, 30/Tag, Verlauf 50; ADR-0078), Browser-Eingabe, Tests; noch nicht deployt.
 - AP 70: research_rules_v2: Marktrecht, Lagerwesen, Stadtrecht; höhere Projektstufen von Marktplatz, Lagerhaus, Rathaus, Hafen brauchen Technik (ADR-0079); noch nicht deployt.
 - AP 71: Siedlungsabfrage nennt je Projekt die nötige Technik und ob der Ort sie kennt (`tech_known`); Browser zeigt „braucht Technik …“. Im echten Browser ungetestet.
+- AP 72: Kompatibilitätstest: unter alten Regeldateien (Siedlung/Forschung/Ausrüstung v1, Gemeinschaft v2) gespeicherter Stand lädt und läuft unter den neuen Standards.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
