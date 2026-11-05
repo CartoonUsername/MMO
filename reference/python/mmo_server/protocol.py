@@ -262,7 +262,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
        research_titles=w.research.titles.get(a["char"], [])), mutating=False),
     _c("query.echoes", "char:s", "char", lambda w, a: w.echo.view(a["char"]), mutating=False),
     _c("profession.specialize", "char:s profession:s branch:s", "char", lambda w, a: w.specialize(a["char"], a["profession"], a["branch"])),
-    _c("plot.sell", "char:s site:s n:i buyer:s price:i", "char", lambda w, a: w.settlements.sell_plot(a["char"], a["site"], a["n"], a["buyer"], a["price"])),
+    _c("plot.sell", "char:s site:s n:i buyer:s? price:i", "char", lambda w, a: w.settlements.sell_plot(a["char"], a["site"], a["n"], a.get("buyer"), a["price"])),
     _c("plot.cancel_sale", "char:s site:s n:i", "char", lambda w, a: w.settlements.cancel_sale(a["char"], a["site"], a["n"])),
     _c("plot.accept_sale", "char:s site:s n:i", "char", lambda w, a: w.settlements.accept_sale(a["char"], a["site"], a["n"])),
     _c("equip.wear", "char:s item_key:s", "char", lambda w, a: w.equipment.equip(a["char"], a["item_key"])),

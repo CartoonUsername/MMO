@@ -109,7 +109,7 @@ namespace Mmo
             new Cmd("query.prestige", false, "char", new Arg[] { new Arg("char", 's', false) }),
             new Cmd("query.echoes", false, "char", new Arg[] { new Arg("char", 's', false) }),
             new Cmd("profession.specialize", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("profession", 's', false), new Arg("branch", 's', false) }),
-            new Cmd("plot.sell", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("site", 's', false), new Arg("n", 'i', false), new Arg("buyer", 's', false), new Arg("price", 'i', false) }),
+            new Cmd("plot.sell", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("site", 's', false), new Arg("n", 'i', false), new Arg("buyer", 's', true), new Arg("price", 'i', false) }),
             new Cmd("plot.cancel_sale", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("site", 's', false), new Arg("n", 'i', false) }),
             new Cmd("plot.accept_sale", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("site", 's', false), new Arg("n", 'i', false) }),
             new Cmd("equip.wear", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("item_key", 's', false) }),

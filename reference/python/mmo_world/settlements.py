@@ -196,12 +196,12 @@ class SettlementService:
         if not self.R.get("sale_days"):
             raise WorldError("Grundstückshandel gibt es in diesen Regeln nicht")
 
-    def sell_plot(self, char: str, site: str, n: int, buyer: str, price: int) -> dict[str, Any]:
+    def sell_plot(self, char: str, site: str, n: int, buyer: str | None, price: int) -> dict[str, Any]:
         self._need_sales()
         p = self._plot(site, n)
         if p["owner"] != char:
             raise WorldError("Das Grundstück gehört dir nicht")
-        if not isinstance(buyer, str) or buyer == char or not self.exists(buyer):
+        if buyer is not None and (not isinstance(buyer, str) or buyer == char or not self.exists(buyer)):       # None = offenes Angebot (AP 56)
             raise WorldError("Käufer ungültig")
         if not _is_int(price) or not 0 <= price <= self.R["max_sale_price"]:
             raise WorldError("Preis ungültig")
@@ -211,20 +211,22 @@ class SettlementService:
             raise WorldError("Das Lager muss vor dem Verkauf leer sein")
         offer = {"seller": char, "buyer": buyer, "price": price, "day": self.day()}
         self.sales[f"{site}:{n}"] = offer
-        self.notify(buyer, "plot.sale_offered", {"plot": f"{site}:{n}", "seller": char, "price": price})
+        if buyer is not None:
+            self.notify(buyer, "plot.sale_offered", {"plot": f"{site}:{n}", "seller": char, "price": price})
         return dict(offer, site=site, n=n)
 
     def cancel_sale(self, char: str, site: str, n: int) -> None:
         o = self.sales.get(f"{site}:{n}") if _is_int(n) else None
         if o is None or o["seller"] != char:
             raise WorldError("Kein eigenes Verkaufsangebot für dieses Grundstück")
-        self.notify(o["buyer"], "plot.sale_cancelled", {"plot": f"{site}:{n}", "seller": char})
+        if o["buyer"] is not None:
+            self.notify(o["buyer"], "plot.sale_cancelled", {"plot": f"{site}:{n}", "seller": char})
         del self.sales[f"{site}:{n}"]
 
     def accept_sale(self, char: str, site: str, n: int) -> dict[str, Any]:
         self._need_sales()
         o = self.sales.get(f"{site}:{n}") if _is_int(n) else None
-        if o is None or o["buyer"] != char:
+        if o is None or o["seller"] == char or (o["buyer"] is not None and o["buyer"] != char):
             raise WorldError("Kein Verkaufsangebot an dich für dieses Grundstück")
         p = self._plot(site, n)
         if p["owner"] != o["seller"] or p["unpaid"] or self.used(p):
@@ -353,7 +355,8 @@ class SettlementService:
         for key in [k for k, o in sorted(self.sales.items()) if day - o["day"] > days]:
             o = self.sales.pop(key)                                     # Angebot verfallen
             for who in (o["seller"], o["buyer"]):
-                self.notify(who, "plot.sale_expired", {"plot": key})
+                if who is not None:
+                    self.notify(who, "plot.sale_expired", {"plot": key})
         self.last_day = day
         return out
 
@@ -395,6 +398,7 @@ class SettlementService:
                 "order_bonus": self.order_bonus(char), "orders_per_reach": self.R.get("orders_per_reach", 0),
                 "sales_out": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["seller"] == char],
                 "sales_in": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["buyer"] == char],
+                "sales_open": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["buyer"] is None and o["seller"] != char][:50],
                 "sale_fee_permille": self.R.get("sale_fee_permille", 0), "sale_days": self.R.get("sale_days", 0)}
 
     def check(self) -> list[str]:

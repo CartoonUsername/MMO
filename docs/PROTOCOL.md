@@ -164,7 +164,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.prestige` | char:s | char | lesend | query |
 | `query.echoes` | char:s | char | lesend | query |
 | `profession.specialize` | char:s, profession:s, branch:s | char | schreibend | default |
-| `plot.sell` | char:s, site:s, n:i, buyer:s, price:i | char | schreibend | default |
+| `plot.sell` | char:s, site:s, n:i, buyer?:s, price:i | char | schreibend | default |
 | `plot.cancel_sale` | char:s, site:s, n:i | char | schreibend | default |
 | `plot.accept_sale` | char:s, site:s, n:i | char | schreibend | default |
 | `equip.wear` | char:s, item_key:s | char | schreibend | default |

@@ -57,6 +57,9 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 53 | Zweigwirkung 2: +50 Gütepunkte für Rezepte des aktiven Zweigs | §14–16 | 2/3 | **fertig** (ADR-0075); Balancing, Client-Anzeige offen |
 | 54 | Client-Hinweis zum Gütebonus | §14–16 | 2/3 | **fertig, im echten Browser ungetestet** |
 | 55 | Echter Meisterwerk-Weg in die Chronik getestet | §47–49 | 3 | **fertig** (nur Test) |
+| 56 | Offene Grundstücksangebote (Server) | Siedlungen | 2/3 | **fertig** (ADR-0073 ergänzt) |
+| 57 | Browser: offene Angebote und Verkaufsdialog | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
+| 58 | Missbrauchstests offene Angebote | §50–55 | 4 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

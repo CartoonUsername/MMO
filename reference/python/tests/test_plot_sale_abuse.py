@@ -58,6 +58,31 @@ class PlotSaleAbuse(unittest.TestCase):
         self.assertEqual(self.owner(), "anna")
         self.assertEqual(self.w.settlements.sales, {})                                               # ungültiges Angebot entfernt
 
+    def test_open_offer_can_be_taken_by_anyone_once(self):                                         # AP 56
+        self.assertTrue(self.a.call("plot.sell", site="hauptstadt", n=1, price=200)["ok"])         # ohne Käufer = offen
+        self.assertEqual([o["plot"] for o in self.b.call("query.settlements")["result"]["sales_open"]], ["hauptstadt:1"])
+        self.assertEqual(self.a.call("query.settlements")["result"]["sales_open"], [])            # eigene Angebote nicht in der Fremdliste
+        self.assertEqual(len(self.a.call("query.settlements")["result"]["sales_out"]), 1)
+        self.assertFalse(self.a.call("plot.accept_sale", site="hauptstadt", n=1)["ok"])             # nicht an sich selbst
+        coin = self.w.trading.coin
+        before = self.w.inv.balance("cleo", coin)
+        self.assertTrue(self.c.call("plot.accept_sale", site="hauptstadt", n=1)["ok"])
+        self.assertEqual((self.owner(), before - self.w.inv.balance("cleo", coin)), ("cleo", 200))
+        self.assertFalse(self.b.call("plot.accept_sale", site="hauptstadt", n=1)["ok"])             # schon weg
+        self.assertEqual(self.w.settlements.sales, {})
+        self.assertEqual([i["kind"] for i in self.w.outbox.fetch("anna")["items"] if i["kind"].startswith("plot.")], ["plot.sold"])
+        self.assertEqual([i["kind"] for i in self.w.outbox.fetch("ben")["items"] if i["kind"].startswith("plot.")], [])
+        self.assertEqual(check_consistency(self.w), [])
+
+    def test_open_offer_is_cancelled_and_expires_quietly(self):                                    # AP 56
+        self.a.call("plot.sell", site="hauptstadt", n=1, price=200)
+        self.assertFalse(self.b.call("plot.cancel_sale", site="hauptstadt", n=1)["ok"])
+        self.assertTrue(self.a.call("plot.cancel_sale", site="hauptstadt", n=1)["ok"])
+        self.a.call("plot.sell", site="hauptstadt", n=1, price=200)
+        self.w.settlements.advance(10)
+        self.assertEqual(self.w.settlements.sales, {})
+        self.assertEqual([i["kind"] for i in self.w.outbox.fetch("anna")["items"] if i["kind"].startswith("plot.")], ["plot.sale_expired"])
+
 
 if __name__ == "__main__":
     unittest.main()

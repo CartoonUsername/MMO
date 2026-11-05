@@ -11,3 +11,7 @@ Status: angenommen (Vorschlag, Claude, autorisiert; Platzhalterwerte)
 
 ## Offen
 - Öffentlicher Grundstücksmarkt statt Einzelangebot; Chronik/Benachrichtigung bei Verkauf; Client-Fenster.
+
+## Ergänzung AP 56–58: offene Angebote
+- `plot.sell` ohne `buyer` erstellt ein **offenes Angebot**: jeder außer dem Verkäufer darf es annehmen (der Erste gewinnt, danach ist es weg). Die Abfrage `query.settlements` führt fremde offene Angebote in `sales_open` (höchstens 50). Bei offenen Angeboten gibt es keine Benachrichtigung an einen Käufer; der Verkäufer erfährt vom Verkauf (`plot.sold`) und vom Verfall (`plot.sale_expired`).
+- Gebühr, Frist und Bedingungen unverändert. Ein Kaufmarkt mit Suche/Sortierung bleibt offen.
