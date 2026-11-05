@@ -366,7 +366,7 @@ namespace Mmo
             {
                 var c = kit[i]; var cmd = (string)c["cmd"];
                 float left = cooldownUntil.TryGetValue(cmd, out var until) ? Mathf.Max(0f, until - Time.time) : 0f;
-                var label = (i < 9 ? (i + 1) + " " : "") + cmd + "\nAusd. " + c["cost"] + (left > 0f ? "  " + left.ToString("0.0") + " s" : "");
+                var label = (i < 9 ? (i + 1) + " " : "") + Panels.SkillLabel(cmd) + "\nAusd. " + c["cost"] + (left > 0f ? "  " + left.ToString("0.0") + " s" : "");
                 if (GUILayout.Button(label, GUILayout.Height(48), GUILayout.Width(70)) && fight != null) UseSkill(cmd);
             }
             GUILayout.EndHorizontal();

@@ -16,6 +16,21 @@ namespace Mmo
 
     public static class Panels
     {
+        static readonly System.Collections.Generic.Dictionary<string, string> ElementNames = new System.Collections.Generic.Dictionary<string, string>
+        {
+            { "fire", "Feuer" }, { "water", "Wasser" }, { "shadow", "Schatten" }, { "light", "Licht" }, { "wind", "Wind" },
+            { "earth", "Erde" }, { "electric", "Elektro" }, { "ice", "Eis" }, { "nature", "Natur" },
+        };
+
+        /// <summary>Anzeigename eines Kampfbefehls: Kombinationszauber (combo_a_b[_c]) als "Erde+Wasser", sonst der Befehl selbst (AP 27/28).</summary>
+        public static string SkillLabel(string cmd)
+        {
+            if (cmd == null || !cmd.StartsWith("combo_")) return cmd;
+            var parts = cmd.Substring(6).Split('_');
+            for (int i = 0; i < parts.Length; i++) parts[i] = ElementNames.TryGetValue(parts[i], out var n) ? n : parts[i];
+            return string.Join("+", parts);
+        }
+
         public static readonly PanelDef[] All = new PanelDef[]
         {
             new PanelDef("Figur", "query.character", new[] { "character.choose_class", "essence.decide", "essence.trial", "essence.adopt", "combat.set_loadout" }),

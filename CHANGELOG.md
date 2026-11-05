@@ -7,6 +7,7 @@
 - AP 25: Bewegungswirkung der Kombinationen (Ausweichfenster; sim_rules_v14, game_rules_v17, ADR-0064); noch nicht deployt.
 - AP 26: Beschwörung und Umgebung der Kombinationen (sim_rules_v15, game_rules_v18, ADR-0065); noch nicht deployt.
 - AP 27: Browser-Client zeigt Kombinationszauber mit lesbaren Namen (Skill-Leiste, Elementfenster); Unity-Client nicht angepasst.
+- AP 28: Unity-Client zeigt Kombinationszauber mit lesbaren Namen (Panels.SkillLabel, CoreCheck-Prüfung; in Unity selbst ungetestet).
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

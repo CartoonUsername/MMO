@@ -25,6 +25,9 @@ static class Program
         var unknown = Panels.Unknown();
         Check(unknown.Count == 0, "alle Fenster-Befehle stehen im Katalog" + (unknown.Count > 0 ? ": " + string.Join(",", unknown) : ""));
 
+        Check(Panels.SkillLabel("combo_earth_water") == "Erde+Wasser" && Panels.SkillLabel("combo_earth_nature_water") == "Erde+Natur+Wasser"
+              && Panels.SkillLabel("cast_water") == "cast_water" && Panels.SkillLabel("light") == "light", "Namen der Kombinationszauber");
+
         var net = new NetClient();
         string welcome = null;
         net.OnEvent += ev => { if ((string)ev["ev"] == "welcome") welcome = (string)ev["ev"]; };
