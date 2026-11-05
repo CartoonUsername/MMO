@@ -102,6 +102,7 @@ class SettlementTests(unittest.TestCase):
         self.assertEqual(s.order_bonus("anna"), 0)
         s.contribute("anna", "hauptstadt", "harbor", 2500, {"wooden_beam@standard": 40, "iron_ingot@standard": 10})
         self.assertEqual((s.order_bonus("anna"), s.order_bonus("ben"), s.view("anna")["order_bonus"]), (3, 0, 3))
+        self.assertEqual(s.view("anna")["orders_per_reach"], 3)
         for _ in range(3):
             w.exchange.place("anna", "sell", item, 1, 25)
         with self.assertRaises(WorldError):

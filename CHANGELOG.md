@@ -22,6 +22,7 @@
 - AP 39: Missbrauchstests für `profession.specialize` (ungültige/fremde Eingaben, keine Nebenwirkungen).
 - AP 40: `python -m mmo_game.upgrade` hebt einen Spielstand auf eine höhere CEE-Regelversion (ADR-0071); `docs/DEPLOY_PENDING.md` beschreibt die ausstehende Bereitstellung.
 - AP 41: Hafen erhöht die Zahl offener Marktorders um 3 je Stufe (settlement_rules_v2, ADR-0072); noch nicht deployt.
+- AP 42: Siedlungsabfrage liefert `orders_per_reach`; Browser zeigt Hafenwirkung als „+N offene Orders“ und die eigene Zusatzgrenze. Im echten Browser ungetestet.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

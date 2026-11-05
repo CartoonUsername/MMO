@@ -333,7 +333,7 @@ class SettlementService:
         return {"sites": [self.site_view(s) for s in self.R["sites"]], "mine": mine, "plot_limit": self.plot_limit(char),
                 "contributed": dict(sorted(self.contrib.get(char, {}).items())), "buildings": {k: {"name": b["name"], "levels": b["levels"]} for k, b in self.R["buildings"].items()},
                 "coins": self.inv.balance(char, self.coin), "fee_discount_permille": self.fee_discount_permille(char),
-                "order_bonus": self.order_bonus(char)}
+                "order_bonus": self.order_bonus(char), "orders_per_reach": self.R.get("orders_per_reach", 0)}
 
     def check(self) -> list[str]:
         errs = []

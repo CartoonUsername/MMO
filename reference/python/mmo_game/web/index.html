@@ -244,11 +244,11 @@ async function refreshGear(){
 const FX_NAME={move_permille:"Bewegung",fee_discount_permille:"Gebührenrabatt Markt",raid_defence_permille:"Raidverteidigung",stash_bonus:"Lagerbonus",trade_reach:"Handelsreichweite",plot_limit_bonus:"Mehr Grundstücke"};
 async function refreshTown(){
   const r=await call("query.settlements",{});if(!r.ok){$("townBox").textContent=errMsg(r);return}
-  const v=r.result,box=$("townBox");box.textContent="";kv(box,"Münzen",v.coins);kv(box,"Meine Grundstücke",v.mine.length+"/"+v.plot_limit);kv(box,"Gebührenrabatt Markt",(v.fee_discount_permille/10)+" %");
+  const v=r.result,box=$("townBox");box.textContent="";kv(box,"Münzen",v.coins);kv(box,"Meine Grundstücke",v.mine.length+"/"+v.plot_limit);kv(box,"Gebührenrabatt Markt",(v.fee_discount_permille/10)+" %");if(v.order_bonus)kv(box,"Zusätzliche Orders (Hafen)","+"+v.order_bonus);
   const done=async(cmd,args,ok)=>{await callAct("townMsg",cmd,Object.assign({char:me},args),ok);refreshTown()};
   for(const s of v.sites){sect(box,s.name+" · "+s.region+(s.stage?" · "+s.stage:""));
     if(!s.open){const b=el("button","Ort gründen ("+s.found_cost+" Münzen)");b.onclick=()=>{const n=prompt("Name der Siedlung (3–24 Zeichen)");if(n)done("settlement.found",{site:s.id,name:n},"Ort gegründet")};box.appendChild(b);continue}
-    const fx=Object.entries(s.effects).filter(([,x])=>x).map(([k,x])=>(FX_NAME[k]||k)+" "+(k.endsWith("_permille")?(x/10)+" %":x)).join(" · ");if(fx)box.appendChild(el("div","Wirkung: "+fx,"hint"));
+    const fx=Object.entries(s.effects).filter(([,x])=>x).map(([k,x])=>k==="trade_reach"?"Hafen: +"+x*v.orders_per_reach+" offene Orders":(FX_NAME[k]||k)+" "+(k.endsWith("_permille")?(x/10)+" %":x)).join(" · ");if(fx)box.appendChild(el("div","Wirkung: "+fx,"hint"));
     for(const p of s.plots){const mine=p.owner===me;
       const acts=[];if(mine){const bl=v.buildings;for(const k of Object.keys(bl)){if(p.building&&p.building!==k)continue;acts.push([(p.building?"Ausbauen: ":"Bauen: ")+bl[k].name,()=>done("plot.build",{site:s.id,n:p.n,building:k},"Gebaut")])}
         if(p.building)acts.push(["Einlagern",()=>{const k=prompt("Ware (z. B. timber@standard)");const q=parseInt(prompt("Menge"),10);if(k&&q)done("plot.stash_in",{site:s.id,n:p.n,item_key:k,qty:q},"Eingelagert")}],["Auslagern",()=>{const k=prompt("Ware");const q=parseInt(prompt("Menge"),10);if(k&&q)done("plot.stash_out",{site:s.id,n:p.n,item_key:k,qty:q},"Ausgelagert")}]);
