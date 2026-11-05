@@ -48,6 +48,13 @@ class ElementGame(unittest.TestCase):
         self.assertIn("combo_nature_water", kit)
         self.assertEqual(self.a.call("game.elements")["result"]["combos"], {"combo_nature_water": ["nature", "water"]})
 
+    def test_combo_riders_are_reported(self):                     # AP 32
+        self.attune("water", "nature")
+        r = self.a.call("game.elements")["result"]
+        self.assertEqual(set(r["combo_riders"]), set(r["combos"]))
+        self.assertTrue(all(isinstance(v, dict) and v for v in r["combo_riders"].values()))
+        self.assertGreater(r["ticks_per_second"], 0)
+
     def test_single_element_has_no_combo(self):
         self.attune("water")
         kit = {c["cmd"] for c in self.a.call("game.kit")["result"]["commands"]}

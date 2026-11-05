@@ -336,7 +336,9 @@ class GameServer:
         casts = {e: next((n for n, s in skills(self.sim).items() if s.get("element") == e), None) for e in part["attuned"]}
         mine = {s["ability"] for s in self._combo_skills(part["attuned"])}
         combos = {n: list(s["elements"]) for n, s in skills(self.sim).items() if s.get("ability") in mine}
-        return {"attuned": list(part["attuned"]), "casts": casts, "combos": combos, "switch_ticks": self.sim.get("elements", {}).get("switch_ticks", 0),
+        riders = {n: s["riders"] for n, s in skills(self.sim).items() if n in combos and s.get("riders")}      # Zusatzwirkungen (AP 32)
+        return {"attuned": list(part["attuned"]), "casts": casts, "combos": combos, "combo_riders": riders,
+                "ticks_per_second": self.sim["ticks_per_second"], "switch_ticks": self.sim.get("elements", {}).get("switch_ticks", 0),
                 "affinity": dict(part["affinity"])}
 
     def _cmd_kit(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:
