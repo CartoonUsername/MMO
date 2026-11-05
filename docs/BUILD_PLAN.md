@@ -49,6 +49,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 45 | Missbrauchstests Grundstückshandel | §50–55 | 4 | **fertig** (nur Test) |
 | 46 | Chronik: erstes Meisterstück je Rezept | §47–49 | 3 | **fertig** (ADR-0074); echte Spitzengüte nur über den Haken getestet |
 | 47 | Browser-Chronik zeigt Meisterstück-Erstleistung | §47–49 | 3 | **fertig, im echten Browser ungetestet** |
+| 48 | Balancing-Rechnung AP 36/41/43 | – | – | **fertig** (nur Doku, nicht per Bot gemessen) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 
