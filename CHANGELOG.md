@@ -4,6 +4,7 @@
 - AP 22: Kombinationszauber (36 Paare, 84 Dreier) im Kampf (sim_rules_v11, game_rules_v14, ADR-0061); noch nicht deployt.
 - AP 23: Bereichswirkung der Kombinationszauber (Verlangsamung, Schutz, Ausdauer; sim_rules_v12, game_rules_v15, ADR-0062); noch nicht deployt.
 - AP 24: Klassenwirkung der Kombinationszauber (sim_rules_v13, game_rules_v16, ADR-0063); noch nicht deployt.
+- AP 25: Bewegungswirkung der Kombinationen (Ausweichfenster; sim_rules_v14, game_rules_v17, ADR-0064); noch nicht deployt.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
 - AP 20: Client-Fenster für Elementzauber, Echo-Wirkung, Gildenforschung und Raid (ADR-0059).

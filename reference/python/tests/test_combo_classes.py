@@ -51,3 +51,24 @@ class ComboClasses(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GameLayer(unittest.TestCase):
+    def test_fight_start_passes_the_base_class(self):
+        from unittest import mock
+        import mmo_game.game as gm
+        from mmo_game import GameServer
+        from tests.test_game import Bot
+        from tests.test_game_enemies import start
+        seen = []
+        real = gm.LiveEncounter
+
+        def spy(sim, types, specs, abilities=None):
+            seen.extend(specs)
+            return real(sim, types, specs, abilities)
+        g = GameServer()
+        a = Bot(g, "anna")
+        g.world.svc.record("anna", "identity.class_chosen", {"base_class": "warrior"})
+        with mock.patch.object(gm, "LiveEncounter", spy):
+            self.assertTrue(start(g, a, (3000, 1000)))
+        self.assertEqual(seen[0]["class"], "warrior")

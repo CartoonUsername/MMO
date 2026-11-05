@@ -84,7 +84,7 @@ class RulesTests(unittest.TestCase):
         R = load_game_rules()
         g = GameServer()
         self.assertEqual(g.world.svc.rules.version, "9")
-        self.assertEqual(g.sim["version"], "13")
+        self.assertEqual(g.sim["version"], "14")
         self.assertTrue(R["speed_cm_per_tick"] > 0 and R["aggro_radius"] > 0)
         # Beute nur aus bekannten Gegnern und handelbaren Gegenständen
         for t, items in R["drops"].items():

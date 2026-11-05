@@ -223,6 +223,8 @@ class _Pack(_Group):
                 e.slow_until = max(e.slow_until, t + r["slow_ticks"] * p.cls.get("slow_permille", 1000) // 1000)
             if "mitigate" in r and not t < p.mit_until:
                 p.mit_until, p.mit_permille = t + r["mitigate"]["ticks"], min(r["mitigate"]["damage_permille"], p.cls.get("mitigate_damage_permille", 1000))
+            if "evade_ticks" in r:
+                p.evade_until = max(p.evade_until, t + r["evade_ticks"])
             if "stamina" in r:
                 p.stam = min(self.cfg["player"]["stamina_max"], p.stam + r["stamina"] * p.cls.get("stamina_permille", 1000) // 1000)
         if a["counts_as"]:

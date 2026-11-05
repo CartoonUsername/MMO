@@ -37,6 +37,20 @@ class Riders(unittest.TestCase):
         r = hp_after(V12, [[0, "combo_light_water"], [120, "combo_light_water"], [130, "flee"]], "bear")
         self.assertLess(r.opponent_hp, V12["opponents"]["bear"]["hp"] - 2 * 200)
 
+    def test_mobility_rider_evades_a_hit(self):                       # AP 25
+        V13 = load_sim_rules("sim_rules_v13.json")
+        V14 = load_sim_rules("sim_rules_v14.json")
+        self.assertEqual(V14["skills"]["combo_fire_wind"]["riders"], {"slow_ticks": 60, "evade_ticks": 8})
+        self.assertNotIn("evade_ticks", V14["skills"]["combo_earth_fire"].get("riders", {}))
+        self.assertNotIn("evade_ticks", V13["skills"]["combo_fire_wind"].get("riders", {}))
+        run = lambda c, cmd: simulate_pack(c, ["wolf"], [{"level": 1, "inputs": [[35, cmd], [60, "flee"]]}]).players[0]
+        self.assertEqual(run(V13, "combo_fire_wind").damage_ticks, (40,))              # Treffer in v13
+        self.assertEqual(run(V14, "combo_fire_wind").damage_ticks, ())                 # in v14 ausgewichen
+        self.assertEqual(run(V14, "combo_earth_fire").damage_ticks, (40,))             # ohne Bewegungsbereich nicht
+        bad = {**V14, "skills": {**V14["skills"], "combo_fire_wind": {**V14["skills"]["combo_fire_wind"], "riders": {"evade_ticks": 0}}}}
+        with self.assertRaises(SimError):
+            validate_sim_rules(bad)
+
     def test_invalid_riders_rejected(self):
         base = V12["skills"]["combo_fire_water"]
         for bad in ({"slow_ticks": 0}, {"slow_ticks": True}, {"x": 1}, {"mitigate": {"ticks": 5, "damage_permille": 1500}}, "slow"):
