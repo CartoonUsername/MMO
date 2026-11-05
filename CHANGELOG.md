@@ -15,6 +15,7 @@
 - AP 32: `game.elements` liefert die Zusatzwirkungen der Kombinationszauber (`combo_riders`); Browser-Client zeigt sie als lesbaren Text. Unity nicht angepasst; noch nicht deployt.
 - AP 33: Zweigwahl und Respezialisierung der Berufe (rules_v10, ADR-0068), Befehl `profession.specialize`; Spielschicht noch auf rules_v9, noch nicht deployt.
 - AP 34: game_rules_v19 (Standard) läuft auf CEE rules_v10, Zweigwahl im Spiel aktiv (ADR-0069); noch nicht deployt.
+- AP 35: Browser-Client zeigt den aktiven Berufszweig und bietet Wahl/Wechsel an (Befehl `profession.specialize`); im echten Browser ungetestet, Unity offen.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

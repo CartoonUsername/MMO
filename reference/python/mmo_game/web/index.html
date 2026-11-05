@@ -480,6 +480,10 @@ async function refreshChar(){
   if(!pr.length)box.appendChild(el("div","Noch keine Berufserfahrung – stelle etwas her (Fenster Herstellen).","hint"));
   for(const [k,v] of pr.sort((a,b)=>b[1]-a[1])){kv(box,PROF_NAME[k]||k,v+" EP");const pd=(c.profession_detail||{})[k];
     if(pd){for(const [bid,b] of Object.entries(pd.branches))if(b.points>0)barRow(box,"  Zweig: "+b.name+" (Stufe "+b.level+")",b.points,b.next||b.points,"nd");
+      if(pd.chosen){const cb=pd.branches[pd.chosen];kv(box,"  Aktiver Zweig",cb?cb.name:pd.chosen)}
+      if(v>0){const row=el("div","","hint");row.appendChild(document.createTextNode("  "+(pd.chosen?"Zweig wechseln (kostet Münzen, Abklingzeit): ":"Zweig wählen: ")));
+        for(const [bid,b] of Object.entries(pd.branches)){if(bid===pd.chosen)continue;const bt=el("button",b.name);bt.onclick=async()=>{if(!confirm("Zweig „"+b.name+"“ für "+(PROF_NAME[k]||k)+" wählen?"))return;await act("charMsg","profession.specialize",{profession:k,branch:bid},"Zweig gewählt");refreshChar()};row.appendChild(bt)}
+        box.appendChild(row)}
       if(pd.masterpieces.length)kv(box,"  Meisterstücke",pd.masterpieces.join(", "));
       if(v>0&&pd.masterpiece_goals.length)box.appendChild(el("div","  Ziel Meisterstück (beste Güte): "+pd.masterpiece_goals.join(", "),"hint"))}}
   const dirs=Object.entries(c.combat.directions||{});sect(box,"Kampfentwicklung");
