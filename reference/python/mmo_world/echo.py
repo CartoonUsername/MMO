@@ -23,9 +23,12 @@ from .errors import WorldError
 from .inventory import Inventory
 
 SINK = "world:sink"
+# Wirkungen, die die Kampfsimulation kennt: Schlüssel -> (Art, Mindestwert, Höchstwert) – wie mmo_sim.rules.EFFECT_KEYS
+COMBAT_KEYS = {"heavy_damage_permille": ("mul", 1, 10000), "light_damage_permille": ("mul", 1, 10000),
+               "damage_taken_permille": ("mul", 1, 10000), "block_damage_permille": ("min", 0, 1000), "dodge_cost_delta": ("add", -100, 100)}
 
 
-def load_echo_rules(name: str = "echo_rules_v1.json") -> dict[str, Any]:
+def load_echo_rules(name: str = "echo_rules_v2.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_world").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -43,6 +46,13 @@ def validate_echo_rules(r: dict[str, Any]) -> None:
         raise WorldError("echo_rules: drop_from_level ungültig")
     if r["slots"]["main"] < 1 or r["slots"]["hybrid"] < 0:
         raise WorldError("echo_rules: slots ungültig")
+    c = r.get("combat")
+    if c is not None:
+        if not _is_int(c["hybrid_permille"]) or not 0 <= c["hybrid_permille"] <= 1000 or not _is_int(c["mastery_permille_per_level"]) or c["mastery_permille_per_level"] < 0:
+            raise WorldError("echo_rules: combat ungültig")
+        for trad, prof in c["profiles"].items():
+            if trad not in r["echoes"] or not prof or any(k not in COMBAT_KEYS or not _is_int(v) or v == 0 for k, v in prof.items()):
+                raise WorldError(f"echo_rules: combat.profiles.{trad} ungültig")
     for k in ("dust", "protect", "seal"):
         if "@" not in r["items"][k]:
             raise WorldError("echo_rules: items ungültig")
@@ -293,6 +303,50 @@ class EchoService:
         pts = self.mastery.get(char, {}).get(tradition, 0)
         return sum(1 for t in self.R["mastery"]["thresholds"] if pts >= t)
 
+    # -- Kampfwirkung (AP 17, ADR-0056) --------------------------------------------------
+    def _combat_echoes(self, char: str) -> list[tuple[dict[str, Any], int]]:
+        """Ausgerüstete Echos mit ihrer Wirkstärke (Promille: Haupt 1000, Hybrid hybrid_permille)."""
+        c = self.R.get("combat")
+        eq = self.equipped.get(char)
+        if not c or not eq:
+            return []
+        out = []
+        if eq.get("main"):
+            out.append((self.echoes[eq["main"]], 1000))
+        out += [(self.echoes[x], c["hybrid_permille"]) for x in eq.get("hybrid", [])]
+        return out
+
+    def sim_effects(self, char: str) -> dict[str, int]:
+        """Zusammengefasste Kampfwirkungen der ausgerüsteten Echos (Schlüssel wie EFFECT_KEYS der Simulation); leer ohne Echos."""
+        c = self.R.get("combat")
+        out: dict[str, int] = {}
+        for e, share in self._combat_echoes(char):
+            prof = c["profiles"].get(e["def"], {})
+            ml = self.mastery_level(char, e["def"])
+            power = e["resonance"] * (1000 + c["mastery_permille_per_level"] * ml) // 1000 * share // 1000
+            for key, step in prof.items():
+                kind, lo, hi = COMBAT_KEYS[key]
+                val = step * power // 10 if kind == "add" else 1000 + step * power
+                val = max(lo, min(hi, val))
+                if key not in out:
+                    out[key] = val
+                elif kind == "mul":
+                    out[key] = max(lo, min(hi, out[key] * val // 1000))
+                elif kind == "min":
+                    out[key] = min(out[key], val)
+                else:
+                    out[key] = max(lo, min(hi, out[key] + val))
+        return {k: v for k, v in out.items() if v != (0 if COMBAT_KEYS[k][0] == "add" else 1000)}
+
+    def granted_abilities(self, char: str) -> list[str]:
+        """Fähigkeiten der ausgerüsteten Traditionen: Haupt-Echo immer, Hybrid-Echo ab Meisterschaftsstufe."""
+        c = self.R.get("combat")
+        out: list[str] = []
+        for e, share in self._combat_echoes(char):
+            if share == 1000 or self.mastery_level(char, e["def"]) >= c["hybrid_ability_mastery"]:
+                out += [a for a in self.R["echoes"][e["def"]]["abilities"] if a not in out]
+        return out
+
     # -- Sicht -------------------------------------------------------------------------
     def _public(self, e: dict[str, Any]) -> dict[str, Any]:
         d = self.R["echoes"][e["def"]]
@@ -310,7 +364,8 @@ class EchoService:
         market = [{**li, "echo": self._public(self.echoes[li["echo"]])} for li in self.listings.values() if li["seller"] != char]
         return {"echoes": mine, "loadout": self.loadout(char), "market": market, "items": dict(self.R["items"]),
                 "mastery": {t: {"points": p, "level": self.mastery_level(char, t)} for t, p in self.mastery.get(char, {}).items()},
-                "max_resonance": self.R["max_resonance"], "bands": self.R["bands"]}
+                "max_resonance": self.R["max_resonance"], "bands": self.R["bands"],
+                "combat": {"effects": self.sim_effects(char), "abilities": self.granted_abilities(char)}}
 
     # -- Konsistenz / Persistenz ---------------------------------------------------------
     def check(self) -> list[str]:

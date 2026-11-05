@@ -283,10 +283,27 @@ class GameServer:
         st = self.world.svc.state(char)
         cls = st.parts["identity"]["base_class"]
         out = list(self.R.get("class_kits", {}).get(cls, [])) if cls else []
+        for ab in self.world.echo.granted_abilities(char):              # Fähigkeiten ausgerüsteter Kampfecho-Traditionen (AP 17)
+            if ab not in out:
+                out.append(ab)
         for el in st.parts["element"]["attuned"]:                      # geprägte Elemente schalten ihren Zauber frei (AP 16)
             ab = self.R.get("element_abilities", {}).get(el)
             if ab and ab not in out:
                 out.append(ab)
+        return out
+
+    def _sim_gear(self, char: str) -> dict[str, int]:
+        """Kampfwirkungen von Ausrüstung und ausgerüsteten Echos, zusammengefasst (Faktoren multiplizieren, Blockwert nimmt das Minimum, Kosten addieren)."""
+        out = dict(self.world.equipment.sim_gear(char))
+        for k, v in self.world.echo.sim_effects(char).items():
+            if k not in out:
+                out[k] = v
+            elif k == "block_damage_permille":
+                out[k] = min(out[k], v)
+            elif k == "dodge_cost_delta":
+                out[k] = max(-100, min(100, out[k] + v))
+            else:
+                out[k] = max(1, min(10000, out[k] * v // 1000))
         return out
 
     def _cmd_info(self, cmd: str) -> dict[str, Any]:
@@ -809,7 +826,7 @@ class GameServer:
                             and _dist2(mp["pos"], self.players[trigger_char]["pos"]) <= R["join_radius"] ** 2):
                         chars.append(m)
         chars = chars[: self.sim["group"]["max_party"]]
-        specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars}, {c: self.world.equipment.sim_gear(c) for c in chars})
+        specs = self.encounters.pack_specs(chars, {}, {c: self._kit_abilities(c) for c in chars}, {c: self._sim_gear(c) for c in chars})
         types = [e["type"] for e in pack]
         # Fähigkeiten: feste der Vorlage plus Baukasten je Spawn-Punkt und Tag (reproduzierbar, ADR-0032/0033)
         abilities = [roll_abilities(self.sim, e["type"], e["id"], self.world.day[0]) for e in pack] if "enemy_abilities" in self.sim else None

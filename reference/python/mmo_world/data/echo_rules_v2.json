@@ -1,0 +1,159 @@
+{
+ "version": 2,
+ "_comment": "PLATZHALTER (AP 7, ADR-0046): Kampfecho-Definitionen, Resonanz +0..+30, Kosten, Erfolgsraten, Schutz, Pechschutz, Slots. Exakte Wahrscheinlichkeiten/Kosten/Slotzahlen sind laut Blueprint (Fragen 7-9) OFFEN und hier nur konfigurierbare Platzhalter. Ein Fehlschlag zerstört nie ein Echo.",
+ "max_resonance": 30,
+ "bands": [
+  {
+   "from": 0,
+   "key": "awakening",
+   "name": "Erweckung"
+  },
+  {
+   "from": 5,
+   "key": "manifestation",
+   "name": "Manifestation"
+  },
+  {
+   "from": 10,
+   "key": "extended",
+   "name": "Erweiterte Form"
+  },
+  {
+   "from": 15,
+   "key": "exalted",
+   "name": "Erhabene Form"
+  },
+  {
+   "from": 20,
+   "key": "legendary",
+   "name": "Legendäre Form"
+  },
+  {
+   "from": 25,
+   "key": "mythic",
+   "name": "Mythische Form"
+  }
+ ],
+ "success_permille": [
+  1000,
+  965,
+  930,
+  895,
+  860,
+  825,
+  790,
+  755,
+  720,
+  685,
+  590,
+  555,
+  520,
+  485,
+  450,
+  415,
+  380,
+  345,
+  310,
+  275,
+  180,
+  145,
+  110,
+  75,
+  40,
+  40,
+  40,
+  40,
+  40,
+  40
+ ],
+ "cost": {
+  "dust_base": 1,
+  "dust_per_levels": 3,
+  "coins_per_level": 10
+ },
+ "drop_from_level": 10,
+ "items": {
+  "dust": "resonance_dust@standard",
+  "protect": "ward_stone@standard",
+  "seal": "resonance_seal@standard"
+ },
+ "pity": {
+  "step_permille": 25,
+  "cap_permille": 300
+ },
+ "slots": {
+  "main": 1,
+  "hybrid": 2
+ },
+ "mastery": {
+  "thresholds": [
+   100,
+   300,
+   700,
+   1500,
+   3000
+  ],
+  "daily_cap": 60
+ },
+ "market": {
+  "fee_permille": 50,
+  "max_price": 100000000,
+  "max_listings_per_character": 10
+ },
+ "echoes": {
+  "wolf_tradition": {
+   "name": "Wolfstradition",
+   "classes": [
+    "warrior",
+    "archer"
+   ],
+   "element": null,
+   "abilities": [
+    "power_strike",
+    "flowing_step"
+   ],
+   "text": "Kampfstil des Rudels: Ansturm und Beweglichkeit."
+  },
+  "ember_tradition": {
+   "name": "Glut-Tradition",
+   "classes": [
+    "shaman_alchemist",
+    "warrior"
+   ],
+   "element": "fire",
+   "abilities": [
+    "ember_strike"
+   ],
+   "text": "Schmiedefeuer als Kampfkunst."
+  },
+  "stone_tradition": {
+   "name": "Steintradition",
+   "classes": null,
+   "element": "earth",
+   "abilities": [
+    "shield_wall"
+   ],
+   "text": "Seltene, klassenübergreifende Tradition der Beständigkeit."
+  }
+ },
+ "combat": {
+  "_comment": "AP 17 (ADR-0056, PLATZHALTER): Kampfwirkung ausgerüsteter Echos. Stärke = Resonanzstufe x (1000 + mastery_permille_per_level x Meisterschaftsstufe)/1000; Hybrid-Echos wirken mit hybrid_permille. Je Wirkung ein Schritt pro Stufe: mul = Faktor 1000 + Schritt x Stärke, add = Schritt x Stärke / 10, min (nur block_damage_permille) = 1000 + Schritt x Stärke (Schritt negativ = stärkerer Block). Nur Wirkungen, die die Kampfsimulation kennt. Fähigkeiten der Tradition: Haupt-Echo immer, Hybrid-Echo ab Meisterschaftsstufe hybrid_ability_mastery.",
+  "hybrid_permille": 500,
+  "mastery_permille_per_level": 40,
+  "hybrid_ability_mastery": 1,
+  "profiles": {
+   "wolf_tradition": {
+    "heavy_damage_permille": 6,
+    "dodge_cost_delta": -1
+   },
+   "ember_tradition": {
+    "light_damage_permille": 5,
+    "heavy_damage_permille": 3
+   },
+   "stone_tradition": {
+    "damage_taken_permille": -4,
+    "block_damage_permille": -6
+   }
+  }
+ }
+}
