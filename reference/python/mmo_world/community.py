@@ -100,6 +100,11 @@ class Chronicle:
         shown = next((t["name"] for t in self.titles.get(char, []) if t["id"] == cid), None)
         return {"points": pts, "titles": list(self.titles.get(char, [])), "chosen": cid if shown else None, "display": shown}
 
+    def display_title(self, char: str) -> str | None:
+        """Anzeigetitel ohne die Chronik zu durchsuchen (für häufige Ansichten)."""
+        cid = self.chosen.get(char)
+        return next((t["name"] for t in self.titles.get(char, []) if t["id"] == cid), None) if cid else None
+
     def choose_title(self, char: str, title_id: str | None) -> dict[str, Any]:
         """Wählt einen verdienten Titel als Anzeigetitel (AP 73, ADR-0080); None entfernt ihn."""
         if title_id is None:

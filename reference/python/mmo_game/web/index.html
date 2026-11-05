@@ -664,7 +664,7 @@ function syncEnts(){
   if(!state)return;const seen=new Set();
   const up=(id,kind,p,extra)=>{seen.add(id);let e=ents.get(id);if(!e){e={x:p[0],y:p[1],fx:0,fy:1};ents.set(id,e)}e.tx=p[0];e.ty=p[1];e.kind=kind;Object.assign(e,extra);};
   up("me","me",state.you.pos,{name:state.you.char,fight:!!state.you.fight});
-  for(const p of state.players)up("p:"+p.char,"player",p.pos,{name:p.char,fight:p.fight});
+  for(const p of state.players)up("p:"+p.char,"player",p.pos,{name:p.title?p.char+" · "+p.title:p.char,fight:p.fight});
   for(const e of state.enemies)if(e.alive)up("e:"+e.id,"enemy",e.pos,{type:e.type,st:e.state,fight:e.fight});
   for(const n of state.nodes)up("n:"+n.id,"node",n.pos,{item:n.item.split("@")[0],ready:n.ready});
   for(const k of [...ents.keys()])if(!seen.has(k))ents.delete(k);

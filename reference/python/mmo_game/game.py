@@ -1032,6 +1032,10 @@ class GameServer:
         near = sorted(((d, c) for c, p in self.players.items() if c != char and (d := _dist2(p["pos"], me["pos"])) <= r2))
         cap = self.R.get("interest", {}).get("max_visible_players", 10 ** 9)
         others = [{"char": c, "pos": list(self.players[c]["pos"]), "fight": c in self.fight_of, "look": self._look(c)} for _, c in near[:cap]]
+        for o in others:
+            t = self.world.chronicle.display_title(o["char"])
+            if t:
+                o["title"] = t                                                    # Anzeigetitel (AP 76, ADR-0080)
         others.sort(key=lambda o: o["char"])
         enemies = [{"id": e["id"], "type": e["type"], "pos": list(e["pos"]), "alive": e["alive"], "fight": e["fight"] is not None, "state": e["state"]}
                    for e in self.enemies if _dist2(e["pos"], me["pos"]) <= r2]

@@ -32,6 +32,17 @@ class TitleChoice(unittest.TestCase):
         self.assertEqual(self.prestige(self.a)["display"], None)
         self.assertEqual(self.w.chronicle.chosen, {})
 
+    def test_others_see_the_display_title_in_the_snapshot(self):                                      # AP 76
+        me_b = self.g.players["ben"]
+        self.g.players["anna"]["pos"] = tuple(me_b["pos"])                                           # nebeneinander
+        before = [o for o in self.g._snapshot_for("ben")["players"] if o["char"] == "anna"][0]
+        self.assertNotIn("title", before)
+        tid = next(t["id"] for t in self.prestige(self.a)["titles"] if t["name"].startswith("Gründer"))
+        self.a.call("title.choose", title=tid)
+        after = [o for o in self.g._snapshot_for("ben")["players"] if o["char"] == "anna"][0]
+        self.assertEqual(after["title"], "Gründer von Moorheim")
+        self.assertNotIn("title", [o for o in self.g._snapshot_for("anna")["players"] if o["char"] == "ben"][0])
+
     def test_cannot_choose_titles_one_does_not_have(self):
         foreign = next(t["id"] for t in self.prestige(self.a)["titles"] if t["name"].startswith("Gründer"))
         for bad in (foreign, "nope", "", 7, ["x"], True):

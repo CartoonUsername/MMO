@@ -8,4 +8,4 @@ Status: angenommen (Vorschlag, Claude, autorisiert)
 - Browser: Titelwahl im Chronikfenster; Unity-Fenster „Chronik“ kennt den Befehl.
 
 ## Offen
-- Anzeige des Titels über dem Namen anderer Spieler (Spielerliste/Sichtbarkeit); mehrere Anzeigeplätze.
+- Seit AP 76 zeigt die Zustandsmeldung den Titel bei Mitspielern. Offen: mehrere Anzeigeplätze, Darstellung in Unity.
