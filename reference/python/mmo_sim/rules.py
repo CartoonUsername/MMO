@@ -150,6 +150,16 @@ def validate_element_rules(cfg: dict[str, Any]) -> None:
     for name, s in skills(cfg).items():
         if "element" in s and s["element"] not in names:
             raise SimError(f"skills.{name}: unbekanntes Element")
+        rd = s.get("riders")
+        if rd is not None:                                            # Bereichswirkung (AP 23)
+            def pos(v: Any) -> bool:
+                return isinstance(v, int) and not isinstance(v, bool) and v > 0
+            m = rd.get("mitigate") if isinstance(rd, dict) else None
+            if (not isinstance(rd, dict) or "elements" not in s or set(rd) - {"slow_ticks", "mitigate", "stamina"}
+                    or any(k in rd and not pos(rd[k]) for k in ("slow_ticks", "stamina"))
+                    or ("mitigate" in rd and not (isinstance(m, dict) and pos(m.get("ticks")) and isinstance(m.get("damage_permille"), int)
+                                                  and 0 <= m["damage_permille"] <= 1000))):
+                raise SimError(f"skills.{name}: riders ungültig (nur bei Kombinationen)")
         if "elements" in s:                                           # Kombinationszauber (AP 22)
             ee = s["elements"]
             if ("element" in s or not isinstance(ee, list) or len(ee) not in (2, 3) or len(set(ee)) != len(ee)
