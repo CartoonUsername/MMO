@@ -1,0 +1,116 @@
+{
+ "version": 2,
+ "_comment": "PLATZHALTER (AP 12, ADR-0051): Technik, Forschung, Epochen. Alle Namen und Zahlen sind Vorschläge, KEINE bestätigten Spielinhalte (Blueprint §42: Epoche, Namen, Weltgeschichte offen). Jede Siedlung entscheidet selbst, was sie erforscht (§43). Erste Erforscher erhalten Anerkennung und einen zeitlich begrenzten Vorsprung; niemand kann eine Technik dauerhaft sperren (§44). v2 (AP 70, ADR-0079): drei weitere Techniken (Marktrecht, Lagerwesen, Stadtrecht) schalten höhere Stufen von Marktplatz, Lagerhaus und Rathaus frei; Dampfkraft schaltet Hafen Stufe 2 frei.",
+ "epochs": [
+  {
+   "id": "klassisch",
+   "name": "Klassisches Zeitalter"
+  },
+  {
+   "id": "fruehindustrie",
+   "name": "Frühe Industrie"
+  }
+ ],
+ "lead_days": 14,
+ "license_price": 500,
+ "adopt_permille": 400,
+ "min_research_days": 1,
+ "max_catch_up_days": 60,
+ "techs": {
+  "mauerbau": {
+   "name": "Mauerbau",
+   "epoch": 0,
+   "requires": [],
+   "days": 5,
+   "cost": {
+    "coins": 1500,
+    "items": {
+     "timber@standard": 40
+    }
+   },
+   "unlocks": "Stadtmauer ab Stufe 1"
+  },
+  "pflasterstrasse": {
+   "name": "Pflasterstraßen",
+   "epoch": 0,
+   "requires": [],
+   "days": 4,
+   "cost": {
+    "coins": 1200,
+    "items": {
+     "wooden_beam@standard": 30
+    }
+   },
+   "unlocks": "Straße ab Stufe 3"
+  },
+  "seefahrt": {
+   "name": "Seefahrt",
+   "epoch": 0,
+   "requires": [],
+   "days": 7,
+   "cost": {
+    "coins": 2500,
+    "items": {
+     "wooden_beam@standard": 40
+    }
+   },
+   "unlocks": "Hafen ab Stufe 1"
+  },
+  "dampfkraft": {
+   "name": "Dampfkraft",
+   "epoch": 1,
+   "requires": [
+    "mauerbau"
+   ],
+   "days": 10,
+   "cost": {
+    "coins": 8000,
+    "items": {
+     "iron_ingot@standard": 60
+    }
+   },
+   "unlocks": "noch ohne Wirkung (Epoche 2 folgt mit Weltgeschichte)"
+  },
+  "marktrecht": {
+   "name": "Marktrecht",
+   "epoch": 0,
+   "requires": [],
+   "days": 5,
+   "cost": {
+    "coins": 1800,
+    "items": {
+     "wooden_beam@standard": 30
+    }
+   },
+   "unlocks": "Marktplatz ab Stufe 2"
+  },
+  "lagerwesen": {
+   "name": "Lagerwesen",
+   "epoch": 0,
+   "requires": [],
+   "days": 5,
+   "cost": {
+    "coins": 1500,
+    "items": {
+     "timber@standard": 40
+    }
+   },
+   "unlocks": "Lagerhaus ab Stufe 2"
+  },
+  "stadtrecht": {
+   "name": "Stadtrecht",
+   "epoch": 1,
+   "requires": [
+    "marktrecht"
+   ],
+   "days": 10,
+   "cost": {
+    "coins": 6000,
+    "items": {
+     "iron_ingot@standard": 40
+    }
+   },
+   "unlocks": "Rathaus ab Stufe 2"
+  }
+ }
+}

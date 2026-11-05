@@ -165,7 +165,8 @@
           "coins": 2000,
           "items": {
             "wooden_beam@standard": 40
-          }
+          },
+          "requires_tech": "marktrecht"
         }
       ],
       "effect": {
@@ -189,7 +190,8 @@
           "coins": 1800,
           "items": {
             "wooden_beam@standard": 30
-          }
+          },
+          "requires_tech": "lagerwesen"
         },
         {
           "coins": 4000,
@@ -250,7 +252,8 @@
           "items": {
             "wooden_beam@standard": 80,
             "iron_ingot@standard": 30
-          }
+          },
+          "requires_tech": "dampfkraft"
         }
       ],
       "effect": {
@@ -276,7 +279,8 @@
           "items": {
             "wooden_beam@standard": 60,
             "iron_ingot@standard": 20
-          }
+          },
+          "requires_tech": "stadtrecht"
         }
       ],
       "effect": {

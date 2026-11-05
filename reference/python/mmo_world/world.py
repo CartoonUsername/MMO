@@ -45,7 +45,7 @@ ECHO_RULES = "echo_rules_v2.json"
 EQUIPMENT_RULES = "equipment_rules_v2.json"      # v2: Setboni (AP 61, ADR-0076); v1 bleibt erhalten
 BRANCH_RULES = "branch_rules_v1.json"
 SETTLEMENT_RULES = "settlement_rules_v2.json"      # v2: Marktplatz-Rabatt 250/500 ‰ (ADR-0067); v1 bleibt erhalten
-RESEARCH_RULES = "research_rules_v1.json"
+RESEARCH_RULES = "research_rules_v2.json"      # v2: Marktrecht, Lagerwesen, Stadtrecht (AP 70, ADR-0079); v1 bleibt erhalten
 COMMUNITY_RULES = "community_rules_v3.json"      # v3: Chronikart masterpiece_first (AP 46, ADR-0074); v2 bleibt erhalten
 
 

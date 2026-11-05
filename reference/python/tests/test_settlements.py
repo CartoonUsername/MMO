@@ -197,6 +197,21 @@ class SettlementTests(unittest.TestCase):
         s.R["wall_tax_relief"] = False                                              # ältere Regeln: keine Wirkung
         self.assertEqual(s.tax_of(mp), 12)
 
+    def test_new_techs_gate_higher_project_levels(self):             # AP 70
+        s, w = self.s, self.w
+        s.found("anna", "moorufer", "Moorheim")
+        s.buy_plot("anna", "moorufer", 1)
+        s.contribute("anna", "moorufer", "market_square", 800, {"timber@standard": 40})            # Stufe 1 frei
+        with self.assertRaises(WorldError) as cm:
+            s.contribute("anna", "moorufer", "market_square", 2000, {"wooden_beam@standard": 40})   # Stufe 2 braucht Marktrecht
+        self.assertIn("marktrecht", str(cm.exception))
+        self.assertEqual(w.research.R["version"], 2)
+        for tech in ("marktrecht", "lagerwesen", "stadtrecht", "dampfkraft"):
+            self.assertIn(tech, w.research.R["techs"])
+        w.research.known.setdefault("moorufer", {})["marktrecht"] = {"day": 1, "via": "test"}
+        self.assertTrue(s.contribute("anna", "moorufer", "market_square", 2000, {"wooden_beam@standard": 40})["completed"])
+        self.assertEqual(s.fee_discount_permille("anna"), 500)                                      # v2-Rabatt Stufe 2
+
     def test_plot_limit_and_roundtrip(self):
         s, w = self.s, self.w
         for n in (1, 2, 4):

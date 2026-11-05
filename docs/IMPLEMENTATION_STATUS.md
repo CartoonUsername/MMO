@@ -55,7 +55,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Dynamische NPC-Wirtschaft | teilweise | Markt, Preisdynamik (ADR-0015/0017), Weltereignisse mit Preisschocks, Markt-Fenster (ADR-0049); keine NPC-Lebensprofile |
 | Spielerunternehmen: Gründung, Personal, Beteiligungen, Produktion | vorhanden (Referenz) | ADR-0012/0016, `company.*`, `production.*` |
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
-| Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte, Spezialisierung, Produktionsvorsprung offen |
+| Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte seit AP 70 (ADR-0079, 7 Techniken); Spezialisierung, Produktionsvorsprung offen |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
 | Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (bis 8 Spieler, ADR-0058) seit AP 18/19 (ADR-0057); Gildenchat seit AP 66 (ADR-0078); Echtzeit-Zustellung offen |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |
