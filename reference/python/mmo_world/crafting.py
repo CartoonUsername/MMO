@@ -42,6 +42,7 @@ class CraftingService:
         self.cee, self.inv, self.day, self.server_id = service, inventory, day_provider, server_id
         self.rules = service.rules
         self._counter = 0
+        self.masterpiece: Callable[[str, str], None] = lambda char, recipe: None     # Welt meldet erste Meisterstücke (AP 46)
 
     def craft(self, character_id: str, recipe_id: str, quantity: int, material_grade: str,
               technique_id: str | None = None, element: str | None = None) -> CraftResult:
@@ -76,4 +77,6 @@ class CraftingService:
         self.inv.apply(character_id, {}, produced)
         if xp > 0:  # Berufsfortschritt nur aus gedeckelten Punkten -> kein unbegrenztes Hochfarmen
             self.cee.record(character_id, "profession.work", {"profession": recipe["profession"], "xp": xp})
+        if quality == cfg["tiers"][-1]:
+            self.masterpiece(character_id, recipe_id)
         return CraftResult(event, quality, needed, produced, xp)

@@ -140,5 +140,38 @@ class MigrationAndPersistenceTests(unittest.TestCase):              # AP 38
             w9.specialize("anna", "smithing", "refining")
 
 
+class MasterpieceChronicleTests(unittest.TestCase):                  # AP 46: erstes Meisterstück je Rezept in der Weltchronik (ADR-0074)
+    def setUp(self):
+        from mmo_world.world import World
+        self.w = World("rules_v10.json")
+        for c in ("anna", "ben"):
+            self.w.svc.create(c, "player")
+            self.w.svc.record(c, "identity.xp_gained", {"amount": 10000})
+            self.w.inv.deposit(c, "iron_ore@standard", 100)
+
+    def test_only_the_first_masterpiece_of_a_recipe_is_chronicled(self):
+        w = self.w
+        w.crafting.masterpiece("anna", "iron_ingot")                                  # Haken, den craft() bei Spitzengüte ruft
+        w.crafting.masterpiece("ben", "iron_ingot")
+        w.crafting.masterpiece("ben", "bread")
+        rows = [e for e in w.chronicle.entries if e["kind"] == "masterpiece_first"]
+        self.assertEqual([(e["chars"], e["data"]["recipe"]) for e in rows], [(["anna"], "iron_ingot"), (["ben"], "bread")])
+        self.assertEqual([t["name"] for t in w.chronicle.titles["anna"]], ["Erstes Meisterstück: iron ingot"])
+        self.assertEqual(w.chronicle.prestige("anna")["points"], 15)
+
+    def test_craft_calls_the_hook_only_for_top_quality(self):
+        calls = []
+        self.w.crafting.masterpiece = lambda c, r: calls.append((c, r))
+        r = self.w.crafting.craft("anna", "iron_ingot", 1, "standard")
+        self.assertNotEqual(r.quality, self.w.crafting.rules["crafting"]["tiers"][-1])
+        self.assertEqual(calls, [])
+
+    def test_older_community_rules_do_not_break_crafting_hook(self):
+        w = self.w
+        del w.chronicle.R["kinds"]["masterpiece_first"]
+        w.crafting.masterpiece("anna", "iron_ingot")                                  # keine Ausnahme, kein Eintrag
+        self.assertEqual([e for e in w.chronicle.entries if e["kind"] == "masterpiece_first"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

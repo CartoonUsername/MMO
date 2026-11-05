@@ -310,7 +310,7 @@ async function refreshGuild(){
   if(off){const w=el("button","Auszahlen");w.onclick=()=>done("guild.take",{item_key:ik.value.trim(),qty:parseInt(iq.value,10)||0},"Ausgezahlt");box.appendChild(w)}
   const lv=el("button",lead?"Gilde auflösen":"Gilde verlassen");lv.onclick=()=>{if(confirm(lead?"Gilde auflösen? Die Kasse geht an dich.":"Gilde verlassen?"))done(lead?"guild.disband":"guild.leave",{},"Erledigt")};box.appendChild(lv)
 }
-const CHRON_TXT={settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name,raid_cleared:e=>"bezwang als Erste den Raid "+e.data.name};
+const CHRON_TXT={masterpiece_first:e=>"fertigte als Erste ein Meisterstück: "+e.data.name,settlement_founded:e=>"gründete die Siedlung "+e.data.name,tech_discovered:e=>"entdeckte als Erste die Technik "+e.data.name,epoch:e=>"Die Welt tritt ein ins "+e.data.name,guild_founded:e=>"gründete die Gilde "+e.data.name,boss_defeated:e=>"besiegte als Erste "+e.data.name,dungeon_cleared:e=>"bezwang als Erste "+e.data.name,raid_cleared:e=>"bezwang als Erste den Raid "+e.data.name};
 async function refreshChron(){
   const box=$("chronBox");box.textContent="";
   const p=await call("query.prestige",{});if(p.ok){kv(box,"Ruhmpunkte",p.result.points);const ts=p.result.titles.map(t=>t.name).concat(p.result.research_titles);box.appendChild(el("div","Titel: "+(ts.length?ts.join(", "):"noch keine"),"hint"))}

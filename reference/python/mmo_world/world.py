@@ -46,7 +46,7 @@ EQUIPMENT_RULES = "equipment_rules_v1.json"
 BRANCH_RULES = "branch_rules_v1.json"
 SETTLEMENT_RULES = "settlement_rules_v2.json"      # v2: Marktplatz-Rabatt 250/500 ‰ (ADR-0067); v1 bleibt erhalten
 RESEARCH_RULES = "research_rules_v1.json"
-COMMUNITY_RULES = "community_rules_v2.json"
+COMMUNITY_RULES = "community_rules_v3.json"      # v3: Chronikart masterpiece_first (AP 46, ADR-0074); v2 bleibt erhalten
 
 
 class World:
@@ -62,6 +62,10 @@ class World:
         self.company_rules = load_company_rules(company_rules)
         self.company_registry = CompanyRegistry(self.company_rules)
         self._wire(clock)
+
+    def _masterpiece_made(self, char: str, recipe_id: str) -> None:
+        if "masterpiece_first" in self.chronicle.R["kinds"]:                                     # ältere Gemeinschaftsregeln kennen die Art nicht
+            self.chronicle.record("masterpiece_first", [char], key=f"masterpiece:{recipe_id}", name=recipe_id.replace("_", " "), recipe=recipe_id)
 
     def specialize(self, char: str, profession: str, branch: str) -> dict[str, Any]:
         """Zweigwahl / Respezialisierung eines Berufs (AP 33, ADR-0068): CEE prüft Erfahrung, Zweig und Abklingzeit, die Welt nimmt die Münzen (Senke)."""
@@ -127,6 +131,7 @@ class World:
         if oldg2 is not None:
             self.guilds._counter, self.guilds.guilds, self.guilds.member_of, self.guilds.invites = oldg2._counter, oldg2.guilds, oldg2.member_of, oldg2.invites
         self.settlements.record = self.research.record = self.guilds.record = self.chronicle.record
+        self.crafting.masterpiece = self._masterpiece_made                                       # erstes Meisterstück je Rezept (AP 46)
         oldp = getattr(self, "production", None)
         self.production = ProductionService(self.svc, self.inv, self.company, load_production_rules(PRODUCTION_RULES), clock, sid, self.trading)
         self.production.extra_lines, self.production.extra_storage, self.production.offline_cap = (

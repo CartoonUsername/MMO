@@ -1,0 +1,140 @@
+{
+  "version": "3",
+  "_comment": "PLATZHALTER (AP 13, ADR-0052): Gilden, Weltchronik, Prestige. Alle Zahlen sind Vorschläge, KEINE bestätigten Spielinhalte (Blueprint §45 'noch nicht vollständig ausgearbeitet', §48 Vorschlag). Stadtpolitik ist zurückgestellt (§46) und nicht enthalten. Gilden sind freiwillig: nichts Grundlegendes hängt an einer Gilde, Einzelspieler verlieren keinen Zugang. v2 (AP 18, ADR-0057): Gildenforschung und Raid-Punkte.",
+  "guild": {
+    "found_cost": 1000,
+    "name_len": [
+      3,
+      24
+    ],
+    "tag_len": [
+      2,
+      4
+    ],
+    "base_members": 20,
+    "max_invites_per_char": 5,
+    "roles": [
+      "leader",
+      "officer",
+      "member"
+    ],
+    "house": {
+      "name": "Gildenhaus",
+      "levels": [
+        {
+          "coins": 1500,
+          "items": {
+            "timber@standard": 40
+          }
+        },
+        {
+          "coins": 4000,
+          "items": {
+            "wooden_beam@standard": 60
+          }
+        },
+        {
+          "coins": 9000,
+          "items": {
+            "wooden_beam@standard": 100,
+            "iron_ingot@standard": 40
+          }
+        }
+      ],
+      "member_cap": [
+        20,
+        30,
+        40,
+        60
+      ]
+    },
+    "points": {
+      "boss": 5,
+      "dungeon": 3,
+      "contribute_per_100": 1,
+      "raid": 8
+    },
+    "research": {
+      "_comment": "PLATZHALTER (AP 18): Gildenforschung aus der Gildenkasse; Dauer in Tagen; Wirkungen bewusst klein (kein Zwang zur Gilde, §45/§49). raid_entries: zusätzliche Raid-Zutritte je Tag für die Gilde; member_cap: zusätzliche Mitgliederplätze; raid_treasury_permille: Zuschlag auf die Raid-Gildenkasse.",
+      "techs": {
+        "scouting": {
+          "name": "Spähtrupps",
+          "cost": {
+            "coin@gold": 2000,
+            "timber@standard": 20
+          },
+          "days": 2,
+          "requires": null,
+          "effect": {
+            "raid_entries": 1
+          }
+        },
+        "banners": {
+          "name": "Gildenbanner",
+          "cost": {
+            "coin@gold": 1500,
+            "timber@standard": 30
+          },
+          "days": 2,
+          "requires": null,
+          "effect": {
+            "member_cap": 5
+          }
+        },
+        "strongbox": {
+          "name": "Gildentruhe",
+          "cost": {
+            "coin@gold": 4000,
+            "iron_ingot@standard": 20
+          },
+          "days": 3,
+          "requires": "scouting",
+          "effect": {
+            "raid_treasury_permille": 250
+          }
+        }
+      }
+    }
+  },
+  "chronicle": {
+    "page_max": 50,
+    "kinds": {
+      "settlement_founded": {
+        "title": "Gründer von {name}",
+        "prestige": 20
+      },
+      "tech_discovered": {
+        "title": null,
+        "prestige": 30
+      },
+      "epoch": {
+        "title": null,
+        "prestige": 0
+      },
+      "guild_founded": {
+        "title": null,
+        "prestige": 10
+      },
+      "boss_defeated": {
+        "title": "Bezwinger von {name}",
+        "prestige": 40,
+        "first_only": true
+      },
+      "dungeon_cleared": {
+        "title": "Erstbezwinger von {name}",
+        "prestige": 25,
+        "first_only": true
+      },
+      "raid_cleared": {
+        "title": "Raid-Bezwinger von {name}",
+        "prestige": 35,
+        "first_only": true
+      },
+      "masterpiece_first": {
+        "title": "Erstes Meisterstück: {name}",
+        "prestige": 15,
+        "first_only": true
+      }
+    }
+  }
+}
