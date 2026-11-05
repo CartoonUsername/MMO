@@ -296,6 +296,9 @@ async function refreshGuild(){
     sect(box,"Gilden der Welt");for(const x of v.directory)box.appendChild(el("div",x.name+" ["+x.tag+"] · "+x.members+" Mitglieder · "+x.points+" Punkte","hint"));return}
   sect(box,g.name+" ["+g.tag+"] · "+g.role);kv(box,"Punkte",g.points);kv(box,"Mitglieder",g.members.length+"/"+g.capacity);
   const lead=g.role==="leader",off=lead||g.role==="officer";
+  sect(box,"Gildenchat");for(const m of (g.chat||[]).slice(-12))box.appendChild(el("div","Tag "+m.day+" · "+m.char+": "+m.text,"hint"));
+  {const row=el("div","","row2"),inp=textInput("Nachricht (bis 64 Zeichen)");inp.maxLength=64;const sb=el("button","Senden");
+   const send=()=>{const t=inp.value.trim();if(t)done("guild.say",{text:t},"Gesendet")};sb.onclick=send;inp.onkeydown=e=>{if(e.key==="Enter")send()};row.append(inp,sb);box.appendChild(row)}
   for(const m of g.members){const acts=[];
     if(lead&&m.char!==me){acts.push([m.role==="officer"?"Zum Mitglied":"Zum Offizier",()=>done("guild.role",{target:m.char,role:m.role==="officer"?"member":"officer"},"Rolle geändert")],["Leitung übergeben",()=>{if(confirm("Leitung an "+m.char+" übergeben?"))done("guild.role",{target:m.char,role:"leader"},"Übergeben")}])}
     if(off&&m.char!==me&&m.role!=="leader")acts.push(["Entfernen",()=>{if(confirm(m.char+" entfernen?"))done("guild.kick",{target:m.char},"Entfernt")}]);

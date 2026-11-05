@@ -102,6 +102,7 @@ namespace Mmo
             new Cmd("guild.role", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("target", 's', false), new Arg("role", 's', false) }),
             new Cmd("guild.disband", true, "char", new Arg[] { new Arg("char", 's', false) }),
             new Cmd("guild.research", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("tech", 's', false) }),
+            new Cmd("guild.say", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("text", 's', false) }),
             new Cmd("guild.stash", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("item_key", 's', false), new Arg("qty", 'i', false) }),
             new Cmd("guild.take", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("item_key", 's', false), new Arg("qty", 'i', false) }),
             new Cmd("guild.contribute", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("coins", 'i', true), new Arg("item_key", 's', true), new Arg("qty", 'i', true) }),

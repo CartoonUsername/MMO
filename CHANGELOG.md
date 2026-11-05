@@ -39,6 +39,7 @@
 - AP 61/63: Ausrüstungssets mit Setbonus (equipment_rules_v2, ADR-0076) samt Tests; noch nicht deployt.
 - AP 62: `query.equipment` liefert `sets`; Browser zeigt Setfortschritt und aktive Boni. Im echten Browser ungetestet.
 - AP 64/65: Mauer senkt die Grundsteuer im Ort (settlement_rules_v2, ADR-0077, Vorschlag/Notlösung), Browser-Beschriftung; noch nicht deployt.
+- AP 66–69: Gildenchat (`guild.say`, 64 Zeichen, 30/Tag, Verlauf 50; ADR-0078), Browser-Eingabe, Tests; noch nicht deployt.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

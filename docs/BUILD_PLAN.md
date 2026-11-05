@@ -67,6 +67,10 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 63 | Tests Setboni (Güte-unabhängig, Kappen, Validierung) | §31 | 2/3 | **fertig** (nur Test) |
 | 64 | Mauer-Wirkung: Grundsteuerrabatt | Siedlungen | 2/3 | **fertig** (ADR-0077, Notlösung) |
 | 65 | Anzeige des Steuerrabatts (Abfrage-Steuer + Browser-Beschriftung) | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
+| 66 | Gildenchat (Server) | §45 | 3 | **fertig** (ADR-0078) |
+| 67 | Gildenchat in der Gildenabfrage / Persistenz | §45 | 3 | **fertig** (Test inkl. Export/Import) |
+| 68 | Browser: Gildenchat | §45 | 3 | **fertig, im echten Browser ungetestet** |
+| 69 | Missbrauchstests Gildenchat | §50–55 | 4 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

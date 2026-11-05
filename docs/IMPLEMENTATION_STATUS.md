@@ -57,7 +57,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
 | Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte, Spezialisierung, Produktionsvorsprung offen |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
-| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (bis 8 Spieler, ADR-0058) seit AP 18/19 (ADR-0057); Chat, Client-Fenster dafür offen |
+| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (bis 8 Spieler, ADR-0058) seit AP 18/19 (ADR-0057); Gildenchat seit AP 66 (ADR-0078); Echtzeit-Zustellung offen |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |
 | Weltchronik, Prestige | teilweise (neu) | Chronik mit Erstleistungen, Titel, Ruhmpunkte, Fenster (ADR-0052); seltene Inhalte offen |
 | Stadtpolitik | zurückgestellt | nicht bauen |

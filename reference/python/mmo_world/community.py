@@ -349,6 +349,25 @@ class GuildService:
         if gid is not None:
             self.guilds[gid]["points"] += self.R["points"][kind]
 
+    CHAT_KEEP, CHAT_MAX_LEN, CHAT_PER_DAY = 50, 64, 30      # 64 = Stringgrenze des Protokolls
+
+    def say(self, char: str, text: str) -> dict[str, Any]:
+        """Gildenchat (AP 66, ADR-0078): kurze Nachricht an alle Mitglieder; Verlauf (letzte 50) und Tagesgrenze je Figur."""
+        g = self._mine(char)
+        if not isinstance(text, str):
+            raise WorldError("Nachricht muss Text sein")
+        text = text.strip()
+        if not text or len(text) > self.CHAT_MAX_LEN or any(ord(c) < 32 for c in text):
+            raise WorldError(f"Nachricht: 1 bis {self.CHAT_MAX_LEN} Zeichen, ohne Steuerzeichen")
+        chat, today = g.setdefault("chat", []), self.day()
+        if sum(1 for m in chat if m["char"] == char and m["day"] == today) >= self.CHAT_PER_DAY:
+            raise WorldError("Tageslimit für Gildennachrichten erreicht")
+        g["chat_n"] = g.get("chat_n", 0) + 1
+        msg = {"n": g["chat_n"], "day": today, "char": char, "text": text}
+        chat.append(msg)
+        del chat[:-self.CHAT_KEEP]
+        return msg
+
     def view(self, char: str) -> dict[str, Any]:
         gid = self.member_of.get(char)
         mine = None
@@ -365,7 +384,7 @@ class GuildService:
             mine = {"id": gid, "name": g["name"], "tag": g["tag"], "role": g["members"][char], "founded": g["founded"], "points": g["points"],
                     "members": [{"char": m, "role": r, "contributed": g["contrib"].get(m, 0)} for m, r in sorted(g["members"].items())],
                     "capacity": self.capacity(g), "house": {"level": h["level"], "max": len(levels), "next": nxt}, "research": self.research_view(g),
-                    "treasury": self.inv.holdings(self.treasury(gid)) if g["members"][char] in ("leader", "officer") else None, "log": g["log"][-15:]}
+                    "treasury": self.inv.holdings(self.treasury(gid)) if g["members"][char] in ("leader", "officer") else None, "log": g["log"][-15:], "chat": g.get("chat", [])[-30:]}
         return {"mine": mine, "invites": [{"id": i, "name": self.guilds[i]["name"], "tag": self.guilds[i]["tag"]} for i in self.invites.get(char, []) if i in self.guilds],
                 "found_cost": self.R["found_cost"], "coins": self.inv.balance(char, self.coin),
                 "directory": [{"id": g["id"], "name": g["name"], "tag": g["tag"], "members": len(g["members"]), "points": g["points"]}
