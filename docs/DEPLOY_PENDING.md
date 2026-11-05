@@ -19,3 +19,6 @@ Auf dem VPS läuft Commit `ee249f9` (AP 16–21, 2026-11-05). **Nicht bereitgest
 - Unity-Client: Namen der Kombinationszauber ohne Unity-Editor kompiliert/geprüft; keine Anzeige der Zweigwahl.
 - Alte Spielstände: `tests/test_old_state_compat.py` (AP 72) lädt einen unter den alten Regeldateien gespeicherten Stand unter den neuen Standards und prüft Konsistenz, Weiterspielen und erneutes Speichern; auf dem echten Spielstand nicht erprobt.
 - Der Upgrade-Ablauf ist nur im Test mit einem Wegwerf-Spielstand gelaufen.
+
+## Browser-Rauchtest (AP 90–92)
+Vor einem Deployment: `scripts/browser_smoke.sh` ausführen (braucht Node ≥ 22 und Chromium; Port per `PORT`). Prüft Fenster, Gildenchat, Titelwahl und Grundstücksangebot im echten Browser gegen einen Wegwerf-Server.
