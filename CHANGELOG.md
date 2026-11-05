@@ -34,6 +34,7 @@
 - AP 53: aktiver Berufszweig gibt +50 Gütepunkte für seine Rezepte (rules_v10, ADR-0075); noch nicht deployt.
 - AP 54: Browser-Hinweis nennt den Gütebonus. AP 55: echter Herstellungsweg bis zum Meisterwerk getestet, schließt die Lücke aus AP 46.
 - AP 56–58: Offene Grundstücksangebote (`plot.sell` ohne Käufer, jeder darf annehmen; `sales_open` in der Abfrage), Browser-Liste und Verkaufsdialog, Missbrauchstests (ADR-0073 ergänzt). Im echten Browser ungetestet.
+- AP 59: Fuzz-Test läuft auch auf rules_v10 und kennt echte Orte, Berufe und Zweige; Zweigwahl, Grundstücksverkauf, -annahme und -rücknahme erreichen Erfolgspfade, Invarianten (keine Münzen/Waren aus dem Nichts, Konsistenz) halten.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

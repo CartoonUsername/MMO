@@ -60,6 +60,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 56 | Offene Grundstücksangebote (Server) | Siedlungen | 2/3 | **fertig** (ADR-0073 ergänzt) |
 | 57 | Browser: offene Angebote und Verkaufsdialog | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
 | 58 | Missbrauchstests offene Angebote | §50–55 | 4 | **fertig** (nur Test) |
+| 59 | Fuzz-Test für rules_v10 und die neuen Befehle | §50–55 | 4 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 
