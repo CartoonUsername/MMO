@@ -658,6 +658,27 @@ def scenario_economy_directions() -> dict[str, Any]:
     }
 
 
+SPEC_EV = "profession.specialize"
+
+
+def scenario_profession_specialization() -> dict[str, Any]:
+    sp = lambda prof, branch, day: (SPEC_EV, {"profession": prof, "branch": branch, "day": day})  # noqa: E731
+    return {
+        "description": "Zweigwahl und Respezialisierung (rules v10): Erfahrung nötig, gültiger Zweig, Abklingzeit 7 Tage, kein Wechsel auf denselben Zweig, kein Zurückspringen des Tages.",
+        "rules_file": "rules_v10.json",
+        "steps": [
+            _created(), sp("smithing", "refining", 1),                                    # noch keine Erfahrung
+            ("profession.work", {"profession": "smithing", "xp": 50}),
+            sp("smithing", "nope", 1), sp("alchemy", "refining", 1), sp("smithing", "refining", -1), sp("smithing", "refining", True),
+            (SPEC_EV, {"profession": "smithing", "branch": "refining"}), (SPEC_EV, {"profession": "smithing", "branch": "refining", "day": 1, "x": 1}),
+            sp("smithing", "refining", 3),
+            sp("smithing", "refining", 20), sp("smithing", "heavy_arms", 9), sp("smithing", "heavy_arms", 2),   # gleicher Zweig, Abklingzeit, Rücksprung
+            sp("smithing", "heavy_arms", 10), sp("smithing", "shadow_alloys", 17),
+            ("profession.work", {"profession": "farming", "xp": 10}), sp("farming", "baking", 17),
+        ],
+    }
+
+
 SCENARIOS = {
     "identity_basic": scenario_identity_basic,
     "element_limits": scenario_element_limits,
@@ -683,6 +704,7 @@ SCENARIOS = {
     "economy_directions": scenario_economy_directions,
     "economy_dynamic_reference": scenario_economy_dynamic_reference,
     "combat_abilities_loadout": scenario_combat_abilities_loadout,
+    "profession_specialization": scenario_profession_specialization,
 }
 
 

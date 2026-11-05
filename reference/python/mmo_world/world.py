@@ -24,6 +24,7 @@ from .branches import BranchService, load_branch_rules
 from .echo import EchoService, load_echo_rules
 from .direct_trade import DirectTrade, load_trade_rules
 from .discovery import DiscoveryRegistry
+from .errors import WorldError
 from .notifications import Outbox
 from .party import PartyService, load_party_rules
 from .exchange import Exchange, load_market_rules
@@ -61,6 +62,23 @@ class World:
         self.company_rules = load_company_rules(company_rules)
         self.company_registry = CompanyRegistry(self.company_rules)
         self._wire(clock)
+
+    def specialize(self, char: str, profession: str, branch: str) -> dict[str, Any]:
+        """Zweigwahl / Respezialisierung eines Berufs (AP 33, ADR-0068): CEE prüft Erfahrung, Zweig und Abklingzeit, die Welt nimmt die Münzen (Senke)."""
+        from mmo_cee.professions import SPEC_EVENT
+        cfg = self.svc.rules_of(char)["professions"].get("specialization")
+        if cfg is None:
+            raise WorldError("Zweigwahl gibt es in dieser Regelversion nicht")
+        payload = {"profession": profession, "branch": branch, "day": self.day[0]}
+        state = self.svc.state(char)
+        self.svc.projector.validate(state, SPEC_EVENT, payload)                 # vorab prüfen, damit nichts bezahlt wird, was abgelehnt würde
+        cost = cfg["cost_change" if state.parts["profession"].get("spec", {}).get(profession) else "cost_first"]
+        if cost and self.inv.balance(char, self.trading.coin) < cost:
+            raise WorldError(f"Zu wenig Münzen ({cost} nötig)")
+        if cost:
+            self.inv.apply(char, {self.trading.coin: cost}, {})
+        self.svc.record(char, SPEC_EVENT, payload)
+        return {"profession": profession, "branch": branch, "day": payload["day"], "paid": cost}
 
     def _wire(self, clock: Any) -> None:
         """(Neu) verdrahtet die Dienste mit den aktuellen Registern; Zähler der Dienste bleiben erhalten, wenn vorhanden."""

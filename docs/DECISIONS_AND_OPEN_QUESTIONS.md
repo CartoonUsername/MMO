@@ -14,7 +14,7 @@ Windows-PC zuerst · Unity 6 als Engine (ADR-0054) · serverautoritativ · alle 
 | 7 | Gleichzeitige Echos | 3 Slots (Haupttradition + 2), Hybrid erst ab Meisterschaft |
 | 8 | Resonanz-Raten | Kurve fällt von 100 % (+0..+5) auf ca. 20 % (+25..+30), nie Zerstörung, Rückschritt nur ab +15, Pechschutz addiert pro Fehlschlag; Zahlen in Regeldatei, nie im Code |
 | 9 | Serverexklusive Echos | wenige Weltbosse; Verbreitung nach Epochenwechsel |
-| 10 | Berufswechsel | Respezialisierung gegen Kosten und Abklingzeit, Meisterschaft bleibt als Historie erhalten |
+| 10 | Berufswechsel | Respezialisierung gegen Kosten und Abklingzeit, Meisterschaft bleibt als Historie erhalten (umgesetzt als Vorschlag in AP 33, ADR-0068) |
 | 17 | Währung/Gebühren | eine Währung, Marktgebühr 3 %, NPC-Senke gegen Inflation |
 | 18 | Grundstücke | feste Größenklassen S/M/L, Besitzlimit je Figur |
 | 25 | Monetarisierung | nur kosmetisch/Komfort ohne Spielvorteil |

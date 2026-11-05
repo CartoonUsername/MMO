@@ -108,6 +108,7 @@ namespace Mmo
             new Cmd("query.chronicle", false, "", new Arg[] { new Arg("offset", 'i', true), new Arg("limit", 'i', true), new Arg("kind", 's', true) }),
             new Cmd("query.prestige", false, "char", new Arg[] { new Arg("char", 's', false) }),
             new Cmd("query.echoes", false, "char", new Arg[] { new Arg("char", 's', false) }),
+            new Cmd("profession.specialize", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("profession", 's', false), new Arg("branch", 's', false) }),
             new Cmd("equip.wear", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("item_key", 's', false) }),
             new Cmd("equip.remove", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("slot", 's', false) }),
             new Cmd("equip.look", true, "char", new Arg[] { new Arg("char", 's', false), new Arg("slot", 's', false), new Arg("item", 's', true) }),

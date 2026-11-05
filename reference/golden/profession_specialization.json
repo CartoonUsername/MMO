@@ -1,0 +1,651 @@
+{
+  "character_id": "c1",
+  "derived": {
+    "ability_progress": {
+      "ally_mend": {
+        "command": null,
+        "equipped": false,
+        "kind": "support",
+        "missing": [
+          "direction:supporter>=1"
+        ]
+      },
+      "ally_ward": {
+        "command": null,
+        "equipped": false,
+        "kind": "support",
+        "missing": [
+          "direction:supporter>=2"
+        ]
+      },
+      "disrupting_blow": {
+        "command": "stun",
+        "equipped": false,
+        "kind": "control",
+        "missing": [
+          "direction:controller>=1"
+        ]
+      },
+      "ember_strike": {
+        "command": null,
+        "equipped": false,
+        "kind": "attack",
+        "missing": [
+          "direction:vanguard>=2",
+          "attuned:fire"
+        ]
+      },
+      "flowing_step": {
+        "command": null,
+        "equipped": false,
+        "kind": "mobility",
+        "missing": [
+          "direction:skirmisher>=1"
+        ]
+      },
+      "hindering_mark": {
+        "command": "slow",
+        "equipped": false,
+        "kind": "control",
+        "missing": [
+          "direction:controller>=1"
+        ]
+      },
+      "power_strike": {
+        "command": "heavy",
+        "equipped": false,
+        "kind": "attack",
+        "missing": [
+          "direction:vanguard>=1"
+        ]
+      },
+      "riposte": {
+        "command": null,
+        "equipped": false,
+        "kind": "defense",
+        "missing": [
+          "direction:guardian>=2"
+        ]
+      },
+      "shield_wall": {
+        "command": null,
+        "equipped": false,
+        "kind": "defense",
+        "missing": [
+          "direction:guardian>=1"
+        ]
+      },
+      "twilight_veil": {
+        "command": null,
+        "equipped": false,
+        "kind": "utility",
+        "missing": [
+          "form:twilight_kin"
+        ]
+      },
+      "veteran_focus": {
+        "command": null,
+        "equipped": false,
+        "kind": "utility",
+        "missing": [
+          "level>=15"
+        ]
+      }
+    },
+    "allowed_commands": [
+      "block",
+      "dodge",
+      "flee",
+      "light"
+    ],
+    "combat_directions": {},
+    "craft_direction_scores": {
+      "elemental_smith": 0,
+      "fine_artisan": 0,
+      "glass_alchemist": 0,
+      "inventor": 0,
+      "mass_producer": 0
+    },
+    "craft_directions": {},
+    "craft_profile": {
+      "finesse": 0,
+      "infusion": 0,
+      "innovation": 0,
+      "volume": 0
+    },
+    "discovery_progress": {
+      "frostglass_recipe": {
+        "evidence": [],
+        "evidence_missing": [
+          "frost_lily",
+          "glass_sand",
+          "cold_kiln",
+          "first_cast"
+        ],
+        "evidence_needed": 4,
+        "known": false,
+        "missing_requirements": [
+          "profession:alchemy>=2",
+          "attuned:ice"
+        ],
+        "ready": false
+      },
+      "iron_folding": {
+        "evidence": [],
+        "evidence_missing": [
+          "ore_sample_a",
+          "ore_sample_b",
+          "forge_trial"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "profession:smithing>=3"
+        ],
+        "ready": false
+      },
+      "old_shrine_map": {
+        "evidence": [],
+        "evidence_missing": [
+          "shrine_mural",
+          "hermit_story"
+        ],
+        "evidence_needed": 2,
+        "known": false,
+        "missing_requirements": [],
+        "ready": false
+      },
+      "twilight_rite": {
+        "evidence": [],
+        "evidence_missing": [
+          "dusk_altar",
+          "dawn_altar",
+          "blended_light"
+        ],
+        "evidence_needed": 3,
+        "known": false,
+        "missing_requirements": [
+          "level>=20",
+          "attuned:light",
+          "attuned:shadow",
+          "discovery:old_shrine_map"
+        ],
+        "ready": false
+      },
+      "windrider_glider": {
+        "evidence": [],
+        "evidence_missing": [
+          "wing_sketch",
+          "thermal_survey",
+          "cloth_test",
+          "frame_test",
+          "first_flight"
+        ],
+        "evidence_needed": 5,
+        "known": false,
+        "missing_requirements": [
+          "level>=15",
+          "profession:engineering>=2",
+          "profession:research>=3"
+        ],
+        "ready": false
+      }
+    },
+    "economic_direction_scores": {
+      "apothecary_trader": 0,
+      "arms_dealer": 0,
+      "grocer": 0,
+      "luxury_trader": 0,
+      "materials_broker": 0,
+      "merchant": 0
+    },
+    "economic_directions": {},
+    "economic_profile": {
+      "best_rung": -1,
+      "companies_founded_total": 0,
+      "companies_open": 0,
+      "company_id": null,
+      "network_size": 0,
+      "role": null,
+      "rung": -1,
+      "trades": 0
+    },
+    "eligible_essences": [],
+    "essence_profile": {
+      "advantages": {},
+      "disadvantages": {},
+      "form": "human"
+    },
+    "essence_scores": {
+      "ember_kin": {
+        "contributions": {
+          "combat_direction:vanguard": 0,
+          "decision:ember_vow:accept": 0,
+          "discovery:iron_folding": 0,
+          "element_affinity:fire": 0,
+          "element_attuned:fire": 0,
+          "profession:smithing": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "grove_warden": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:grove_rite:accept": 0,
+          "element_attuned:nature": 0,
+          "profession:alchemy": 0,
+          "profession:farming": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "stone_born": {
+        "contributions": {
+          "combat_direction:guardian": 0,
+          "decision:mountain_oath:accept": 0,
+          "element_attuned:earth": 0,
+          "profession:construction": 0,
+          "profession:mining": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "tide_walker": {
+        "contributions": {
+          "combat_direction:supporter": 0,
+          "decision:ember_vow:refuse": 0,
+          "element_attuned:water": 0,
+          "profession:logistics": 0,
+          "profession:trade": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "twilight_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "discovery:twilight_rite": 0,
+          "element_attuned:light": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      },
+      "umbral_kin": {
+        "contributions": {
+          "combat_direction:duelist": 0,
+          "combat_direction:skirmisher": 0,
+          "decision:shadow_pact:accept": 0,
+          "element_affinity:shadow": 0,
+          "element_attuned:shadow": 0
+        },
+        "eligible": false,
+        "score": 0,
+        "threshold": 600
+      }
+    },
+    "known_discoveries": [],
+    "known_recipes": [
+      "bread",
+      "healing_salve",
+      "iron_ingot",
+      "wooden_beam"
+    ],
+    "known_techniques": [],
+    "loadout_slots": 2,
+    "style_profile": {
+      "control": 0,
+      "defense": 0,
+      "mobility": 0,
+      "precision": 0,
+      "strength": 0,
+      "support": 0
+    },
+    "unlocked_abilities": []
+  },
+  "description": "Zweigwahl und Respezialisierung (rules v10): Erfahrung nötig, gültiger Zweig, Abklingzeit 7 Tage, kein Wechsel auf denselben Zweig, kein Zurückspringen des Tages.",
+  "final_state": {
+    "combat": {
+      "daily": {
+        "day": 0,
+        "opponents": {},
+        "points": {
+          "control": 0,
+          "defense": 0,
+          "mobility": 0,
+          "precision": 0,
+          "strength": 0,
+          "support": 0
+        }
+      },
+      "encounters": {},
+      "loadout": [],
+      "loadout_day": 0,
+      "points": {
+        "control": 0,
+        "defense": 0,
+        "mobility": 0,
+        "precision": 0,
+        "strength": 0,
+        "support": 0
+      },
+      "stats": {
+        "defeat": 0,
+        "fled": 0,
+        "victory": 0
+      }
+    },
+    "crafting": {
+      "crafts": {},
+      "daily": {
+        "day": 0,
+        "points": {
+          "finesse": 0,
+          "infusion": 0,
+          "innovation": 0,
+          "volume": 0
+        },
+        "recipes": {}
+      },
+      "elements": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "families": {
+        "glass": 0,
+        "grain": 0,
+        "herb": 0,
+        "metal": 0,
+        "stone": 0,
+        "wood": 0
+      },
+      "points": {
+        "finesse": 0,
+        "infusion": 0,
+        "innovation": 0,
+        "volume": 0
+      },
+      "recipes": {},
+      "techniques": {}
+    },
+    "discovery": {
+      "evidence": {},
+      "known": {},
+      "last_day": 0
+    },
+    "economy": {
+      "career": {
+        "best_rung": -1,
+        "changes": 0,
+        "company_id": null,
+        "role": null,
+        "since_day": 0
+      },
+      "classes": {
+        "food": 0,
+        "luxury": 0,
+        "materials": 0,
+        "medicine": 0,
+        "weapons": 0
+      },
+      "counterparties": {},
+      "daily": {
+        "counterparties": {},
+        "day": 0,
+        "points": {
+          "network": 0,
+          "volume": 0
+        }
+      },
+      "founded": {},
+      "last_day": 0,
+      "points": {
+        "network": 0,
+        "volume": 0
+      },
+      "trades": {}
+    },
+    "element": {
+      "affinity": {
+        "earth": 0,
+        "electric": 0,
+        "fire": 0,
+        "ice": 0,
+        "light": 0,
+        "nature": 0,
+        "shadow": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "attuned": []
+    },
+    "essence": {
+      "adopted_at_seq": null,
+      "decisions": {},
+      "form": "human",
+      "trials_passed": []
+    },
+    "identity": {
+      "base_class": null,
+      "kind": "player",
+      "level": 1,
+      "xp": 0
+    },
+    "profession": {
+      "spec": {
+        "farming": {
+          "branch": "baking",
+          "day": 17
+        },
+        "smithing": {
+          "branch": "shadow_alloys",
+          "day": 17
+        }
+      },
+      "xp": {
+        "farming": 10,
+        "smithing": 50
+      }
+    }
+  },
+  "final_state_sha256": "785d5fd9d7145793415a4c61fa6f16c57071275e9e010798e390140ca50afa18",
+  "format": 1,
+  "name": "profession_specialization",
+  "rules_file": "rules_v10.json",
+  "rules_sha256": "45e251071f5707fdae43065bf73adec746f26e8f168d77e140b1fba8271aaa83",
+  "steps": [
+    {
+      "event_hash": "66200989296b6f7f2de5952aedd0b9b96a48cd072d50e9ce0f2d248c983aa971",
+      "expect": "accepted",
+      "payload": {
+        "kind": "player"
+      },
+      "seq": 0,
+      "state_sha256": "c0707251c5976c29300d5ef7c0ff9baf824552341d56bc7b718432f3d7f1cd34",
+      "type": "identity.created"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": 1,
+        "profession": "smithing"
+      },
+      "state_sha256": "c0707251c5976c29300d5ef7c0ff9baf824552341d56bc7b718432f3d7f1cd34",
+      "type": "profession.specialize"
+    },
+    {
+      "event_hash": "48f7410bf44017fba16ad22ac4987df30b33bde57eeb99b226dfd7dfc2cbb1a9",
+      "expect": "accepted",
+      "payload": {
+        "profession": "smithing",
+        "xp": 50
+      },
+      "seq": 1,
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.work"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "nope",
+        "day": 1,
+        "profession": "smithing"
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": 1,
+        "profession": "alchemy"
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": -1,
+        "profession": "smithing"
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": true,
+        "profession": "smithing"
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "profession": "smithing"
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": 1,
+        "profession": "smithing",
+        "x": 1
+      },
+      "state_sha256": "20c03b8142f8df549ba1a397eb7c8ae9d4d74d73b81dfa3e79bae65783aac4b3",
+      "type": "profession.specialize"
+    },
+    {
+      "event_hash": "94efa67eae3a0c2cb8058fd171437f23709fc771e6c281b79717a1477e928abc",
+      "expect": "accepted",
+      "payload": {
+        "branch": "refining",
+        "day": 3,
+        "profession": "smithing"
+      },
+      "seq": 2,
+      "state_sha256": "55c17fb3979a9b4cda825c82ea887a7f563e57b58b2d45f89f7238ac9331489e",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "refining",
+        "day": 20,
+        "profession": "smithing"
+      },
+      "state_sha256": "55c17fb3979a9b4cda825c82ea887a7f563e57b58b2d45f89f7238ac9331489e",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "heavy_arms",
+        "day": 9,
+        "profession": "smithing"
+      },
+      "state_sha256": "55c17fb3979a9b4cda825c82ea887a7f563e57b58b2d45f89f7238ac9331489e",
+      "type": "profession.specialize"
+    },
+    {
+      "expect": "rejected",
+      "payload": {
+        "branch": "heavy_arms",
+        "day": 2,
+        "profession": "smithing"
+      },
+      "state_sha256": "55c17fb3979a9b4cda825c82ea887a7f563e57b58b2d45f89f7238ac9331489e",
+      "type": "profession.specialize"
+    },
+    {
+      "event_hash": "aea85c5caafee94756d834737fcad9eb73cb6a48db705b57da63d2a49e46d0b9",
+      "expect": "accepted",
+      "payload": {
+        "branch": "heavy_arms",
+        "day": 10,
+        "profession": "smithing"
+      },
+      "seq": 3,
+      "state_sha256": "f3c85f854c13a038c7fe0761b0e8d32b9c942c8964d1eba70da435e65093a698",
+      "type": "profession.specialize"
+    },
+    {
+      "event_hash": "d0102283836d618f4e1500a509d076a8acab455c163bd86b5d9b2b16588bb15b",
+      "expect": "accepted",
+      "payload": {
+        "branch": "shadow_alloys",
+        "day": 17,
+        "profession": "smithing"
+      },
+      "seq": 4,
+      "state_sha256": "c31ccbe0e060563e6a7220670eda09aa6f7617a833b10482ec14a6967459aa77",
+      "type": "profession.specialize"
+    },
+    {
+      "event_hash": "1b419cec86961cab9380665396b101cf2eaebcf07ce0651d01c70cd23160bc1b",
+      "expect": "accepted",
+      "payload": {
+        "profession": "farming",
+        "xp": 10
+      },
+      "seq": 5,
+      "state_sha256": "1256fe13a72160fda1e383e1662709d8f4c5822bac76ae1a487791e5b0e51339",
+      "type": "profession.work"
+    },
+    {
+      "event_hash": "8db14db62ab3ba9b850f36511694393caeccdf69213cfc4a3bfa3bc1595ac116",
+      "expect": "accepted",
+      "payload": {
+        "branch": "baking",
+        "day": 17,
+        "profession": "farming"
+      },
+      "seq": 6,
+      "state_sha256": "785d5fd9d7145793415a4c61fa6f16c57071275e9e010798e390140ca50afa18",
+      "type": "profession.specialize"
+    }
+  ]
+}

@@ -163,6 +163,7 @@ bei Wiederholung zusätzlich `"replayed": true`. Nur `code` ist Vertrag, `messag
 | `query.chronicle` | offset?:i, limit?:i, kind?:s | – | lesend | query |
 | `query.prestige` | char:s | char | lesend | query |
 | `query.echoes` | char:s | char | lesend | query |
+| `profession.specialize` | char:s, profession:s, branch:s | char | schreibend | default |
 | `equip.wear` | char:s, item_key:s | char | schreibend | default |
 | `equip.remove` | char:s, slot:s | char | schreibend | default |
 | `equip.look` | char:s, slot:s, item?:s | char | schreibend | default |

@@ -260,6 +260,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("query.prestige", "char:s", "char", lambda w, a: dict(w.chronicle.prestige(a["char"]),
        research_titles=w.research.titles.get(a["char"], [])), mutating=False),
     _c("query.echoes", "char:s", "char", lambda w, a: w.echo.view(a["char"]), mutating=False),
+    _c("profession.specialize", "char:s profession:s branch:s", "char", lambda w, a: w.specialize(a["char"], a["profession"], a["branch"])),
     _c("equip.wear", "char:s item_key:s", "char", lambda w, a: w.equipment.equip(a["char"], a["item_key"])),
     _c("equip.remove", "char:s slot:s", "char", lambda w, a: w.equipment.unequip(a["char"], a["slot"])),
     _c("equip.look", "char:s slot:s item:s?", "char", lambda w, a: w.equipment.set_look(a["char"], a["slot"], a.get("item"))),

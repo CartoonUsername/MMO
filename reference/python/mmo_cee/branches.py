@@ -42,6 +42,7 @@ def profession_view(state: CharacterState, rules: Rules, pr: dict[str, Any] | No
             branches[bid] = {"name": br["name"], "points": pts, "level": level, "next": nxt}
         masterpieces = sorted(r for r, e in part["recipes"].items() if e["best"] >= top and recipes.get(r, {}).get("profession") == pid)
         goals = sorted(r for r, v in recipes.items() if v["profession"] == pid and r not in masterpieces)
-        out[pid] = {"name": p["name"], "xp": state.parts["profession"]["xp"].get(pid, 0) if "profession" in state.parts else 0,
+        chosen = state.parts["profession"].get("spec", {}).get(pid) if "profession" in state.parts else None
+        out[pid] = {"chosen": chosen["branch"] if chosen else None, "chosen_day": chosen["day"] if chosen else None, "name": p["name"], "xp": state.parts["profession"]["xp"].get(pid, 0) if "profession" in state.parts else 0,
                     "branches": branches, "masterpieces": masterpieces, "masterpiece_goals": goals}
     return out
