@@ -37,6 +37,16 @@ class UpgradeStoreTests(unittest.TestCase):
         self.assertIn("anna", g2.saved_pos)                                            # Spielzustand übernommen
         self.assertEqual(g2.world.specialize("anna", "smithing", "refining")["paid"], 0)
 
+    def test_dry_run_checks_but_writes_nothing(self):                              # AP 81
+        before = sorted(p.name for p in self.path.iterdir())
+        out = upgrade_store(self.path, "rules_v10.json", dry_run=True)
+        self.assertEqual((out["dry_run"], out["from_rules"], out["to_rules"], out["consistency"], out["characters"]), (True, "9", "10", "ok", 1))
+        self.assertEqual(sorted(p.name for p in self.path.iterdir()), before)           # keine neue Generation, game_state unberührt
+        self.assertEqual(Store(self.path).generations(), [self.gen])
+        self.assertEqual(main(["--data", str(self.path), "--to", "rules_v10.json", "--dry-run"]), 0)
+        self.assertEqual(Store(self.path).generations(), [self.gen])
+        self.assertEqual(main(["--data", str(self.path), "--to", "rules_v9.json", "--dry-run"]), 1)
+
     def test_failures_leave_the_store_untouched_and_cli_reports_them(self):
         before = sorted(p.name for p in self.path.iterdir())
         with self.assertRaises(Exception):

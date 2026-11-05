@@ -11,7 +11,7 @@ Auf dem VPS läuft Commit `ee249f9` (AP 16–21, 2026-11-05). **Nicht bereitgest
 1. Auf dem Server als root: `bash scripts/backup_mmo.sh` (geprüfte Sicherung; Hinweis zur externen Kopie beachten).
 2. Code bereitstellen wie bisher: `git pull` im Klon, dann `bash deploy/setup.sh` (legt `/opt/mmo/python.prev` als Rückweg an).
 3. **Der Spielstand bleibt zunächst auf CEE v9.** Das Spiel läuft, nur die Zweigwahl (`profession.specialize`) ist abgelehnt.
-4. Zweigwahl aktivieren (bewusst, getrennt): `systemctl stop mmo`, dann `cd /opt/mmo/python && python3 -m mmo_game.upgrade --data /var/lib/mmo --to rules_v10.json`, dann `chown -R mmo:mmo /var/lib/mmo` und `systemctl start mmo`.
+4. Zweigwahl aktivieren (bewusst, getrennt): `systemctl stop mmo`, zuerst Probelauf `cd /opt/mmo/python && python3 -m mmo_game.upgrade --data /var/lib/mmo --to rules_v10.json --dry-run` (schreibt nichts), dann ohne `--dry-run`, dann `chown -R mmo:mmo /var/lib/mmo` und `systemctl start mmo`.
 5. Rückweg: Dienst stoppen, `python.prev` zurück, Sicherung zurückspielen (`scripts/restore_mmo.sh`).
 
 ## Ungeprüft

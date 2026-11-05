@@ -1,6 +1,8 @@
 """Hebt einen gespeicherten Spielstand auf eine höhere CEE-Regelversion (ADR-0071).
 
-    python -m mmo_game.upgrade --data /var/lib/mmo --to rules_v10.json
+    python -m mmo_game.upgrade --data /var/lib/mmo --to rules_v10.json [--dry-run]
+
+`--dry-run` lädt, hebt im Speicher an und prüft die Konsistenz, ohne etwas zu schreiben (zuerst ausführen).
 
 Nur bei gestopptem Dienst ausführen (vorher Sicherung: scripts/backup_mmo.sh). Der Spielstand wird als NEUE Generation
 geschrieben; die bisherigen Generationen bleiben unverändert und erlauben den Rückweg. Positionen, Gegner und Sammelpunkte
@@ -13,14 +15,21 @@ import shutil
 import sys
 from pathlib import Path
 
-from mmo_world.persistence import Store, upgrade_world
+from mmo_world.persistence import Store, check_consistency, upgrade_world
 
 
-def upgrade_store(path: str | Path, target_cee_file: str) -> dict:
+def upgrade_store(path: str | Path, target_cee_file: str, dry_run: bool = False) -> dict:
+    """Hebt den Spielstand an. `dry_run`: alles prüfen (laden, anheben, Konsistenz), aber nichts schreiben (AP 81)."""
     store = Store(path)
     gen, world = store.load_latest_valid()
     before = world.svc.rules.version
     new = upgrade_world(world, target_cee_file)
+    problems = check_consistency(new)
+    if problems:                                                       # nie einen inkonsistenten Stand als neue Generation schreiben
+        raise ValueError(f"Konsistenzprüfung nach dem Anheben fehlgeschlagen: {problems[:3]}")
+    if dry_run:
+        return {"dry_run": True, "from_rules": before, "to_rules": new.svc.rules.version, "generation_old": gen, "characters": len(new.svc.log.character_ids()),
+                "consistency": "ok"}
     gen_new = store.commit(new)
     f = Path(path) / "game_state.json"
     moved = False
@@ -42,12 +51,12 @@ def upgrade_store(path: str | Path, target_cee_file: str) -> dict:
 def main(argv: list[str]) -> int:
     def arg(name: str) -> str | None:
         return argv[argv.index(name) + 1] if name in argv and argv.index(name) + 1 < len(argv) else None
-    data, to = arg("--data"), arg("--to")
+    data, to, dry = arg("--data"), arg("--to"), "--dry-run" in argv
     if not data or not to:
         print(__doc__)
         return 2
     try:
-        print(json.dumps(upgrade_store(data, to), ensure_ascii=False))
+        print(json.dumps(upgrade_store(data, to, dry), ensure_ascii=False))
     except Exception as e:  # bewusst breit: jede Ablehnung ist ein Abbruch ohne Änderung der alten Generationen
         print(f"ABBRUCH: {e}", file=sys.stderr)
         return 1

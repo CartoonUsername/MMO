@@ -82,6 +82,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 78 | Statusabgleich auf Stand AP 80 | – | – | **fertig** (nur Doku) |
 | 79 | Lastmessung 60 Bots | §50–55 | 4 | **fertig**: p95 5,46 ms je Tick |
 | 80 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck) | – | – | **fertig**, ohne Befund |
+| 81 | Upgrade-Werkzeug: Probelauf und Konsistenzsperre | §50–55 | 4 | **fertig** (Test mit Wegwerf-Spielstand) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 
