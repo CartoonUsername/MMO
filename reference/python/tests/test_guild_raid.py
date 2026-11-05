@@ -109,9 +109,11 @@ class Raid(unittest.TestCase):
         self.a = join(self.g, "anna", ENTRY)
         self.b = join(self.g, "ben", ENTRY)
         self.c = join(self.g, "cora", ENTRY)
-        for n in ("anna", "ben", "cora"):
+        self.d = join(self.g, "dora", ENTRY)
+        self.e = join(self.g, "emil", ENTRY)
+        for n in ("anna", "ben", "cora", "dora", "emil"):
             unlock(self.g, n)
-        self.gid = guild_of(self.g, "anna", "ben")
+        self.gid = guild_of(self.g, "anna", "ben", "dora", "emil")          # 4 Mitglieder = Mindestgröße (AP 21); cora steht nur daneben
 
     def test_raid_is_in_rules_and_marked(self):
         self.assertTrue(self.g.dungeon_rules["steinherz_krypta"]["guild_raid"])
@@ -121,7 +123,7 @@ class Raid(unittest.TestCase):
     def test_needs_guild_and_enough_members(self):
         self.assertFalse(self.c.call("game.dungeon_enter", dungeon="steinherz_krypta")["ok"])        # keine Gilde
         self.g.players["ben"]["pos"] = (100, 100)
-        self.assertFalse(self.a.call("game.dungeon_enter", dungeon="steinherz_krypta")["ok"])        # zu wenige am Eingang
+        self.assertFalse(self.a.call("game.dungeon_enter", dungeon="steinherz_krypta")["ok"])        # nur 3 am Eingang, 4 nötig
 
     def test_only_guild_members_join_and_party_is_ignored(self):
         pid = self.g.world.parties.create("anna")
@@ -130,12 +132,12 @@ class Raid(unittest.TestCase):
         self.assertIsNotNone(self.g.world.parties.view("cora"))                                 # cora ist in anna's Gruppe, aber nicht in der Gilde
         r = self.a.call("game.dungeon_enter", dungeon="steinherz_krypta")
         self.assertTrue(r["ok"], r)
-        self.assertEqual(sorted(r["result"]["party"]), ["anna", "ben"])
+        self.assertEqual(sorted(r["result"]["party"]), ["anna", "ben", "dora", "emil"])
         self.assertNotIn("cora", self.g.dungeon_of)
 
     def test_one_entry_per_guild_per_day_then_scouting_adds_one(self):
         self.assertTrue(self.a.call("game.dungeon_enter", dungeon="steinherz_krypta")["ok"])
-        for c in ("anna", "ben"):
+        for c in ("anna", "ben", "dora", "emil"):
             self.g.dungeon_of.pop(c, None)
         self.g.dungeons.clear()
         self.assertFalse(self.a.call("game.dungeon_enter", dungeon="steinherz_krypta")["ok"])
@@ -156,13 +158,13 @@ class Raid(unittest.TestCase):
             outcome, actions = "victory", {"light": 1}
 
         class Res:
-            outcome, players = "victory", [P(), P()]
+            outcome, players = "victory", [P(), P(), P(), P()]
         before = gs.guilds[self.gid]["points"]
-        self.g._dungeon_after({"dungeon": rid, "chars": ["anna", "ben"]}, Res())
+        self.g._dungeon_after({"dungeon": rid, "chars": ["anna", "ben", "dora", "emil"]}, Res())
         t = gs.treasury(self.gid)
         self.assertEqual(self.g.world.inv.balance(t, COIN), 1200 * 1250 // 1000)
         self.assertEqual(self.g.world.inv.balance(t, "resonance_dust@standard"), 40 * 1250 // 1000)
-        self.assertEqual(gs.guilds[self.gid]["points"] - before, 2 * 8)                    # 8 Punkte je Beteiligtem
+        self.assertEqual(gs.guilds[self.gid]["points"] - before, 4 * 8)                    # 8 Punkte je Beteiligtem
         self.assertEqual(self.g.world.chronicle.entries[-1]["kind"], "raid_cleared")
         self.assertEqual(self.g.world.inv.balance("anna", "ward_stone@standard"), 1)       # persönliche Truhe wie im Dungeon
 
@@ -172,7 +174,7 @@ class Raid(unittest.TestCase):
 
         class Res:
             outcome, players = "defeat", []
-        self.g._dungeon_after({"dungeon": rid, "chars": ["anna", "ben"]}, Res())
+        self.g._dungeon_after({"dungeon": rid, "chars": ["anna", "ben", "dora", "emil"]}, Res())
         self.assertEqual(self.g.world.inv.balance(self.g.world.guilds.treasury(self.gid), COIN), 0)
 
 

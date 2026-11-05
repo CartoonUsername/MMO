@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v12.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v13.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -672,12 +672,13 @@ class GameServer:
             self.daily[f"guild:{gid}|raid:{did}"] = self.daily.get(f"guild:{gid}|raid:{did}", 0) + 1
         self._dungeon_counter += 1
         rid = f"dng-{self._dungeon_counter:05d}"
-        self.dungeons[rid] = {"id": rid, "dungeon": did, "name": dg["name"], "chars": group, "stage": -1, "stages_total": len(dg["stages"]), "next_at": self.tick_no + 5,
-                              "guild": gid if raid else None}
+        stages = [s for s in dg["stages"] if len(group) >= s.get("min_party", 0)]       # große Gruppen bekommen zusätzliche Etappen (AP 21)
+        self.dungeons[rid] = {"id": rid, "dungeon": did, "name": dg["name"], "chars": group, "stage": -1, "stages_total": len(stages), "stages": stages,
+                              "next_at": self.tick_no + 5, "guild": gid if raid else None}
         for m in group:
             self.dungeon_of[m] = rid
             self.players[m]["immune_until"] = self.tick_no + 10 ** 6       # Karten-Gegner lassen Durchläufe in Ruhe
-            self._emit_to(m, {"ev": "dungeon", "state": "entered", "dungeon": did, "name": dg["name"], "party": group, "stages": len(dg["stages"])})
+            self._emit_to(m, {"ev": "dungeon", "state": "entered", "dungeon": did, "name": dg["name"], "party": group, "stages": len(stages)})
         return {"run": rid, "party": group}
 
     def _dungeon_tick(self) -> None:
@@ -690,7 +691,7 @@ class GameServer:
                 continue
             dg = self.R["dungeons"][run["dungeon"]]
             run["stage"] += 1
-            st = dg["stages"][run["stage"]]
+            st = (run.get("stages") or dg["stages"])[run["stage"]]
             ent = tuple(dg["entrance"])
             pack = [{"id": f"{rid}-{run['stage']}-{i}", "type": t, "pos": ent, "home": ent, "fight": None, "state": "idle", "target": None, "path": []}
                     for i, t in enumerate(st["enemies"])]

@@ -24,6 +24,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 18 | Gilden-Raids und Gildenforschung | §45, §47–49 | 3 | **fertig** (ADR-0057; Client-Fenster offen) |
 | 19 | Größere Kampfgruppen (Raid/Weltboss bis 8) | §33–35, §45, §55 | 3/4 | **fertig** (sim_rules_v10, game_rules_v12, ADR-0058); Balancing und Client-Anzeige offen |
 | 20 | Client-Fenster für AP 16–19 (Browser, Unity-Gildenfenster) | §26–29, §45 | 2/3 | **fertig, im Browser/Unity ungetestet** (ADR-0059; statische Tests) |
+| 21 | Raid-Balancing nach Gruppengröße (Mindestgröße 4, Etappen nach Größe) | §45, §55 | 3/4 | **fertig** (game_rules_v13, ADR-0060); Richtwerte aus Bots, echte Spieltests offen |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)
 1. **Server:** Klassen-Kits (`game_rules_v2.json`), Kampfdaten je Figur (`game.kit`: Befehl, Kosten, Abklingzeit, Sperrzeit; im `fight_start`). Tests.
