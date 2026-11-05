@@ -45,6 +45,7 @@
 - AP 72: Kompatibilitätstest: unter alten Regeldateien (Siedlung/Forschung/Ausrüstung v1, Gemeinschaft v2) gespeicherter Stand lädt und läuft unter den neuen Standards.
 - AP 73–75: Anzeigetitel aus der Weltchronik wählen (`title.choose`, ADR-0080), Browser-Auswahl, Tests; noch nicht deployt.
 - AP 76: Der gewählte Anzeigetitel erscheint in der Zustandsmeldung bei Mitspielern (`players[].title`) und im Browser neben dem Namen. Im echten Browser ungetestet.
+- AP 77: Fuzz-Test erreicht Erfolgspfade für Gildenchat (`guild.say`) und Titelwahl (`title.choose`); Invarianten halten.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

@@ -78,6 +78,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 74 | Browser: Titelwahl im Chronikfenster | §47–49 | 3 | **fertig, im echten Browser ungetestet** |
 | 75 | Tests Titelwahl (Missbrauch, Persistenz) | §47–49 | 3 | **fertig** (nur Test) |
 | 76 | Anzeigetitel bei Mitspielern sichtbar | §47–49 | 3 | **fertig, im echten Browser ungetestet** |
+| 77 | Fuzz-Test: Gildenchat und Titelwahl | §50–55 | 4 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 
