@@ -264,7 +264,7 @@ async function refreshTown(){
     for(const p of s.free_plots)box.appendChild(li("Frei: Nr. "+p.n+" ("+p.size+") für "+p.price,[["Kaufen",()=>done("plot.buy",{site:s.id,n:p.n},"Gekauft")]]));
     for(const [id,pr] of Object.entries(s.projects)){const need=pr.next?Object.entries(pr.next).map(([k,x])=>k.split("@")[0]+" "+x.have+"/"+x.need).join(", "):"fertig";
       const acts=pr.next?[["Beitragen",()=>{const k=prompt("Was? Münzen: coin@gold, sonst z. B. timber@standard",Object.keys(pr.next)[0]);const q=parseInt(prompt("Menge"),10);if(k&&q)done("project.contribute",k==="coin@gold"?{site:s.id,project:id,coins:q}:{site:s.id,project:id,item_key:k,qty:q},"Beigetragen")}]]:[];
-      box.appendChild(li(pr.name+" Stufe "+pr.level+"/"+pr.max+" · "+need,acts))}}
+      box.appendChild(li(pr.name+" Stufe "+pr.level+"/"+pr.max+" · "+need+(pr.requires_tech?(pr.tech_known?" · Technik "+pr.requires_tech+" ✔":" · ⚠ braucht Technik "+pr.requires_tech+" (Forschung)"):""),acts))}}
 }
 // ---------- Forschung (Anzeige und Absichten) ----------
 async function refreshTech(){

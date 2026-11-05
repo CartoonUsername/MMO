@@ -392,6 +392,8 @@ class SettlementService:
                 nxt = {k: {"need": q, "have": st["have"].get(k, 0)} for k, q in need.items()}
             projs[pid] = {"name": pr["name"], "level": st["level"], "max": len(pr["levels"]), "next": nxt,
                           "requires_tech": (pr["levels"][st["level"]].get("requires_tech") if st["level"] < len(pr["levels"]) else None)}
+            rt = projs[pid]["requires_tech"]
+            projs[pid]["tech_known"] = True if rt is None else bool(self.tech_known(site, rt))
         return {"id": site, "name": self.founded.get(site, {}).get("name", s["name"]), "region": s["region"], "capital": bool(s.get("capital")),
                 "open": opened, "found_cost": None if opened else self.R["found_cost"], "founder": self.founded.get(site, {}).get("founder"),
                 "stage": self.stage(site) if opened else None, "effects": self.effects(site) if opened else {},

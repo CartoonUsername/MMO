@@ -205,10 +205,14 @@ class SettlementTests(unittest.TestCase):
         with self.assertRaises(WorldError) as cm:
             s.contribute("anna", "moorufer", "market_square", 2000, {"wooden_beam@standard": 40})   # Stufe 2 braucht Marktrecht
         self.assertIn("marktrecht", str(cm.exception))
+        ms = next(x for x in s.view("anna")["sites"] if x["id"] == "moorufer")["projects"]["market_square"]
+        self.assertEqual((ms["requires_tech"], ms["tech_known"]), ("marktrecht", False))             # AP 71: Client erfährt den Grund
+        self.assertTrue(next(x for x in s.view("anna")["sites"] if x["id"] == "moorufer")["projects"]["road"]["tech_known"])
         self.assertEqual(w.research.R["version"], 2)
         for tech in ("marktrecht", "lagerwesen", "stadtrecht", "dampfkraft"):
             self.assertIn(tech, w.research.R["techs"])
         w.research.known.setdefault("moorufer", {})["marktrecht"] = {"day": 1, "via": "test"}
+        self.assertTrue(next(x for x in s.view("anna")["sites"] if x["id"] == "moorufer")["projects"]["market_square"]["tech_known"])
         self.assertTrue(s.contribute("anna", "moorufer", "market_square", 2000, {"wooden_beam@standard": 40})["completed"])
         self.assertEqual(s.fee_discount_permille("anna"), 500)                                      # v2-Rabatt Stufe 2
 
