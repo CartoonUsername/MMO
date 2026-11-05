@@ -301,5 +301,6 @@
       "stadt",
       8
     ]
-  ]
+  ],
+  "orders_per_reach": 3
 }

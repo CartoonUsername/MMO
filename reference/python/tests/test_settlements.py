@@ -90,6 +90,26 @@ class SettlementTests(unittest.TestCase):
         w.exchange.place("ben", "sell", item, 10, 20)           # Rabatt gilt nur für den Verkäufer
         self.assertEqual(w.exchange.place("anna", "buy", item, 10, 20).fills[0].fee, base)
 
+    def test_harbor_raises_open_order_limit(self):                  # AP 41
+        s, w = self.s, self.w
+        item = "iron_ingot@standard"
+        for _ in range(10):
+            w.exchange.place("anna", "sell", item, 1, 25)
+        with self.assertRaises(WorldError):
+            w.exchange.place("anna", "sell", item, 1, 25)           # Standardgrenze 10
+        s.tech_known = lambda site, tech: True
+        s.buy_plot("anna", "hauptstadt", 1)
+        self.assertEqual(s.order_bonus("anna"), 0)
+        s.contribute("anna", "hauptstadt", "harbor", 2500, {"wooden_beam@standard": 40, "iron_ingot@standard": 10})
+        self.assertEqual((s.order_bonus("anna"), s.order_bonus("ben"), s.view("anna")["order_bonus"]), (3, 0, 3))
+        for _ in range(3):
+            w.exchange.place("anna", "sell", item, 1, 25)
+        with self.assertRaises(WorldError):
+            w.exchange.place("anna", "sell", item, 1, 25)           # 10 + 3
+        with self.assertRaises(WorldError):                          # Ben ohne Hafen bleibt bei 10
+            for _ in range(11):
+                w.exchange.place("ben", "sell", item, 1, 25)
+
     def test_plot_limit_and_roundtrip(self):
         s, w = self.s, self.w
         for n in (1, 2, 4):

@@ -110,6 +110,7 @@ class World:
         if olds is not None:
             self.settlements.founded, self.settlements.plots, self.settlements.projects = olds.founded, olds.plots, olds.projects
             self.settlements.contrib, self.settlements.last_day = olds.contrib, olds.last_day
+        self.exchange.order_bonus = lambda c: self.settlements.order_bonus(c)                  # Hafen: mehr offene Orders (AP 41)
         self.exchange.fee_discount = lambda c: self.settlements.fee_discount_permille(c)      # Marktplatz-Rabatt (AP 29)
         oldr = getattr(self, "research", None)
         self.research = ResearchService(self.settlements, self.inv, self.trading.coin, load_research_rules(RESEARCH_RULES), clock)

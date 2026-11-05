@@ -140,6 +140,11 @@ class SettlementService:
         """Marktgebühren-Rabatt (Promille der Gebühr) durch den Marktplatz: bester Wert unter den Orten, in denen die Figur ein Grundstück besitzt (AP 29)."""
         return max([self.effects(p["site"])["fee_discount_permille"] for p in self.owned_by(char) if self.is_open(p["site"])] or [0])
 
+    def order_bonus(self, char: str) -> int:
+        """Zusätzliche offene Marktorders durch den Hafen: bester Wert (Handelsreichweite x orders_per_reach) unter den offenen Orten mit Grundstück der Figur (AP 41)."""
+        per = self.R.get("orders_per_reach", 0)
+        return per * max([self.effects(p["site"])["trade_reach"] for p in self.owned_by(char) if self.is_open(p["site"])] or [0])
+
     def road_permille(self, region: str | None) -> int:
         """Bewegungsbonus durch Straßen: bester Wert unter den gegründeten Orten der Region (vom Spiel je Position abgefragt)."""
         return max([self.effects(s)["move_permille"] for s, d in self.R["sites"].items() if d["region"] == region and self.is_open(s)] or [0])
@@ -327,7 +332,8 @@ class SettlementService:
         mine = [dict(self.plot_view(p), site=p["site"]) for p in self.owned_by(char)]
         return {"sites": [self.site_view(s) for s in self.R["sites"]], "mine": mine, "plot_limit": self.plot_limit(char),
                 "contributed": dict(sorted(self.contrib.get(char, {}).items())), "buildings": {k: {"name": b["name"], "levels": b["levels"]} for k, b in self.R["buildings"].items()},
-                "coins": self.inv.balance(char, self.coin), "fee_discount_permille": self.fee_discount_permille(char)}
+                "coins": self.inv.balance(char, self.coin), "fee_discount_permille": self.fee_discount_permille(char),
+                "order_bonus": self.order_bonus(char)}
 
     def check(self) -> list[str]:
         errs = []

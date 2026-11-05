@@ -76,6 +76,7 @@ class Exchange:
         self.cee, self.inv, self.trading, self.mr, self.day, self.server_id = service, inventory, trading, rules, day_provider, server_id
         self.coin = trading.coin
         self.notify: Callable[[str, str, dict[str, Any]], None] = lambda recipient, kind, data: None  # Weltdienst setzt den Postausgang
+        self.order_bonus: Callable[[str], int] = lambda char: 0      # zusätzliche offene Orders je Figur (Hafen, AP 41)
         self.fee_discount: Callable[[str], int] = lambda char: 0     # Rabatt auf die Gebühr in Promille je Verkäufer (Marktplatz, AP 29)
         self.orders: dict[str, dict[str, Any]] = {}
         self.stats: dict[str, dict[str, Any]] = {}
@@ -131,7 +132,7 @@ class Exchange:
         if not isinstance(ioc, bool):
             raise WorldError("ioc muss bool sein")
         self._band(item_key, unit_price)
-        if len(self.open_orders(character_id)) >= self.mr["max_open_orders"] and not ioc:
+        if len(self.open_orders(character_id)) >= self.mr["max_open_orders"] + max(0, self.order_bonus(character_id)) and not ioc:
             raise WorldError("Zu viele offene Orders")
         self._counter += 1
         oid = f"{self.server_id}-ord-{self._counter:08d}"
