@@ -63,6 +63,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 59 | Fuzz-Test für rules_v10 und die neuen Befehle | §50–55 | 4 | **fertig** (nur Test) |
 | 60 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck, Lasttest) | – | – | **fertig**, ohne Befund |
 | 61 | Ausrüstungssets: Setbonus nach getragenen Teilen (Server) | §31 | 2/3 | **fertig** (ADR-0076); Seltenheiten, Rezepte offen |
+| 62 | Anzeige der Sets (Abfrage + Browser) | §31 | 2/3 | **fertig, im echten Browser ungetestet** |
 | 63 | Tests Setboni (Güte-unabhängig, Kappen, Validierung) | §31 | 2/3 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |

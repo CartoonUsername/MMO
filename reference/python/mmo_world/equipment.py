@@ -212,7 +212,7 @@ class EquipmentService:
                         "classes": d["classes"], "min_level": d["min_level"], "effects": {e: self._scale(e, v, grade) for e, v in d["effects"].items()}})
         wd = self.wardrobe.get(char, [])
         return {"slots": list(self.R["slots"]), "worn": worn, "bag": bag, "effects": self.effects(char), "appearance": self.appearance(char),
-                "look": dict(self.look.get(char, {})),
+                "look": dict(self.look.get(char, {})), "sets": self.set_progress(char),
                 "wardrobe": [{"item": i, "name": self.R["items"][i]["name"], "slot": self.R["items"][i]["slot"]} for i in wd]}
 
     # -- Konsistenz / Persistenz --------------------------------------------------------------

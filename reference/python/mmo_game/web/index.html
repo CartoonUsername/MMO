@@ -231,6 +231,8 @@ async function refreshGear(){
   for(const s of v.slots){const w=v.worn[s],row=el("div","","k");row.append(el("span",SLOT_NAME[s]||s),el("b",w?w.name+" ("+w.grade+", "+WEIGHT_NAME[w.weight]+")":"–"));box.appendChild(row);
     if(w){box.appendChild(el("div",w.style,"hint"));const b=el("button","Ablegen");b.onclick=async()=>{await act("gearMsg","equip.remove",{slot:s},"Abgelegt");refreshGear()};box.appendChild(b)}}
   kv(box,"Gesamtwirkung",effTxt(v.effects));
+  const sets=Object.values(v.sets||{});if(sets.length){sect(box,"Sets");for(const st of sets){box.appendChild(el("div",st.name+" ("+st.worn.length+"/"+st.pieces.length+")","k"));
+    for(const b of st.bonuses)box.appendChild(el("div","  "+(b.active?"✔ ":"○ ")+b.pieces+" Teile: "+effTxt(b.effects),b.active?"":"hint"))}}
   sect(box,"Im Gepäck");if(!v.bag.length)box.appendChild(el("div","Keine Ausrüstung im Gepäck – Gegner lassen manchmal Stücke fallen.","hint"));
   for(const it of v.bag){box.appendChild(el("div",it.name+" ×"+it.qty+" ("+it.grade+", "+WEIGHT_NAME[it.weight]+", "+(SLOT_NAME[it.slot]||it.slot)+") – "+effTxt(it.effects)+(it.min_level>1?" · ab Stufe "+it.min_level:"")+(it.classes?" · "+it.classes.map(k=>CLASS_NAME[k]||k).join("/"):""),"hint"));
     const b=el("button","Anlegen");b.onclick=async()=>{await act("gearMsg","equip.wear",{item_key:it.key},"Angelegt");refreshGear()};box.appendChild(b)}

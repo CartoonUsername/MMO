@@ -35,6 +35,13 @@ class SetBonusTests(unittest.TestCase):
         self.assertTrue(all(b["active"] for b in w.equipment.set_progress("a")["wanderer"]["bonuses"]))
         self.assertLess(three["damage_taken_permille"], two["damage_taken_permille"])                   # zweiter Bonus 960 wirkt
 
+    def test_view_reports_set_progress_for_the_client(self):                                           # AP 62
+        w = world()
+        give(w, "leather_jerkin@common", "traveler_boots@common")
+        sets = w.equipment.view("a")["sets"]
+        self.assertEqual((sets["wanderer"]["worn"], [b["active"] for b in sets["wanderer"]["bonuses"]]), (["leather_jerkin", "traveler_boots"], [True, False]))
+        self.assertEqual(sets["ironbound"]["worn"], [])
+
     def test_bonus_disappears_when_a_piece_is_removed_and_ignores_grade(self):
         w = world()
         give(w, "iron_blade@fine", "iron_cuirass@poor")                                               # beliebige Güten zählen
