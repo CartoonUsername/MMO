@@ -65,6 +65,8 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 61 | Ausrüstungssets: Setbonus nach getragenen Teilen (Server) | §31 | 2/3 | **fertig** (ADR-0076); Seltenheiten, Rezepte offen |
 | 62 | Anzeige der Sets (Abfrage + Browser) | §31 | 2/3 | **fertig, im echten Browser ungetestet** |
 | 63 | Tests Setboni (Güte-unabhängig, Kappen, Validierung) | §31 | 2/3 | **fertig** (nur Test) |
+| 64 | Mauer-Wirkung: Grundsteuerrabatt | Siedlungen | 2/3 | **fertig** (ADR-0077, Notlösung) |
+| 65 | Anzeige des Steuerrabatts (Abfrage-Steuer + Browser-Beschriftung) | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

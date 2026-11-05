@@ -305,5 +305,6 @@
   "orders_per_reach": 3,
   "sale_days": 7,
   "sale_fee_permille": 50,
-  "max_sale_price": 1000000
+  "max_sale_price": 1000000,
+  "wall_tax_relief": true
 }

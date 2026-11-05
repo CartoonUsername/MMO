@@ -243,7 +243,7 @@ async function refreshGear(){
     sel.onchange=async()=>{const a={slot:s};if(sel.value)a.item=sel.value;await act("gearMsg","equip.look",a,"Aussehen gesetzt");refreshGear()};box.appendChild(sel)}
 }
 // ---------- Siedlung: Grundstücke und Gemeinschaftsprojekte (Anzeige und Absichten) ----------
-const FX_NAME={move_permille:"Bewegung",fee_discount_permille:"Gebührenrabatt Markt",raid_defence_permille:"Raidverteidigung",stash_bonus:"Lagerbonus",trade_reach:"Handelsreichweite",plot_limit_bonus:"Mehr Grundstücke"};
+const FX_NAME={move_permille:"Bewegung",fee_discount_permille:"Gebührenrabatt Markt",raid_defence_permille:"Mauer: Steuerrabatt",stash_bonus:"Lagerbonus",trade_reach:"Handelsreichweite",plot_limit_bonus:"Mehr Grundstücke"};
 async function refreshTown(){
   const r=await call("query.settlements",{});if(!r.ok){$("townBox").textContent=errMsg(r);return}
   const v=r.result,box=$("townBox");box.textContent="";kv(box,"Münzen",v.coins);kv(box,"Meine Grundstücke",v.mine.length+"/"+v.plot_limit);kv(box,"Gebührenrabatt Markt",(v.fee_discount_permille/10)+" %");if(v.order_bonus)kv(box,"Zusätzliche Orders (Hafen)","+"+v.order_bonus);

@@ -180,6 +180,23 @@ class SettlementTests(unittest.TestCase):
         s2.load(s.to_json())
         self.assertEqual(s2.sales, s.sales)
 
+    def test_wall_lowers_plot_tax(self):                              # AP 64
+        s, w = self.s, self.w
+        s.buy_plot("anna", "hauptstadt", 1)
+        medium = next(n for n in range(1, 13) if s.size_of(n) == "medium")
+        s.buy_plot("anna", "hauptstadt", medium)
+        mp = s.plots[f"hauptstadt:{medium}"]
+        self.assertEqual((s.tax_of(s.plots["hauptstadt:1"]), s.tax_of(mp)), (5, 12))
+        s.projects["hauptstadt:wall"] = {"level": 1, "have": {}}                    # Mauer Stufe 1: 150 ‰
+        self.assertEqual(s.tax_of(mp), 12 - 12 * 150 // 1000)
+        s.projects["hauptstadt:wall"] = {"level": 2, "have": {}}                    # Stufe 2: 350 ‰
+        self.assertEqual((s.tax_of(mp), s.plot_view(mp)["tax"]), (8, 8))
+        before = w.inv.balance("anna", CRC)
+        s.advance(1)
+        self.assertEqual(before - w.inv.balance("anna", CRC), s.tax_of(s.plots["hauptstadt:1"]) + 8)   # wirklich abgebucht
+        s.R["wall_tax_relief"] = False                                              # ältere Regeln: keine Wirkung
+        self.assertEqual(s.tax_of(mp), 12)
+
     def test_plot_limit_and_roundtrip(self):
         s, w = self.s, self.w
         for n in (1, 2, 4):

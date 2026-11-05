@@ -8,4 +8,4 @@ Status: angenommen (Vorschlag, Claude, autorisiert; Platzhalterwert)
 - Keine neue Geldquelle: mehr Orders binden mehr Hinterlegtes.
 
 ## Offen
-- Die Mauer (`raid_defence_permille`) hat weiterhin keine Wirkung (keine Angriffsmechanik auf Orte vorhanden, bewusst nicht erfunden).
+- (Überholt durch AP 64: die Mauer senkt die Grundsteuer.) Die Mauer (`raid_defence_permille`) hatte keine Wirkung (keine Angriffsmechanik auf Orte vorhanden, bewusst nicht erfunden).

@@ -142,6 +142,13 @@ class SettlementService:
         """Marktgebühren-Rabatt (Promille der Gebühr) durch den Marktplatz: bester Wert unter den Orten, in denen die Figur ein Grundstück besitzt (AP 29)."""
         return max([self.effects(p["site"])["fee_discount_permille"] for p in self.owned_by(char) if self.is_open(p["site"])] or [0])
 
+    def tax_of(self, p: dict[str, Any]) -> int:
+        """Tagessteuer eines Grundstücks; die Mauer des Ortes senkt sie (wall_tax_relief, AP 64, ADR-0077)."""
+        tax = self.R["plot_sizes"][p["size"]]["tax_per_day"]
+        if self.R.get("wall_tax_relief"):
+            tax -= tax * self.effects(p["site"])["raid_defence_permille"] // 1000
+        return tax
+
     def order_bonus(self, char: str) -> int:
         """Zusätzliche offene Marktorders durch den Hafen: bester Wert (Handelsreichweite x orders_per_reach) unter den offenen Orten mit Grundstück der Figur (AP 41)."""
         per = self.R.get("orders_per_reach", 0)
@@ -342,7 +349,7 @@ class SettlementService:
         for _ in range(start + 1, day + 1):
             for key in sorted(self.plots):
                 p = self.plots[key]
-                tax = self.R["plot_sizes"][p["size"]]["tax_per_day"]
+                tax = self.tax_of(p)
                 if self.inv.balance(p["owner"], self.coin) >= tax:
                     self.inv.apply(p["owner"], {self.coin: tax}, {})
                     p["unpaid"] = 0
@@ -363,7 +370,7 @@ class SettlementService:
     # -- Sicht ---------------------------------------------------------------------------------
     def plot_view(self, p: dict[str, Any]) -> dict[str, Any]:
         return {"n": p["n"], "size": p["size"], "owner": p["owner"], "building": p["building"], "level": p["level"],
-                "unpaid": p["unpaid"], "tax": self.R["plot_sizes"][p["size"]]["tax_per_day"],
+                "unpaid": p["unpaid"], "tax": self.tax_of(p),
                 "capacity": self.capacity(p), "used": self.used(p)}
 
     def site_view(self, site: str) -> dict[str, Any]:
