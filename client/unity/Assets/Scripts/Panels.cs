@@ -43,7 +43,7 @@ namespace Mmo
             new PanelDef("Firma", "query.my_companies", new[] { "company.found", "company.hire", "company.fire", "company.upgrade", "company.close", "production.stock_in", "production.stock_out", "production.start", "production.cancel", "production.sell", "company.branch_open", "company.branch_close", "company.branch_reopen" }),
             new PanelDef("Siedlung", "query.settlements", new[] { "settlement.found", "plot.buy", "plot.build", "plot.stash_in", "plot.stash_out", "plot.abandon", "plot.sell", "plot.cancel_sale", "plot.accept_sale", "project.contribute" }),
             new PanelDef("Forschung", "query.research", new[] { "research.start", "research.contribute", "research.license" }),
-            new PanelDef("Gilde", "query.guild", new[] { "guild.found", "guild.invite", "guild.accept", "guild.decline", "guild.leave", "guild.kick", "guild.role", "guild.stash", "guild.take", "guild.contribute", "guild.research", "guild.say", "guild.disband" }),
+            new PanelDef("Gilde", "query.guild", new[] { "guild.found", "guild.invite", "guild.accept", "guild.decline", "guild.leave", "guild.kick", "guild.role", "guild.stash", "guild.take", "guild.contribute", "guild.research", "guild.say", "guild.mute", "guild.disband" }),
             new PanelDef("Chronik", "query.chronicle", new[] { "query.prestige", "title.choose" }),
         };
 

@@ -10,3 +10,6 @@ Status: angenommen (Vorschlag, Claude, autorisiert; Platzhalterwerte)
 
 ## Offen
 - Echtzeit-Zustellung (Benachrichtigung), Stummschalten/Moderation durch Offiziere, Weltchat, Flüstern.
+
+## Ergänzung AP 82–84: Moderation
+- `guild.mute {target, on?}`: Offiziere schalten Mitglieder stumm, der Leiter auch Offiziere; nie den Leiter oder sich selbst. Stummgeschaltete können nicht schreiben, aber lesen. Speicherung `muted` in der Gilde nur bei Bedarf; Austritt/Rauswurf hebt die Sperre auf (`check()` prüft, dass nur Mitglieder stumm sind). Browser: Knopf „Stummschalten“ in der Mitgliederliste, Anzeige „stumm“.

@@ -56,6 +56,38 @@ class GuildChat(unittest.TestCase):
         self.assertNotIn("chat", g)
         self.assertNotIn("chat_n", g)
 
+
+    def test_moderation_mute_and_unmute(self):                                                    # AP 82–84
+        gid = self.w.guilds.member_of["anna"]
+        self.assertTrue(self.a.call("guild.say", text="hallo")["ok"])
+        self.assertFalse(self.b.call("guild.mute", target="cleo")["ok"])                          # Ben ist nur Mitglied
+        self.assertFalse(self.a.call("guild.mute", target="anna")["ok"])                          # nicht sich selbst
+        self.assertFalse(self.a.call("guild.mute", target="cleo")["ok"])                          # Cleo ist nicht in der Gilde
+        r = self.a.call("guild.mute", target="ben")
+        self.assertTrue(r["ok"] and r["result"]["muted"])
+        self.assertFalse(self.b.call("guild.say", text="hört mich jemand?")["ok"])
+        self.assertEqual(self.a.call("query.guild")["result"]["mine"]["muted"], ["ben"])
+        self.assertTrue(self.a.call("guild.mute", target="ben", on=False)["ok"])
+        self.assertTrue(self.b.call("guild.say", text="wieder da")["ok"])
+        self.assertNotIn("muted", self.w.guilds.guilds[gid])                                       # leeres Feld wird nicht gespeichert
+        self.assertEqual(check_consistency(self.w), [])
+
+    def test_officers_cannot_mute_officers_or_the_leader_and_leaving_clears_the_mute(self):
+        gid = self.w.guilds.member_of["anna"]
+        self.assertTrue(self.a.call("guild.role", target="ben", role="officer")["ok"])
+        self.a.call("guild.invite", target="cleo")
+        self.c.call("guild.accept", guild=gid)
+        self.assertFalse(self.b.call("guild.mute", target="anna")["ok"])                          # Leiter nie
+        self.assertTrue(self.a.call("guild.mute", target="ben")["ok"])                            # Leiter darf Offizier stummschalten
+        self.a.call("guild.mute", target="ben", on=False)
+        self.assertTrue(self.b.call("guild.mute", target="cleo")["ok"])                           # Offizier darf Mitglied
+        self.c.call("guild.leave")
+        self.assertNotIn("muted", self.w.guilds.guilds[gid])                                       # Austritt hebt die Sperre auf
+        self.assertEqual(check_consistency(self.w), [])
+        self.a.call("guild.invite", target="cleo")
+        self.c.call("guild.accept", guild=gid)
+        self.assertTrue(self.c.call("guild.say", text="neu dabei")["ok"])                         # nach Wiedereintritt nicht mehr stumm
+
     def test_roundtrip_through_persistence(self):
         from mmo_world.persistence import export_world, import_world
         import json

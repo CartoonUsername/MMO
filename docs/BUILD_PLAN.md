@@ -83,6 +83,9 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 79 | Lastmessung 60 Bots | §50–55 | 4 | **fertig**: p95 5,46 ms je Tick |
 | 80 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck) | – | – | **fertig**, ohne Befund |
 | 81 | Upgrade-Werkzeug: Probelauf und Konsistenzsperre | §50–55 | 4 | **fertig** (Test mit Wegwerf-Spielstand) |
+| 82 | Gildenchat-Moderation (Server) | §45 | 3 | **fertig** (ADR-0078 ergänzt) |
+| 83 | Browser: Stummschalten | §45 | 3 | **fertig, im echten Browser ungetestet** |
+| 84 | Tests Moderation (Rollen, Austritt, Konsistenz) | §45 | 3 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

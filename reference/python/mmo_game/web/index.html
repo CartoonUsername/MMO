@@ -301,8 +301,9 @@ async function refreshGuild(){
    const send=()=>{const t=inp.value.trim();if(t)done("guild.say",{text:t},"Gesendet")};sb.onclick=send;inp.onkeydown=e=>{if(e.key==="Enter")send()};row.append(inp,sb);box.appendChild(row)}
   for(const m of g.members){const acts=[];
     if(lead&&m.char!==me){acts.push([m.role==="officer"?"Zum Mitglied":"Zum Offizier",()=>done("guild.role",{target:m.char,role:m.role==="officer"?"member":"officer"},"Rolle geändert")],["Leitung übergeben",()=>{if(confirm("Leitung an "+m.char+" übergeben?"))done("guild.role",{target:m.char,role:"leader"},"Übergeben")}])}
+    if(off&&m.char!==me&&m.role!=="leader"&&(lead||m.role==="member")){const mu=(g.muted||[]).includes(m.char);acts.push([mu?"Stumm aufheben":"Stummschalten",()=>done("guild.mute",{target:m.char,on:!mu},mu?"Stumm aufgehoben":"Stummgeschaltet")])}
     if(off&&m.char!==me&&m.role!=="leader")acts.push(["Entfernen",()=>{if(confirm(m.char+" entfernen?"))done("guild.kick",{target:m.char},"Entfernt")}]);
-    box.appendChild(li(m.char+" ("+m.role+") · Beitrag "+m.contributed,acts))}
+    box.appendChild(li(m.char+" ("+m.role+") · Beitrag "+m.contributed+((g.muted||[]).includes(m.char)?" · 🔇 stumm":""),acts))}
   if(off){const a=el("div","","row2"),n=textInput("Figur einladen"),b=el("button","Einladen");b.onclick=()=>done("guild.invite",{target:n.value.trim()},"Eingeladen");a.append(n,b);box.appendChild(a)}
   sect(box,"Gildenhaus Stufe "+g.house.level+"/"+g.house.max);
   if(g.house.next){box.appendChild(li(Object.entries(g.house.next).map(([k,x])=>k.split("@")[0]+" "+x.have+"/"+x.need).join(", "),[["Beitragen",()=>{const k=prompt("Was? Münzen: coin@gold, sonst z. B. timber@standard",Object.keys(g.house.next)[0]);const q=parseInt(prompt("Menge"),10);if(k&&q)done("guild.contribute",k==="coin@gold"?{coins:q}:{item_key:k,qty:q},"Beigetragen")}]]))}

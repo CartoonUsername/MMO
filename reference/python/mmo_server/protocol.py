@@ -253,6 +253,7 @@ COMMANDS: dict[str, Command] = {c.name: c for c in [
     _c("guild.role", "char:s target:s role:s", "char", lambda w, a: w.guilds.set_role(a["char"], a["target"], a["role"])),
     _c("guild.disband", "char:s", "char", lambda w, a: w.guilds.disband(a["char"])),
     _c("guild.research", "char:s tech:s", "char", lambda w, a: w.guilds.research_start(a["char"], a["tech"])),
+    _c("guild.mute", "char:s target:s on:b?", "char", lambda w, a: w.guilds.mute(a["char"], a["target"], a.get("on", True))),
     _c("guild.say", "char:s text:s", "char", lambda w, a: w.guilds.say(a["char"], a["text"])),
     _c("guild.stash", "char:s item_key:s qty:i", "char", lambda w, a: w.guilds.deposit(a["char"], a["item_key"], a["qty"])),
     _c("guild.take", "char:s item_key:s qty:i", "char", lambda w, a: w.guilds.withdraw(a["char"], a["item_key"], a["qty"])),

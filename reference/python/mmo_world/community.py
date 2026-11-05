@@ -281,6 +281,7 @@ class GuildService:
                 raise WorldError("Übergib zuerst die Leitung (Befördern zum Leiter) oder löse die Gilde auf")
             return self.disband(char)
         del g["members"][char], self.member_of[char]
+        self._unmute(g, char)
         self._log(g, "left", char)
 
     def kick(self, char: str, target: str) -> None:
@@ -291,6 +292,7 @@ class GuildService:
         if role == "leader" or (role == "officer" and g["members"][char] != "leader"):
             raise WorldError("Das darfst du nicht")
         del g["members"][target], self.member_of[target]
+        self._unmute(g, target)
         self._log(g, "kicked", char, target=target)
 
     def set_role(self, char: str, target: str, role: str) -> None:
@@ -371,11 +373,36 @@ class GuildService:
         if gid is not None:
             self.guilds[gid]["points"] += self.R["points"][kind]
 
+    @staticmethod
+    def _unmute(g: dict[str, Any], char: str) -> None:
+        if char in g.get("muted", []):
+            g["muted"].remove(char)
+            if not g["muted"]:
+                del g["muted"]                                          # leeres Feld nicht speichern (Zustand bleibt unverändert)
+
+    def mute(self, char: str, target: str, on: bool = True) -> dict[str, Any]:
+        """Stummschalten im Gildenchat (AP 82, ADR-0081): Offiziere schalten Mitglieder, der Leiter auch Offiziere stumm; nie den Leiter."""
+        g = self._need_role(char, "leader", "officer")
+        role = g["members"].get(target)
+        if role is None or target == char:
+            raise WorldError("Ungültiges Ziel")
+        if role == "leader" or (role == "officer" and g["members"][char] != "leader"):
+            raise WorldError("Diese Rolle darfst du nicht stummschalten")
+        if on:
+            if target not in g.setdefault("muted", []):
+                g["muted"].append(target)
+                g["muted"].sort()
+        else:
+            self._unmute(g, target)
+        return {"target": target, "muted": target in g.get("muted", [])}
+
     CHAT_KEEP, CHAT_MAX_LEN, CHAT_PER_DAY = 50, 64, 30      # 64 = Stringgrenze des Protokolls
 
     def say(self, char: str, text: str) -> dict[str, Any]:
         """Gildenchat (AP 66, ADR-0078): kurze Nachricht an alle Mitglieder; Verlauf (letzte 50) und Tagesgrenze je Figur."""
         g = self._mine(char)
+        if char in g.get("muted", []):
+            raise WorldError("Du bist im Gildenchat stummgeschaltet")
         if not isinstance(text, str):
             raise WorldError("Nachricht muss Text sein")
         text = text.strip()
@@ -406,7 +433,7 @@ class GuildService:
             mine = {"id": gid, "name": g["name"], "tag": g["tag"], "role": g["members"][char], "founded": g["founded"], "points": g["points"],
                     "members": [{"char": m, "role": r, "contributed": g["contrib"].get(m, 0)} for m, r in sorted(g["members"].items())],
                     "capacity": self.capacity(g), "house": {"level": h["level"], "max": len(levels), "next": nxt}, "research": self.research_view(g),
-                    "treasury": self.inv.holdings(self.treasury(gid)) if g["members"][char] in ("leader", "officer") else None, "log": g["log"][-15:], "chat": g.get("chat", [])[-30:]}
+                    "treasury": self.inv.holdings(self.treasury(gid)) if g["members"][char] in ("leader", "officer") else None, "log": g["log"][-15:], "chat": g.get("chat", [])[-30:], "muted": list(g.get("muted", []))}
         return {"mine": mine, "invites": [{"id": i, "name": self.guilds[i]["name"], "tag": self.guilds[i]["tag"]} for i in self.invites.get(char, []) if i in self.guilds],
                 "found_cost": self.R["found_cost"], "coins": self.inv.balance(char, self.coin),
                 "directory": [{"id": g["id"], "name": g["name"], "tag": g["tag"], "members": len(g["members"]), "points": g["points"]}
@@ -422,6 +449,7 @@ class GuildService:
             for m in g["members"]:
                 if self.member_of.get(m) != gid:
                     errs.append(f"{gid}: {m} nicht eingetragen")
+            errs += [f"{gid}: stummgeschaltet {m} ist kein Mitglied" for m in g.get("muted", []) if m not in g["members"]]
         for m, gid in self.member_of.items():
             if gid not in self.guilds or m not in self.guilds[gid]["members"]:
                 errs.append(f"{m}: Gilde {gid} passt nicht")
