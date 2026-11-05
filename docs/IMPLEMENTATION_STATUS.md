@@ -39,7 +39,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Marktplatz-Rabatt auf Börsengebühr | vorhanden (neu) | AP 29, ADR-0066: 0/250/500 ‰ je Stufe (v2, ADR-0067) für Verkäufer mit Grundstück im Ort; Browser-Client zeigt ihn (AP 30), Unity generisch |
 | Hafen-Wirkung (mehr offene Marktorders) | vorhanden (neu) | AP 41, ADR-0072: +3 Orders je Stufe; Mauer bleibt ohne Wirkung (keine Angriffsmechanik) |
 | Grundstückshandel zwischen Spielern | vorhanden (neu) | AP 43–45, ADR-0073: Angebot an einen Käufer, 5 % Gebühr, 7 Tage; Browser-Fenster, Unity nur Befehlsliste; öffentlicher Grundstücksmarkt fehlt |
-| Chronik: erstes Meisterstück je Rezept | vorhanden (neu) | AP 46/47, ADR-0074: `community_rules_v3`; echter Weg bis Spitzengüte nur über den Haken getestet |
+| Chronik: erstes Meisterstück je Rezept | vorhanden (neu) | AP 46/47, ADR-0074: `community_rules_v3`; echter Weg bis Spitzengüte seit AP 55 getestet |
 | Zweigwirkung (aktiver Berufszweig) | vorhanden (neu) | AP 36, ADR-0070: +25 % Berufserfahrung für Rezepte des Zweigs; weitere Wirkungen offen |
 | Upgrade-Werkzeug für Spielstände | vorhanden (neu) | AP 40, ADR-0071: `python -m mmo_game.upgrade`; nur mit Wegwerf-Spielstand erprobt |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |

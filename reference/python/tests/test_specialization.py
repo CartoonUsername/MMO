@@ -140,6 +140,11 @@ class MigrationAndPersistenceTests(unittest.TestCase):              # AP 38
             w9.specialize("anna", "smithing", "refining")
 
 
+def World_craft_quality(w, char, grade):
+    w.inv.deposit(char, f"iron_ore@{grade}", 10)
+    return w.crafting.craft(char, "iron_ingot", 1, grade).quality
+
+
 class MasterpieceChronicleTests(unittest.TestCase):                  # AP 46: erstes Meisterstück je Rezept in der Weltchronik (ADR-0074)
     def setUp(self):
         from mmo_world.world import World
@@ -171,6 +176,18 @@ class MasterpieceChronicleTests(unittest.TestCase):                  # AP 46: er
         del w.chronicle.R["kinds"]["masterpiece_first"]
         w.crafting.masterpiece("anna", "iron_ingot")                                  # keine Ausnahme, kein Eintrag
         self.assertEqual([e for e in w.chronicle.entries if e["kind"] == "masterpiece_first"], [])
+
+    def test_real_masterwork_craft_reaches_the_chronicle(self):                       # AP 55: echter Weg, ohne Haken-Umweg
+        w = self.w
+        for c in ("anna", "ben"):
+            w.svc.record(c, "profession.work", {"profession": "smithing", "xp": 96000})         # Meisterschaftsstufe 10
+            w.inv.deposit(c, "iron_ore@select", 10)
+        low = World_craft_quality(w, "anna", "standard")                                    # schlechteres Material: kein Meisterwerk
+        self.assertNotEqual(low, "masterwork")
+        self.assertEqual(w.crafting.craft("anna", "iron_ingot", 1, "select").quality, "masterwork")
+        self.assertEqual(w.crafting.craft("ben", "iron_ingot", 1, "select").quality, "masterwork")
+        rows = [e for e in w.chronicle.entries if e["kind"] == "masterpiece_first"]
+        self.assertEqual([(e["chars"], e["data"]["recipe"]) for e in rows], [(["anna"], "iron_ingot")])   # nur die Erste
 
 
 class FocusQualityTests(unittest.TestCase):                          # AP 53: aktiver Zweig gibt Gütepunkte (ADR-0075)

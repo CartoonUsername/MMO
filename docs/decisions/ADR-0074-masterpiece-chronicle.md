@@ -9,5 +9,5 @@ Status: angenommen (Vorschlag, Claude, autorisiert; Platzhalterwerte)
 - Kein Gildenpunkte-/Rundruf-Pfad (der liegt in der Spielschicht und wird für Herstellungen nicht durchlaufen).
 
 ## Offen
-- Meisterstück-Erreichen ist im Test nur über den Haken geprüft: CEE verbietet eine erzwungene Spitzengüte; ein echter Herstellungsweg bis `masterwork` wurde hier nicht durchgespielt.
+- Seit AP 55 durch einen echten Herstellungsweg getestet (Schmiedekunst Stufe 10, Eisenbarren aus ausgewähltem Erz = Meisterwerk).
 - Schöne Rezeptnamen, serverweiter Hinweis.
