@@ -118,5 +118,27 @@ class FocusXpTests(unittest.TestCase):                              # AP 36: akt
         self.assertEqual(w.cs.craft("p", "iron_ingot", 10, "standard").profession_xp, self.make(None).cs.craft("p", "iron_ingot", 10, "standard").profession_xp)
 
 
+class MigrationAndPersistenceTests(unittest.TestCase):              # AP 38
+    def test_existing_world_upgrades_from_v9_and_roundtrips_with_a_chosen_branch(self):
+        import json
+        from mmo_world.persistence import check_consistency, export_world, import_world, upgrade_world
+        from mmo_world.world import World
+        w9 = World("rules_v9.json")
+        w9.svc.create("anna", "player")
+        w9.svc.record("anna", "profession.work", {"profession": "smithing", "xp": 50})
+        w10 = upgrade_world(w9, "rules_v10.json")                                  # alle Figuren migrieren
+        self.assertEqual(w10.svc.rules.version, "10")
+        r = w10.specialize("anna", "smithing", "refining")
+        self.assertEqual(r["paid"], 0)
+        self.assertEqual(w10.svc.state("anna").parts["profession"]["xp"], {"smithing": 50})       # alte Erfahrung bleibt
+        self.assertEqual(check_consistency(w10), [])
+        env, logs = export_world(w10)
+        back = import_world(json.loads(json.dumps(env)), json.loads(json.dumps(logs)))
+        self.assertEqual(back.svc.profession_branches("anna")["smithing"]["chosen"], "refining")
+        self.assertEqual(check_consistency(back), [])
+        with self.assertRaises(Exception):                                         # v9-Welt bleibt unberührt
+            w9.specialize("anna", "smithing", "refining")
+
+
 if __name__ == "__main__":
     unittest.main()
