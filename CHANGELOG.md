@@ -19,6 +19,7 @@
 - AP 36: aktiver Berufszweig gibt +25 % Berufserfahrung für seine Rezepte (rules_v10, ADR-0070); noch nicht deployt.
 - AP 37: `query.character` liefert die Regeln der Zweigwahl (`specialization`); Browser-Client zeigt Kosten, Sperrzeit und Bonus. Im echten Browser ungetestet.
 - AP 38: Test: Welt von CEE v9 auf v10 heben, Zweig wählen, exportieren/importieren, Konsistenzprüfung (nur Tests, keine Regeländerung).
+- AP 39: Missbrauchstests für `profession.specialize` (ungültige/fremde Eingaben, keine Nebenwirkungen).
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

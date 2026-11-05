@@ -86,6 +86,27 @@ class SpecializationGame(unittest.TestCase):                      # AP 34: Zweig
         self.assertEqual((sp["cooldown_days"], sp["cost_first"], sp["cost_change"], sp["focus_xp_permille"]), (7, 0, 500, 250))
         self.assertFalse([k for k in sp if k.startswith("_")])
 
+    def test_specialize_abuse_is_rejected_without_side_effects(self):      # AP 39
+        g = GameServer()
+        a, b = Bot(g, "anna"), Bot(g, "ben")
+        a.call("game.join"), b.call("game.join")
+        for c in ("anna", "ben"):
+            g.world.svc.record(c, "profession.work", {"profession": "smithing", "xp": 50})
+        coins = g.world.inv.balance("anna", g.world.trading.coin)
+        bad = [dict(profession="smithing", branch="nope"), dict(profession="mining", branch="refining"), dict(profession="smithing", branch=7),
+               dict(profession=["smithing"], branch="refining"), dict(profession="smithing", branch=None), dict(profession="__proto__", branch="refining"),
+               dict(profession="smithing", branch="refining", day=99)]
+        for args in bad:
+            self.assertFalse(a.call("profession.specialize", **args)["ok"], args)
+        # fremde Figur: das Gateway bindet "char" an die Sitzung
+        r = g.handle(a.sid, {"v": 1, "id": "x1", "cmd": "profession.specialize", "args": {"char": "ben", "profession": "smithing", "branch": "refining"}})
+        self.assertFalse(r["ok"])
+        self.assertIsNone(g.world.svc.profession_branches("ben")["smithing"]["chosen"])
+        self.assertIsNone(g.world.svc.profession_branches("anna")["smithing"]["chosen"])
+        self.assertEqual(g.world.inv.balance("anna", g.world.trading.coin), coins)
+        self.assertTrue(a.call("profession.specialize", profession="smithing", branch="refining")["ok"])
+        self.assertEqual(g.world.svc.profession_branches("ben")["smithing"]["chosen"], None)
+
 
 if __name__ == "__main__":
     unittest.main()

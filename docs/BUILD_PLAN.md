@@ -40,6 +40,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 36 | Wirkung des aktiven Zweigs (+25 % Berufserfahrung für seine Rezepte) | §14–16 | 2/3 | **fertig** (ADR-0070); Balancing, weitere Wirkungen offen |
 | 37 | Client-Hinweis zu Kosten/Sperre/Bonus der Zweigwahl | §14–16 | 2/3 | **fertig, im echten Browser ungetestet** (Syntaxprüfung mit Node) |
 | 38 | Migrations- und Persistenztest der Zweigwahl (v9 → v10, Export/Import) | §14–16 | 2/3 | **fertig** (nur Test) |
+| 39 | Missbrauchstests Zweigwahl | §50–55 | 4 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 
