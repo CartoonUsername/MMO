@@ -126,6 +126,13 @@ def element_permille(cfg: dict[str, Any], attacker: str | None, defender: str | 
     return 1000
 
 
+def skill_element_permille(cfg: dict[str, Any], skill: dict[str, Any], defender: str | None) -> int:
+    """Schadensfaktor eines Fähigkeitsbefehls: Einzelelement, oder bei Kombinationen der beste Faktor der Elemente (AP 22)."""
+    if "elements" in skill:
+        return max(element_permille(cfg, x, defender) for x in skill["elements"])
+    return element_permille(cfg, skill.get("element"), defender)
+
+
 def validate_element_rules(cfg: dict[str, Any]) -> None:
     el = cfg["elements"]
     for k in ("strong_permille", "weak_permille", "same_permille"):
@@ -143,6 +150,11 @@ def validate_element_rules(cfg: dict[str, Any]) -> None:
     for name, s in skills(cfg).items():
         if "element" in s and s["element"] not in names:
             raise SimError(f"skills.{name}: unbekanntes Element")
+        if "elements" in s:                                           # Kombinationszauber (AP 22)
+            ee = s["elements"]
+            if ("element" in s or not isinstance(ee, list) or len(ee) not in (2, 3) or len(set(ee)) != len(ee)
+                    or ee != sorted(ee) or any(x not in names for x in ee)):
+                raise SimError(f"skills.{name}: elements ungültig (2 oder 3 verschiedene, alphabetische Elemente, nicht zusammen mit element)")
 
 
 def validate_skill_rules(cfg: dict[str, Any]) -> None:

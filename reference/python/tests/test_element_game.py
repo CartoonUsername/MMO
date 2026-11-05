@@ -42,6 +42,23 @@ class ElementGame(unittest.TestCase):
         kit = {c["cmd"] for c in self.a.call("game.kit")["result"]["commands"]}
         self.assertIn("cast_ember", kit)
 
+    def test_pair_unlocks_combo_cast(self):                       # AP 22
+        self.attune("water", "nature")
+        kit = {c["cmd"] for c in self.a.call("game.kit")["result"]["commands"]}
+        self.assertIn("combo_nature_water", kit)
+        self.assertEqual(self.a.call("game.elements")["result"]["combos"], {"combo_nature_water": ["nature", "water"]})
+
+    def test_single_element_has_no_combo(self):
+        self.attune("water")
+        kit = {c["cmd"] for c in self.a.call("game.kit")["result"]["commands"]}
+        self.assertFalse([c for c in kit if c.startswith("combo_")])
+
+    def test_three_attunements_unlock_triple_and_pairs(self):
+        self.g.world.svc.record("anna", "identity.xp_gained", {"amount": 400000})      # drittes Element: Endgame-Stufe
+        self.attune("water", "nature", "earth")
+        combos = self.a.call("game.elements")["result"]["combos"]
+        self.assertEqual(set(combos), {"combo_earth_nature", "combo_earth_water", "combo_nature_water", "combo_earth_nature_water"})
+
 
 if __name__ == "__main__":
     unittest.main()

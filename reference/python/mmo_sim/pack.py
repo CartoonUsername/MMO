@@ -27,7 +27,7 @@ from .errors import SimError
 from .fight import EncounterResult
 from .group import _Group, _P, _validated
 from .enemies import abilities_at, effective_interval, extra_commands
-from .rules import COMMANDS, element_permille, GROUP_COMMANDS, MULTI_COMMANDS, skill_commands, skills
+from .rules import COMMANDS, skill_element_permille, GROUP_COMMANDS, MULTI_COMMANDS, skill_commands, skills
 
 
 @dataclass(frozen=True)
@@ -205,7 +205,7 @@ class _Pack(_Group):
         """Eigene Fähigkeitsbefehle (ADR-0027)."""
         p, kind = self.ps[idx], a["kind"]
         if kind == "burst_dot":
-            f = element_permille(self.cfg, a.get("element"), e.spec.get("element"))
+            f = skill_element_permille(self.cfg, a, e.spec.get("element"))
             dmg = a["damage"] * f // 1000
             self._hurt(e, dmg, t, "skill")
             p.threat += dmg

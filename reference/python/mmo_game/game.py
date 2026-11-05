@@ -12,6 +12,7 @@ import json
 import os
 import re
 from importlib import resources
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -34,7 +35,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v13.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v14.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -290,7 +291,16 @@ class GameServer:
             ab = self.R.get("element_abilities", {}).get(el)
             if ab and ab not in out:
                 out.append(ab)
+        out += [s["ability"] for s in self._combo_skills(st.parts["element"]["attuned"])]     # Paar-/Dreierzauber (AP 22)
         return out
+
+    def _combo_skills(self, attuned: list[str]) -> list[dict[str, Any]]:
+        """Kombinationszauber, die die geprägten Elemente freischalten: jedes Paar, mit drei Prägungen auch der Dreier."""
+        if not self.R.get("combo_abilities"):
+            return []
+        have = sorted(attuned)
+        want = {tuple(c) for n in (2, 3) if n <= len(have) for c in combinations(have, n)}
+        return [s for s in skills(self.sim).values() if "elements" in s and tuple(s["elements"]) in want]
 
     def _sim_gear(self, char: str) -> dict[str, int]:
         """Kampfwirkungen von Ausrüstung und ausgerüsteten Echos, zusammengefasst (Faktoren multiplizieren, Blockwert nimmt das Minimum, Kosten addieren)."""
@@ -324,7 +334,9 @@ class GameServer:
         """Elementübersicht für den Kampf (AP 16): geprägte Elemente, ihre Zauberbefehle und die Wechselzeit."""
         part = self.world.svc.state(char).parts["element"]
         casts = {e: next((n for n, s in skills(self.sim).items() if s.get("element") == e), None) for e in part["attuned"]}
-        return {"attuned": list(part["attuned"]), "casts": casts, "switch_ticks": self.sim.get("elements", {}).get("switch_ticks", 0),
+        mine = {s["ability"] for s in self._combo_skills(part["attuned"])}
+        combos = {n: list(s["elements"]) for n, s in skills(self.sim).items() if s.get("ability") in mine}
+        return {"attuned": list(part["attuned"]), "casts": casts, "combos": combos, "switch_ticks": self.sim.get("elements", {}).get("switch_ticks", 0),
                 "affinity": dict(part["affinity"])}
 
     def _cmd_kit(self, sid: str, char: str, a: dict[str, Any]) -> dict[str, Any]:

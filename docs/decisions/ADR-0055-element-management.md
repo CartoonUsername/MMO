@@ -9,6 +9,6 @@ Status: angenommen (Vorschlag, vom Projektinhaber am 2026-11-05 zur eigenständi
 - Spielschicht: `game.elements` (geprägte Elemente, Zauberbefehle, Wechselzeit); `game.kit` enthält die freigeschalteten Zauber (Kit-Leiste des Clients ist datengetrieben).
 
 ## Nicht entschieden / offen
-- Dreier- und Domänenskills, Wechselwirkung von Elementkombinationen im Kampf (Katalog existiert seit AP 4a).
+- (Kombinationszauber seit AP 22, ADR-0061; Domänenwirkung weiter offen) Dreier- und Domänenskills, Wechselwirkung von Elementkombinationen im Kampf (Katalog existiert seit AP 4a).
 - Eigene Werte je Element (derzeit alle Zauber mit der Vorlage von `cast_ember`).
 - Darstellung/Effekte im Client; im echten Browser und in Unity nicht geprüft.

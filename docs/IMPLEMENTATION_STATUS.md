@@ -31,6 +31,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Elementschaden im Kampf (Stärke/Schwäche/gleich, Sofort- und Zeitschaden) | vorhanden (neu) | `sim_rules_v8` `elements`, ADR-0043; bisher nur `cast_ember` (Feuer); weitere Elementskills offen |
 | Ausrüstung mit Wirkung (leicht/schwer) und Transmog getrennt von Werten | vorhanden (neu) | `mmo_world/equipment.py`, ADR-0047; Slots/Seltenheiten/Sets/Rezepte offen, Teile im Client noch nicht gezeichnet |
 | Aktives Elementmanagement im Kampf | vorhanden (neu) | AP 16, ADR-0055: Zauber je geprägtem Element, Wechselzeit 40 Ticks; Platzhalterwerte, Dreier-/Domänenskills offen |
+| Kombinationszauber (Paar, Dreier) im Kampf | vorhanden (neu) | AP 22, ADR-0061: 36 Paar- und 84 Dreierzauber, bester Elementfaktor, keine Wechselzeit; Domänen-/Klassenwirkung offen, Client ungeprüft |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
 | Action-Kampf, Telegraphen, Zustände | teilweise | 1:1-, Gruppen-, Mehrgegner-Kampf, Gegnerfähigkeiten (sim_rules_v7); **Raumkampf/Trefferzonen/PvP fehlen** |
 | Dungeons, Weltbosse, Raids | teilweise (neu) | 1 Dungeon (3 Etappen), 1 Gildenraid (AP 18, bis 8 Spieler seit AP 19), Weltboss mit Mitkämpfern/Kiste, ADR-0048/0057/0058; echte Instanzen fehlen |
