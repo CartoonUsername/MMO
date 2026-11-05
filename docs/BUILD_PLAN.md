@@ -45,6 +45,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 41 | Hafen-Wirkung: mehr offene Marktorders | Siedlungen | 2/3 | **fertig** (ADR-0072); Mauer bleibt ohne Wirkung |
 | 42 | Anzeige der Hafenwirkung (Abfrage + Browser) | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
 | 43 | Grundstückshandel (Angebot an einen Käufer, 5 % Gebühr, 7 Tage) | Siedlungen | 2/3 | **fertig** (ADR-0073); Client-Fenster, Benachrichtigung offen |
+| 44 | Client: Grundstückshandel (Browser, Unity-Befehlsliste) | Siedlungen | 2/3 | **fertig, im echten Browser ungetestet** |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

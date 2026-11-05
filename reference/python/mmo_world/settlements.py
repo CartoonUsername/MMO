@@ -389,7 +389,7 @@ class SettlementService:
                 "order_bonus": self.order_bonus(char), "orders_per_reach": self.R.get("orders_per_reach", 0),
                 "sales_out": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["seller"] == char],
                 "sales_in": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["buyer"] == char],
-                "sale_fee_permille": self.R.get("sale_fee_permille", 0)}
+                "sale_fee_permille": self.R.get("sale_fee_permille", 0), "sale_days": self.R.get("sale_days", 0)}
 
     def check(self) -> list[str]:
         errs = []

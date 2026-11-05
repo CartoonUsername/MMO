@@ -125,6 +125,7 @@ class SettlementTests(unittest.TestCase):
             s.sell_plot("anna", "hauptstadt", 1, "ben", 1000)                      # Lager nicht leer
         s.stash_out("anna", "hauptstadt", 1, "timber@standard", 5)
         offer = s.sell_plot("anna", "hauptstadt", 1, "ben", 1000)
+        self.assertEqual((s.view("anna")["sale_days"], s.view("anna")["sale_fee_permille"]), (7, 50))
         self.assertEqual((offer["price"], s.view("ben")["sales_in"][0]["plot"], len(s.view("anna")["sales_out"])), (1000, "hauptstadt:1", 1))
         with self.assertRaises(WorldError):
             s.accept_sale("anna", "hauptstadt", 1)                                 # nur der Käufer
