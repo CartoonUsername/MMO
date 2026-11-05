@@ -28,10 +28,11 @@ class ElementManagement(unittest.TestCase):
 
     def test_game_rules_cover_all_elements(self):
         g = load_game_rules()
-        self.assertEqual(g["sim_rules"], "sim_rules_v9.json")
+        sim = load_sim_rules(g["sim_rules"])                              # Standardregeln (ab AP 19 sim_rules_v10) behalten die Elementzauber
+        self.assertEqual(sim["elements"]["switch_ticks"], 40)
         self.assertEqual(set(g["element_abilities"]), set(ELEMENTS))
         for el, ab in g["element_abilities"].items():
-            self.assertTrue(any(s.get("ability") == ab for s in V9["skills"].values() if isinstance(s, dict)), el)
+            self.assertTrue(any(s.get("ability") == ab for s in sim["skills"].values() if isinstance(s, dict)), el)
 
     def test_same_element_repeats_without_switch_delay(self):
         # Abklingzeit 80 Ticks gilt weiter; Wechselzeit (40) spielt bei gleichem Element keine Rolle

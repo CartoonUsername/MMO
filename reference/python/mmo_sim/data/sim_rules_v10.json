@@ -1,0 +1,863 @@
+{
+ "version": "10",
+ "_comment": "VORLÄUFIGE technische Referenzwerte (Proof of Pipeline), KEINE beschlossenen Spielinhalte. Wie v6, aber nachjustiert nach den Balancing-Reihen von `mmo_sim.balance` (ADR-0034): Lebenspunkte der Familien, Rudelwelpen als Beschworene, Boss-Fähigkeiten, Ankündigung auch normaler Angriffe. Alles Ganzzahlen; 1 Tick = 100 ms.",
+ "ticks_per_second": 10,
+ "max_ticks": 6000,
+ "max_inputs": 5000,
+ "report": {
+  "min_duration_s": 5
+ },
+ "player": {
+  "base_hp": 1000,
+  "hp_per_level": 20,
+  "stamina_max": 100,
+  "stamina_regen_per_tick": 1
+ },
+ "actions": {
+  "light": {
+   "cost": 8,
+   "busy": 8,
+   "cooldown": 0,
+   "damage": 40
+  },
+  "precise": {
+   "cost": 8,
+   "busy": 15,
+   "cooldown": 0,
+   "damage": 90
+  },
+  "heavy": {
+   "cost": 25,
+   "busy": 20,
+   "cooldown": 20,
+   "damage": 130,
+   "windup": 6
+  },
+  "dodge": {
+   "cost": 20,
+   "busy": 4,
+   "cooldown": 20,
+   "active": 4,
+   "perfect_window": 2
+  },
+  "block": {
+   "cost": 10,
+   "busy": 8,
+   "cooldown": 15,
+   "active": 8,
+   "parry_window": 2,
+   "damage_permille": 250
+  },
+  "stun": {
+   "cost": 20,
+   "busy": 6,
+   "cooldown": 60,
+   "ticks": 15
+  },
+  "slow": {
+   "cost": 15,
+   "busy": 6,
+   "cooldown": 30,
+   "ticks": 40,
+   "interval_permille": 1500
+  }
+ },
+ "opponents": {
+  "training_dummy": {
+   "level": 1,
+   "hp": 500,
+   "attack_interval": 0,
+   "windup": 0,
+   "damage": 0,
+   "stagger": 0,
+   "role": "swarm",
+   "element": "nature",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     0
+    ],
+    "entries": {}
+   },
+   "danger_cap": 0
+  },
+  "wolf": {
+   "level": 5,
+   "hp": 850,
+   "attack_interval": 35,
+   "windup": 5,
+   "damage": 60,
+   "stagger": 10,
+   "role": "swarm",
+   "element": "nature",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "crippling_bite": 3,
+     "howl": 1
+    }
+   },
+   "danger_cap": 6
+  },
+  "bear": {
+   "level": 12,
+   "hp": 2100,
+   "attack_interval": 45,
+   "windup": 8,
+   "damage": 120,
+   "stagger": 8,
+   "role": "brute",
+   "element": "earth",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "heavy_slam": 3,
+     "crippling_bite": 2
+    }
+   },
+   "danger_cap": 6
+  },
+  "stone_golem": {
+   "level": 20,
+   "hp": 2000,
+   "attack_interval": 50,
+   "windup": 12,
+   "damage": 200,
+   "stagger": 6,
+   "role": "guardian",
+   "element": "earth",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "stone_skin": 2,
+     "ground_pound": 1
+    }
+   },
+   "danger_cap": 8
+  },
+  "alpha_wolf": {
+   "level": 8,
+   "hp": 1300,
+   "attack_interval": 35,
+   "windup": 5,
+   "damage": 80,
+   "stagger": 8,
+   "role": "elite",
+   "element": "nature",
+   "abilities": [
+    "howl"
+   ],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "crippling_bite": 2,
+     "heavy_slam": 1
+    }
+   },
+   "danger_cap": 9,
+   "phases": [
+    {
+     "at_permille": 600,
+     "add": [
+      "crippling_bite"
+     ],
+     "attack_interval_permille": 850
+    },
+    {
+     "at_permille": 250,
+     "add": [
+      "call_pack"
+     ],
+     "attack_interval_permille": 700
+    }
+   ]
+  },
+  "wisp_healer": {
+   "level": 6,
+   "hp": 450,
+   "attack_interval": 60,
+   "windup": 6,
+   "damage": 30,
+   "stagger": 10,
+   "role": "support",
+   "element": "light",
+   "abilities": [
+    "mend"
+   ],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "crippling_bite": 2,
+     "howl": 1
+    }
+   },
+   "danger_cap": 6
+  },
+  "bog_witch": {
+   "level": 9,
+   "hp": 1650,
+   "attack_interval": 50,
+   "windup": 10,
+   "damage": 50,
+   "stagger": 10,
+   "role": "caster",
+   "element": "shadow",
+   "abilities": [
+    "burning_curse"
+   ],
+   "pool": {
+    "count": [
+     0,
+     2
+    ],
+    "entries": {
+     "crippling_bite": 3,
+     "stone_skin": 1,
+     "mend": 1
+    }
+   },
+   "danger_cap": 8
+  },
+  "stone_warden": {
+   "level": 14,
+   "hp": 2400,
+   "attack_interval": 55,
+   "windup": 14,
+   "damage": 140,
+   "stagger": 6,
+   "role": "guardian",
+   "element": "earth",
+   "abilities": [
+    "stone_skin",
+    "ground_pound"
+   ],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "crippling_bite": 2,
+     "stunning_blow": 1
+    }
+   },
+   "danger_cap": 9
+  },
+  "shadow_hunter": {
+   "level": 11,
+   "hp": 1700,
+   "attack_interval": 36,
+   "windup": 4,
+   "damage": 70,
+   "stagger": 8,
+   "role": "controller",
+   "element": "shadow",
+   "abilities": [
+    "stunning_blow"
+   ],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "crippling_bite": 2,
+     "heavy_slam": 1
+    }
+   },
+   "danger_cap": 7
+  },
+  "totem_caller": {
+   "level": 12,
+   "hp": 1200,
+   "attack_interval": 70,
+   "windup": 8,
+   "damage": 40,
+   "stagger": 8,
+   "role": "summoner",
+   "element": "nature",
+   "abilities": [
+    "call_pack"
+   ],
+   "pool": {
+    "count": [
+     0,
+     1
+    ],
+    "entries": {
+     "howl": 2,
+     "burning_curse": 1
+    }
+   },
+   "danger_cap": 8
+  },
+  "stone_imp": {
+   "level": 10,
+   "hp": 120,
+   "attack_interval": 40,
+   "windup": 5,
+   "damage": 50,
+   "stagger": 10,
+   "role": "swarm",
+   "element": "earth",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     0
+    ],
+    "entries": {}
+   },
+   "danger_cap": 0
+  },
+  "stone_heart_colossus": {
+   "level": 25,
+   "hp": 7000,
+   "attack_interval": 60,
+   "windup": 16,
+   "damage": 240,
+   "stagger": 5,
+   "role": "boss",
+   "element": "earth",
+   "abilities": [
+    "colossus_slam",
+    "colossus_quake"
+   ],
+   "pool": {
+    "count": [
+     0,
+     0
+    ],
+    "entries": {}
+   },
+   "danger_cap": 20,
+   "phases": [
+    {
+     "at_permille": 700,
+     "add": [
+      "stone_skin"
+     ],
+     "attack_interval_permille": 900
+    },
+    {
+     "at_permille": 400,
+     "add": [
+      "call_imps"
+     ],
+     "attack_interval_permille": 800
+    },
+    {
+     "at_permille": 250,
+     "add": [
+      "stunning_blow"
+     ],
+     "attack_interval_permille": 650
+    }
+   ]
+  },
+  "wolf_pup": {
+   "level": 3,
+   "hp": 250,
+   "attack_interval": 40,
+   "windup": 5,
+   "damage": 35,
+   "stagger": 10,
+   "role": "swarm",
+   "element": "nature",
+   "abilities": [],
+   "pool": {
+    "count": [
+     0,
+     0
+    ],
+    "entries": {}
+   },
+   "danger_cap": 0
+  }
+ },
+ "ability_effects": {
+  "_comment": "Zusammensetzung mehrerer ausgerüsteter Fähigkeiten: *_permille multiplizieren (Fähigkeiten in alphabetischer Reihenfolge, je Schritt abgerundet), block_damage_permille nimmt das Minimum, *_bonus/*_delta addieren sich.",
+  "power_strike": {
+   "heavy_damage_permille": 1250
+  },
+  "disrupting_blow": {
+   "stun_ticks_bonus": 5
+  },
+  "hindering_mark": {
+   "slow_ticks_bonus": 10
+  },
+  "shield_wall": {
+   "block_damage_permille": 150
+  },
+  "riposte": {
+   "parry_stagger_bonus": 6
+  },
+  "flowing_step": {
+   "dodge_cost_delta": -8,
+   "dodge_cooldown_delta": -8
+  },
+  "ember_strike": {
+   "light_damage_permille": 1400
+  },
+  "veteran_focus": {
+   "stamina_regen_bonus": 1
+  },
+  "twilight_veil": {
+   "damage_taken_permille": 900
+  }
+ },
+ "group": {
+  "max_party": 8,
+  "opponent_hp_per_extra_member_permille": 600,
+  "heal": {
+   "amount": 200,
+   "cost": 20,
+   "busy": 8,
+   "cooldown": 40
+  },
+  "shield": {
+   "absorb": 150,
+   "ticks": 40,
+   "cost": 15,
+   "busy": 8,
+   "cooldown": 50
+  },
+  "ability_commands": {
+   "ally_mend": "heal",
+   "ally_ward": "shield"
+  },
+  "threat": {
+   "heal_permille": 1000
+  },
+  "_comment_ap19": "AP 19 (ADR-0058): max_party 8 für Gildenraids und Weltbosse; normale Gruppen bleiben durch party_rules (max_size 4) begrenzt. Der Gegner-HP-Zuschlag je zusätzlichem Mitglied (600 Promille) gilt unverändert."
+ },
+ "multi": {
+  "max_opponents": 3,
+  "sweep": {
+   "cost": 30,
+   "busy": 14,
+   "cooldown": 50,
+   "damage": 50
+  }
+ },
+ "skills": {
+  "_comment": "Eigene Befehle einzelner Fähigkeiten (nur in der Mehrgegner-Simulation `mmo_sim.pack`). `ability` muss ausgerüstet sein, wenn die Figur Befehle über Fähigkeiten freigeschaltet bekommt. `counts_as`: CEE-Aktion, die ein Einsatz zählt (null = keine Entwicklungspunkte).",
+  "cast_ember": {
+   "ability": "ember_strike",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "fire"
+  },
+  "dash": {
+   "ability": "flowing_step",
+   "kind": "evade",
+   "cost": 15,
+   "busy": 4,
+   "cooldown": 60,
+   "ticks": 6,
+   "counts_as": null
+  },
+  "veil": {
+   "ability": "twilight_veil",
+   "kind": "mitigate",
+   "cost": 25,
+   "busy": 6,
+   "cooldown": 120,
+   "ticks": 30,
+   "damage_permille": 500,
+   "counts_as": null
+  },
+  "focus_surge": {
+   "ability": "veteran_focus",
+   "kind": "restore_stamina",
+   "cost": 0,
+   "busy": 6,
+   "cooldown": 300,
+   "amount": 50,
+   "counts_as": null
+  },
+  "cast_water": {
+   "ability": "elem_water",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "water"
+  },
+  "cast_earth": {
+   "ability": "elem_earth",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "earth"
+  },
+  "cast_nature": {
+   "ability": "elem_nature",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "nature"
+  },
+  "cast_electric": {
+   "ability": "elem_electric",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "electric"
+  },
+  "cast_ice": {
+   "ability": "elem_ice",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "ice"
+  },
+  "cast_wind": {
+   "ability": "elem_wind",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "wind"
+  },
+  "cast_light": {
+   "ability": "elem_light",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "light"
+  },
+  "cast_shadow": {
+   "ability": "elem_shadow",
+   "kind": "burst_dot",
+   "cost": 30,
+   "busy": 12,
+   "cooldown": 80,
+   "damage": 180,
+   "dot": {
+    "interval": 10,
+    "damage": 20,
+    "ticks": 40
+   },
+   "counts_as": "heavy_hit",
+   "element": "shadow"
+  }
+ },
+ "enemy_abilities": {
+  "_comment": "Gegnerfähigkeiten. Jede gefährliche Fähigkeit hat eine Vorwarnzeit (`windup` >= 1 Tick, wird dem Client angekündigt) und mindestens eine Antwort der Spieler (`answers`). `danger` zählt gegen die Gefahrengrenze einer Vorlage; `group` erlaubt höchstens eine Fähigkeit je Gruppe; `rollable: false` = nur feste Fähigkeiten oder Phasen. Wirkung folgt in der Simulation (ADR-0033). `min_attack_cycle`: Boden für Angriffstakt + Vorwarnzeit in Ticks, den auch Phasen und Verstärkungen nicht unterschreiten (hält die möglichen Aktionsraten unter den Plausibilitätslimits der CEE). `player_slow_permille`: Verlangsamung von Spielern streckt Sperr- und Abklingzeiten; `heal_threshold_permille`: Heiler heilen Verbündete unter diesem Lebensanteil; `max_enemies`: höchstens so viele lebende Gegner zugleich (Beschwörungen).",
+  "answers": [
+   "dodge",
+   "block",
+   "parry",
+   "interrupt",
+   "shield",
+   "break_shield",
+   "kill_caster",
+   "area",
+   "focus"
+  ],
+  "abilities": {
+   "heavy_slam": {
+    "kind": "slam",
+    "windup": 12,
+    "damage_permille": 2500,
+    "cooldown": 120,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "parry",
+     "block"
+    ],
+    "danger": 3,
+    "group": "burst"
+   },
+   "ground_pound": {
+    "kind": "area",
+    "windup": 16,
+    "damage_permille": 1000,
+    "cooldown": 200,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "shield"
+    ],
+    "danger": 3,
+    "group": "burst"
+   },
+   "stunning_blow": {
+    "kind": "state",
+    "state": "stun",
+    "ticks": 12,
+    "windup": 8,
+    "damage_permille": 300,
+    "cooldown": 240,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "parry"
+    ],
+    "danger": 3,
+    "group": "burst"
+   },
+   "crippling_bite": {
+    "kind": "state",
+    "state": "slow",
+    "ticks": 40,
+    "windup": 6,
+    "damage_permille": 600,
+    "cooldown": 150,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "block"
+    ],
+    "danger": 1
+   },
+   "burning_curse": {
+    "kind": "cast",
+    "state": "burn",
+    "ticks": 40,
+    "interval": 10,
+    "tick_damage": 15,
+    "windup": 20,
+    "cooldown": 180,
+    "interruptible": true,
+    "answers": [
+     "interrupt",
+     "kill_caster"
+    ],
+    "danger": 2
+   },
+   "stone_skin": {
+    "kind": "shield",
+    "absorb": 400,
+    "ticks": 80,
+    "breakable_by": [
+     "parry",
+     "precise_hit"
+    ],
+    "windup": 10,
+    "cooldown": 300,
+    "interruptible": false,
+    "answers": [
+     "break_shield",
+     "focus"
+    ],
+    "danger": 2
+   },
+   "mend": {
+    "kind": "heal_ally",
+    "amount_permille": 200,
+    "windup": 15,
+    "cooldown": 120,
+    "interruptible": true,
+    "answers": [
+     "interrupt",
+     "kill_caster",
+     "focus"
+    ],
+    "danger": 2
+   },
+   "howl": {
+    "kind": "buff_allies",
+    "buff": "haste",
+    "attack_interval_permille": 700,
+    "ticks": 30,
+    "windup": 10,
+    "cooldown": 250,
+    "interruptible": true,
+    "answers": [
+     "interrupt",
+     "kill_caster"
+    ],
+    "danger": 2
+   },
+   "call_pack": {
+    "kind": "summon",
+    "summon": "wolf_pup",
+    "count": 2,
+    "max_alive": 4,
+    "windup": 20,
+    "cooldown": 300,
+    "interruptible": true,
+    "answers": [
+     "interrupt",
+     "area"
+    ],
+    "danger": 3
+   },
+   "call_imps": {
+    "kind": "summon",
+    "summon": "stone_imp",
+    "count": 2,
+    "max_alive": 4,
+    "windup": 20,
+    "cooldown": 300,
+    "interruptible": true,
+    "answers": [
+     "interrupt",
+     "area"
+    ],
+    "danger": 3,
+    "rollable": false
+   },
+   "colossus_slam": {
+    "kind": "slam",
+    "windup": 8,
+    "damage_permille": 2600,
+    "cooldown": 100,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "parry",
+     "block"
+    ],
+    "danger": 3,
+    "group": "burst",
+    "rollable": false
+   },
+   "colossus_quake": {
+    "kind": "area",
+    "windup": 8,
+    "damage_permille": 1500,
+    "cooldown": 160,
+    "interruptible": false,
+    "answers": [
+     "dodge",
+     "shield"
+    ],
+    "danger": 3,
+    "group": "burst",
+    "rollable": false
+   }
+  },
+  "min_attack_cycle": 40,
+  "player_slow_permille": 1500,
+  "heal_threshold_permille": 700,
+  "max_enemies": 6,
+  "telegraph_basic": true
+ },
+ "elements": {
+  "_comment": "Elementwirkung (AP 4b, ADR-0043; Platzhalterwerte). Fähigkeitsbefehle mit `element` verursachen gegen Gegner mit `element` mehr (strong), weniger (weak) oder gleichelementig weniger (same) Schaden; Wirkung auf Sofortschaden und Schaden über Zeit. Fehlt ein Element, bleibt der Schaden unverändert.",
+  "strong_permille": 1250,
+  "weak_permille": 800,
+  "same_permille": 750,
+  "strong": {
+   "fire": [
+    "nature",
+    "ice"
+   ],
+   "water": [
+    "fire",
+    "earth"
+   ],
+   "earth": [
+    "electric"
+   ],
+   "nature": [
+    "water",
+    "earth"
+   ],
+   "electric": [
+    "water"
+   ],
+   "ice": [
+    "nature",
+    "wind"
+   ],
+   "wind": [
+    "earth"
+   ],
+   "light": [
+    "shadow"
+   ],
+   "shadow": [
+    "light"
+   ]
+  },
+  "switch_ticks": 40,
+  "_comment_switch": "AP 16 (ADR-0055): Wer nach einem Elementzauber ein ANDERES Element wirken will, muss `switch_ticks` Ticks warten; dasselbe Element ist sofort wieder möglich (Abklingzeit des Befehls gilt weiter). Platzhalter."
+ }
+}

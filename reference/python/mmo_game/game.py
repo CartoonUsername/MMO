@@ -34,7 +34,7 @@ COIN = "coin@gold"
 MAX_LINE = 4096
 
 
-def load_game_rules(name: str = "game_rules_v11.json") -> dict[str, Any]:
+def load_game_rules(name: str = "game_rules_v12.json") -> dict[str, Any]:
     return json.loads(resources.files("mmo_game").joinpath("data", name).read_text(encoding="utf-8"))
 
 
@@ -659,7 +659,7 @@ class GameServer:
             if view is not None:
                 group += [m for m in view["members"] if m != char and m in self.players and m not in self.fight_of and m not in self.dungeon_of
                           and _dist2(self.players[m]["pos"], tuple(dg["entrance"])) <= dg["radius"] ** 2]
-        group = group[: self.sim["group"]["max_party"]]
+        group = group[: min(self.sim["group"]["max_party"], raid.get("max_members", 4) if raid else 4)]   # Raids bis max_members (AP 19), normale Gruppen bis 4
         for m in group:
             why = self._access(m, self._region_at(tuple(dg["entrance"])))
             if why:

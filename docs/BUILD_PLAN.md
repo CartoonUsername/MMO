@@ -21,7 +21,8 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 15 | Engine-Client (Unity 6, vom Nutzer bestätigt) | §50, §77 | 1–2 | Unity 6 gewählt; Code fertig, in Unity ungetestet (ADR-0054) |
 | 16 | Aktives Elementmanagement im Kampf | §26, §74 | 2/3 | **fertig** (Zauber je Element, Wechselzeit; ADR-0055); Dreier-/Domänenskills offen |
 | 17 | Kampfwirkung der Kampfechos (Resonanz, Meisterschaft, Fähigkeiten) | §17–21, §73 | 2/3 | **fertig** (echo_rules_v2, ADR-0056); Elementwirkung/Optik im Kampf offen |
-| 18 | Gilden-Raids und Gildenforschung | §45, §47–49 | 3 | **fertig** (ADR-0057; Raid-Trupp max. 4, Client-Fenster offen) |
+| 18 | Gilden-Raids und Gildenforschung | §45, §47–49 | 3 | **fertig** (ADR-0057; Client-Fenster offen) |
+| 19 | Größere Kampfgruppen (Raid/Weltboss bis 8) | §33–35, §45, §55 | 3/4 | **fertig** (sim_rules_v10, game_rules_v12, ADR-0058); Balancing und Client-Anzeige offen |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)
 1. **Server:** Klassen-Kits (`game_rules_v2.json`), Kampfdaten je Figur (`game.kit`: Befehl, Kosten, Abklingzeit, Sperrzeit; im `fight_start`). Tests.
