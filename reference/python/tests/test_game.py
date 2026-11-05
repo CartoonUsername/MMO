@@ -83,7 +83,7 @@ class RulesTests(unittest.TestCase):
     def test_game_rules_load_and_match_the_oracle_files(self):
         R = load_game_rules()
         g = GameServer()
-        self.assertEqual(g.world.svc.rules.version, "9")
+        self.assertEqual(g.world.svc.rules.version, "10")
         self.assertEqual(g.sim["version"], "15")
         self.assertTrue(R["speed_cm_per_tick"] > 0 and R["aggro_radius"] > 0)
         # Beute nur aus bekannten Gegnern und handelbaren Gegenständen

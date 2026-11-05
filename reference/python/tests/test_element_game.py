@@ -67,5 +67,17 @@ class ElementGame(unittest.TestCase):
         self.assertEqual(set(combos), {"combo_earth_nature", "combo_earth_water", "combo_nature_water", "combo_earth_nature_water"})
 
 
+class SpecializationGame(unittest.TestCase):                      # AP 34: Zweigwahl im Spiel aktiv (game_rules_v19, ADR-0069)
+    def test_specialize_over_the_protocol(self):
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        g.world.svc.record("anna", "profession.work", {"profession": "smithing", "xp": 50})
+        r = a.call("profession.specialize", profession="smithing", branch="refining")
+        self.assertEqual((r["ok"], r["result"]["paid"]), (True, 0))
+        self.assertEqual(a.call("profession.specialize", profession="smithing", branch="heavy_arms")["ok"], False)   # Abklingzeit
+        self.assertEqual(g.world.svc.profession_branches("anna")["smithing"]["chosen"], "refining")
+
+
 if __name__ == "__main__":
     unittest.main()
