@@ -31,6 +31,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 25 | Bewegungswirkung der Kombinationen (Ausweichfenster) | §22–26 | 2/3 | **fertig** (sim_rules_v14, game_rules_v17, ADR-0064); Beschwörung/Umgebung, Balancing offen |
 | 26 | Beschwörung und Umgebung der Kombinationen (alle 8 Wirkbereiche belegt) | §22–26 | 2/3 | **fertig** (sim_rules_v15, game_rules_v18, ADR-0065); echte Helferfigur, Balancing, Client offen |
 | 29 | Marktplatz-Rabatt auf die Börsengebühr | Siedlungen | 2/3 | **fertig** (ADR-0066, Test in test_settlements); Balancing, Client-Anzeige, Deployment offen |
+| 30 | Anzeige des Marktplatz-Rabatts (Abfrage + Browser-Client) | Siedlungen | 2/3 | **fertig** (Test in test_settlements); Unity nur generisch, in Unity ungetestet |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

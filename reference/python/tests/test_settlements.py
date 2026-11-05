@@ -85,6 +85,7 @@ class SettlementTests(unittest.TestCase):
         s.contribute("anna", "moorufer", "market_square", 800, {"timber@standard": 40})   # Stufe 1: 100 Promille Rabatt
         self.assertEqual(s.fee_discount_permille("anna"), 100)
         self.assertEqual(s.fee_discount_permille("ben"), 0)      # ohne Grundstück kein Rabatt
+        self.assertEqual((s.view("anna")["fee_discount_permille"], s.view("ben")["fee_discount_permille"]), (100, 0))
         self.assertEqual(sell_fee(), base - base * 100 // 1000)
         w.exchange.place("ben", "sell", item, 10, 20)           # Rabatt gilt nur für den Verkäufer
         self.assertEqual(w.exchange.place("anna", "buy", item, 10, 20).fills[0].fee, base)

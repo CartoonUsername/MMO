@@ -327,7 +327,7 @@ class SettlementService:
         mine = [dict(self.plot_view(p), site=p["site"]) for p in self.owned_by(char)]
         return {"sites": [self.site_view(s) for s in self.R["sites"]], "mine": mine, "plot_limit": self.plot_limit(char),
                 "contributed": dict(sorted(self.contrib.get(char, {}).items())), "buildings": {k: {"name": b["name"], "levels": b["levels"]} for k, b in self.R["buildings"].items()},
-                "coins": self.inv.balance(char, self.coin)}
+                "coins": self.inv.balance(char, self.coin), "fee_discount_permille": self.fee_discount_permille(char)}
 
     def check(self) -> list[str]:
         errs = []
