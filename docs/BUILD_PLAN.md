@@ -86,6 +86,9 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 82 | Gildenchat-Moderation (Server) | §45 | 3 | **fertig** (ADR-0078 ergänzt) |
 | 83 | Browser: Stummschalten | §45 | 3 | **fertig, im echten Browser ungetestet** |
 | 84 | Tests Moderation (Rollen, Austritt, Konsistenz) | §45 | 3 | **fertig** (nur Test) |
+| 85 | Gildenchat live zustellen (Server) | §45 | 3 | **fertig** |
+| 86 | Browser: Chat-Ereignis anzeigen | §45 | 3 | **fertig, im echten Browser ungetestet** |
+| 87 | Tests Zustellung (Absender, Nicht-Mitglied, stumm, offline) | §45 | 3 | **fertig** (nur Test) |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

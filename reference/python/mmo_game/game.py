@@ -77,6 +77,7 @@ class GameServer:
         self.encounters = EncounterServer(self.sim, self.world.svc, lambda: self.world.day[0])
         self.players: dict[str, dict[str, Any]] = {}     # Figur -> Zustand im Raum
         self.sess_of: dict[str, str] = {}                # Figur -> Sitzung
+        self.world.guilds.on_say = self._guild_chat_push
         self.queues: dict[str, list[dict[str, Any]]] = {}
         self.fights: dict[str, dict[str, Any]] = {}
         self.fight_of: dict[str, str] = {}               # Figur -> Kampf
@@ -180,6 +181,13 @@ class GameServer:
     def _emit(self, sid: str | None, ev: dict[str, Any]) -> None:
         if sid in self.queues:
             self.queues[sid].append(ev)
+
+    def _guild_chat_push(self, guild: dict[str, Any], msg: dict[str, Any]) -> None:
+        """Gildennachricht live an die online Mitglieder außer dem Absender (AP 85, ADR-0081); Offline-Mitglieder lesen den Verlauf."""
+        ev = {"ev": "guild_chat", "tag": guild["tag"], "n": msg["n"], "day": msg["day"], "char": msg["char"], "text": msg["text"]}
+        for c in guild["members"]:
+            if c != msg["char"] and c in self.sess_of:
+                self._emit_to(c, ev)
 
     def _emit_to(self, char: str, ev: dict[str, Any]) -> None:
         self._emit(self.sess_of.get(char), ev)

@@ -88,6 +88,28 @@ class GuildChat(unittest.TestCase):
         self.c.call("guild.accept", guild=gid)
         self.assertTrue(self.c.call("guild.say", text="neu dabei")["ok"])                         # nach Wiedereintritt nicht mehr stumm
 
+
+    def test_live_push_reaches_online_members_except_the_sender(self):                          # AP 85–87
+        self.b.pull(), self.a.pull(), self.c.pull()
+        self.b.events.clear(), self.a.events.clear(), self.c.events.clear()
+        self.assertTrue(self.a.call("guild.say", text="Hallo Gilde")["ok"])
+        for bot in (self.a, self.b, self.c):
+            bot.pull()
+        got = lambda bot: [e for e in bot.events if e.get("ev") == "guild_chat"]
+        self.assertEqual([(e["char"], e["text"], e["tag"], e["n"]) for e in got(self.b)], [("anna", "Hallo Gilde", "NW", 1)])
+        self.assertEqual(got(self.a), [])                                                       # Absender bekommt keine Kopie
+        self.assertEqual(got(self.c), [])                                                       # Nicht-Mitglied hört nichts
+        self.a.call("guild.mute", target="ben")
+        self.b.call("guild.say", text="stumm")
+        self.a.pull()
+        self.assertEqual([e for e in self.a.events if e.get("ev") == "guild_chat" and e["text"] == "stumm"], [])   # abgelehnte Nachricht wird nicht verteilt
+
+    def test_offline_members_are_skipped_without_error(self):
+        self.g.disconnect(self.b.sid)                                                           # Ben geht offline
+        self.assertNotIn("ben", self.g.sess_of)
+        self.assertTrue(self.a.call("guild.say", text="ist jemand da?")["ok"])                  # kein Fehler, Verlauf bleibt für später
+        self.assertEqual(self.w.guilds.guilds[self.w.guilds.member_of["anna"]]["chat"][-1]["text"], "ist jemand da?")
+
     def test_roundtrip_through_persistence(self):
         from mmo_world.persistence import export_world, import_world
         import json

@@ -44,7 +44,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Upgrade-Werkzeug für Spielstände | vorhanden (neu) | AP 40, ADR-0071: `python -m mmo_game.upgrade`; nur mit Wegwerf-Spielstand erprobt |
 | Ausrüstungssets mit Setbonus | vorhanden (neu) | AP 61–63, ADR-0076: 2 Platzhaltersets, Boni güteunabhängig und unter den Kappen; Anzeige im Browser; Rezepte/Seltenheiten offen |
 | Mauer-Wirkung | vorhanden (neu), Notlösung | AP 64, ADR-0077: senkt die Grundsteuer; echte Schutzwirkung erst mit einer Angriffsmechanik auf Orte |
-| Gildenchat | vorhanden (neu) | AP 66–69, ADR-0078: 64 Zeichen, 30/Tag, Verlauf 50; Browser-Eingabe; kein Echtzeit-Push |
+| Gildenchat | vorhanden (neu) | AP 66–69, 82–87, ADR-0078: 64 Zeichen, 30/Tag, Verlauf 50; Stummschalten; Live-Zustellung an online Mitglieder; Browser |
 | Anzeigetitel aus der Chronik | vorhanden (neu) | AP 73–76, ADR-0080: Wahl, Anzeige bei Mitspielern (Browser), Unity nur Befehl |
 | Forschung v2 (7 Techniken, Bindung höherer Projektstufen) | vorhanden (neu) | AP 70/71, ADR-0079 |
 | Skill-Leiste, Klassen-Kits, Kampfanzeige im Client | vorhanden (neu) | ADR-0039, `game_rules_v2.json`; Kits sind Platzhalter |
@@ -62,7 +62,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 | Filialen, Töchter, Offline-Betrieb mit Deckel | teilweise | Filialen + Offline-Deckel + Firmenfenster (ADR-0049); Töchter fehlen. Blueprint: Offline-Produktion im Blueprint ausdrücklich ohne unendliche Geldquelle |
 | Forschung, Epochen, Entdecker (Siedlungsebene) | teilweise (neu) | Techniken, Epochensperre, Entdecker-Vorsprung, Lizenz, Übernahme, Fenster (ADR-0051); Epochen-Inhalte seit AP 70 (ADR-0079, 7 Techniken); Spezialisierung, Produktionsvorsprung offen |
 | Spielerstädte, Grundstücke, Gemeinschaftsprojekte | teilweise | Orte, Grundstücke, Gebäude/Lager, Projekte mit Wirkung (Straße, Lagerhaus, Rathaus), Fenster (ADR-0050); Marktplatz/Mauer/Hafen-Wirkung, Grundstückshandel, Platzierung offen |
-| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (bis 8 Spieler, ADR-0058) seit AP 18/19 (ADR-0057); Gildenchat seit AP 66 (ADR-0078); Echtzeit-Zustellung offen |
+| Gilden | teilweise (neu) | Rollen, Kasse, Gildenhaus, Punkte, Fenster (ADR-0052); Gildenforschung und Gildenraid (bis 8 Spieler, ADR-0058) seit AP 18/19 (ADR-0057); Gildenchat seit AP 66 (ADR-0078) mit Moderation und Live-Zustellung (AP 82–87) |
 | Direkter Handel, Benachrichtigungen | vorhanden | ADR-0023/0024 |
 | Weltchronik, Prestige | teilweise (neu) | Chronik mit Erstleistungen, Titel, Ruhmpunkte, Fenster (ADR-0052); seltene Inhalte offen |
 | Stadtpolitik | zurückgestellt | nicht bauen |

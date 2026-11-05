@@ -182,6 +182,7 @@ function onMessage(m){
     case"economy_event":log("📰 "+m.headline+" (bis Tag "+m.until+")","g");if($("wMarket").open)refreshMarket().catch(()=>{});break;
     case"plot_forfeit":log("⚠ Grundstück "+m.n+" in "+m.site+" ist verfallen (Steuer nicht gezahlt); Lager zurückgegeben","b");if($("wTown").open)refreshTown().catch(()=>{});break;
     case"tech":log("🔬 "+m.site+" kennt jetzt "+m.tech+(m.first?" – Weltneuheit! Entdecker: "+m.pioneer:""),"g");if($("wTech").open)refreshTech().catch(()=>{});break;
+    case"guild_chat":log("💬 ["+m.tag+"] "+m.char+": "+m.text,"g");if($("wGuild")&&$("wGuild").open)refreshGuild().catch(()=>{});break;
     case"chronicle":log("📜 Weltchronik: "+m.chars.join(", ")+" – "+m.name,"g");if($("wChron").open)refreshChron().catch(()=>{});break;
     case"region":log((m.warning?"⚠ ":"")+"Region: "+m.name+" – Gefahr "+m.danger+"/5, empfohlen ab Stufe "+m.level+(m.warning?" (sehr gefährlich, aber begehbar)":""),m.warning?"e":"g");break;
     case"region_blocked":log("🔒 "+m.name+": "+m.reason,"e");break;

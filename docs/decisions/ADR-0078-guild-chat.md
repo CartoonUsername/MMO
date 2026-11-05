@@ -13,3 +13,7 @@ Status: angenommen (Vorschlag, Claude, autorisiert; Platzhalterwerte)
 
 ## Ergänzung AP 82–84: Moderation
 - `guild.mute {target, on?}`: Offiziere schalten Mitglieder stumm, der Leiter auch Offiziere; nie den Leiter oder sich selbst. Stummgeschaltete können nicht schreiben, aber lesen. Speicherung `muted` in der Gilde nur bei Bedarf; Austritt/Rauswurf hebt die Sperre auf (`check()` prüft, dass nur Mitglieder stumm sind). Browser: Knopf „Stummschalten“ in der Mitgliederliste, Anzeige „stumm“.
+
+## Ergänzung AP 85–87: Live-Zustellung
+- `GuildService.on_say`-Haken; die Spielschicht schickt das Ereignis `guild_chat {tag, n, day, char, text}` an alle **online** Gildenmitglieder außer dem Absender. Abgelehnte (stumme/ungültige) Nachrichten werden nicht verteilt; Offline-Mitglieder lesen den Verlauf. Browser: Meldung im Log und Aktualisierung des offenen Gildenfensters.
+- Kein Zustellnachweis, keine Warteschlange für Offline-Mitglieder (der Verlauf ersetzt sie).

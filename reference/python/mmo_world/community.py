@@ -142,6 +142,7 @@ class GuildService:
         self.invites: dict[str, list[str]] = {}
         self._counter = 0
         self.record: Callable[..., Any] = lambda *a, **k: None
+        self.on_say: Callable[[dict[str, Any], dict[str, Any]], None] = lambda guild, msg: None      # Spielschicht verteilt Nachrichten live (AP 85)
 
     @property
     def active(self) -> bool:
@@ -415,6 +416,7 @@ class GuildService:
         msg = {"n": g["chat_n"], "day": today, "char": char, "text": text}
         chat.append(msg)
         del chat[:-self.CHAT_KEEP]
+        self.on_say(g, msg)
         return msg
 
     def view(self, char: str) -> dict[str, Any]:
