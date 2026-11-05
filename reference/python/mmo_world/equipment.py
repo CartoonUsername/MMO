@@ -40,6 +40,17 @@ def validate_equipment_rules(r: dict[str, Any], cee_rules: Any) -> None:
                 raise WorldError(f"equipment_rules: {iid}: Wirkung {k!r} ungültig")
     if not grades:
         raise WorldError("equipment_rules: keine Gütestufen")
+    for sid, st in r.get("sets", {}).items():
+        if len(st["pieces"]) < 2 or len(set(st["pieces"])) != len(st["pieces"]) or any(p not in r["items"] for p in st["pieces"]):
+            raise WorldError(f"equipment_rules: Set {sid}: Teile ungültig")
+        last = 0
+        for b in st["bonuses"]:
+            if not isinstance(b["pieces"], int) or isinstance(b["pieces"], bool) or not last < b["pieces"] <= len(st["pieces"]):
+                raise WorldError(f"equipment_rules: Set {sid}: Bonusstufen ungültig")
+            last = b["pieces"]
+            for k, v in b["effects"].items():
+                if k not in SIM_KEYS + ("move_permille",) or not isinstance(v, int) or isinstance(v, bool):
+                    raise WorldError(f"equipment_rules: Set {sid}: Wirkung {k!r} ungültig")
 
 
 class EquipmentService:
@@ -75,18 +86,26 @@ class EquipmentService:
     def effects(self, char: str) -> dict[str, int]:
         """Gesamtwirkung der getragenen Ausrüstung (nur gesetzte Schlüssel), begrenzt durch die Kappen."""
         out: dict[str, int] = {}
+
+        def merge(k: str, v: int) -> None:
+            if k not in out:
+                out[k] = v
+            elif k == "block_damage_permille":
+                out[k] = min(out[k], v)
+            elif k == "dodge_cost_delta":
+                out[k] += v
+            else:
+                out[k] = out[k] * v // 1000
+
         for item_key in self.worn.get(char, {}).values():
             item, grade, d = self._parse(item_key)
             for k, v in d["effects"].items():
-                v = self._scale(k, v, grade)
-                if k not in out:
-                    out[k] = v
-                elif k == "block_damage_permille":
-                    out[k] = min(out[k], v)
-                elif k == "dodge_cost_delta":
-                    out[k] += v
-                else:
-                    out[k] = out[k] * v // 1000
+                merge(k, self._scale(k, v, grade))
+        for st in self.set_progress(char).values():                      # Setboni (ab equipment_rules_v2), unabhängig von der Güte
+            for b in st["bonuses"]:
+                if b["active"]:
+                    for k, v in b["effects"].items():
+                        merge(k, v)
         c = self.R["caps"]
         if "damage_taken_permille" in out:
             out["damage_taken_permille"] = max(c["damage_taken_permille_min"], out["damage_taken_permille"])
@@ -99,6 +118,16 @@ class EquipmentService:
             out["move_permille"] = max(c["move_permille_min"], min(c["move_permille_max"], out["move_permille"]))
         if "dodge_cost_delta" in out:
             out["dodge_cost_delta"] = max(-c["dodge_cost_delta_max"], min(c["dodge_cost_delta_max"], out["dodge_cost_delta"]))
+        return out
+
+    def set_progress(self, char: str) -> dict[str, dict[str, Any]]:
+        """Getragene Teile je Set und welche Boni aktiv sind (leer in Regeln ohne Sets)."""
+        worn = {self._parse(k)[0] for k in self.worn.get(char, {}).values()}
+        out: dict[str, dict[str, Any]] = {}
+        for sid, st in self.R.get("sets", {}).items():
+            have = sorted(p for p in st["pieces"] if p in worn)
+            out[sid] = {"name": st["name"], "pieces": st["pieces"], "worn": have,
+                        "bonuses": [{"pieces": b["pieces"], "effects": b["effects"], "active": len(have) >= b["pieces"]} for b in st["bonuses"]]}
         return out
 
     def sim_gear(self, char: str) -> dict[str, int]:

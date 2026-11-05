@@ -36,6 +36,7 @@
 - AP 56–58: Offene Grundstücksangebote (`plot.sell` ohne Käufer, jeder darf annehmen; `sales_open` in der Abfrage), Browser-Liste und Verkaufsdialog, Missbrauchstests (ADR-0073 ergänzt). Im echten Browser ungetestet.
 - AP 59: Fuzz-Test läuft auch auf rules_v10 und kennt echte Orte, Berufe und Zweige; Zweigwahl, Grundstücksverkauf, -annahme und -rücknahme erreichen Erfolgspfade, Invarianten (keine Münzen/Waren aus dem Nichts, Konsistenz) halten.
 - AP 60: Gesamtprüfung: 1526 Tests, Golden-Vectors-Prüfung, Unity-Kerncheck und Lasttest (p95 0,85 ms) ohne Befund; DEPLOY_PENDING auf Stand AP 60.
+- AP 61/63: Ausrüstungssets mit Setbonus (equipment_rules_v2, ADR-0076) samt Tests; noch nicht deployt.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
