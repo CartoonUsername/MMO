@@ -70,6 +70,14 @@ try {
   check(town2.includes("Angebot zurückziehen"), "Offenes Grundstücksangebot per Klick erstellt (Knopf wechselt zu 'Angebot zurückziehen')");
   await ev("[...document.querySelectorAll('#townBox button')].find(b=>b.textContent==='Angebot zurückziehen').click()"); await sleep(800);
   check((await ev("document.getElementById('townBox').innerText")).includes("Verkaufen"), "Angebot per Klick zurückgezogen");
+  // Markt: Kaufauftrag per Klick platzieren, in der Liste sehen, per Klick zurückziehen
+  await ev("refreshMarket()"); await sleep(600);
+  await ev("window.__ref=0"); await ev("callRaw('query.market_quote',{item_key:itemKey()}).then(r=>{window.__ref=(r.result&&(r.result.reference||r.result.ref))||0})"); await sleep(500);
+  await ev("document.getElementById('mSide').value='buy';document.getElementById('mQty').value='2';document.getElementById('mPrice').value=String(window.__ref);document.getElementById('mPlace').click()"); await sleep(900);
+  const mo = await ev("document.getElementById('mOrders').innerText");
+  check(/Kauf 2× .* zu \d+/.test(mo), "Kaufauftrag per Klick platziert und gelistet" + (/Kauf 2×/.test(mo) ? "" : ": " + (await ev("document.getElementById('marketMsg').innerText"))));
+  await ev("[...document.querySelectorAll('#mOrders button')].find(b=>b.textContent==='Zurückziehen').click()"); await sleep(800);
+  check(!/Kauf 2×/.test(await ev("document.getElementById('mOrders').innerText")), "Auftrag per Klick zurückgezogen");
   check(problems.length === 0, "Keine JS-Ausnahmen/console.error" + (problems.length ? ":\n  " + problems.slice(0, 5).join("\n  ") : ""));
 } catch (e) { console.log("FEHLER  " + e.message); failed++; }
 finally { chrome.kill(); }

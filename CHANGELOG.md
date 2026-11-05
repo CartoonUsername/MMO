@@ -54,6 +54,8 @@
 - AP 85–87: Live-Zustellung des Gildenchats (`guild_chat`-Ereignis an online Mitglieder), Browser-Behandlung, Tests (ADR-0078 ergänzt). Im echten Browser ungetestet.
 - AP 88/89: `query.market` nennt Gebühr, Rabatt und Auftragsgrenze der Figur; Browser zeigt sie im Marktfenster; Tests. Im echten Browser ungetestet.
 - AP 90–92: Browser-Rauchtest `scripts/browser_smoke.sh` (headless Chromium über CDP, Wegwerf-Server): Registrierung, alle Fenster ohne `undefined`/`NaN`, Gilde/Chat, Siedlung, Titelwahl, Grundstücksangebot setzen und zurückziehen per echtem Klick. Damit sind diese Anzeigen im echten Browser geprüft.
+- AP 93: Rauchtest um Marktauftrag per Klick (Platzieren, Listenanzeige, Zurückziehen) erweitert.
+- AP 94: Statusabgleich auf Stand AP 93 (IMPLEMENTATION_STATUS, BUILD_PLAN).
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).

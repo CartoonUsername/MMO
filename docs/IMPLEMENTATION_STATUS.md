@@ -87,3 +87,7 @@ Legende: **vorhanden** (Code + Tests) · **teilweise** · **fehlt** · **Konflik
 
 ## Offene Entscheidungen (Blueprint §57), die vor Bau geklärt sein müssen
 Anzahl gleichzeitig ausrüstbarer Echos (Frage 7) · Resonanz-Raten/Kosten (8) · welche Echos serverexklusiv sind (9) · Berufswechsel (10) · Währung/Gebühren (17) · Grundstücksgrößen (18).
+
+
+## Browser-Prüfung (Stand AP 93)
+Der Browser-Client wird seit AP 90 mit `scripts/browser_smoke.sh` im echten (headless) Chromium geprüft: Registrierung, alle Fenster ohne `undefined`/`NaN`, Gildenchat, Siedlung, Titelwahl, Grundstücksangebot und Marktauftrag per Klick. Nicht abgedeckt: Herstellungsfenster, Kampf, Raid, Live-Push zwischen zwei Clients. Unity-Client bleibt nur per Kerncheck (dotnet) geprüft, nicht im Editor.

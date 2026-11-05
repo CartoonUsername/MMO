@@ -81,6 +81,8 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 77 | Fuzz-Test: Gildenchat und Titelwahl | §50–55 | 4 | **fertig** (nur Test) |
 | 78 | Statusabgleich auf Stand AP 80 | – | – | **fertig** (nur Doku) |
 | 90–92 | Browser-Rauchtest im echten Chromium (`scripts/browser_smoke.sh`) | – | – | **fertig** |
+| 93 | Rauchtest: Marktauftrag per Klick | – | – | **fertig** |
+| 94 | Statusabgleich auf Stand AP 93 | – | – | **fertig** (nur Doku) |
 | 79 | Lastmessung 60 Bots | §50–55 | 4 | **fertig**: p95 5,46 ms je Tick |
 | 80 | Gesamtprüfung (Tests, Golden Vectors, Unity-Kerncheck) | – | – | **fertig**, ohne Befund |
 | 81 | Upgrade-Werkzeug: Probelauf und Konsistenzsperre | §50–55 | 4 | **fertig** (Test mit Wegwerf-Spielstand) |
