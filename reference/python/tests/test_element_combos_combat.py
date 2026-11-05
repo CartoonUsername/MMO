@@ -60,7 +60,7 @@ class ComboCombat(unittest.TestCase):
 
     def test_game_rules_use_v12(self):
         g = load_game_rules()
-        self.assertEqual(g["sim_rules"], "sim_rules_v14.json")
+        self.assertEqual(g["sim_rules"], "sim_rules_v15.json")
         self.assertTrue(g["combo_abilities"])
         self.assertEqual(len(list(combinations(EL, 2))), 36)
 

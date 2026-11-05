@@ -29,6 +29,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 23 | Bereichswirkung der Kombinationen (Kontrolle, Schutz, Beistand) | §22–26, §74 | 2/3 | **fertig** (sim_rules_v12, game_rules_v15, ADR-0062); Klassenumsetzung, Bewegung/Beschwörung/Umgebung offen |
 | 24 | Klassenwirkung der Kombinationen (Krieger/Bogenschütze/Schamane) | §24 | 2/3 | **fertig** (sim_rules_v13, game_rules_v16, ADR-0063); Bewegung/Beschwörung/Umgebung, Balancing offen |
 | 25 | Bewegungswirkung der Kombinationen (Ausweichfenster) | §22–26 | 2/3 | **fertig** (sim_rules_v14, game_rules_v17, ADR-0064); Beschwörung/Umgebung, Balancing offen |
+| 26 | Beschwörung und Umgebung der Kombinationen (alle 8 Wirkbereiche belegt) | §22–26 | 2/3 | **fertig** (sim_rules_v15, game_rules_v18, ADR-0065); echte Helferfigur, Balancing, Client offen |
 
 ## AP 1 im Detail (Teilschritte, Reihenfolge fest)
 1. **Server:** Klassen-Kits (`game_rules_v2.json`), Kampfdaten je Figur (`game.kit`: Befehl, Kosten, Abklingzeit, Sperrzeit; im `fight_start`). Tests.

@@ -223,6 +223,10 @@ class _Pack(_Group):
                 e.slow_until = max(e.slow_until, t + r["slow_ticks"] * p.cls.get("slow_permille", 1000) // 1000)
             if "mitigate" in r and not t < p.mit_until:
                 p.mit_until, p.mit_permille = t + r["mitigate"]["ticks"], min(r["mitigate"]["damage_permille"], p.cls.get("mitigate_damage_permille", 1000))
+            if "dot_permille" in r and e.burn is not None:
+                e.burn[2] = e.burn[2] * r["dot_permille"] // 1000
+            if "stagger_ticks" in r:
+                e.stagger_until = max(e.stagger_until, t + r["stagger_ticks"])
             if "evade_ticks" in r:
                 p.evade_until = max(p.evade_until, t + r["evade_ticks"])
             if "stamina" in r:

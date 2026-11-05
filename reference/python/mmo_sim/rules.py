@@ -155,8 +155,8 @@ def validate_element_rules(cfg: dict[str, Any]) -> None:
             def pos(v: Any) -> bool:
                 return isinstance(v, int) and not isinstance(v, bool) and v > 0
             m = rd.get("mitigate") if isinstance(rd, dict) else None
-            if (not isinstance(rd, dict) or "elements" not in s or set(rd) - {"slow_ticks", "mitigate", "stamina", "evade_ticks"}
-                    or any(k in rd and not pos(rd[k]) for k in ("slow_ticks", "stamina", "evade_ticks"))
+            if (not isinstance(rd, dict) or "elements" not in s or set(rd) - {"slow_ticks", "mitigate", "stamina", "evade_ticks", "dot_permille", "stagger_ticks"}
+                    or any(k in rd and not pos(rd[k]) for k in ("slow_ticks", "stamina", "evade_ticks", "dot_permille", "stagger_ticks"))
                     or ("mitigate" in rd and not (isinstance(m, dict) and pos(m.get("ticks")) and isinstance(m.get("damage_permille"), int)
                                                   and 0 <= m["damage_permille"] <= 1000))):
                 raise SimError(f"skills.{name}: riders ungültig (nur bei Kombinationen)")
