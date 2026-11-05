@@ -78,6 +78,14 @@ class SpecializationGame(unittest.TestCase):                      # AP 34: Zweig
         self.assertEqual(a.call("profession.specialize", profession="smithing", branch="heavy_arms")["ok"], False)   # Abklingzeit
         self.assertEqual(g.world.svc.profession_branches("anna")["smithing"]["chosen"], "refining")
 
+    def test_character_query_reports_specialization_rules(self):          # AP 37
+        g = GameServer()
+        a = Bot(g, "anna")
+        a.call("game.join")
+        sp = a.call("query.character")["result"]["specialization"]
+        self.assertEqual((sp["cooldown_days"], sp["cost_first"], sp["cost_change"], sp["focus_xp_permille"]), (7, 0, 500, 250))
+        self.assertFalse([k for k in sp if k.startswith("_")])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -75,6 +75,7 @@ def _character_view(w: Any, char: str) -> dict[str, Any]:
         "ability_defs": safe(lambda: __import__("mmo_cee.forms", fromlist=["x"]).ability_definitions(svc.state(char), svc.rules_of(char), svc.abilities(char)), {}),
         "combinations": safe(lambda: svc.element_combinations(char), []),
         "profession_detail": safe(lambda: svc.profession_branches(char), {}),
+        "specialization": safe(lambda: {k: v for k, v in svc.rules_of(char)["professions"]["specialization"].items() if not k.startswith("_")}, None),
         "discoveries": safe(lambda: {d: pr for d in svc.rules_of(char)["discovery"]["discoveries"]
                                      for pr in [svc.discovery_progress(char, d)] if pr["known"] or pr["evidence"]}, {}),
     }

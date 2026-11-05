@@ -17,6 +17,7 @@
 - AP 34: game_rules_v19 (Standard) läuft auf CEE rules_v10, Zweigwahl im Spiel aktiv (ADR-0069); noch nicht deployt.
 - AP 35: Browser-Client zeigt den aktiven Berufszweig und bietet Wahl/Wechsel an (Befehl `profession.specialize`); im echten Browser ungetestet, Unity offen.
 - AP 36: aktiver Berufszweig gibt +25 % Berufserfahrung für seine Rezepte (rules_v10, ADR-0070); noch nicht deployt.
+- AP 37: `query.character` liefert die Regeln der Zweigwahl (`specialization`); Browser-Client zeigt Kosten, Sperrzeit und Bonus. Im echten Browser ungetestet.
 - Balancing der Kombinationen gemessen (docs/BALANCE_ELEMENTS.md), keine Regeländerung.
 - Deployment auf den VPS: Commit ee249f9 (AP 16–21) um 2026-11-05T07:33Z; vorher Sicherung mmo-backup-20261105T073325Z, Rollback über /opt/mmo/python.prev.
 - AP 21: Raid-Balancing (Mindestgröße 4, Etappen nach Gruppengröße, game_rules_v13, ADR-0060).
