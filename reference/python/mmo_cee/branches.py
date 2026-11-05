@@ -46,3 +46,13 @@ def profession_view(state: CharacterState, rules: Rules, pr: dict[str, Any] | No
         out[pid] = {"chosen": chosen["branch"] if chosen else None, "chosen_day": chosen["day"] if chosen else None, "name": p["name"], "xp": state.parts["profession"]["xp"].get(pid, 0) if "profession" in state.parts else 0,
                     "branches": branches, "masterpieces": masterpieces, "masterpiece_goals": goals}
     return out
+
+
+def focus_xp_permille(state: CharacterState, rules: Rules, profession: str, recipe_id: str) -> int:
+    """Zusatz-Berufserfahrung (‰) für ein Rezept des aktiven Zweigs (AP 36, ADR-0070); 0 ohne Zweigwahl oder in Regeln ohne Zweigwahl."""
+    cfg = rules["professions"].get("specialization")
+    chosen = state.parts["profession"].get("spec", {}).get(profession) if cfg else None
+    if not chosen:
+        return 0
+    br = load_profession_rules()["professions"].get(profession, {}).get("branches", {}).get(chosen["branch"])
+    return cfg.get("focus_xp_permille", 0) if br and recipe_id in br["recipes"] else 0

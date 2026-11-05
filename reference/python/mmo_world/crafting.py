@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from mmo_cee.branches import focus_xp_permille
 from mmo_cee.crafting import CRAFT_EVENT, craft_blockers, craft_gains, quality_score, quality_tier
 from mmo_cee.history import Event
 from mmo_cee.service import CharacterService
@@ -64,6 +65,7 @@ class CraftingService:
                    "quantity": quantity, "quality": quality, "day": day}
         self.cee.projector.validate(state, CRAFT_EVENT, payload)  # Ablehnung vor jeder Bestandsänderung
         xp = craft_gains(state, self.rules, payload)["volume"] // self.XP_DIVISOR
+        xp += xp * focus_xp_permille(state, self.rules, recipe["profession"], recipe_id) // 1000      # aktiver Zweig (AP 36)
 
         self.inv.apply(character_id, needed, {})  # wirft bei zu wenig Material; verändert dann nichts
         try:

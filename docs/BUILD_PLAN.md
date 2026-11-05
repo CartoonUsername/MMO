@@ -37,6 +37,7 @@ Quelle: `docs/MASTER_BLUEPRINT.md` (03.11.2026). Reihenfolge folgt den Phasen de
 | 33 | Zweigwahl / Respezialisierung der Berufe | §14–16 | 2/3 | **fertig** (rules_v10, ADR-0068, Golden Vector); Spielschicht (game_rules v19), Wirkung des Zweigs, Client offen |
 | 34 | game_rules_v19: Spielschicht auf CEE v10, Zweigwahl im Spiel | §14–16 | 2/3 | **fertig** (ADR-0069); Wirkung des Zweigs, Client offen |
 | 35 | Browser-Client: Zweig wählen/wechseln | §14–16 | 2/3 | **fertig, im echten Browser ungetestet** (Syntaxprüfung mit Node); Unity offen |
+| 36 | Wirkung des aktiven Zweigs (+25 % Berufserfahrung für seine Rezepte) | §14–16 | 2/3 | **fertig** (ADR-0070); Balancing, weitere Wirkungen offen |
 | 27 | Client: Namen der Kombinationszauber (Browser) | §26–29 | 2/3 | **fertig, im echten Browser ungetestet** (statische Tests + Node-Prüfung der Namenslogik); Unity-Client und Anzeige der Zusatzwirkungen offen |
 | 28 | Unity-Client: Namen der Kombinationszauber | §26–29 | 2/3 | **fertig, in Unity ungetestet** (`Panels.SkillLabel`, CoreCheck + CompileCheck grün); Anzeige der Zusatzwirkungen offen |
 

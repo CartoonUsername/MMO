@@ -465,7 +465,7 @@
   "format": 1,
   "name": "profession_specialization",
   "rules_file": "rules_v10.json",
-  "rules_sha256": "45e251071f5707fdae43065bf73adec746f26e8f168d77e140b1fba8271aaa83",
+  "rules_sha256": "88223859703eff55b08cd57c0e954223659e822a38c871effd3ba756464184eb",
   "steps": [
     {
       "event_hash": "66200989296b6f7f2de5952aedd0b9b96a48cd072d50e9ce0f2d248c983aa971",

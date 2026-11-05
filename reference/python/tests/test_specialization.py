@@ -93,5 +93,30 @@ class WorldSpecializationTests(unittest.TestCase):
             w.specialize("anna", "smithing", "refining")
 
 
+class FocusXpTests(unittest.TestCase):                              # AP 36: aktiver Zweig gibt Zusatz-Berufserfahrung (ADR-0070)
+    def make(self, spec_branch):
+        from tests.test_world_crafting import World as CWorld
+        w = CWorld(rules=load_rules("rules_v10.json"))
+        w.char("p", smithing=50)
+        w.stock("p", **{"iron_ore__standard": 100})
+        if spec_branch:
+            w.svc.record("p", SPEC, {"profession": "smithing", "branch": spec_branch, "day": 1})
+        return w
+
+    def test_recipe_in_active_branch_gets_bonus_others_do_not(self):
+        base = self.make(None).cs.craft("p", "iron_ingot", 10, "standard").profession_xp
+        self.assertGreater(base, 3)
+        self.assertEqual(self.make("refining").cs.craft("p", "iron_ingot", 10, "standard").profession_xp, base + base * 250 // 1000)
+        self.assertEqual(self.make("shadow_alloys").cs.craft("p", "iron_ingot", 10, "standard").profession_xp, base)   # Rezept nicht im Zweig
+        self.assertEqual(self.make("heavy_arms").cs.craft("p", "iron_ingot", 10, "standard").profession_xp, base)       # iron_ingot gehört nur zu refining
+
+    def test_no_bonus_with_older_rules(self):
+        from tests.test_world_crafting import World as CWorld
+        w = CWorld(rules=load_rules("rules_v9.json"))
+        w.char("p", smithing=50)
+        w.stock("p", **{"iron_ore__standard": 100})
+        self.assertEqual(w.cs.craft("p", "iron_ingot", 10, "standard").profession_xp, self.make(None).cs.craft("p", "iron_ingot", 10, "standard").profession_xp)
+
+
 if __name__ == "__main__":
     unittest.main()

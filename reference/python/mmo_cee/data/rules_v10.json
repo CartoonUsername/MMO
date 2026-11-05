@@ -53,10 +53,11 @@
       96000
     ],
     "specialization": {
-      "_comment": "PLATZHALTER (AP 33, ADR-0068): Zweigwahl je Beruf. Wahl braucht Erfahrung im Beruf; Wechsel nur nach Abklingzeit. Münzkosten trägt die Weltschicht. Zweigpunkte/Meisterstücke bleiben als Historie erhalten (Blueprint-Frage 10, Vorschlag).",
+      "_comment": "PLATZHALTER (AP 33, ADR-0068): Zweigwahl je Beruf. Wahl braucht Erfahrung im Beruf; Wechsel nur nach Abklingzeit. Münzkosten trägt die Weltschicht. Zweigpunkte/Meisterstücke bleiben als Historie erhalten (Blueprint-Frage 10, Vorschlag). focus_xp_permille: Zusatz-Berufserfahrung (‰) für Rezepte des aktiven Zweigs (ADR-0070).",
       "cooldown_days": 7,
       "cost_first": 0,
-      "cost_change": 500
+      "cost_change": 500,
+      "focus_xp_permille": 250
     }
   },
   "essence": {
