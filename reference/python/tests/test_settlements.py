@@ -111,6 +111,58 @@ class SettlementTests(unittest.TestCase):
             for _ in range(11):
                 w.exchange.place("ben", "sell", item, 1, 25)
 
+    def test_plot_sale(self):                                        # AP 43
+        s, w = self.s, self.w
+        s.buy_plot("anna", "hauptstadt", 1)
+        s.build("anna", "hauptstadt", 1, "house")
+        for bad in (("ben", -1), ("ben", 10**9), ("anna", 100), ("nobody", 100), ("ben", True)):
+            with self.assertRaises(WorldError):
+                s.sell_plot("anna", "hauptstadt", 1, *bad)
+        with self.assertRaises(WorldError):
+            s.sell_plot("ben", "hauptstadt", 1, "anna", 100)                       # fremdes Grundstück
+        s.stash_in("anna", "hauptstadt", 1, "timber@standard", 5)
+        with self.assertRaises(WorldError):
+            s.sell_plot("anna", "hauptstadt", 1, "ben", 1000)                      # Lager nicht leer
+        s.stash_out("anna", "hauptstadt", 1, "timber@standard", 5)
+        offer = s.sell_plot("anna", "hauptstadt", 1, "ben", 1000)
+        self.assertEqual((offer["price"], s.view("ben")["sales_in"][0]["plot"], len(s.view("anna")["sales_out"])), (1000, "hauptstadt:1", 1))
+        with self.assertRaises(WorldError):
+            s.accept_sale("anna", "hauptstadt", 1)                                 # nur der Käufer
+        a0, b0 = w.inv.balance("anna", CRC), w.inv.balance("ben", CRC)
+        r = s.accept_sale("ben", "hauptstadt", 1)
+        self.assertEqual((r["price"], r["fee"]), (1000, 50))
+        self.assertEqual((w.inv.balance("anna", CRC) - a0, b0 - w.inv.balance("ben", CRC)), (950, 1000))   # Gebühr 5 % verschwindet
+        p = s.plots["hauptstadt:1"]
+        self.assertEqual((p["owner"], p["building"], p["level"]), ("ben", "house", 1))                    # Gebäude geht mit
+        self.assertEqual(s.sales, {})
+        self.assertEqual(check_consistency(w), [])
+
+    def test_plot_sale_cancel_expiry_and_invalid_offers(self):       # AP 43
+        s, w = self.s, self.w
+        s.buy_plot("anna", "hauptstadt", 1)
+        s.sell_plot("anna", "hauptstadt", 1, "ben", 100)
+        s.cancel_sale("anna", "hauptstadt", 1)
+        with self.assertRaises(WorldError):
+            s.accept_sale("ben", "hauptstadt", 1)
+        s.sell_plot("anna", "hauptstadt", 1, "ben", 100)
+        s.advance(8)
+        self.assertEqual(len(s.sales), 1)                                          # Tag 8 = letzter gültiger Tag
+        s.advance(9)                                                               # danach verfallen (7 Tage Frist)
+        self.assertEqual(s.sales, {})
+        s.sell_plot("anna", "hauptstadt", 1, "ben", 100)
+        s.abandon("anna", "hauptstadt", 1)                                         # Aufgeben löscht das Angebot
+        self.assertEqual(s.sales, {})
+        s.buy_plot("anna", "hauptstadt", 2)
+        s.sell_plot("anna", "hauptstadt", 2, "ben", 10**6)
+        with self.assertRaises(WorldError):
+            s.accept_sale("ben", "hauptstadt", 2)                                  # zu wenig Münzen (20000)
+        self.assertEqual(s.plots["hauptstadt:2"]["owner"], "anna")
+        snap = w.snapshot()
+        self.assertEqual(json.loads(s.to_json()), snap["settlements"])
+        s2 = World("rules_v9.json").settlements
+        s2.load(s.to_json())
+        self.assertEqual(s2.sales, s.sales)
+
     def test_plot_limit_and_roundtrip(self):
         s, w = self.s, self.w
         for n in (1, 2, 4):

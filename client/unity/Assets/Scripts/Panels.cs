@@ -41,7 +41,7 @@ namespace Mmo
             new PanelDef("Gruppe", "query.party", new[] { "party.form", "party.invite", "party.accept", "party.decline", "party.leave", "party.kick", "party.promote", "party.set_loot", "party.disband" }),
             new PanelDef("Handel", "query.offers", new[] { "trade.offer", "trade.accept", "trade.decline", "trade.cancel" }),
             new PanelDef("Firma", "query.my_companies", new[] { "company.found", "company.hire", "company.fire", "company.upgrade", "company.close", "production.stock_in", "production.stock_out", "production.start", "production.cancel", "production.sell", "company.branch_open", "company.branch_close", "company.branch_reopen" }),
-            new PanelDef("Siedlung", "query.settlements", new[] { "settlement.found", "plot.buy", "plot.build", "plot.stash_in", "plot.stash_out", "plot.abandon", "project.contribute" }),
+            new PanelDef("Siedlung", "query.settlements", new[] { "settlement.found", "plot.buy", "plot.build", "plot.stash_in", "plot.stash_out", "plot.abandon", "plot.sell", "plot.cancel_sale", "plot.accept_sale", "project.contribute" }),
             new PanelDef("Forschung", "query.research", new[] { "research.start", "research.contribute", "research.license" }),
             new PanelDef("Gilde", "query.guild", new[] { "guild.found", "guild.invite", "guild.accept", "guild.decline", "guild.leave", "guild.kick", "guild.role", "guild.stash", "guild.take", "guild.contribute", "guild.research", "guild.disband" }),
             new PanelDef("Chronik", "query.chronicle", new[] { "query.prestige" }),

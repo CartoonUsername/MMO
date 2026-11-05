@@ -58,6 +58,7 @@ class SettlementService:
         self.plots: dict[str, dict[str, Any]] = {}        # "ort:nr" -> {site, n, size, owner, building, level, unpaid, bought}
         self.projects: dict[str, dict[str, Any]] = {}     # "ort:projekt" -> {level, have}
         self.contrib: dict[str, dict[str, int]] = {}      # Figur -> {Ort: Wert}
+        self.sales: dict[str, dict[str, Any]] = {}        # "ort:nr" -> {seller, buyer, price, day}: Verkaufsangebot (AP 43)
         self.last_day = 0
         self.record: Callable[..., Any] = lambda *a, **k: None                    # Chronik (AP 13)
         self.tech_known: Callable[[str, str], bool] = lambda site, tech: True      # von ResearchService überschrieben (AP 12)
@@ -187,6 +188,55 @@ class SettlementService:
         if h:
             self.inv.apply_many([(so, h, {}), (p["owner"], {}, h)])
         del self.plots[f"{p['site']}:{p['n']}"]
+        self.sales.pop(f"{p['site']}:{p['n']}", None)
+
+    # -- Grundstückshandel (AP 43, ADR-0073) ---------------------------------------------------
+    def _need_sales(self) -> None:
+        if not self.R.get("sale_days"):
+            raise WorldError("Grundstückshandel gibt es in diesen Regeln nicht")
+
+    def sell_plot(self, char: str, site: str, n: int, buyer: str, price: int) -> dict[str, Any]:
+        self._need_sales()
+        p = self._plot(site, n)
+        if p["owner"] != char:
+            raise WorldError("Das Grundstück gehört dir nicht")
+        if not isinstance(buyer, str) or buyer == char or not self.exists(buyer):
+            raise WorldError("Käufer ungültig")
+        if not _is_int(price) or not 0 <= price <= self.R["max_sale_price"]:
+            raise WorldError("Preis ungültig")
+        if p["unpaid"]:
+            raise WorldError("Offene Steuer: erst bezahlen lassen")
+        if self.used(p):
+            raise WorldError("Das Lager muss vor dem Verkauf leer sein")
+        offer = {"seller": char, "buyer": buyer, "price": price, "day": self.day()}
+        self.sales[f"{site}:{n}"] = offer
+        return dict(offer, site=site, n=n)
+
+    def cancel_sale(self, char: str, site: str, n: int) -> None:
+        o = self.sales.get(f"{site}:{n}") if _is_int(n) else None
+        if o is None or o["seller"] != char:
+            raise WorldError("Kein eigenes Verkaufsangebot für dieses Grundstück")
+        del self.sales[f"{site}:{n}"]
+
+    def accept_sale(self, char: str, site: str, n: int) -> dict[str, Any]:
+        self._need_sales()
+        o = self.sales.get(f"{site}:{n}") if _is_int(n) else None
+        if o is None or o["buyer"] != char:
+            raise WorldError("Kein Verkaufsangebot an dich für dieses Grundstück")
+        p = self._plot(site, n)
+        if p["owner"] != o["seller"] or p["unpaid"] or self.used(p):
+            del self.sales[f"{site}:{n}"]                              # Angebot nicht mehr gültig
+            raise WorldError("Das Angebot ist nicht mehr gültig")
+        if len(self.owned_by(char)) >= self.plot_limit(char):
+            raise WorldError("Grenze für persönliche Grundstücke erreicht")
+        fee = o["price"] * self.R["sale_fee_permille"] // 1000
+        if o["price"] > self.inv.balance(char, self.coin):
+            raise WorldError("Zu wenig Münzen")
+        if o["price"]:
+            self.inv.apply_many([(char, {self.coin: o["price"]}, {}), (o["seller"], {}, {self.coin: o["price"] - fee})])   # Gebühr verschwindet (Senke)
+        p["owner"] = char
+        del self.sales[f"{site}:{n}"]
+        return {"site": site, "n": n, "seller": o["seller"], "price": o["price"], "fee": fee}
 
     def build(self, char: str, site: str, n: int, building: str) -> int:
         p = self._plot(site, n)
@@ -295,6 +345,9 @@ class SettlementService:
                     if p["unpaid"] >= self.R["forfeit_after_unpaid_days"]:
                         out.append({"kind": "plot_forfeit", "site": p["site"], "n": p["n"], "owner": p["owner"]})
                         self._release(p)
+        days = self.R.get("sale_days", 0)
+        for key in [k for k, o in sorted(self.sales.items()) if day - o["day"] > days]:
+            del self.sales[key]                                         # Angebot verfallen
         self.last_day = day
         return out
 
@@ -333,10 +386,16 @@ class SettlementService:
         return {"sites": [self.site_view(s) for s in self.R["sites"]], "mine": mine, "plot_limit": self.plot_limit(char),
                 "contributed": dict(sorted(self.contrib.get(char, {}).items())), "buildings": {k: {"name": b["name"], "levels": b["levels"]} for k, b in self.R["buildings"].items()},
                 "coins": self.inv.balance(char, self.coin), "fee_discount_permille": self.fee_discount_permille(char),
-                "order_bonus": self.order_bonus(char), "orders_per_reach": self.R.get("orders_per_reach", 0)}
+                "order_bonus": self.order_bonus(char), "orders_per_reach": self.R.get("orders_per_reach", 0),
+                "sales_out": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["seller"] == char],
+                "sales_in": [dict(o, plot=k) for k, o in sorted(self.sales.items()) if o["buyer"] == char],
+                "sale_fee_permille": self.R.get("sale_fee_permille", 0)}
 
     def check(self) -> list[str]:
         errs = []
+        for key, o in self.sales.items():
+            if key not in self.plots or self.plots[key]["owner"] != o["seller"]:
+                errs.append(f"{key}: Verkaufsangebot ohne passendes Grundstück")
         for key, p in self.plots.items():
             if p["site"] not in self.R["sites"] or not self.is_open(p["site"]):
                 errs.append(f"{key}: Ort nicht gegründet")
@@ -349,9 +408,12 @@ class SettlementService:
         return errs
 
     def to_json(self) -> str:
-        return json.dumps({"founded": self.founded, "plots": self.plots, "projects": self.projects, "contrib": self.contrib, "last_day": self.last_day},
-                          sort_keys=True, separators=(",", ":"))
+        d = {"founded": self.founded, "plots": self.plots, "projects": self.projects, "contrib": self.contrib, "last_day": self.last_day}
+        if self.sales:                                                 # nur bei Bedarf: unveränderte Welten behalten ihren bisherigen Zustand
+            d["sales"] = self.sales
+        return json.dumps(d, sort_keys=True, separators=(",", ":"))
 
     def load(self, text: str) -> None:
         d = json.loads(text)
         self.founded, self.plots, self.projects, self.contrib, self.last_day = d["founded"], d["plots"], d["projects"], d["contrib"], d["last_day"]
+        self.sales = d.get("sales", {})
